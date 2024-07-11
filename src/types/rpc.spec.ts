@@ -214,6 +214,18 @@ describe('rpc', () => {
       expect(() => RpcResponse.parse(validRpcResponse)).not.toThrow();
     });
 
+    it('should validate a correct RpcResponse with application custom error', () => {
+      const validRpcResponse = {
+        jsonrpc: JSON_RPC_VERSION_2,
+        id: 1,
+        error: {
+          code: 9999,
+          message: 'A custom application error occurred'
+        }
+      };
+      expect(() => RpcResponse.parse(validRpcResponse)).not.toThrow();
+    });
+
     it('should throw if RpcResponse has neither no result nor error', () => {
       const invalidRpcResponse = {
         jsonrpc: JSON_RPC_VERSION_2,
