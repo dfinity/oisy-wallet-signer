@@ -4,6 +4,7 @@ import {
   JSON_RPC_VERSION_2,
   RpcErrorCode,
   RpcNotification,
+  RpcRequest,
   inferRpcRequest,
   inferRpcResponse
 } from './rpc';
@@ -66,63 +67,125 @@ describe('rpc', () => {
   });
 
   describe('RpcRequest', () => {
-    const paramsSchema = z.object({hello: z.string()});
-    const RpcCustomRequest = inferRpcRequest(paramsSchema);
+    describe('Without params', () => {
+      it('should validate a correct RpcRequest', () => {
+        const validRpcRequest = {
+          jsonrpc: JSON_RPC_VERSION_2,
+          id: 1,
+          method: 'test'
+        };
+        expect(() => RpcRequest.parse(validRpcRequest)).not.toThrow();
+      });
 
-    it('should validate a correct RpcRequest with custom params', () => {
-      const validRpcRequest = {
-        jsonrpc: JSON_RPC_VERSION_2,
-        id: 1,
-        method: 'test',
-        params: {hello: 'world'}
-      };
-      expect(() => RpcCustomRequest.parse(validRpcRequest)).not.toThrow();
+      it('should validate a correct RpcRequest with undefined params', () => {
+        const validRpcRequest = {
+          jsonrpc: JSON_RPC_VERSION_2,
+          id: 1,
+          method: 'test',
+          params: {
+            hello: 'world'
+          }
+        };
+        expect(() => RpcRequest.parse(validRpcRequest)).not.toThrow();
+      });
+
+      it('should throw if RpcRequest has additional fields', () => {
+        const invalidRpcRequest = {
+          jsonrpc: JSON_RPC_VERSION_2,
+          id: 1,
+          method: 'test',
+          hello: 'world'
+        };
+        expect(() => RpcRequest.parse(invalidRpcRequest)).toThrow();
+      });
+
+      it('should throw if RpcRequest has no id', () => {
+        const invalidRpcRequest = {
+          jsonrpc: JSON_RPC_VERSION_2,
+          method: 'test',
+          params: {hello: 123}
+        };
+        expect(() => RpcRequest.parse(invalidRpcRequest)).toThrow();
+      });
+
+      it('should throw if RpcRequest has no jsonrpc', () => {
+        const invalidRpcRequest = {
+          id: 123,
+          method: 'test',
+          params: {hello: 123}
+        };
+        expect(() => RpcRequest.parse(invalidRpcRequest)).toThrow();
+      });
+
+      it('should throw if RpcRequest has no method', () => {
+        const invalidRpcRequest = {
+          jsonrpc: JSON_RPC_VERSION_2,
+          id: 123,
+          params: {hello: 123}
+        };
+        expect(() => RpcRequest.parse(invalidRpcRequest)).toThrow();
+      });
     });
 
-    it('should throw if RpcRequest has incorrect custom params', () => {
-      const invalidRpcRequest = {
-        jsonrpc: JSON_RPC_VERSION_2,
-        id: 1,
-        method: 'test',
-        params: {hello: 123}
-      };
-      expect(() => RpcCustomRequest.parse(invalidRpcRequest)).toThrow();
-    });
+    describe('With params', () => {
+      const paramsSchema = z.object({hello: z.string()});
+      const RpcCustomRequest = inferRpcRequest(paramsSchema);
 
-    it('should throw if RpcRequest has no custom params', () => {
-      const invalidRpcRequest = {
-        jsonrpc: JSON_RPC_VERSION_2,
-        id: 1,
-        method: 'test'
-      };
-      expect(() => RpcCustomRequest.parse(invalidRpcRequest)).toThrow();
-    });
+      it('should validate a correct RpcRequest with custom params', () => {
+        const validRpcRequest = {
+          jsonrpc: JSON_RPC_VERSION_2,
+          id: 1,
+          method: 'test',
+          params: {hello: 'world'}
+        };
+        expect(() => RpcCustomRequest.parse(validRpcRequest)).not.toThrow();
+      });
 
-    it('should throw if RpcRequest has no id', () => {
-      const invalidRpcRequest = {
-        jsonrpc: JSON_RPC_VERSION_2,
-        method: 'test',
-        params: {hello: 123}
-      };
-      expect(() => RpcCustomRequest.parse(invalidRpcRequest)).toThrow();
-    });
+      it('should throw if RpcRequest has incorrect custom params', () => {
+        const invalidRpcRequest = {
+          jsonrpc: JSON_RPC_VERSION_2,
+          id: 1,
+          method: 'test',
+          params: {hello: 123}
+        };
+        expect(() => RpcCustomRequest.parse(invalidRpcRequest)).toThrow();
+      });
 
-    it('should throw if RpcRequest has no jsonrpc', () => {
-      const invalidRpcRequest = {
-        id: 123,
-        method: 'test',
-        params: {hello: 123}
-      };
-      expect(() => RpcCustomRequest.parse(invalidRpcRequest)).toThrow();
-    });
+      it('should throw if RpcRequest has no custom params', () => {
+        const invalidRpcRequest = {
+          jsonrpc: JSON_RPC_VERSION_2,
+          id: 1,
+          method: 'test'
+        };
+        expect(() => RpcCustomRequest.parse(invalidRpcRequest)).toThrow();
+      });
 
-    it('should throw if RpcRequest has no method', () => {
-      const invalidRpcRequest = {
-        jsonrpc: JSON_RPC_VERSION_2,
-        id: 123,
-        params: {hello: 123}
-      };
-      expect(() => RpcCustomRequest.parse(invalidRpcRequest)).toThrow();
+      it('should throw if RpcRequest has no id', () => {
+        const invalidRpcRequest = {
+          jsonrpc: JSON_RPC_VERSION_2,
+          method: 'test',
+          params: {hello: 123}
+        };
+        expect(() => RpcCustomRequest.parse(invalidRpcRequest)).toThrow();
+      });
+
+      it('should throw if RpcRequest has no jsonrpc', () => {
+        const invalidRpcRequest = {
+          id: 123,
+          method: 'test',
+          params: {hello: 123}
+        };
+        expect(() => RpcCustomRequest.parse(invalidRpcRequest)).toThrow();
+      });
+
+      it('should throw if RpcRequest has no method', () => {
+        const invalidRpcRequest = {
+          jsonrpc: JSON_RPC_VERSION_2,
+          id: 123,
+          params: {hello: 123}
+        };
+        expect(() => RpcCustomRequest.parse(invalidRpcRequest)).toThrow();
+      });
     });
   });
 
