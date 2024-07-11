@@ -14,12 +14,16 @@ const Rpc = z.object({
   id: z.optional(RpcId)
 });
 
-const RpcRequest = Rpc.merge(
-  z.object({
-    method: z.string(),
-    params: z.optional(z.any())
-  })
-);
+export const RpcRequest = Rpc.extend({
+  id: RpcId
+})
+  .merge(
+    z.object({
+      method: z.string(),
+      params: z.optional(z.any())
+    })
+  )
+  .strict();
 
 type RpcRequestType = z.infer<typeof RpcRequest>;
 
