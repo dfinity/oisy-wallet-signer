@@ -97,7 +97,9 @@ export const inferRpcResponse = <T extends z.ZodTypeAny>(
         error: RpcResponseError
       })
       .partial()
-  ).refine(
-    ({result, error}) => result !== undefined || error !== undefined,
-    'Either result or error should be provided.'
-  );
+  )
+    .strict()
+    .refine(
+      ({result, error}) => result !== undefined || error !== undefined,
+      'Either result or error should be provided.'
+    );

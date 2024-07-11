@@ -273,5 +273,15 @@ describe('rpc', () => {
       };
       expect(() => RpcResponse.parse(validRpcResponse)).toThrow();
     });
+
+    it('should throw if RpcResponse has additional fields', () => {
+      const invalidRpcResponse = {
+        jsonrpc: JSON_RPC_VERSION_2,
+        id: 1,
+        result: {success: true},
+        hello: 'world'
+      };
+      expect(() => RpcResponse.parse(invalidRpcResponse)).toThrow();
+    });
   });
 });
