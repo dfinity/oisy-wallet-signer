@@ -18,6 +18,17 @@ describe('rpc', () => {
       expect(() => RpcNotification.parse(validRpcNotification)).not.toThrow();
     });
 
+    it('should validate RpcNotification accept params', () => {
+      const validRpcNotification = {
+        jsonrpc: JSON_RPC_VERSION_2,
+        method: 'test',
+        params: {
+          hello: 'world'
+        }
+      };
+      expect(() => RpcNotification.parse(validRpcNotification)).not.toThrow();
+    });
+
     it('should throw if RpcNotification has an id', () => {
       const invalidRpcNotification = {
         jsonrpc: JSON_RPC_VERSION_2,
