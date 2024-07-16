@@ -3,14 +3,14 @@ import {z} from 'zod';
 export const ICRC25_REQUEST_PERMISSIONS = 'icrc25_request_permissions';
 export const ICRC25_PERMISSIONS = 'icrc25_permissions';
 export const ICRC25_SUPPORTED_STANDARDS = 'icrc25_supported_standards';
-// TODO: ICRC29 to be defined
-export const ICRC29_STATUS = 'icrc29_status';
+// TODO: ICRC27 to be defined
+export const ICRC27_ACCOUNTS = 'icrc27_accounts';
 
 export const IcrcWalletMethod = z.enum([
   ICRC25_REQUEST_PERMISSIONS,
   ICRC25_PERMISSIONS,
   ICRC25_SUPPORTED_STANDARDS,
-  ICRC29_STATUS
+  ICRC27_ACCOUNTS
 ]);
 
 export const IcrcWalletRequestMethod = IcrcWalletMethod.exclude([

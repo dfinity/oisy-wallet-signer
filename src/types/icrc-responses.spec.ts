@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {ICRC25_PERMISSION_GRANTED, ICRC29_STATUS} from './icrc';
+import {ICRC25_PERMISSION_GRANTED, ICRC27_ACCOUNTS} from './icrc';
 import {
   IcrcSupportedStandardsResponse,
   IcrcWalletPermissionsResponse,
@@ -22,7 +22,7 @@ describe('icrc-responses', () => {
         scopes: [
           {
             scope: {
-              method: ICRC29_STATUS
+              method: ICRC27_ACCOUNTS
             },
             state: ICRC25_PERMISSION_GRANTED
           }
@@ -41,7 +41,7 @@ describe('icrc-responses', () => {
           scopes: [
             {
               scope: {
-                method: ICRC29_STATUS
+                method: ICRC27_ACCOUNTS
               }
             }
           ]
@@ -57,7 +57,7 @@ describe('icrc-responses', () => {
           scopes: [
             {
               scope: {
-                method: ICRC29_STATUS
+                method: ICRC27_ACCOUNTS
               },
               state: 'test'
             }

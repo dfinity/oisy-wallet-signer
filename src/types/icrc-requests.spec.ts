@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {ICRC29_STATUS} from './icrc';
+import {ICRC27_ACCOUNTS} from './icrc';
 import {
   IcrcWalletPermissionsRequest,
   IcrcWalletRequestPermissionsRequest,
@@ -19,7 +19,7 @@ describe('icrc-requests', () => {
       params: {
         scopes: [
           {
-            method: ICRC29_STATUS
+            method: ICRC27_ACCOUNTS
           }
         ]
       }
