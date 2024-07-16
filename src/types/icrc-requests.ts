@@ -8,11 +8,13 @@ import {
 import {inferRpcRequestWithParams, inferRpcRequestWithoutParams} from './rpc';
 
 const IcrcWalletScopesParams = z.object({
-  scopes: z.array(
-    z.object({
-      method: IcrcWalletRequestMethod
-    })
-  )
+  scopes: z
+    .array(
+      z.object({
+        method: IcrcWalletRequestMethod
+      })
+    )
+    .min(1)
 });
 
 // icrc25_request_permissions
