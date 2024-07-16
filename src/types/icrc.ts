@@ -10,18 +10,22 @@ export const IcrcWalletMethod = z.enum([
   ICRC25_SUPPORTED_STANDARDS
 ]);
 
-const IcrcWalletRequestMethod = IcrcWalletMethod.exclude([
+export const IcrcWalletRequestMethod = IcrcWalletMethod.exclude([
   ICRC25_REQUEST_PERMISSIONS,
   ICRC25_PERMISSIONS,
   ICRC25_SUPPORTED_STANDARDS
 ]);
 
-const IcrcWalletScopes = z.array(
-  z.object({
-    method: IcrcWalletRequestMethod
-  })
-);
+export const ICRC25_PERMISSION_GRANTED = 'granted';
+export const ICRC25_PERMISSION_DENIED = 'denied';
+export const ICRC25_PERMISSION_ASK_ON_USE = 'ask_on_user';
 
-export const IcrcWalletScopesParams = z.object({
-  scopes: IcrcWalletScopes
-});
+export const IcrcWalletPermissionState = z.enum([
+  ICRC25_PERMISSION_GRANTED,
+  ICRC25_PERMISSION_DENIED,
+  ICRC25_PERMISSION_ASK_ON_USE
+]);
+
+export const ICRC25 = 'ICRC-25';
+
+export const IcrcWalletStandard = z.enum([ICRC25]);
