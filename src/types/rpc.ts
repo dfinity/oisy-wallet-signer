@@ -14,7 +14,7 @@ const Rpc = z.object({
   id: z.optional(RpcId)
 });
 
-export const RpcRequest = Rpc.extend({
+const RpcRequest = Rpc.extend({
   id: RpcId
 })
   .merge(
@@ -27,14 +27,35 @@ export const RpcRequest = Rpc.extend({
 
 type RpcRequestType = z.infer<typeof RpcRequest>;
 
-export const inferRpcRequest = <T extends z.ZodTypeAny>(params: T): z.ZodType<RpcRequestType> =>
-  RpcRequest.extend({
-    id: RpcId
-  }).merge(
-    z.object({
-      params
+export const inferRpcRequestWithoutParams = ({
+  method
+}: {
+  method: string;
+}): z.ZodType<RpcRequestType> =>
+  RpcRequest.omit({method: true, params: true})
+    .strict()
+    .extend({
+      id: RpcId,
+      method: z.literal(method)
+    });
+
+export const inferRpcRequestWithParams = <T extends z.ZodTypeAny>({
+  params,
+  method
+}: {
+  params: T;
+  method: string;
+}): z.ZodType<RpcRequestType> =>
+  RpcRequest.omit({method: true})
+    .extend({
+      id: RpcId,
+      method: z.literal(method)
     })
-  );
+    .merge(
+      z.object({
+        params
+      })
+    );
 
 export const RpcNotification = RpcRequest.omit({id: true}).strict();
 
