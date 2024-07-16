@@ -25,6 +25,8 @@ export type IcrcWalletRequestPermissionsResponseType = z.infer<
 // https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_permissions
 export const IcrcWalletPermissionsResponse = IcrcWalletRequestPermissionsResponse;
 
+export type IcrcWalletPermissionsResponseType = z.infer<typeof IcrcWalletPermissionsResponse>;
+
 // icrc25_supported_standards
 // https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_supported_standards
 const urlRegex =

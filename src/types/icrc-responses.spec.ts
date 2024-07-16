@@ -1,14 +1,19 @@
 import {describe, expect, it} from 'vitest';
 import {ICRC25_PERMISSION_GRANTED, ICRC27_ACCOUNTS} from './icrc';
 import {
-  IcrcWalletRequestPermissionsResponse,
-  type IcrcWalletRequestPermissionsResponseType
+  IcrcWalletPermissionsResponse,
+  IcrcWalletRequestPermissionsResponse
 } from './icrc-responses';
 import {JSON_RPC_VERSION_2} from './rpc';
 
 describe('icrc-responses', () => {
-  describe('icrc25_request_permissions', () => {
-    const validResponse: IcrcWalletRequestPermissionsResponseType = {
+  const responseSchemas = [
+    {icrc: 'icrc25_request_permissions', schema: IcrcWalletRequestPermissionsResponse},
+    {icrc: 'icrc25_permissions', schema: IcrcWalletPermissionsResponse}
+  ];
+
+  describe.each(responseSchemas)('$icrc', ({schema}) => {
+    const validResponse = {
       jsonrpc: JSON_RPC_VERSION_2,
       id: 1,
       result: {
@@ -24,11 +29,11 @@ describe('icrc-responses', () => {
     };
 
     it('should validate a correct response', () => {
-      expect(() => IcrcWalletRequestPermissionsResponse.parse(validResponse)).not.toThrow();
+      expect(() => schema.parse(validResponse)).not.toThrow();
     });
 
     it('should throw if response has no state', () => {
-      const invalidResponse: IcrcWalletRequestPermissionsResponseType = {
+      const invalidResponse = {
         ...validResponse,
         result: {
           scopes: [
@@ -40,11 +45,11 @@ describe('icrc-responses', () => {
           ]
         }
       };
-      expect(() => IcrcWalletRequestPermissionsResponse.parse(invalidResponse)).toThrow();
+      expect(() => schema.parse(invalidResponse)).toThrow();
     });
 
     it('should throw if response has invalid state', () => {
-      const invalidResponse: IcrcWalletRequestPermissionsResponseType = {
+      const invalidResponse = {
         ...validResponse,
         result: {
           scopes: [
@@ -57,11 +62,11 @@ describe('icrc-responses', () => {
           ]
         }
       };
-      expect(() => IcrcWalletRequestPermissionsResponse.parse(invalidResponse)).toThrow();
+      expect(() => schema.parse(invalidResponse)).toThrow();
     });
 
     it('should throw if response has invalid method', () => {
-      const invalidResponse: IcrcWalletRequestPermissionsResponseType = {
+      const invalidResponse = {
         ...validResponse,
         result: {
           scopes: [
@@ -74,11 +79,11 @@ describe('icrc-responses', () => {
           ]
         }
       };
-      expect(() => IcrcWalletRequestPermissionsResponse.parse(invalidResponse)).toThrow();
+      expect(() => schema.parse(invalidResponse)).toThrow();
     });
 
     it('should throw if response has no method', () => {
-      const invalidResponse: IcrcWalletRequestPermissionsResponseType = {
+      const invalidResponse = {
         ...validResponse,
         result: {
           scopes: [
@@ -89,11 +94,11 @@ describe('icrc-responses', () => {
           ]
         }
       };
-      expect(() => IcrcWalletRequestPermissionsResponse.parse(invalidResponse)).toThrow();
+      expect(() => schema.parse(invalidResponse)).toThrow();
     });
 
     it('should throw if response has no scope', () => {
-      const invalidResponse: IcrcWalletRequestPermissionsResponseType = {
+      const invalidResponse = {
         ...validResponse,
         result: {
           scopes: [
@@ -103,52 +108,52 @@ describe('icrc-responses', () => {
           ]
         }
       };
-      expect(() => IcrcWalletRequestPermissionsResponse.parse(invalidResponse)).toThrow();
+      expect(() => schema.parse(invalidResponse)).toThrow();
     });
 
     it('should throw if response has empty scope', () => {
-      const invalidResponse: IcrcWalletRequestPermissionsResponseType = {
+      const invalidResponse = {
         ...validResponse,
         result: {
           scopes: [{}]
         }
       };
-      expect(() => IcrcWalletRequestPermissionsResponse.parse(invalidResponse)).toThrow();
+      expect(() => schema.parse(invalidResponse)).toThrow();
     });
 
     it('should throw if response has no scopes', () => {
       const {result: _, ...rest} = validResponse;
 
-      const response: IcrcWalletRequestPermissionsResponseType = {
+      const response = {
         ...rest,
         result: {}
       };
 
-      expect(() => IcrcWalletRequestPermissionsResponse.parse(response)).toThrow();
+      expect(() => schema.parse(response)).toThrow();
     });
 
     it('should throw if response has no result', () => {
       const {result: _, ...rest} = validResponse;
 
-      const response: IcrcWalletRequestPermissionsResponseType = rest;
+      const response = rest;
 
-      expect(() => IcrcWalletRequestPermissionsResponse.parse(response)).toThrow();
+      expect(() => schema.parse(response)).toThrow();
     });
 
     it('should throw if response has no id', () => {
       const {id: _, ...rest} = validResponse;
 
-      const response: Partial<IcrcWalletRequestPermissionsResponseType> = rest;
+      const response = rest;
 
-      expect(() => IcrcWalletRequestPermissionsResponse.parse(response)).toThrow();
+      expect(() => schema.parse(response)).toThrow();
     });
 
     it('should throw if response has no jsonrpc', () => {
       const {jsonrpc: _, ...rest} = validResponse;
 
-      const response: Partial<IcrcWalletRequestPermissionsResponseType> = rest;
+      const response = rest;
 
-      expect(() => IcrcWalletRequestPermissionsResponse.parse(response)).toThrow();
+      expect(() => schema.parse(response)).toThrow();
     });
   });
 });
