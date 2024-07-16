@@ -17,6 +17,10 @@ const IcrcWalletScopesResult = z.object({
 // https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_request_permissions
 export const IcrcWalletRequestPermissionsResponse = inferRpcResponse(IcrcWalletScopesResult);
 
+export type IcrcWalletRequestPermissionsResponseType = z.infer<
+  typeof IcrcWalletRequestPermissionsResponse
+>;
+
 // icrc25_permissions
 // https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_permissions
 export const IcrcWalletPermissionsResponse = IcrcWalletRequestPermissionsResponse;
