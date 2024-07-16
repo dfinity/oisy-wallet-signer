@@ -7,6 +7,8 @@ import {
 } from './icrc';
 import {inferRpcRequestWithParams, inferRpcRequestWithoutParams} from './rpc';
 
+// icrc25_request_permissions
+// https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_request_permissions
 const IcrcWalletScopesParams = z.object({
   scopes: z
     .array(
@@ -17,8 +19,6 @@ const IcrcWalletScopesParams = z.object({
     .min(1)
 });
 
-// icrc25_request_permissions
-// https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_request_permissions
 export const IcrcWalletRequestPermissionsRequest = inferRpcRequestWithParams({
   method: ICRC25_REQUEST_PERMISSIONS,
   params: IcrcWalletScopesParams
