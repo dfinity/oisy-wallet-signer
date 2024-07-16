@@ -3,6 +3,7 @@ import {ICRC27_ACCOUNTS} from './icrc';
 import {
   IcrcWalletPermissionsRequest,
   IcrcWalletRequestPermissionsRequest,
+  IcrcWalletStatusRequest,
   IcrcWalletSupportedStandardsRequest,
   type IcrcWalletPermissionsRequestType,
   type IcrcWalletRequestPermissionsRequestType,
@@ -133,45 +134,50 @@ describe('icrc-requests', () => {
     });
   });
 
-  describe('icrc25_supported_standards', () => {
+  const requestWithoutParamsSchemas = [
+    {method: 'icrc25_supported_standards', schema: IcrcWalletSupportedStandardsRequest},
+    {method: 'icrc29_status', schema: IcrcWalletStatusRequest}
+  ];
+
+  describe.each(requestWithoutParamsSchemas)('$method', ({schema, method}) => {
     const validRequest: IcrcWalletSupportedStandardsRequestType = {
       jsonrpc: JSON_RPC_VERSION_2,
       id: 1,
-      method: 'icrc25_supported_standards'
+      method
     };
 
     it('should validate a correct request', () => {
-      expect(() => IcrcWalletSupportedStandardsRequest.parse(validRequest)).not.toThrow();
+      expect(() => schema.parse(validRequest)).not.toThrow();
     });
 
     it('should throw if request has params', () => {
-      const invalidRequest: IcrcWalletSupportedStandardsRequestType = {
+      const invalidRequest = {
         ...validRequest,
         params: {}
       };
-      expect(() => IcrcWalletSupportedStandardsRequest.parse(invalidRequest)).toThrow();
+      expect(() => schema.parse(invalidRequest)).toThrow();
     });
 
     it('should throw if request has invalid method', () => {
-      const invalidRequest: IcrcWalletSupportedStandardsRequestType = {
+      const invalidRequest = {
         ...validRequest,
         method: 'test'
       };
-      expect(() => IcrcWalletSupportedStandardsRequest.parse(invalidRequest)).toThrow();
+      expect(() => schema.parse(invalidRequest)).toThrow();
     });
 
     it('should throw if request has no id', () => {
       const {id: _, ...rest} = validRequest;
 
-      const invalidRequest: Partial<IcrcWalletSupportedStandardsRequestType> = rest;
-      expect(() => IcrcWalletSupportedStandardsRequest.parse(invalidRequest)).toThrow();
+      const invalidRequest = rest;
+      expect(() => schema.parse(invalidRequest)).toThrow();
     });
 
     it('should throw if request has no jsonrpc', () => {
       const {jsonrpc: _, ...rest} = validRequest;
 
-      const invalidRequest: Partial<IcrcWalletSupportedStandardsRequestType> = rest;
-      expect(() => IcrcWalletSupportedStandardsRequest.parse(invalidRequest)).toThrow();
+      const invalidRequest = rest;
+      expect(() => schema.parse(invalidRequest)).toThrow();
     });
   });
 });

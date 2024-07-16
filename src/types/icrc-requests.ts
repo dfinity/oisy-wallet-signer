@@ -3,6 +3,7 @@ import {
   ICRC25_PERMISSIONS,
   ICRC25_REQUEST_PERMISSIONS,
   ICRC25_SUPPORTED_STANDARDS,
+  ICRC29_STATUS,
   IcrcWalletScopedMethod
 } from './icrc';
 import {inferRpcRequestWithParams, inferRpcRequestWithoutParams} from './rpc';
@@ -45,3 +46,11 @@ export const IcrcWalletSupportedStandardsRequest = inferRpcRequestWithoutParams(
 export type IcrcWalletSupportedStandardsRequestType = z.infer<
   typeof IcrcWalletSupportedStandardsRequest
 >;
+
+// icrc29_status
+// https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_29_window_post_message_transport.md
+export const IcrcWalletStatusRequest = inferRpcRequestWithoutParams({
+  method: ICRC29_STATUS
+});
+
+export type IcrcWalletStatusRequestType = z.infer<typeof IcrcWalletStatusRequest>;
