@@ -38,14 +38,15 @@ const urlSchema = z
   .regex(urlRegex)
   .refine(
     (url) => {
-      const match = url.match(/ICRCs\/(ICRC-\d+)\.md$/);
+      const match = /(ICRC-\d+)\.md/g.exec(url);
 
       if (match === null) {
         return;
       }
 
       const [_, icrc] = match;
-      return Object.values(IcrcWalletStandard).includes(icrc);
+
+      return Object.keys(IcrcWalletStandard.Values).includes(icrc);
     },
     {
       message: 'The URL does not match any of the IcrcWalletStandard values.'
@@ -54,11 +55,15 @@ const urlSchema = z
 
 export const IcrcSupportedStandardsResponse = inferRpcResponse(
   z.object({
-    supportedStandards: z.array(
-      z.object({
-        name: IcrcWalletStandard,
-        url: urlSchema
-      })
-    )
+    supportedStandards: z
+      .array(
+        z.object({
+          name: IcrcWalletStandard,
+          url: urlSchema
+        })
+      )
+      .min(1)
   })
 );
+
+export type IcrcSupportedStandardsResponseType = z.infer<typeof IcrcSupportedStandardsResponse>;
