@@ -13,11 +13,7 @@ export const IcrcWalletMethod = z.enum([
   ICRC27_ACCOUNTS
 ]);
 
-export const IcrcWalletRequestMethod = IcrcWalletMethod.exclude([
-  ICRC25_REQUEST_PERMISSIONS,
-  ICRC25_PERMISSIONS,
-  ICRC25_SUPPORTED_STANDARDS
-]);
+export const IcrcWalletScopedMethod = IcrcWalletMethod.extract([ICRC27_ACCOUNTS]);
 
 export const ICRC25_PERMISSION_GRANTED = 'granted';
 export const ICRC25_PERMISSION_DENIED = 'denied';
