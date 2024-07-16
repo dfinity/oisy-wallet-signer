@@ -3,8 +3,10 @@ import {ICRC27_ACCOUNTS} from './icrc';
 import {
   IcrcWalletPermissionsRequest,
   IcrcWalletRequestPermissionsRequest,
+  IcrcWalletSupportedStandardsRequest,
   type IcrcWalletPermissionsRequestType,
-  type IcrcWalletRequestPermissionsRequestType
+  type IcrcWalletRequestPermissionsRequestType,
+  type IcrcWalletSupportedStandardsRequestType
 } from './icrc-requests';
 import {JSON_RPC_VERSION_2} from './rpc';
 
@@ -128,6 +130,48 @@ describe('icrc-requests', () => {
 
       const invalidRequest: Partial<IcrcWalletPermissionsRequestType> = rest;
       expect(() => IcrcWalletPermissionsRequest.parse(invalidRequest)).toThrow();
+    });
+  });
+
+  describe('icrc25_supported_standards', () => {
+    const validRequest: IcrcWalletSupportedStandardsRequestType = {
+      jsonrpc: JSON_RPC_VERSION_2,
+      id: 1,
+      method: 'icrc25_supported_standards'
+    };
+
+    it('should validate a correct request', () => {
+      expect(() => IcrcWalletSupportedStandardsRequest.parse(validRequest)).not.toThrow();
+    });
+
+    it('should throw if request has params', () => {
+      const invalidRequest: IcrcWalletSupportedStandardsRequestType = {
+        ...validRequest,
+        params: {}
+      };
+      expect(() => IcrcWalletSupportedStandardsRequest.parse(invalidRequest)).toThrow();
+    });
+
+    it('should throw if request has invalid method', () => {
+      const invalidRequest: IcrcWalletSupportedStandardsRequestType = {
+        ...validRequest,
+        method: 'test'
+      };
+      expect(() => IcrcWalletSupportedStandardsRequest.parse(invalidRequest)).toThrow();
+    });
+
+    it('should throw if request has no id', () => {
+      const {id: _, ...rest} = validRequest;
+
+      const invalidRequest: Partial<IcrcWalletSupportedStandardsRequestType> = rest;
+      expect(() => IcrcWalletSupportedStandardsRequest.parse(invalidRequest)).toThrow();
+    });
+
+    it('should throw if request has no jsonrpc', () => {
+      const {jsonrpc: _, ...rest} = validRequest;
+
+      const invalidRequest: Partial<IcrcWalletSupportedStandardsRequestType> = rest;
+      expect(() => IcrcWalletSupportedStandardsRequest.parse(invalidRequest)).toThrow();
     });
   });
 });
