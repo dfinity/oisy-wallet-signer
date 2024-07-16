@@ -67,3 +67,10 @@ export const IcrcSupportedStandardsResponse = inferRpcResponse(
 );
 
 export type IcrcSupportedStandardsResponseType = z.infer<typeof IcrcSupportedStandardsResponse>;
+
+// icrc29_status
+// https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_29_window_post_message_transport.md
+
+export const IcrcReadyResponse = inferRpcResponse(z.literal('ready'));
+
+export type IcrcReadyResponseType = z.infer<typeof IcrcReadyResponse>;

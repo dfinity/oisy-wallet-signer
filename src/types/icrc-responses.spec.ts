@@ -1,9 +1,11 @@
 import {describe, expect, it} from 'vitest';
 import {ICRC25_PERMISSION_GRANTED, ICRC27_ACCOUNTS} from './icrc';
 import {
+  IcrcReadyResponse,
   IcrcSupportedStandardsResponse,
   IcrcWalletPermissionsResponse,
   IcrcWalletRequestPermissionsResponse,
+  type IcrcReadyResponseType,
   type IcrcSupportedStandardsResponseType
 } from './icrc-responses';
 import {JSON_RPC_VERSION_2} from './rpc';
@@ -293,6 +295,60 @@ describe('icrc-responses', () => {
       const response: Partial<IcrcSupportedStandardsResponseType> = rest;
 
       expect(() => IcrcSupportedStandardsResponse.parse(response)).toThrow();
+    });
+  });
+
+  describe('icrc29_status', () => {
+    const validResponse: IcrcReadyResponseType = {
+      jsonrpc: JSON_RPC_VERSION_2,
+      id: 1,
+      result: 'ready'
+    };
+
+    it('should validate a correct response', () => {
+      expect(() => IcrcReadyResponse.parse(validResponse)).not.toThrow();
+    });
+
+    it('should throw if response has no valid result string', () => {
+      const invalidResponse: IcrcReadyResponseType = {
+        ...validResponse,
+        result: 'test'
+      };
+      expect(() => IcrcReadyResponse.parse(invalidResponse)).toThrow();
+    });
+
+    it('should throw if response has no valid result type', () => {
+      const invalidResponse: IcrcReadyResponseType = {
+        ...validResponse,
+        result: {
+          hello: 'world'
+        }
+      };
+      expect(() => IcrcReadyResponse.parse(invalidResponse)).toThrow();
+    });
+
+    it('should throw if response has no result', () => {
+      const {result: _, ...rest} = validResponse;
+
+      const response: IcrcReadyResponseType = rest;
+
+      expect(() => IcrcReadyResponse.parse(response)).toThrow();
+    });
+
+    it('should throw if response has no id', () => {
+      const {id: _, ...rest} = validResponse;
+
+      const response: Partial<IcrcReadyResponseType> = rest;
+
+      expect(() => IcrcReadyResponse.parse(response)).toThrow();
+    });
+
+    it('should throw if response has no jsonrpc', () => {
+      const {jsonrpc: _, ...rest} = validResponse;
+
+      const response: Partial<IcrcReadyResponseType> = rest;
+
+      expect(() => IcrcReadyResponse.parse(response)).toThrow();
     });
   });
 });
