@@ -1,12 +1,12 @@
 import {z} from 'zod';
-import {IcrcWalletPermissionState, IcrcWalletRequestMethod, IcrcWalletStandard} from './icrc';
+import {IcrcWalletPermissionState, IcrcWalletScopedMethod, IcrcWalletStandard} from './icrc';
 import {inferRpcResponse} from './rpc';
 
 const IcrcWalletScopesResult = z.object({
   scopes: z.array(
     z.object({
       scope: z.object({
-        method: IcrcWalletRequestMethod
+        method: IcrcWalletScopedMethod
       }),
       state: IcrcWalletPermissionState
     })
