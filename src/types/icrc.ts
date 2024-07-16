@@ -5,12 +5,14 @@ export const ICRC25_PERMISSIONS = 'icrc25_permissions';
 export const ICRC25_SUPPORTED_STANDARDS = 'icrc25_supported_standards';
 // TODO: ICRC27 to be defined
 export const ICRC27_ACCOUNTS = 'icrc27_accounts';
+export const ICRC29_STATUS = 'icrc29_status';
 
 export const IcrcWalletMethod = z.enum([
   ICRC25_REQUEST_PERMISSIONS,
   ICRC25_PERMISSIONS,
   ICRC25_SUPPORTED_STANDARDS,
-  ICRC27_ACCOUNTS
+  ICRC27_ACCOUNTS,
+  ICRC29_STATUS
 ]);
 
 export const IcrcWalletScopedMethod = IcrcWalletMethod.extract([ICRC27_ACCOUNTS]);
@@ -26,5 +28,6 @@ export const IcrcWalletPermissionState = z.enum([
 ]);
 
 export const ICRC25 = 'ICRC-25';
+export const ICRC29 = 'ICRC-29';
 
-export const IcrcWalletStandard = z.enum([ICRC25]);
+export const IcrcWalletStandard = z.enum([ICRC25, ICRC29]);
