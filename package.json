@@ -74,6 +74,7 @@
     "node": ">=20"
   },
   "peerDependencies": {
+    "@dfinity/utils": "^2.3.1",
     "zod": "^3.23.8"
   }
 }
