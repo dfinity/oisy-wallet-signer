@@ -1,16 +1,25 @@
-import {
+import type {
   IcrcWalletPermissionsRequestType,
   IcrcWalletRequestPermissionsRequestType,
   IcrcWalletSupportedStandardsRequestType
 } from './types/icrc-requests';
 
-interface SignerParameters {}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface SignerParameters {}
+
+type SignerMessageEvent = MessageEvent<
+  Partial<
+    | IcrcWalletRequestPermissionsRequestType
+    | IcrcWalletPermissionsRequestType
+    | IcrcWalletSupportedStandardsRequestType
+  >
+>;
 
 export class Signer {
-  #walletOrigin: string | undefined;
+  readonly #walletOrigin: string | undefined;
 
-  private constructor({}: SignerParameters) {
-    window.addEventListener('message', this.onMessage);
+  private constructor(_parameters: SignerParameters) {
+    window.addEventListener('message', this.onMessageListener);
   }
 
   static connect(parameters: SignerParameters): Signer {
@@ -18,18 +27,13 @@ export class Signer {
     return signer;
   }
 
-  disconnect = () => {
-    window.removeEventListener('message', this.onMessage);
+  disconnect = (): void => {
+    window.removeEventListener('message', this.onMessageListener);
   };
 
-  private onMessage = async ({
-    data,
-    origin
-  }: MessageEvent<
-    Partial<
-      | IcrcWalletRequestPermissionsRequestType
-      | IcrcWalletPermissionsRequestType
-      | IcrcWalletSupportedStandardsRequestType
-    >
-  >) => {};
+  private readonly onMessageListener = (message: SignerMessageEvent): void => {
+    void this.onMessage(message);
+  };
+
+  private readonly onMessage = async (_message: SignerMessageEvent): Promise<void> => {};
 }
