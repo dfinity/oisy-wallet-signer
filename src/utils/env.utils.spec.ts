@@ -1,4 +1,3 @@
-import {describe, expect, it, vi} from 'vitest';
 import {isBrowser} from './env.utils';
 
 describe('isBrowser', () => {
