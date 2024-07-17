@@ -33,10 +33,10 @@
       "require": "./dist/index.mjs",
       "types": "./dist/index.d.ts"
     },
-    "./relying-party": {
-      "import": "./dist/relying-party.js",
-      "require": "./dist/relying-party.mjs",
-      "types": "./dist/relying-party.d.ts"
+    "./wallet": {
+      "import": "./dist/wallet.js",
+      "require": "./dist/wallet.mjs",
+      "types": "./dist/wallet.d.ts"
     },
     "./signer": {
       "import": "./dist/signer.js",
