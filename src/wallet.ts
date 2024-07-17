@@ -6,6 +6,7 @@ import {
 
 /**
  * The parameters to establish a connection with a wallet.
+ * @interface
  */
 export interface WalletParameters {
   /**
@@ -30,6 +31,7 @@ export class Wallet {
   /**
    * Establish a connection with a wallet.
    *
+   * @static
    * @param {Object} WalletParameters - The parameters to initialize the wallet connection.
    * @returns {Promise<Wallet>} A promise that resolves to an instance of the wallet that was connected.
    */

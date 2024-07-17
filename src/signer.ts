@@ -4,6 +4,10 @@ import type {
   IcrcWalletSupportedStandardsRequestType
 } from './types/icrc-requests';
 
+/**
+ * The parameters to initialize a signer.
+ * @interface
+ */
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface SignerParameters {}
 
@@ -22,11 +26,22 @@ export class Signer {
     window.addEventListener('message', this.onMessageListener);
   }
 
+  /**
+   * Creates a signer that listens and communicates with a relying party.
+   *
+   * @static
+   * @param {SignerParameters} parameters - The parameters for the signer.
+   * @returns {Signer} The connected signer.
+   */
   static connect(parameters: SignerParameters): Signer {
     const signer = new Signer(parameters);
     return signer;
   }
 
+  /**
+   * Disconnects the signer, removing the message event listener.
+   * @returns {void}
+   */
   disconnect = (): void => {
     window.removeEventListener('message', this.onMessageListener);
   };
