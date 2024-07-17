@@ -1,4 +1,8 @@
-import {WALLET_WINDOW_CENTER, windowFeatures, type WalletWindowOptions} from './utils/window.utils';
+import {
+  WALLET_WINDOW_TOP_RIGHT,
+  windowFeatures,
+  type WalletWindowOptions
+} from './utils/window.utils';
 
 /**
  * The parameters to establish a connection with a wallet.
@@ -31,7 +35,7 @@ export class Wallet {
    */
   static async connect({
     url,
-    windowOptions = WALLET_WINDOW_CENTER
+    windowOptions = WALLET_WINDOW_TOP_RIGHT
   }: WalletParameters): Promise<Wallet> {
     return await new Promise<Wallet>((resolve) => {
       const disconnect = (): void => {
