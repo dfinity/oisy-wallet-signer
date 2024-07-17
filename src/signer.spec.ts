@@ -2,26 +2,20 @@ import {type MockInstance} from 'vitest';
 import {Signer, type SignerParameters} from './signer';
 
 describe('Signer', () => {
-  let signer: Signer;
   const mockParameters: SignerParameters = {};
 
-  beforeEach(() => {
-    signer = Signer.connect(mockParameters);
-  });
-
-  afterEach(() => {
-    signer.disconnect();
-  });
-
   it('should init a signer', () => {
+    const signer = Signer.connect(mockParameters);
     expect(signer).toBeInstanceOf(Signer);
+    signer.disconnect();
   });
 
   it('should add event listener for message on connect', () => {
     const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
 
-    Signer.connect(mockParameters);
+    const signer = Signer.connect(mockParameters);
     expect(addEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
+    signer.disconnect();
   });
 
   it('should remove event listener for message on connect', () => {
@@ -41,11 +35,15 @@ describe('Signer', () => {
 
     let onMessageListenerSpy: MockInstance;
 
+    let signer: Signer;
+
     beforeEach(() => {
+      signer = Signer.connect(mockParameters);
       onMessageListenerSpy = vi.spyOn(signer as unknown as {onMessage: () => void}, 'onMessage');
     });
 
     afterEach(() => {
+      signer.disconnect();
       onMessageListenerSpy.mockClear();
     });
 
