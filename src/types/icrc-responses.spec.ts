@@ -1,4 +1,3 @@
-import {describe, expect, it} from 'vitest';
 import {ICRC25_PERMISSION_GRANTED, ICRC27_ACCOUNTS} from './icrc';
 import {
   IcrcReadyResponse,
