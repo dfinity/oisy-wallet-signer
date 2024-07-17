@@ -1,5 +1,5 @@
 import {beforeEach} from 'vitest';
-import {WALLET_WINDOW_CENTER, windowFeatures} from './utils/window.utils';
+import {WALLET_WINDOW_CENTER, WALLET_WINDOW_TOP_RIGHT, windowFeatures} from './utils/window.utils';
 import {Wallet, type WalletParameters} from './wallet';
 
 describe('Wallet', () => {
@@ -20,11 +20,35 @@ describe('Wallet', () => {
     vi.restoreAllMocks();
   });
 
-  it('should connect to the wallet with default options', async () => {
+  const options = [
+    {
+      title: 'default options',
+      params: mockParameters,
+      expectedOptions: windowFeatures(WALLET_WINDOW_TOP_RIGHT)
+    },
+    {
+      title: 'centered window',
+      params: {
+        ...mockParameters,
+        windowOptions: WALLET_WINDOW_CENTER
+      },
+      expectedOptions: windowFeatures(WALLET_WINDOW_CENTER)
+    },
+    {
+      title: 'custom window',
+      params: {
+        ...mockParameters,
+        windowOptions: 'height=600, width=400'
+      },
+      expectedOptions: 'height=600, width=400'
+    }
+  ];
+
+  it.each(options)('$title', async ({params, expectedOptions}) => {
     const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
     const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
 
-    const promise = Wallet.connect(mockParameters);
+    const promise = Wallet.connect(params);
 
     const messageEvent = new MessageEvent('message', {
       origin: mockParameters.url
@@ -36,11 +60,7 @@ describe('Wallet', () => {
 
     expect(wallet).toBeInstanceOf(Wallet);
 
-    expect(window.open).toHaveBeenCalledWith(
-      mockParameters.url,
-      'walletWindow',
-      windowFeatures(WALLET_WINDOW_CENTER)
-    );
+    expect(window.open).toHaveBeenCalledWith(mockParameters.url, 'walletWindow', expectedOptions);
     expect(window.open).toHaveBeenCalledTimes(1);
 
     expect(addEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
