@@ -1,5 +1,5 @@
-import {afterEach, beforeEach, describe, MockInstance} from 'vitest';
-import {Signer, SignerParameters} from './signer';
+import {afterEach, beforeEach, describe, type MockInstance} from 'vitest';
+import {Signer, type SignerParameters} from './signer';
 
 describe('Signer', () => {
   let signer: Signer;
