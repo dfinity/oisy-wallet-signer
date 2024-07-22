@@ -1,0 +1,11 @@
+[workspace]
+members = [
+    "src/relying_party_backend",
+    "src/wallet_backend"]
+resolver = "2"
+
+[workspace.dependencies]
+candid = "0.10.2"
+ic-cdk = "0.14.0"
+ic-cdk-macros = "0.14.0"
+serde = "1.0.190"

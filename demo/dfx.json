@@ -1,0 +1,75 @@
+{
+	"dfx": "0.20.0",
+	"canisters": {
+		"relying_party_backend": {
+			"candid": "src/relying_party_backend/relying_party_backend.did",
+			"package": "relying_party_backend",
+			"type": "rust",
+			"optimize": "cycles"
+		},
+		"relying_party_frontend": {
+			"frontend": {
+				"entrypoint": "src/relying_party_frontend/build/index.html"
+			},
+			"source": ["src/relying_party_frontend/build/"],
+			"type": "assets"
+		},
+		"wallet_backend": {
+			"candid": "src/wallet_backend/wallet_backend.did",
+			"package": "wallet_backend",
+			"type": "rust",
+			"optimize": "cycles"
+		},
+		"wallet_frontend": {
+			"frontend": {
+				"entrypoint": "src/wallet_frontend/build/index.html"
+			},
+			"source": ["src/wallet_frontend/build/"],
+			"type": "assets"
+		},
+		"internet_identity": {
+			"type": "custom",
+			"candid": "https://github.com/dfinity/internet-identity/releases/download/release-2023-11-17/internet_identity.did",
+			"wasm": "https://github.com/dfinity/internet-identity/releases/download/release-2023-11-17/internet_identity_dev.wasm.gz",
+			"remote": {
+				"id": {
+					"ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
+				}
+			}
+		},
+		"icp_ledger": {
+			"type": "custom",
+			"candid": "target/ic/icp_ledger.did",
+			"wasm": "target/ic/icp_ledger.wasm",
+			"remote": {
+				"id": {
+					"ic": "ryjl3-tyaaa-aaaaa-aaaba-cai"
+				}
+			}
+		},
+		"icp_index": {
+			"type": "custom",
+			"candid": "target/ic/icp_index.did",
+			"wasm": "target/ic/icp_index.wasm",
+			"remote": {
+				"id": {
+					"ic": "qhbym-qaaaa-aaaaa-aaafq-cai"
+				}
+			}
+		}
+	},
+	"defaults": {
+		"build": {
+			"args": "",
+			"packtool": ""
+		}
+	},
+	"output_env_file": ".env.development",
+	"version": 1,
+	"networks": {
+		"local": {
+			"bind": "127.0.0.1:4943",
+			"type": "ephemeral"
+		}
+	}
+}
