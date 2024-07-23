@@ -2,7 +2,7 @@
 	import Layout from '$core/components/Layout.svelte';
 	import '$core/styles/app.scss';
 	import { WALLET_POPUP_HEIGHT, WALLET_POPUP_WIDTH } from '$core/constants/app.constants';
-	import type {Snippet} from "svelte";
+	import type { Snippet } from 'svelte';
 
 	const size = {
 		width: WALLET_POPUP_WIDTH,
@@ -17,9 +17,9 @@
 </script>
 
 {#snippet title()}
-Wallet 👛
+	Wallet 👛
 {/snippet}
 
-<Layout {title}>
+<Layout {title} {size}>
 	{@render children()}
 </Layout>

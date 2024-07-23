@@ -1,19 +1,19 @@
 <script lang="ts">
-    import Layout from '$core/components/Layout.svelte';
-    import '$core/styles/app.scss';
-    import type {Snippet} from "svelte";
+	import Layout from '$core/components/Layout.svelte';
+	import '$core/styles/app.scss';
+	import type { Snippet } from 'svelte';
 
-    type Props = {
-        children: Snippet;
-    };
+	type Props = {
+		children: Snippet;
+	};
 
-    let { children } = $props<Props>();
+	let { children } = $props<Props>();
 </script>
 
 {#snippet title()}
-    Relying Party 🥳
+	Relying Party 🥳
 {/snippet}
 
 <Layout {title}>
-    {@render children()}
+	{@render children()}
 </Layout>

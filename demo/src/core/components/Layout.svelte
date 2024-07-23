@@ -5,7 +5,7 @@
 	import SignIn from '$core/components/SignIn.svelte';
 	import SignOut from '$core/components/SignOut.svelte';
 	import { fade } from 'svelte/transition';
-	import type {Snippet} from "svelte";
+	import type { Snippet } from 'svelte';
 
 	type Props = {
 		size?: {
