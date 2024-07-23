@@ -1,8 +1,7 @@
-name: Publish
+name: Lib Next
 
 on:
-  release:
-    types: [released]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -13,10 +12,12 @@ jobs:
       id-token: write
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Prepare
         uses: ./.github/actions/prepare
-      - run: npm run build
-      - run: npm publish --provenance --access public
+      - name: Build next version
+        run: ./scripts/build-next
+      - run: npm publish --provenance --access public --tag next
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
