@@ -4,7 +4,6 @@ on:
   pull_request:
     paths:
       - 'demo/**'
-  workflow_dispatch:
 
 jobs:
 
