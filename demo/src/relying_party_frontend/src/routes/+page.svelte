@@ -14,7 +14,7 @@
 </script>
 
 {#if isNullish(wallet)}
-	<Button {onclick} testId="connect-wallet">Connect Wallet</Button>
+	<Button {onclick} testId="connect-wallet-button">Connect Wallet</Button>
 {:else}
 	<div in:fade>
 		<p>Connected</p>
