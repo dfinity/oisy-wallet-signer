@@ -16,7 +16,7 @@
 		title: Snippet;
 	};
 
-	let { size, children, title } = $props<Props>();
+	let { size, children, title }: Props = $props();
 
 	const init = async () => await Promise.all([syncAuthStore()]);
 

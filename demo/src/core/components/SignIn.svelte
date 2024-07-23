@@ -10,7 +10,7 @@
 		};
 	};
 
-	let { size } = $props<Props>();
+	let { size }: Props = $props();
 
 	const onclick = async () => {
 		await authStore.signIn({ size });

@@ -6,7 +6,7 @@
 		children: Snippet;
 	};
 
-	let { onclick, children } = $props<Props>();
+	let { onclick, children }: Props = $props();
 </script>
 
 <button

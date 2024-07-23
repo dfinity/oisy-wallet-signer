@@ -13,7 +13,7 @@
 		children: Snippet;
 	};
 
-	let { children } = $props<Props>();
+	let { children }: Props = $props();
 </script>
 
 {#snippet title()}
