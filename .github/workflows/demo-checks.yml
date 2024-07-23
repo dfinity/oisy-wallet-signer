@@ -6,7 +6,6 @@ on:
       - 'demo/**'
 
 jobs:
-
   lint:
     runs-on: ubuntu-latest
 
