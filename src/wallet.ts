@@ -10,7 +10,7 @@ import {
  */
 export interface WalletParameters {
   /**
-   * The URL to connect to the wallet.
+   * The URL of the wallet.
    */
   url: string;
 

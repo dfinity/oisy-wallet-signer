@@ -22,7 +22,8 @@ const config = {
 		},
 		alias: {
 			$declarations: '../../src/declarations',
-			$core: '../../src/core'
+			$core: '../../src/core',
+			'@dfinity/oisy-wallet-signer': '../../../src'
 		}
 	}
 };
