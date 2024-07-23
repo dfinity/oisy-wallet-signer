@@ -50,9 +50,13 @@
     "ts-declaration": "tsc --emitDeclarationOnly --outDir dist",
     "build": "tsc --noEmit && node rmdir.mjs && node esbuild.mjs && npm run ts-declaration",
     "lint": "eslint --max-warnings 0 \"src/**/*\"",
-    "test": "tsc --noEmit -p ./tsconfig.spec.json && vitest"
+    "test": "tsc --noEmit -p ./tsconfig.spec.json && vitest",
+    "e2e": "NODE_ENV=development playwright test",
+    "e2e:ci": "playwright test --reporter=html"
   },
   "devDependencies": {
+    "@dfinity/internet-identity-playwright": "^0.0.2",
+    "@playwright/test": "^1.45.3",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.12.7",
     "@typescript-eslint/eslint-plugin": "^6.20.0",

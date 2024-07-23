@@ -17,4 +17,4 @@
 	};
 </script>
 
-<Button {onclick}><IconSignIn /> Sign-in</Button>
+<Button {onclick} testId="login-button"><IconSignIn /> Sign-in</Button>

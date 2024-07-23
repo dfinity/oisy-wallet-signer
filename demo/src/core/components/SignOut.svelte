@@ -7,4 +7,6 @@
 	};
 </script>
 
-<button {onclick} class="flex gap-1 items-center my-12 text-sm"><IconSignOut /> Sign-out</button>
+<button {onclick} class="flex gap-1 items-center my-12 text-sm" data-tid="logout-button"
+	><IconSignOut /> Sign-out</button
+>
