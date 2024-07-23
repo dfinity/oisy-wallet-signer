@@ -2,6 +2,12 @@ name: Prepare
 
 description: Checkout and install dependencies
 
+inputs:
+  folder:
+    description: 'The folder in which to run npm ci'
+    required: false
+    default: '.'
+
 runs:
   using: composite
   steps:
@@ -12,3 +18,4 @@ runs:
     - name: Install dependencies
       shell: bash
       run: npm ci
+      working-directory: ${{ inputs.folder }}
