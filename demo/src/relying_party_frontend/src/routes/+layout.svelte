@@ -1,10 +1,19 @@
 <script lang="ts">
     import Layout from '$core/components/Layout.svelte';
     import '$core/styles/app.scss';
+    import type {Snippet} from "svelte";
+
+    type Props = {
+        children: Snippet;
+    };
+
+    let { children } = $props<Props>();
 </script>
 
-<Layout>
-    <svelte:fragment slot="title">Relying Party 🥳</svelte:fragment>
+{#snippet title()}
+    Relying Party 🥳
+{/snippet}
 
-    <slot />
+<Layout {title}>
+    {@render children()}
 </Layout>

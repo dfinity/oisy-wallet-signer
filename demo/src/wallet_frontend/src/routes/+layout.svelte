@@ -2,15 +2,24 @@
 	import Layout from '$core/components/Layout.svelte';
 	import '$core/styles/app.scss';
 	import { WALLET_POPUP_HEIGHT, WALLET_POPUP_WIDTH } from '$core/constants/app.constants';
+	import type {Snippet} from "svelte";
 
 	const size = {
 		width: WALLET_POPUP_WIDTH,
 		height: WALLET_POPUP_HEIGHT
 	};
+
+	type Props = {
+		children: Snippet;
+	};
+
+	let { children } = $props<Props>();
 </script>
 
-<Layout {size}>
-	<svelte:fragment slot="title">Wallet 👛</svelte:fragment>
+{#snippet title()}
+Wallet 👛
+{/snippet}
 
-	<slot />
+<Layout {title}>
+	{@render children()}
 </Layout>

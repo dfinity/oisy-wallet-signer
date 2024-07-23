@@ -5,15 +5,18 @@
 	import SignIn from '$core/components/SignIn.svelte';
 	import SignOut from '$core/components/SignOut.svelte';
 	import { fade } from 'svelte/transition';
+	import type {Snippet} from "svelte";
 
 	type Props = {
 		size?: {
 			width: number;
 			height: number;
 		};
+		children: Snippet;
+		title: Snippet;
 	};
 
-	let { size } = $props<Props>();
+	let { size, children, title } = $props<Props>();
 
 	const init = async () => await Promise.all([syncAuthStore()]);
 
@@ -33,14 +36,14 @@
 <svelte:window on:storage={syncAuthStore} />
 
 <main class="w-[100%] h-[100%] p-8">
-	<h1 class="text-4xl pb-4 underline underline-offset-8"><slot name="title" /></h1>
+	<h1 class="text-4xl pb-4 underline underline-offset-8">{@render title()}</h1>
 
 	{#await init()}
 		<p class="animate-pulse text-sm">Loading...</p>
 	{:then _}
 		{#if $signedIn}
 			<div in:fade>
-				<slot />
+				{@render children()}
 
 				<SignOut />
 			</div>
