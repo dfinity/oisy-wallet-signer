@@ -38,6 +38,7 @@ jobs:
           folder: 'demo'
       - name: Check
         run: npm run check
+        working-directory: 'demo'
 
   may-merge:
     needs: ['check', 'lint']
