@@ -10,7 +10,7 @@
 			return;
 		}
 
-		signer = Signer.connect({});
+		signer = Signer.init({});
 	});
 </script>
 

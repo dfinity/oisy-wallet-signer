@@ -5,7 +5,7 @@ describe('Signer', () => {
   const mockParameters: SignerParameters = {};
 
   it('should init a signer', () => {
-    const signer = Signer.connect(mockParameters);
+    const signer = Signer.init(mockParameters);
     expect(signer).toBeInstanceOf(Signer);
     signer.disconnect();
   });
@@ -13,7 +13,7 @@ describe('Signer', () => {
   it('should add event listener for message on connect', () => {
     const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
 
-    const signer = Signer.connect(mockParameters);
+    const signer = Signer.init(mockParameters);
     expect(addEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
     signer.disconnect();
   });
@@ -21,7 +21,7 @@ describe('Signer', () => {
   it('should remove event listener for message on connect', () => {
     const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
 
-    const signer = Signer.connect(mockParameters);
+    const signer = Signer.init(mockParameters);
     signer.disconnect();
 
     expect(removeEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
@@ -38,7 +38,7 @@ describe('Signer', () => {
     let signer: Signer;
 
     beforeEach(() => {
-      signer = Signer.connect(mockParameters);
+      signer = Signer.init(mockParameters);
       onMessageListenerSpy = vi.spyOn(signer as unknown as {onMessage: () => void}, 'onMessage');
     });
 

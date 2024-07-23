@@ -33,7 +33,7 @@ export class Signer {
    * @param {SignerParameters} parameters - The parameters for the signer.
    * @returns {Signer} The connected signer.
    */
-  static connect(parameters: SignerParameters): Signer {
+  static init(parameters: SignerParameters): Signer {
     const signer = new Signer(parameters);
     return signer;
   }
