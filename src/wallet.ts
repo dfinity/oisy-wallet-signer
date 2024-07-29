@@ -1,3 +1,9 @@
+import {assertNonNullish, nonNullish} from '@dfinity/utils';
+import {nanoid} from 'nanoid';
+import {ICRC29_STATUS} from './types/icrc';
+import type {IcrcWalletStatusRequestType} from './types/icrc-requests';
+import {JSON_RPC_VERSION_2} from './types/rpc';
+import {retryUntilReady} from './utils/timeout.utils';
 import {
   WALLET_WINDOW_TOP_RIGHT,
   windowFeatures,
@@ -39,25 +45,50 @@ export class Wallet {
     url,
     windowOptions = WALLET_WINDOW_TOP_RIGHT
   }: WalletParameters): Promise<Wallet> {
-    return await new Promise<Wallet>((resolve) => {
-      const disconnect = (): void => {
-        window.removeEventListener('message', onMessage);
-        popup?.close();
+    const popupFeatures =
+      typeof windowOptions === 'string' ? windowOptions : windowFeatures(windowOptions);
+
+    const popup = window.open(url, 'walletWindow', popupFeatures);
+
+    assertNonNullish(popup, 'Unable to open the wallet window.');
+
+    let wallet: Wallet | undefined;
+
+    const onMessage = ({origin}: MessageEvent): void => {
+      wallet = new Wallet({origin});
+    };
+
+    window.addEventListener('message', onMessage);
+
+    const requestStatus = (): void => {
+      const msg: IcrcWalletStatusRequestType = {
+        id: nanoid(),
+        jsonrpc: JSON_RPC_VERSION_2,
+        method: ICRC29_STATUS
       };
 
-      const onMessage = ({origin}: MessageEvent): void => {
-        disconnect();
+      popup.postMessage(msg, '*');
+    };
 
-        const wallet = new Wallet({origin});
-        resolve(wallet);
-      };
-
-      window.addEventListener('message', onMessage);
-
-      const popupFeatures =
-        typeof windowOptions === 'string' ? windowOptions : windowFeatures(windowOptions);
-
-      const popup = window.open(url, 'walletWindow', popupFeatures);
+    const result = await retryUntilReady({
+      retries: 60,
+      isReady: (): boolean => nonNullish(wallet),
+      fn: requestStatus
     });
+
+    const disconnect = (): void => {
+      window.removeEventListener('message', onMessage);
+      popup.close();
+    };
+
+    disconnect();
+
+    if (result === 'timeout') {
+      throw new Error('Unable to connect wallet. Timeout.');
+    }
+
+    assertNonNullish(wallet);
+
+    return wallet;
   }
 }
