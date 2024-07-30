@@ -9,6 +9,8 @@ const JsonRpc = z.literal(JSON_RPC_VERSION_2);
 
 const RpcId = z.union([z.string(), z.number(), z.null()]);
 
+export type RpcIdType = z.infer<typeof RpcId>;
+
 const Rpc = z.object({
   jsonrpc: JsonRpc,
   id: z.optional(RpcId)
