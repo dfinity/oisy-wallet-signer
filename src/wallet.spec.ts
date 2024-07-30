@@ -10,7 +10,10 @@ describe('Wallet', () => {
   beforeEach(() => {
     originalOpen = window.open;
 
-    vi.stubGlobal('open', vi.fn());
+    vi.stubGlobal(
+      'open',
+      vi.fn(() => window)
+    );
     vi.stubGlobal('close', vi.fn());
   });
 
