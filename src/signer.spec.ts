@@ -65,21 +65,28 @@ describe('Signer', () => {
     });
   });
 
-  describe('assertAndSetOrigin', () => {
+  describe('origin and postMessage', () => {
+    let originalOpener: typeof window.opener;
+
     let notifyReadySpy: MockInstance;
     let signer: Signer;
 
     beforeEach(() => {
       signer = Signer.init(mockParameters);
       notifyReadySpy = vi.spyOn(signerHandlers, 'notifyReady');
+      vi.stubGlobal('opener', {postMessage: vi.fn()});
     });
 
     afterEach(() => {
       signer.disconnect();
+
+      window.opener = originalOpener;
+
       vi.clearAllMocks();
+      vi.restoreAllMocks();
     });
 
-    it('should set the origin if it is not set', () => {
+    it('should use the origin and respond with a post message', () => {
       const testOrigin = 'https://hello.com';
 
       let testId = 'test-123';
@@ -99,6 +106,58 @@ describe('Signer', () => {
         id: testId,
         origin: testOrigin
       });
+    });
+
+    it('should throw an error if a message from different origin is dispatched', () => {
+      const testOrigin = 'https://hello.com';
+      const differentOrigin = 'https://test.com';
+
+      let testId = 'test-123';
+
+      const msg = {
+        data: {
+          id: testId,
+          jsonrpc: JSON_RPC_VERSION_2,
+          method: ICRC29_STATUS
+        },
+        origin: testOrigin
+      };
+
+      const messageEvent = new MessageEvent('message', msg);
+      window.dispatchEvent(messageEvent);
+
+      const messageEventDiff = new MessageEvent('message', {...msg, origin: differentOrigin});
+
+      // TODO: error
+
+      window.dispatchEvent(messageEventDiff);
+    });
+
+    it('should reset #walletOrigin to null after disconnect', () => {
+      const testOrigin = 'https://hello.com';
+      const differentOrigin = 'https://world.com';
+
+      let testId = 'test-123';
+
+      const msg = {
+        data: {
+          id: testId,
+          jsonrpc: JSON_RPC_VERSION_2,
+          method: ICRC29_STATUS
+        },
+        origin: testOrigin
+      };
+
+      const messageEvent = new MessageEvent('message', msg);
+      window.dispatchEvent(messageEvent);
+
+      const messageEventDiff = new MessageEvent('message', {...msg, origin: differentOrigin});
+
+      signer.disconnect();
+
+      expect(() => {
+        window.dispatchEvent(messageEventDiff);
+      }).not.toThrow();
     });
   });
 });
