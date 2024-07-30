@@ -31,5 +31,5 @@ export const retryUntilReady = async ({
 
   await waitForMilliseconds(intervalInMs);
 
-  return await retryUntilReady({retries: remainingRetries, isReady, fn});
+  return await retryUntilReady({retries: remainingRetries, intervalInMs, isReady, fn});
 };
