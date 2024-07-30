@@ -23,6 +23,7 @@ export const retryRequestStatus = async ({
   };
 
   return await retryUntilReady({
+    // TODO: extract a variable and default value for the Wallet
     retries: 60, // 30 seconds
     isReady,
     fn: requestStatus
