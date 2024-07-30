@@ -1,6 +1,6 @@
 import type {Mock} from 'vitest';
 import type {IcrcReadyResponseType} from '../types/icrc-responses';
-import {JSON_RPC_VERSION_2, RpcIdType} from '../types/rpc';
+import {JSON_RPC_VERSION_2, type RpcIdType} from '../types/rpc';
 import {notifyReady} from './signer.handlers';
 
 describe('Signer handlers', () => {
