@@ -65,9 +65,7 @@ describe('Wallet handlers', () => {
           resolve();
         });
 
-        for (const _ of [...Array(59).keys()]) {
-          await vi.advanceTimersByTimeAsync(500);
-        }
+        await vi.advanceTimersByTimeAsync(60 * 500);
       }));
   });
 });
