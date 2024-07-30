@@ -1,6 +1,8 @@
 import {retryRequestStatus} from './wallet.handlers';
 
 describe('Wallet handlers', () => {
+  const testId = '1234_test';
+
   let popup: Window;
   let isReady: () => boolean;
 
@@ -30,11 +32,11 @@ describe('Wallet handlers', () => {
       // eslint-disable-next-line @typescript-eslint/return-await
       new Promise<void>((resolve) => {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        retryRequestStatus({popup, isReady, msgId: '123'}).then((result) => {
+        retryRequestStatus({popup, isReady, id: testId}).then((result) => {
           // eslint-disable-next-line @typescript-eslint/unbound-method
           expect(popup.postMessage).toHaveBeenCalledWith(
             {
-              id: '123',
+              id: testId,
               jsonrpc: '2.0',
               method: 'icrc29_status'
             },
@@ -59,15 +61,13 @@ describe('Wallet handlers', () => {
       // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
       new Promise<void>(async (resolve) => {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        retryRequestStatus({popup, isReady, msgId: '123'}).then((result) => {
+        retryRequestStatus({popup, isReady, id: testId}).then((result) => {
           expect(result).toEqual('timeout');
 
           resolve();
         });
 
-        for (const _ of [...Array(59).keys()]) {
-          await vi.advanceTimersByTimeAsync(500);
-        }
+        await vi.advanceTimersByTimeAsync(60 * 500);
       }));
   });
 });
