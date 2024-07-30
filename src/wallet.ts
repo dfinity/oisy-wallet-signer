@@ -1,9 +1,6 @@
 import {assertNonNullish, nonNullish} from '@dfinity/utils';
 import {nanoid} from 'nanoid';
-import {ICRC29_STATUS} from './types/icrc';
-import type {IcrcWalletStatusRequestType} from './types/icrc-requests';
-import {JSON_RPC_VERSION_2} from './types/rpc';
-import {retryUntilReady} from './utils/timeout.utils';
+import {retryRequestStatus} from './handlers/wallet.handlers';
 import {
   WALLET_WINDOW_TOP_RIGHT,
   windowFeatures,
@@ -61,35 +58,27 @@ export class Wallet {
 
     window.addEventListener('message', onMessage);
 
-    const requestStatus = (): void => {
-      const msg: IcrcWalletStatusRequestType = {
-        id: nanoid(),
-        jsonrpc: JSON_RPC_VERSION_2,
-        method: ICRC29_STATUS
+    try {
+      const result = await retryRequestStatus({
+        popup,
+        isReady: (): boolean => nonNullish(wallet),
+        msgId: nanoid()
+      });
+
+      if (result === 'timeout') {
+        throw new Error('Connection timeout. Unable to connect to the wallet.');
+      }
+
+      assertNonNullish(wallet);
+
+      return wallet;
+    } finally {
+      const disconnect = (): void => {
+        window.removeEventListener('message', onMessage);
+        popup.close();
       };
 
-      popup.postMessage(msg, '*');
-    };
-
-    const result = await retryUntilReady({
-      retries: 60,
-      isReady: (): boolean => nonNullish(wallet),
-      fn: requestStatus
-    });
-
-    const disconnect = (): void => {
-      window.removeEventListener('message', onMessage);
-      popup.close();
-    };
-
-    disconnect();
-
-    if (result === 'timeout') {
-      throw new Error('Unable to connect wallet. Timeout.');
+      disconnect();
     }
-
-    assertNonNullish(wallet);
-
-    return wallet;
   }
 }
