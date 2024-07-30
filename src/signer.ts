@@ -62,8 +62,8 @@ export class Signer {
     const {success: isStatusRequest, data} = IcrcWalletStatusRequest.safeParse(msgData);
 
     if (isStatusRequest) {
-      const {id: msgId} = data;
-      notifyReady({msgId});
+      const {id} = data;
+      notifyReady({id});
     }
   };
 
