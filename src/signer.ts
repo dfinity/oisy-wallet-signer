@@ -63,15 +63,16 @@ export class Signer {
 
     if (isStatusRequest) {
       const {id} = data;
-      notifyReady({id});
+      notifyReady({id, origin});
     }
   };
 
   private assertAndSetOrigin(origin: string): void {
     if (nonNullish(this.#walletOrigin) && this.#walletOrigin !== origin) {
-      throw new Error('Origin is not allowed to interact with the signer');
+      throw new Error(`The relying party's origin is not allowed to interact with the signer.`);
     }
 
+    // We do not reassign the origin with the same value if it is already set. It is not a significant performance win.
     if (nonNullish(this.#walletOrigin)) {
       return;
     }
