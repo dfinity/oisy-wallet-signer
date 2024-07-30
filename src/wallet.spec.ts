@@ -89,8 +89,10 @@ describe('Wallet', () => {
       vi.restoreAllMocks();
     });
 
-    it('should throw cannot open window', () => {
-      expect(Wallet.connect(mockParameters)).rejects.toThrow('Unable to open the wallet window.');
+    it('should throw cannot open window', async () => {
+      await expect(Wallet.connect(mockParameters)).rejects.toThrow(
+        'Unable to open the wallet window.'
+      );
     });
   });
 });

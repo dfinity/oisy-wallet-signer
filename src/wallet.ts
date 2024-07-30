@@ -51,7 +51,7 @@ export class Wallet {
 
     let wallet: Wallet | undefined;
 
-    const onMessage = ({origin, data}: MessageEvent): void => {
+    const onMessage = ({origin, data: _}: MessageEvent): void => {
       // TODO: safeParse + validate ID
       wallet = new Wallet({origin});
     };
