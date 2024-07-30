@@ -84,7 +84,7 @@ describe('retryUntilReady', () => {
 
     const promise = retryUntilReady({retries: 3, isReady, fn, intervalInMs});
 
-    await vi.advanceTimersByTimeAsync(intervalInMs * 2 * 3);
+    await vi.advanceTimersByTimeAsync(intervalInMs * 2);
 
     await promise;
 
