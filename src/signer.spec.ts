@@ -1,5 +1,8 @@
 import {type MockInstance} from 'vitest';
+import * as signerHandlers from './handlers/signer.handlers';
 import {Signer, type SignerParameters} from './signer';
+import {ICRC29_STATUS} from './types/icrc';
+import {JSON_RPC_VERSION_2} from './types/rpc';
 
 describe('Signer', () => {
   const mockParameters: SignerParameters = {};
@@ -59,6 +62,43 @@ describe('Signer', () => {
       window.dispatchEvent(messageEvent);
 
       expect(onMessageListenerSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('assertAndSetOrigin', () => {
+    let notifyReadySpy: MockInstance;
+    let signer: Signer;
+
+    beforeEach(() => {
+      signer = Signer.init(mockParameters);
+      notifyReadySpy = vi.spyOn(signerHandlers, 'notifyReady');
+    });
+
+    afterEach(() => {
+      signer.disconnect();
+      vi.clearAllMocks();
+    });
+
+    it('should set the origin if it is not set', () => {
+      const testOrigin = 'https://hello.com';
+
+      let testId = 'test-123';
+
+      const messageEvent = new MessageEvent('message', {
+        data: {
+          id: testId,
+          jsonrpc: JSON_RPC_VERSION_2,
+          method: ICRC29_STATUS
+        },
+        origin: testOrigin
+      });
+
+      window.dispatchEvent(messageEvent);
+
+      expect(notifyReadySpy).toHaveBeenCalledWith({
+        id: testId,
+        origin: testOrigin
+      });
     });
   });
 });
