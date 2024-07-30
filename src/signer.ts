@@ -23,7 +23,7 @@ type SignerMessageEvent = MessageEvent<
 >;
 
 export class Signer {
-  #walletOrigin: string | undefined;
+  #walletOrigin: string | undefined | null;
 
   private constructor(_parameters: SignerParameters) {
     window.addEventListener('message', this.onMessageListener);
@@ -47,6 +47,7 @@ export class Signer {
    */
   disconnect = (): void => {
     window.removeEventListener('message', this.onMessageListener);
+    this.#walletOrigin = null;
   };
 
   private readonly onMessageListener = (message: SignerMessageEvent): void => {
