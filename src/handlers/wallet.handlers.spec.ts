@@ -26,9 +26,12 @@ describe('Wallet handlers', () => {
       });
     });
 
-    it('should call icrc29_status postMessage and returns ready', () =>
-      new Promise<void>((done) => {
+    it('should call icrc29_status postMessage and returns ready', async () =>
+      // eslint-disable-next-line @typescript-eslint/return-await
+      new Promise<void>((resolve) => {
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         retryRequestStatus({popup, isReady, msgId: '123'}).then((result) => {
+          // eslint-disable-next-line @typescript-eslint/unbound-method
           expect(popup.postMessage).toHaveBeenCalledWith(
             {
               id: '123',
@@ -40,7 +43,7 @@ describe('Wallet handlers', () => {
 
           expect(result).toEqual('ready');
 
-          done();
+          resolve();
         });
 
         vi.advanceTimersByTime(1000);
@@ -52,12 +55,14 @@ describe('Wallet handlers', () => {
       isReady = vi.fn(() => false);
     });
 
-    it('should timeout after 30 seconds', () =>
-      new Promise<void>(async (done) => {
+    it('should timeout after 30 seconds', async () =>
+      // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
+      new Promise<void>(async (resolve) => {
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         retryRequestStatus({popup, isReady, msgId: '123'}).then((result) => {
           expect(result).toEqual('timeout');
 
-          done();
+          resolve();
         });
 
         for (const _ of [...Array(59).keys()]) {
