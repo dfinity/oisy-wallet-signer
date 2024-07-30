@@ -12,11 +12,11 @@ import type {
 export interface SignerParameters {}
 
 type SignerMessageEvent = MessageEvent<
-    Partial<
-        | IcrcWalletRequestPermissionsRequestType
-        | IcrcWalletPermissionsRequestType
-        | IcrcWalletSupportedStandardsRequestType
-    >
+  Partial<
+    | IcrcWalletRequestPermissionsRequestType
+    | IcrcWalletPermissionsRequestType
+    | IcrcWalletSupportedStandardsRequestType
+  >
 >;
 
 export class Signer {
