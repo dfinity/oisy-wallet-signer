@@ -14,8 +14,8 @@ export const retryRequestStatus = async ({
 }): Promise<'ready' | 'timeout'> => {
   const requestStatus = (): void => {
     const msg: IcrcWalletStatusRequestType = {
-      id,
       jsonrpc: JSON_RPC_VERSION_2,
+      id,
       method: ICRC29_STATUS
     };
 
