@@ -7,66 +7,90 @@ describe('Wallet', () => {
 
   let originalOpen: typeof window.open;
 
-  beforeEach(() => {
-    originalOpen = window.open;
+  describe('Window success', () => {
+    beforeEach(() => {
+      originalOpen = window.open;
 
-    vi.stubGlobal(
-      'open',
-      vi.fn(() => window)
-    );
-    vi.stubGlobal('close', vi.fn());
-  });
-
-  afterEach(() => {
-    window.open = originalOpen;
-
-    vi.restoreAllMocks();
-  });
-
-  const options = [
-    {
-      title: 'default options',
-      params: mockParameters,
-      expectedOptions: windowFeatures(WALLET_WINDOW_TOP_RIGHT)
-    },
-    {
-      title: 'centered window',
-      params: {
-        ...mockParameters,
-        windowOptions: WALLET_WINDOW_CENTER
-      },
-      expectedOptions: windowFeatures(WALLET_WINDOW_CENTER)
-    },
-    {
-      title: 'custom window',
-      params: {
-        ...mockParameters,
-        windowOptions: 'height=600, width=400'
-      },
-      expectedOptions: 'height=600, width=400'
-    }
-  ];
-
-  it.each(options)('$title', async ({params, expectedOptions}) => {
-    const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
-    const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
-
-    const promise = Wallet.connect(params);
-
-    const messageEvent = new MessageEvent('message', {
-      origin: mockParameters.url
+      vi.stubGlobal(
+        'open',
+        vi.fn(() => window)
+      );
+      vi.stubGlobal('close', vi.fn());
     });
 
-    window.dispatchEvent(messageEvent);
+    afterEach(() => {
+      window.open = originalOpen;
 
-    const wallet = await promise;
+      vi.restoreAllMocks();
+    });
 
-    expect(wallet).toBeInstanceOf(Wallet);
+    const options = [
+      {
+        title: 'default options',
+        params: mockParameters,
+        expectedOptions: windowFeatures(WALLET_WINDOW_TOP_RIGHT)
+      },
+      {
+        title: 'centered window',
+        params: {
+          ...mockParameters,
+          windowOptions: WALLET_WINDOW_CENTER
+        },
+        expectedOptions: windowFeatures(WALLET_WINDOW_CENTER)
+      },
+      {
+        title: 'custom window',
+        params: {
+          ...mockParameters,
+          windowOptions: 'height=600, width=400'
+        },
+        expectedOptions: 'height=600, width=400'
+      }
+    ];
 
-    expect(window.open).toHaveBeenCalledWith(mockParameters.url, 'walletWindow', expectedOptions);
-    expect(window.open).toHaveBeenCalledTimes(1);
+    it.each(options)('$title', async ({params, expectedOptions}) => {
+      const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
+      const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
 
-    expect(addEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
-    expect(removeEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
+      const promise = Wallet.connect(params);
+
+      const messageEvent = new MessageEvent('message', {
+        origin: mockParameters.url
+      });
+
+      window.dispatchEvent(messageEvent);
+
+      const wallet = await promise;
+
+      expect(wallet).toBeInstanceOf(Wallet);
+
+      expect(window.open).toHaveBeenCalledWith(mockParameters.url, 'walletWindow', expectedOptions);
+      expect(window.open).toHaveBeenCalledTimes(1);
+
+      expect(addEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
+      expect(removeEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
+    });
+  });
+
+  describe('Window failure', () => {
+    beforeEach(() => {
+      originalOpen = window.open;
+
+      vi.stubGlobal(
+        'open',
+        vi.fn(() => undefined)
+      );
+      vi.stubGlobal('close', vi.fn());
+    });
+
+    afterEach(() => {
+      window.open = originalOpen;
+
+      vi.restoreAllMocks();
+    });
+
+    it('should throw cannot open window', () => {
+      expect(Wallet.connect(mockParameters)).rejects.toThrow('Unable to open the wallet window.');
+    });
   });
 });
