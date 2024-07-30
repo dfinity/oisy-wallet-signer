@@ -69,7 +69,10 @@ export class Wallet {
         throw new Error('Connection timeout. Unable to connect to the wallet.');
       }
 
-      assertNonNullish(wallet);
+      assertNonNullish(
+        wallet,
+        'Unexpected error. Request status succeeded, but wallet is not defined.'
+      );
 
       return wallet;
     } finally {

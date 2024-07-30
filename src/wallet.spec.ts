@@ -1,4 +1,5 @@
 import {beforeEach} from 'vitest';
+import * as walletHandlers from './handlers/wallet.handlers';
 import {WALLET_WINDOW_CENTER, WALLET_WINDOW_TOP_RIGHT, windowFeatures} from './utils/window.utils';
 import {Wallet, type WalletParameters} from './wallet';
 
@@ -69,6 +70,22 @@ describe('Wallet', () => {
 
       expect(addEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
       expect(removeEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
+    });
+
+    it('should throw connection timeout error', async () => {
+      vi.spyOn(walletHandlers, 'retryRequestStatus').mockResolvedValue('timeout');
+
+      await expect(Wallet.connect(mockParameters)).rejects.toThrow(
+        'Connection timeout. Unable to connect to the wallet.'
+      );
+    });
+
+    it('should assert edge case wallet not defined but request status success', async () => {
+      vi.spyOn(walletHandlers, 'retryRequestStatus').mockResolvedValue('ready');
+
+      await expect(Wallet.connect(mockParameters)).rejects.toThrow(
+        'Unexpected error. Request status succeeded, but wallet is not defined.'
+      );
     });
   });
 
