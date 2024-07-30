@@ -63,7 +63,7 @@ export class Wallet {
       const result = await retryRequestStatus({
         popup,
         isReady: (): boolean => nonNullish(wallet),
-        msgId: nanoid()
+        id: nanoid()
       });
 
       if (result === 'timeout') {
