@@ -1,8 +1,12 @@
-import type {
-  IcrcWalletPermissionsRequestType,
-  IcrcWalletRequestPermissionsRequestType,
-  IcrcWalletSupportedStandardsRequestType
+import {nonNullish} from '@dfinity/utils';
+import {
+  IcrcWalletStatusRequest,
+  type IcrcWalletPermissionsRequestType,
+  type IcrcWalletRequestPermissionsRequestType,
+  type IcrcWalletSupportedStandardsRequestType
 } from './types/icrc-requests';
+import type {IcrcReadyResponseType} from './types/icrc-responses';
+import {JSON_RPC_VERSION_2} from './types/rpc';
 
 /**
  * The parameters to initialize a signer.
@@ -20,7 +24,7 @@ type SignerMessageEvent = MessageEvent<
 >;
 
 export class Signer {
-  readonly #walletOrigin: string | undefined;
+  #walletOrigin: string | undefined;
 
   private constructor(_parameters: SignerParameters) {
     window.addEventListener('message', this.onMessageListener);
@@ -50,5 +54,38 @@ export class Signer {
     void this.onMessage(message);
   };
 
-  private readonly onMessage = async (_message: SignerMessageEvent): Promise<void> => {};
+  private readonly onMessage = async ({
+    data: msgData,
+    origin
+  }: SignerMessageEvent): Promise<void> => {
+    this.assertAndSetOrigin(origin);
+
+    const {success: isStatusRequest, data} = IcrcWalletStatusRequest.safeParse(msgData);
+
+    if (isStatusRequest) {
+      const notifyReady = (): void => {
+        const msg: IcrcReadyResponseType = {
+          jsonrpc: JSON_RPC_VERSION_2,
+          id: data.id,
+          result: 'ready'
+        };
+
+        window.opener.postMessage(msg, origin);
+      };
+
+      notifyReady();
+    }
+  };
+
+  private assertAndSetOrigin(origin: string): void {
+    if (nonNullish(this.#walletOrigin) && this.#walletOrigin !== origin) {
+      throw new Error('Origin is not allowed to interact with the signer');
+    }
+
+    if (nonNullish(this.#walletOrigin)) {
+      return;
+    }
+
+    this.#walletOrigin = origin;
+  }
 }
