@@ -1,12 +1,11 @@
 import {nonNullish} from '@dfinity/utils';
+import {notifyReady} from './handlers/signer.handlers';
 import {
   IcrcWalletStatusRequest,
   type IcrcWalletPermissionsRequestType,
   type IcrcWalletRequestPermissionsRequestType,
   type IcrcWalletSupportedStandardsRequestType
 } from './types/icrc-requests';
-import type {IcrcReadyResponseType} from './types/icrc-responses';
-import {JSON_RPC_VERSION_2} from './types/rpc';
 
 /**
  * The parameters to initialize a signer.
@@ -63,17 +62,8 @@ export class Signer {
     const {success: isStatusRequest, data} = IcrcWalletStatusRequest.safeParse(msgData);
 
     if (isStatusRequest) {
-      const notifyReady = (): void => {
-        const msg: IcrcReadyResponseType = {
-          jsonrpc: JSON_RPC_VERSION_2,
-          id: data.id,
-          result: 'ready'
-        };
-
-        window.opener.postMessage(msg, origin);
-      };
-
-      notifyReady();
+      const {id: msgId} = data;
+      notifyReady({msgId});
     }
   };
 
