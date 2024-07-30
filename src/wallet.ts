@@ -1,3 +1,6 @@
+import {assertNonNullish, nonNullish} from '@dfinity/utils';
+import {nanoid} from 'nanoid';
+import {retryRequestStatus} from './handlers/wallet.handlers';
 import {
   WALLET_WINDOW_TOP_RIGHT,
   windowFeatures,
@@ -39,25 +42,47 @@ export class Wallet {
     url,
     windowOptions = WALLET_WINDOW_TOP_RIGHT
   }: WalletParameters): Promise<Wallet> {
-    return await new Promise<Wallet>((resolve) => {
+    const popupFeatures =
+      typeof windowOptions === 'string' ? windowOptions : windowFeatures(windowOptions);
+
+    const popup = window.open(url, 'walletWindow', popupFeatures);
+
+    assertNonNullish(popup, 'Unable to open the wallet window.');
+
+    let wallet: Wallet | undefined;
+
+    const onMessage = ({origin, data: _}: MessageEvent): void => {
+      // TODO: validate origin
+      // TODO: safeParse + validate ID
+      wallet = new Wallet({origin});
+    };
+
+    window.addEventListener('message', onMessage);
+
+    try {
+      const result = await retryRequestStatus({
+        popup,
+        isReady: (): boolean => nonNullish(wallet),
+        id: nanoid()
+      });
+
+      if (result === 'timeout') {
+        throw new Error('Connection timeout. Unable to connect to the wallet.');
+      }
+
+      assertNonNullish(
+        wallet,
+        'Unexpected error. Request status succeeded, but wallet is not defined.'
+      );
+
+      return wallet;
+    } finally {
       const disconnect = (): void => {
         window.removeEventListener('message', onMessage);
-        popup?.close();
+        popup.close();
       };
 
-      const onMessage = ({origin}: MessageEvent): void => {
-        disconnect();
-
-        const wallet = new Wallet({origin});
-        resolve(wallet);
-      };
-
-      window.addEventListener('message', onMessage);
-
-      const popupFeatures =
-        typeof windowOptions === 'string' ? windowOptions : windowFeatures(windowOptions);
-
-      const popup = window.open(url, 'walletWindow', popupFeatures);
-    });
+      disconnect();
+    }
   }
 }
