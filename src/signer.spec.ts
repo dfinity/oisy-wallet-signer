@@ -168,4 +168,56 @@ describe('Signer', () => {
       }).not.toThrow();
     });
   });
+
+  describe('READY postMessage', () => {
+    const testId = 'test-123';
+
+    let originalOpener: typeof window.opener;
+
+    let signer: Signer;
+
+    let postMessageMock: MockInstance;
+
+    beforeEach(() => {
+      signer = Signer.init(mockParameters);
+
+      postMessageMock = vi.fn();
+
+      vi.stubGlobal('opener', {postMessage: postMessageMock});
+    });
+
+    afterEach(() => {
+      signer.disconnect();
+
+      window.opener = originalOpener;
+
+      vi.clearAllMocks();
+      vi.restoreAllMocks();
+    });
+
+    it('should notify READY', () => {
+      const testOrigin = 'https://hello.com';
+
+      const msg = {
+        data: {
+          id: testId,
+          jsonrpc: JSON_RPC_VERSION_2,
+          method: ICRC29_STATUS
+        },
+        origin: testOrigin
+      };
+
+      const messageEvent = new MessageEvent('message', msg);
+      window.dispatchEvent(messageEvent);
+
+      expect(postMessageMock).toHaveBeenCalledWith(
+        {
+          jsonrpc: JSON_RPC_VERSION_2,
+          id: testId,
+          result: 'ready'
+        },
+        testOrigin
+      );
+    });
+  });
 });
