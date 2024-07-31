@@ -1,7 +1,8 @@
 import {nonNullish} from '@dfinity/utils';
 import {SignerErrorCode} from './constants/signer.constants';
-import {notifyError} from './handlers/signer.handlers';
+import {notifyError, notifyReady} from './handlers/signer.handlers';
 import {
+  IcrcWalletStatusRequest,
   type IcrcWalletPermissionsRequestType,
   type IcrcWalletRequestPermissionsRequestType,
   type IcrcWalletSupportedStandardsRequestType
@@ -63,6 +64,13 @@ export class Signer {
     // TODO: assert messages to notify error if methods are not supported.
 
     this.assertAndSetOrigin({msgData, origin});
+
+    const {success: isStatusRequest, data} = IcrcWalletStatusRequest.safeParse(msgData);
+
+    if (isStatusRequest) {
+      const {id} = data;
+      notifyReady({id, origin});
+    }
   };
 
   private assertAndSetOrigin({

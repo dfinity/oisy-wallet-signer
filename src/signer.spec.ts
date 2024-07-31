@@ -1,4 +1,5 @@
 import {type MockInstance} from 'vitest';
+import * as signerHandlers from './handlers/signer.handlers';
 import {Signer, type SignerParameters} from './signer';
 import {ICRC29_STATUS} from './types/icrc';
 import {JSON_RPC_VERSION_2} from './types/rpc';
@@ -69,12 +70,14 @@ describe('Signer', () => {
 
     let originalOpener: typeof window.opener;
 
+    let notifyReadySpy: MockInstance;
     let signer: Signer;
 
     let postMessageMock: MockInstance;
 
     beforeEach(() => {
       signer = Signer.init(mockParameters);
+      notifyReadySpy = vi.spyOn(signerHandlers, 'notifyReady');
       postMessageMock = vi.fn();
       vi.stubGlobal('opener', {postMessage: postMessageMock});
     });
@@ -88,7 +91,25 @@ describe('Signer', () => {
       vi.restoreAllMocks();
     });
 
-    // TODO: it('should use the origin and respond with a post message', () => void) -> this can be assert with the first message, READY
+    it('should use the origin and respond with a post message', () => {
+      const testOrigin = 'https://hello.com';
+
+      const messageEvent = new MessageEvent('message', {
+        data: {
+          id: testId,
+          jsonrpc: JSON_RPC_VERSION_2,
+          method: ICRC29_STATUS
+        },
+        origin: testOrigin
+      });
+
+      window.dispatchEvent(messageEvent);
+
+      expect(notifyReadySpy).toHaveBeenCalledWith({
+        id: testId,
+        origin: testOrigin
+      });
+    });
 
     it('should notify an error if a message from different origin is dispatched', () => {
       const testOrigin = 'https://hello.com';
@@ -145,6 +166,58 @@ describe('Signer', () => {
       expect(() => {
         window.dispatchEvent(messageEventDiff);
       }).not.toThrow();
+    });
+  });
+
+  describe('READY postMessage', () => {
+    const testId = 'test-123';
+
+    let originalOpener: typeof window.opener;
+
+    let signer: Signer;
+
+    let postMessageMock: MockInstance;
+
+    beforeEach(() => {
+      signer = Signer.init(mockParameters);
+
+      postMessageMock = vi.fn();
+
+      vi.stubGlobal('opener', {postMessage: postMessageMock});
+    });
+
+    afterEach(() => {
+      signer.disconnect();
+
+      window.opener = originalOpener;
+
+      vi.clearAllMocks();
+      vi.restoreAllMocks();
+    });
+
+    it('should notify READY', () => {
+      const testOrigin = 'https://hello.com';
+
+      const msg = {
+        data: {
+          id: testId,
+          jsonrpc: JSON_RPC_VERSION_2,
+          method: ICRC29_STATUS
+        },
+        origin: testOrigin
+      };
+
+      const messageEvent = new MessageEvent('message', msg);
+      window.dispatchEvent(messageEvent);
+
+      expect(postMessageMock).toHaveBeenCalledWith(
+        {
+          jsonrpc: JSON_RPC_VERSION_2,
+          id: testId,
+          result: 'ready'
+        },
+        testOrigin
+      );
     });
   });
 });
