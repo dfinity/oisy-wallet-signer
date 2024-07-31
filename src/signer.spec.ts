@@ -1,5 +1,7 @@
 import {type MockInstance} from 'vitest';
 import {Signer, type SignerParameters} from './signer';
+import {ICRC29_STATUS} from './types/icrc';
+import {JSON_RPC_VERSION_2} from './types/rpc';
 
 describe('Signer', () => {
   const mockParameters: SignerParameters = {};
@@ -59,6 +61,90 @@ describe('Signer', () => {
       window.dispatchEvent(messageEvent);
 
       expect(onMessageListenerSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('origin and postMessage', () => {
+    const testId = 'test-123';
+
+    let originalOpener: typeof window.opener;
+
+    let signer: Signer;
+
+    let postMessageMock: MockInstance;
+
+    beforeEach(() => {
+      signer = Signer.init(mockParameters);
+      postMessageMock = vi.fn();
+      vi.stubGlobal('opener', {postMessage: postMessageMock});
+    });
+
+    afterEach(() => {
+      signer.disconnect();
+
+      window.opener = originalOpener;
+
+      vi.clearAllMocks();
+      vi.restoreAllMocks();
+    });
+
+    // TODO: it('should use the origin and respond with a post message', () => void) -> this can be assert with the first message, READY
+
+    it('should notify an error if a message from different origin is dispatched', () => {
+      const testOrigin = 'https://hello.com';
+      const differentOrigin = 'https://test.com';
+
+      const msg = {
+        data: {
+          id: testId,
+          jsonrpc: JSON_RPC_VERSION_2,
+          method: ICRC29_STATUS
+        },
+        origin: testOrigin
+      };
+
+      const messageEvent = new MessageEvent('message', msg);
+      window.dispatchEvent(messageEvent);
+
+      const messageEventDiff = new MessageEvent('message', {...msg, origin: differentOrigin});
+      window.dispatchEvent(messageEventDiff);
+
+      expect(postMessageMock).toHaveBeenCalledWith(
+        {
+          jsonrpc: JSON_RPC_VERSION_2,
+          id: testId,
+          error: {
+            code: 500,
+            message: "The relying party's origin is not allowed to interact with the signer."
+          }
+        },
+        differentOrigin
+      );
+    });
+
+    it('should reset #walletOrigin to null after disconnect', () => {
+      const testOrigin = 'https://hello.com';
+      const differentOrigin = 'https://world.com';
+
+      const msg = {
+        data: {
+          id: testId,
+          jsonrpc: JSON_RPC_VERSION_2,
+          method: ICRC29_STATUS
+        },
+        origin: testOrigin
+      };
+
+      const messageEvent = new MessageEvent('message', msg);
+      window.dispatchEvent(messageEvent);
+
+      const messageEventDiff = new MessageEvent('message', {...msg, origin: differentOrigin});
+
+      signer.disconnect();
+
+      expect(() => {
+        window.dispatchEvent(messageEventDiff);
+      }).not.toThrow();
     });
   });
 });
