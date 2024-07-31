@@ -60,6 +60,9 @@ export class Signer {
     data: msgData,
     origin
   }: SignerMessageEvent): Promise<void> => {
+    // TODO: ignore messages that are not Rpc Requests.
+    // TODO: assert messages to notify error if methods are not supported.
+
     this.assertAndSetOrigin({msgData, origin});
 
     const {success: isStatusRequest, data} = IcrcWalletStatusRequest.safeParse(msgData);
