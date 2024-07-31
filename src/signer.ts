@@ -1,6 +1,6 @@
 import {nonNullish} from '@dfinity/utils';
 import {SignerErrorCode} from './constants/signer.constants';
-import {notifyAndThrowError, notifyReady} from './handlers/signer.handlers';
+import {notifyError, notifyReady} from './handlers/signer.handlers';
 import {
   IcrcWalletStatusRequest,
   type IcrcWalletPermissionsRequestType,
@@ -80,7 +80,7 @@ export class Signer {
     if (nonNullish(this.#walletOrigin) && this.#walletOrigin !== origin) {
       const {data} = RpcRequest.safeParse(msgData);
 
-      notifyAndThrowError({
+      notifyError({
         id: data?.id ?? null,
         origin,
         error: {
@@ -88,7 +88,7 @@ export class Signer {
           message: `The relying party's origin is not allowed to interact with the signer.`
         }
       });
-      // Typescript safety
+
       return;
     }
 

@@ -73,10 +73,13 @@ describe('Signer', () => {
     let notifyReadySpy: MockInstance;
     let signer: Signer;
 
+    let postMessageMock: MockInstance;
+
     beforeEach(() => {
       signer = Signer.init(mockParameters);
       notifyReadySpy = vi.spyOn(signerHandlers, 'notifyReady');
-      vi.stubGlobal('opener', {postMessage: vi.fn()});
+      postMessageMock = vi.fn();
+      vi.stubGlobal('opener', {postMessage: postMessageMock});
     });
 
     afterEach(() => {
@@ -108,7 +111,7 @@ describe('Signer', () => {
       });
     });
 
-    it.skip('should throw an error if a message from different origin is dispatched', () => {
+    it('should notify an error if a message from different origin is dispatched', () => {
       const testOrigin = 'https://hello.com';
       const differentOrigin = 'https://test.com';
 
@@ -125,10 +128,19 @@ describe('Signer', () => {
       window.dispatchEvent(messageEvent);
 
       const messageEventDiff = new MessageEvent('message', {...msg, origin: differentOrigin});
-
-      // TODO: error
-
       window.dispatchEvent(messageEventDiff);
+
+      expect(postMessageMock).toHaveBeenCalledWith(
+        {
+          jsonrpc: JSON_RPC_VERSION_2,
+          id: testId,
+          error: {
+            code: 500,
+            message: "The relying party's origin is not allowed to interact with the signer."
+          }
+        },
+        differentOrigin
+      );
     });
 
     it('should reset #walletOrigin to null after disconnect', () => {

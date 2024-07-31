@@ -22,13 +22,13 @@ export const notifyReady = ({id, origin}: Notify): void => {
   notify({msg, origin});
 };
 
-export const notifyAndThrowError = ({
+export const notifyError = ({
   id,
   error,
   origin
 }: {
   error: RpcResponseErrorType;
-} & Notify): never => {
+} & Notify): void => {
   const msg: RpcResponseWithErrorType = {
     jsonrpc: JSON_RPC_VERSION_2,
     id,
@@ -36,8 +36,6 @@ export const notifyAndThrowError = ({
   };
 
   notify({msg, origin});
-
-  throw new Error(error.message);
 };
 
 const notify = ({msg, origin}: {msg: RpcResponseType} & Pick<Notify, 'origin'>): void =>
