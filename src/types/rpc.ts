@@ -16,7 +16,7 @@ const Rpc = z.object({
   id: z.optional(RpcId)
 });
 
-const RpcRequest = Rpc.extend({
+export const RpcRequest = Rpc.extend({
   id: RpcId
 })
   .merge(
@@ -95,11 +95,13 @@ const RpcResponseError = z.object({
   data: z.optional(z.never())
 });
 
+export type RpcResponseErrorType = z.infer<typeof RpcResponseError>;
+
 const RpcResponse = Rpc.extend({
   id: RpcId
 });
 
-type RpcResponseType = z.infer<typeof RpcResponse>;
+export type RpcResponseType = z.infer<typeof RpcResponse>;
 
 const RpcResponseContent = z
   .object({
@@ -110,17 +112,24 @@ const RpcResponseContent = z
 
 type RpcResponseContentType = z.infer<typeof RpcResponseContent>;
 
+const RpcResponseWithError = RpcResponse.extend({
+  error: RpcResponseError
+});
+
+export type RpcResponseWithErrorType = z.infer<typeof RpcResponseWithError>;
+
 export const inferRpcResponse = <T extends z.ZodTypeAny>(
   result: T
 ): z.ZodType<RpcResponseType & RpcResponseContentType> =>
-  RpcResponse.merge(
-    z
-      .object({
-        result,
-        error: RpcResponseError
-      })
-      .partial()
-  )
+  RpcResponseWithError.omit({error: true})
+    .merge(
+      z
+        .object({
+          result,
+          error: RpcResponseError
+        })
+        .partial()
+    )
     .strict()
     .refine(
       ({result, error}) => result !== undefined || error !== undefined,
