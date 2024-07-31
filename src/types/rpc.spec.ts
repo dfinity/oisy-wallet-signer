@@ -3,6 +3,7 @@ import {
   JSON_RPC_VERSION_2,
   RpcErrorCode,
   RpcNotification,
+  RpcRequest,
   inferRpcRequestWithParams,
   inferRpcRequestWithoutParams,
   inferRpcResponse
@@ -66,6 +67,54 @@ describe('rpc', () => {
   });
 
   describe('RpcRequest', () => {
+    describe('Generic', () => {
+      it('should validate a correct RpcRequest', () => {
+        const validRpcRequest = {
+          jsonrpc: JSON_RPC_VERSION_2,
+          id: 1,
+          method: 'test'
+        };
+        expect(() => RpcRequest.parse(validRpcRequest)).not.toThrow();
+      });
+
+      it('should throw if RpcRequest has additional fields', () => {
+        const invalidRpcRequest = {
+          jsonrpc: JSON_RPC_VERSION_2,
+          id: 1,
+          method: 'test',
+          hello: 'world'
+        };
+        expect(() => RpcRequest.parse(invalidRpcRequest)).toThrow();
+      });
+
+      it('should throw if RpcRequest has no id', () => {
+        const invalidRpcRequest = {
+          jsonrpc: JSON_RPC_VERSION_2,
+          method: 'test',
+          params: {hello: 123}
+        };
+        expect(() => RpcRequest.parse(invalidRpcRequest)).toThrow();
+      });
+
+      it('should throw if RpcRequest has no jsonrpc', () => {
+        const invalidRpcRequest = {
+          id: 123,
+          method: 'test',
+          params: {hello: 123}
+        };
+        expect(() => RpcRequest.parse(invalidRpcRequest)).toThrow();
+      });
+
+      it('should throw if RpcRequest has no method', () => {
+        const invalidRpcRequest = {
+          jsonrpc: JSON_RPC_VERSION_2,
+          id: 123,
+          params: {hello: 123}
+        };
+        expect(() => RpcRequest.parse(invalidRpcRequest)).toThrow();
+      });
+    });
+
     describe('Without params', () => {
       const RpcCustomRequest = inferRpcRequestWithoutParams({method: 'test'});
 
