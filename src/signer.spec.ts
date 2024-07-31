@@ -66,6 +66,8 @@ describe('Signer', () => {
   });
 
   describe('origin and postMessage', () => {
+    const testId = 'test-123';
+
     let originalOpener: typeof window.opener;
 
     let notifyReadySpy: MockInstance;
@@ -89,8 +91,6 @@ describe('Signer', () => {
     it('should use the origin and respond with a post message', () => {
       const testOrigin = 'https://hello.com';
 
-      let testId = 'test-123';
-
       const messageEvent = new MessageEvent('message', {
         data: {
           id: testId,
@@ -111,8 +111,6 @@ describe('Signer', () => {
     it.skip('should throw an error if a message from different origin is dispatched', () => {
       const testOrigin = 'https://hello.com';
       const differentOrigin = 'https://test.com';
-
-      let testId = 'test-123';
 
       const msg = {
         data: {
@@ -136,8 +134,6 @@ describe('Signer', () => {
     it('should reset #walletOrigin to null after disconnect', () => {
       const testOrigin = 'https://hello.com';
       const differentOrigin = 'https://world.com';
-
-      let testId = 'test-123';
 
       const msg = {
         data: {

@@ -1,11 +1,13 @@
 import {nonNullish} from '@dfinity/utils';
-import {notifyReady} from './handlers/signer.handlers';
+import {SignerErrorCode} from './constants/signer.constants';
+import {notifyAndThrowError, notifyReady} from './handlers/signer.handlers';
 import {
   IcrcWalletStatusRequest,
   type IcrcWalletPermissionsRequestType,
   type IcrcWalletRequestPermissionsRequestType,
   type IcrcWalletSupportedStandardsRequestType
 } from './types/icrc-requests';
+import {RpcRequest} from './types/rpc';
 
 /**
  * The parameters to initialize a signer.
@@ -14,13 +16,13 @@ import {
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface SignerParameters {}
 
-type SignerMessageEvent = MessageEvent<
-  Partial<
-    | IcrcWalletRequestPermissionsRequestType
-    | IcrcWalletPermissionsRequestType
-    | IcrcWalletSupportedStandardsRequestType
-  >
+type SignerMessageEventData = Partial<
+  | IcrcWalletRequestPermissionsRequestType
+  | IcrcWalletPermissionsRequestType
+  | IcrcWalletSupportedStandardsRequestType
 >;
+
+type SignerMessageEvent = MessageEvent<SignerMessageEventData>;
 
 export class Signer {
   #walletOrigin: string | undefined | null;
@@ -58,7 +60,7 @@ export class Signer {
     data: msgData,
     origin
   }: SignerMessageEvent): Promise<void> => {
-    this.assertAndSetOrigin(origin);
+    this.assertAndSetOrigin({msgData, origin});
 
     const {success: isStatusRequest, data} = IcrcWalletStatusRequest.safeParse(msgData);
 
@@ -68,9 +70,26 @@ export class Signer {
     }
   };
 
-  private assertAndSetOrigin(origin: string): void {
+  private assertAndSetOrigin({
+    msgData,
+    origin
+  }: {
+    origin: string;
+    msgData: SignerMessageEventData;
+  }): void {
     if (nonNullish(this.#walletOrigin) && this.#walletOrigin !== origin) {
-      throw new Error(`The relying party's origin is not allowed to interact with the signer.`);
+      const {data} = RpcRequest.safeParse(msgData);
+
+      notifyAndThrowError({
+        id: data?.id ?? null,
+        origin,
+        error: {
+          code: SignerErrorCode.ORIGIN_ERROR,
+          message: `The relying party's origin is not allowed to interact with the signer.`
+        }
+      });
+      // Typescript safety
+      return;
     }
 
     // We do not reassign the origin with the same value if it is already set. It is not a significant performance win.
