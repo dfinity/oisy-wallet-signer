@@ -1,5 +1,6 @@
 import {assertNonNullish, nonNullish} from '@dfinity/utils';
 import {nanoid} from 'nanoid';
+import {WALLET_CONNECT_DEFAULT_TIMEOUT_IN_SECONDS} from './constants/wallet.constants';
 import {retryRequestStatus} from './handlers/wallet.handlers';
 import {IcrcReadyResponse} from './types/icrc-responses';
 import {
@@ -23,6 +24,15 @@ export interface WalletParameters {
    * If a string is passed, those are applied as-is to the window that is opened (see https://developer.mozilla.org/en-US/docs/Web/API/Window/open#windowfeatures for more information).
    */
   windowOptions?: WalletWindowOptions | string;
+
+  /**
+   * Specifies the timeout duration in seconds for establishing a connection to the wallet.
+   * The wallet is checked (polled) every 500 milliseconds to determine if it is ready.
+   * If the connection is not established within this duration, the process will time out.
+   *
+   * @default 120 - The default timeout is set to 120 seconds.
+   */
+  connectionTimeoutInSeconds?: number;
 }
 
 export class Wallet {
@@ -41,7 +51,8 @@ export class Wallet {
    */
   static async connect({
     url,
-    windowOptions = WALLET_WINDOW_TOP_RIGHT
+    windowOptions = WALLET_WINDOW_TOP_RIGHT,
+    connectionTimeoutInSeconds = WALLET_CONNECT_DEFAULT_TIMEOUT_IN_SECONDS
   }: WalletParameters): Promise<Wallet> {
     const popupFeatures =
       typeof windowOptions === 'string' ? windowOptions : windowFeatures(windowOptions);
@@ -67,7 +78,8 @@ export class Wallet {
       const result = await retryRequestStatus({
         popup,
         isReady: (): boolean => nonNullish(wallet),
-        id: nanoid()
+        id: nanoid(),
+        timeoutInSeconds: connectionTimeoutInSeconds
       });
 
       if (result === 'timeout') {
