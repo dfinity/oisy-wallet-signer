@@ -1,6 +1,7 @@
 import {assertNonNullish, nonNullish} from '@dfinity/utils';
 import {nanoid} from 'nanoid';
 import {retryRequestStatus} from './handlers/wallet.handlers';
+import {IcrcReadyResponse} from './types/icrc-responses';
 import {
   WALLET_WINDOW_TOP_RIGHT,
   windowFeatures,
@@ -51,10 +52,13 @@ export class Wallet {
 
     let wallet: Wallet | undefined;
 
-    const onMessage = ({origin, data: _}: MessageEvent): void => {
+    const onMessage = ({origin, data: msgData}: MessageEvent): void => {
       // TODO: validate origin
-      // TODO: safeParse + validate ID
-      wallet = new Wallet({origin});
+
+      const {success: isWalletReady} = IcrcReadyResponse.safeParse(msgData);
+      if (isWalletReady) {
+        wallet = new Wallet({origin});
+      }
     };
 
     window.addEventListener('message', onMessage);
