@@ -4,6 +4,8 @@ export const waitForMilliseconds = async (milliseconds: number): Promise<void> =
   });
 };
 
+export type ReadyOrError = 'ready' | 'error';
+
 export const retryUntilReady = async ({
   retries,
   isReady,
@@ -11,14 +13,14 @@ export const retryUntilReady = async ({
   intervalInMs = 500
 }: {
   retries: number;
-  isReady: () => boolean;
+  isReady: () => ReadyOrError | 'pending';
   fn: () => void;
   intervalInMs?: number;
-}): Promise<'ready' | 'timeout'> => {
+}): Promise<ReadyOrError | 'timeout'> => {
   const ready = isReady();
 
-  if (ready) {
-    return 'ready';
+  if (ready !== 'pending') {
+    return ready;
   }
 
   const remainingRetries = retries - 1;

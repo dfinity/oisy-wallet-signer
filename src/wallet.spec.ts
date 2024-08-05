@@ -38,7 +38,28 @@ describe('Wallet', () => {
         vi.spyOn(walletHandlers, 'retryRequestStatus').mockResolvedValue('ready');
 
         await expect(Wallet.connect(mockParameters)).rejects.toThrow(
-          'Unexpected error. Request status succeeded, but wallet is not defined.'
+          'Unexpected error. The request status succeeded, but the wallet response is not defined.'
+        );
+      });
+
+      it('should throw error if the message ready received comes from another origin', async () => {
+        const hackerOrigin = 'https://hacker.com';
+
+        const promise = Wallet.connect(mockParameters);
+
+        const messageEvent = new MessageEvent('message', {
+          origin: hackerOrigin,
+          data: {
+            jsonrpc: JSON_RPC_VERSION_2,
+            id: '123',
+            result: 'ready'
+          }
+        });
+
+        window.dispatchEvent(messageEvent);
+
+        await expect(promise).rejects.toThrow(
+          `The response origin ${hackerOrigin} does not match the requested wallet URL ${mockParameters.url}.`
         );
       });
     });
