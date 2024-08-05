@@ -1,5 +1,6 @@
-import {beforeEach} from 'vitest';
+import {beforeEach, describe} from 'vitest';
 import * as walletHandlers from './handlers/wallet.handlers';
+import {JSON_RPC_VERSION_2} from './types/rpc';
 import {WALLET_WINDOW_CENTER, WALLET_WINDOW_TOP_RIGHT, windowFeatures} from './utils/window.utils';
 import {Wallet, type WalletParameters} from './wallet';
 
@@ -25,67 +26,80 @@ describe('Wallet', () => {
       vi.restoreAllMocks();
     });
 
-    const options = [
-      {
-        title: 'default options',
-        params: mockParameters,
-        expectedOptions: windowFeatures(WALLET_WINDOW_TOP_RIGHT)
-      },
-      {
-        title: 'centered window',
-        params: {
-          ...mockParameters,
-          windowOptions: WALLET_WINDOW_CENTER
-        },
-        expectedOptions: windowFeatures(WALLET_WINDOW_CENTER)
-      },
-      {
-        title: 'custom window',
-        params: {
-          ...mockParameters,
-          windowOptions: 'height=600, width=400'
-        },
-        expectedOptions: 'height=600, width=400'
-      }
-    ];
+    describe('Connection errors', () => {
+      it('should throw connection timeout error', async () => {
+        vi.spyOn(walletHandlers, 'retryRequestStatus').mockResolvedValue('timeout');
 
-    it.each(options)('$title', async ({params, expectedOptions}) => {
-      const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
-      const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
-
-      const promise = Wallet.connect(params);
-
-      const messageEvent = new MessageEvent('message', {
-        origin: mockParameters.url
+        await expect(Wallet.connect(mockParameters)).rejects.toThrow(
+          'Connection timeout. Unable to connect to the wallet.'
+        );
       });
 
-      window.dispatchEvent(messageEvent);
+      it('should assert edge case wallet not defined but request status success', async () => {
+        vi.spyOn(walletHandlers, 'retryRequestStatus').mockResolvedValue('ready');
 
-      const wallet = await promise;
-
-      expect(wallet).toBeInstanceOf(Wallet);
-
-      expect(window.open).toHaveBeenCalledWith(mockParameters.url, 'walletWindow', expectedOptions);
-      expect(window.open).toHaveBeenCalledTimes(1);
-
-      expect(addEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
-      expect(removeEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
+        await expect(Wallet.connect(mockParameters)).rejects.toThrow(
+          'Unexpected error. Request status succeeded, but wallet is not defined.'
+        );
+      });
     });
 
-    it('should throw connection timeout error', async () => {
-      vi.spyOn(walletHandlers, 'retryRequestStatus').mockResolvedValue('timeout');
+    describe('Connection success', () => {
+      const options = [
+        {
+          title: 'default options',
+          params: mockParameters,
+          expectedOptions: windowFeatures(WALLET_WINDOW_TOP_RIGHT)
+        },
+        {
+          title: 'centered window',
+          params: {
+            ...mockParameters,
+            windowOptions: WALLET_WINDOW_CENTER
+          },
+          expectedOptions: windowFeatures(WALLET_WINDOW_CENTER)
+        },
+        {
+          title: 'custom window',
+          params: {
+            ...mockParameters,
+            windowOptions: 'height=600, width=400'
+          },
+          expectedOptions: 'height=600, width=400'
+        }
+      ];
 
-      await expect(Wallet.connect(mockParameters)).rejects.toThrow(
-        'Connection timeout. Unable to connect to the wallet.'
-      );
-    });
+      it.each(options)('$title', async ({params, expectedOptions}) => {
+        const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
+        const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
 
-    it('should assert edge case wallet not defined but request status success', async () => {
-      vi.spyOn(walletHandlers, 'retryRequestStatus').mockResolvedValue('ready');
+        const promise = Wallet.connect(params);
 
-      await expect(Wallet.connect(mockParameters)).rejects.toThrow(
-        'Unexpected error. Request status succeeded, but wallet is not defined.'
-      );
+        const messageEvent = new MessageEvent('message', {
+          origin: mockParameters.url,
+          data: {
+            jsonrpc: JSON_RPC_VERSION_2,
+            id: '123',
+            result: 'ready'
+          }
+        });
+
+        window.dispatchEvent(messageEvent);
+
+        const wallet = await promise;
+
+        expect(wallet).toBeInstanceOf(Wallet);
+
+        expect(window.open).toHaveBeenCalledWith(
+          mockParameters.url,
+          'walletWindow',
+          expectedOptions
+        );
+        expect(window.open).toHaveBeenCalledTimes(1);
+
+        expect(addEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
+        expect(removeEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
+      });
     });
   });
 
