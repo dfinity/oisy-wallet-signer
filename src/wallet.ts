@@ -1,7 +1,8 @@
-import {assertNonNullish, nonNullish} from '@dfinity/utils';
+import {assertNonNullish, nonNullish, notEmptyString} from '@dfinity/utils';
 import {nanoid} from 'nanoid';
 import {retryRequestStatus} from './handlers/wallet.handlers';
 import {IcrcReadyResponse} from './types/icrc-responses';
+import type {ReadyOrError} from './utils/timeout.utils';
 import {
   WALLET_WINDOW_TOP_RIGHT,
   windowFeatures,
@@ -50,14 +51,22 @@ export class Wallet {
 
     assertNonNullish(popup, 'Unable to open the wallet window.');
 
-    let wallet: Wallet | undefined;
+    class MessageError extends Error {}
+
+    let response: Wallet | MessageError | undefined;
 
     const onMessage = ({origin, data: msgData}: MessageEvent): void => {
-      // TODO: validate origin
+      // In our test suite, origin is set to empty string when the message originate from the same window - i.e. when retryRequestStatus are emitted.// In our test suite, the origin is set to an empty string when the message originates from the same window. This occurs when `retryRequestStatus` events are emitted to `*`.
+      if (notEmptyString(origin) && origin !== url) {
+        response = new MessageError(
+          `The response origin ${origin} does not match the requested wallet URL ${url}.`
+        );
+        return;
+      }
 
       const {success: isWalletReady} = IcrcReadyResponse.safeParse(msgData);
       if (isWalletReady) {
-        wallet = new Wallet({origin});
+        response = new Wallet({origin});
       }
     };
 
@@ -66,7 +75,8 @@ export class Wallet {
     try {
       const result = await retryRequestStatus({
         popup,
-        isReady: (): boolean => nonNullish(wallet),
+        isReady: (): ReadyOrError | 'pending' =>
+          nonNullish(response) ? (response instanceof Wallet ? 'ready' : 'error') : 'pending',
         id: nanoid()
       });
 
@@ -75,11 +85,15 @@ export class Wallet {
       }
 
       assertNonNullish(
-        wallet,
-        'Unexpected error. Request status succeeded, but wallet is not defined.'
+        response,
+        'Unexpected error. The request status succeeded, but the wallet response is not defined.'
       );
 
-      return wallet;
+      if (response instanceof MessageError) {
+        throw response;
+      }
+
+      return response;
     } finally {
       const disconnect = (): void => {
         window.removeEventListener('message', onMessage);

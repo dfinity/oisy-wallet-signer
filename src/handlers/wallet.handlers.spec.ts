@@ -1,10 +1,11 @@
+import type {ReadyOrError} from '../utils/timeout.utils';
 import {retryRequestStatus} from './wallet.handlers';
 
 describe('Wallet handlers', () => {
   const testId = '1234_test';
 
   let popup: Window;
-  let isReady: () => boolean;
+  let isReady: () => ReadyOrError | 'pending';
 
   beforeEach(() => {
     vi.useFakeTimers();
@@ -24,7 +25,7 @@ describe('Wallet handlers', () => {
       let counter = 0;
       isReady = vi.fn(() => {
         counter++;
-        return counter > 1;
+        return counter > 1 ? 'ready' : 'pending';
       });
     });
 
@@ -54,7 +55,7 @@ describe('Wallet handlers', () => {
 
   describe('Failure', () => {
     beforeEach(() => {
-      isReady = vi.fn(() => false);
+      isReady = vi.fn(() => 'pending');
     });
 
     it('should timeout after 30 seconds', async () =>
