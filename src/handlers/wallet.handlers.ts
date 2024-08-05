@@ -1,7 +1,7 @@
 import {ICRC29_STATUS} from '../types/icrc';
 import type {IcrcWalletStatusRequestType} from '../types/icrc-requests';
 import {JSON_RPC_VERSION_2, type RpcIdType} from '../types/rpc';
-import {retryUntilReady} from '../utils/timeout.utils';
+import {retryUntilReady, type ReadyOrError} from '../utils/timeout.utils';
 
 export const retryRequestStatus = async ({
   popup,
@@ -10,10 +10,10 @@ export const retryRequestStatus = async ({
   timeoutInSeconds
 }: {
   popup: Window;
-  isReady: () => boolean;
+  isReady: () => ReadyOrError | 'pending';
   id: RpcIdType;
   timeoutInSeconds: number;
-}): Promise<'ready' | 'timeout'> => {
+}): Promise<ReadyOrError | 'timeout'> => {
   const requestStatus = (): void => {
     const msg: IcrcWalletStatusRequestType = {
       jsonrpc: JSON_RPC_VERSION_2,
