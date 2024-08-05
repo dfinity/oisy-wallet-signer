@@ -1,5 +1,6 @@
 import {InternetIdentityPage, testWithII} from '@dfinity/internet-identity-playwright';
 import {expect} from '@playwright/test';
+import {waitForFadeAnimation} from './utils/test.utils';
 
 testWithII.beforeEach(async ({iiPage, browser}) => {
   const REPLICA_URL = 'http://localhost:4943';
@@ -35,5 +36,13 @@ testWithII(
     });
 
     await walletIIPage.signInWithIdentity({identity});
+
+    await walletPage.waitForEvent('close');
+
+    await expect(partyPage.getByTestId('wallet-connected')).toBeVisible();
+
+    await waitForFadeAnimation(partyPage);
+
+    await expect(partyPage.getByTestId('wallet-connected')).toHaveScreenshot();
   }
 );

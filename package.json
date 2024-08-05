@@ -53,6 +53,7 @@
     "lint": "eslint --max-warnings 0 \"src/**/*\"",
     "test": "tsc --noEmit -p ./tsconfig.spec.json && vitest",
     "e2e": "NODE_ENV=development playwright test",
+    "e2e:snapshots": "NODE_ENV=development playwright test --update-snapshots --reporter=list",
     "e2e:ci": "playwright test --reporter=html"
   },
   "devDependencies": {
