@@ -20,6 +20,6 @@
 	<Button {onclick} testId="connect-wallet-button">Connect Wallet</Button>
 {:else}
 	<div in:fade>
-		<p>Connected</p>
+		<p data-tid="wallet-connected">Connected</p>
 	</div>
 {/if}
