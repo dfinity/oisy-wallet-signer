@@ -2,7 +2,7 @@ import {assertNonNullish, nonNullish, notEmptyString} from '@dfinity/utils';
 import {nanoid} from 'nanoid';
 import {retryRequestStatus} from './handlers/wallet.handlers';
 import {IcrcReadyResponse} from './types/icrc-responses';
-import {ReadyOrError} from './utils/timeout.utils';
+import type {ReadyOrError} from './utils/timeout.utils';
 import {
   WALLET_WINDOW_TOP_RIGHT,
   windowFeatures,

@@ -1,4 +1,4 @@
-import {ReadyOrError} from '../utils/timeout.utils';
+import type {ReadyOrError} from '../utils/timeout.utils';
 import {retryRequestStatus} from './wallet.handlers';
 
 describe('Wallet handlers', () => {

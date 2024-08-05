@@ -1,4 +1,4 @@
-import {ReadyOrError, retryUntilReady, waitForMilliseconds} from './timeout.utils';
+import {retryUntilReady, waitForMilliseconds, type ReadyOrError} from './timeout.utils';
 
 describe('waitForMilliseconds', () => {
   it('should wait for the specified milliseconds', async () => {
