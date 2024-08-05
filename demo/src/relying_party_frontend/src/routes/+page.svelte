@@ -3,6 +3,7 @@
 	import { Wallet } from '@dfinity/oisy-wallet-signer/wallet';
 	import { isNullish } from '@dfinity/utils';
 	import Button from '$core/components/Button.svelte';
+	import UserId from '$core/components/UserId.svelte';
 
 	let wallet: Wallet | undefined = $state(undefined);
 
@@ -12,6 +13,8 @@
 		});
 	};
 </script>
+
+<UserId />
 
 {#if isNullish(wallet)}
 	<Button {onclick} testId="connect-wallet-button">Connect Wallet</Button>
