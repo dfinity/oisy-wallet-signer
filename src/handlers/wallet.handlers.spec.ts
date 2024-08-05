@@ -33,7 +33,7 @@ describe('Wallet handlers', () => {
       // eslint-disable-next-line @typescript-eslint/return-await
       new Promise<void>((resolve) => {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        retryRequestStatus({popup, isReady, id: testId}).then((result) => {
+        retryRequestStatus({popup, isReady, timeoutInSeconds: 120, id: testId}).then((result) => {
           // eslint-disable-next-line @typescript-eslint/unbound-method
           expect(popup.postMessage).toHaveBeenCalledWith(
             {
@@ -62,7 +62,7 @@ describe('Wallet handlers', () => {
       // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
       new Promise<void>(async (resolve) => {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        retryRequestStatus({popup, isReady, id: testId}).then((result) => {
+        retryRequestStatus({popup, isReady, timeoutInSeconds: 30, id: testId}).then((result) => {
           expect(result).toEqual('timeout');
 
           resolve();
