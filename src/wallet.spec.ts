@@ -1,4 +1,3 @@
-import {beforeEach, describe} from 'vitest';
 import * as walletHandlers from './handlers/wallet.handlers';
 import {JSON_RPC_VERSION_2} from './types/rpc';
 import {WALLET_WINDOW_CENTER, WALLET_WINDOW_TOP_RIGHT, windowFeatures} from './utils/window.utils';
