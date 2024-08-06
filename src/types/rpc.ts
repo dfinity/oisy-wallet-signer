@@ -116,7 +116,7 @@ const RpcResponseContent = <T extends z.ZodTypeAny>(
     })
     .partial();
 
-type RpcResponseContentType<T extends z.ZodTypeAny> = z.infer<
+type _RpcResponseContentType<T extends z.ZodTypeAny> = z.infer<
   ReturnType<typeof RpcResponseContent<T>>
 >;
 
@@ -150,7 +150,7 @@ export const inferRpcResponse = <T extends z.ZodTypeAny>(
     .merge(
       z
         .object({
-          result: result,
+          result,
           error: RpcResponseError
         })
         .partial()
