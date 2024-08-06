@@ -213,6 +213,7 @@ describe('icrc-responses', () => {
         ...validResponse,
         result: {
           supportedStandards: [
+            // @ts-expect-error: we are testing this on purpose
             {
               name: 'ICRC-25'
             }
@@ -242,6 +243,7 @@ describe('icrc-responses', () => {
         ...validResponse,
         result: {
           supportedStandards: [
+            // @ts-expect-error: we are testing this on purpose
             {
               url: 'https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-25/ICRC-25.md'
             }
@@ -266,6 +268,7 @@ describe('icrc-responses', () => {
 
       const response: IcrcSupportedStandardsResponseType = {
         ...rest,
+        // @ts-expect-error: we are testing this on purpose
         result: {}
       };
 
@@ -311,6 +314,7 @@ describe('icrc-responses', () => {
     it('should throw if response has no valid result string', () => {
       const invalidResponse: IcrcReadyResponseType = {
         ...validResponse,
+        // @ts-expect-error: we are testing this on purpose
         result: 'test'
       };
       expect(() => IcrcReadyResponse.parse(invalidResponse)).toThrow();
@@ -319,6 +323,7 @@ describe('icrc-responses', () => {
     it('should throw if response has no valid result type', () => {
       const invalidResponse: IcrcReadyResponseType = {
         ...validResponse,
+        // @ts-expect-error: we are testing this on purpose
         result: {
           hello: 'world'
         }
