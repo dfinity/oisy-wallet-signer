@@ -1,3 +1,5 @@
+import type {IcrcSupportedStandardsSchemaType} from '../types/icrc-responses';
+
 export enum SignerErrorCode {
   /**
    * The relying party's origin is not allowed to interact with the signer.
@@ -9,3 +11,10 @@ export enum SignerErrorCode {
    */
   REQUEST_NOT_SUPPORTED = 501
 }
+
+export const SIGNER_SUPPORTED_STANDARDS: IcrcSupportedStandardsSchemaType = [
+  {
+    name: 'ICRC-25',
+    url: 'https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-25/ICRC-25.md'
+  }
+];

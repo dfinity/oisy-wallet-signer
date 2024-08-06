@@ -53,16 +53,20 @@ const urlSchema = z
     }
   );
 
+const IcrcSupportedStandardsSchema = z
+  .array(
+    z.object({
+      name: IcrcWalletStandard,
+      url: urlSchema
+    })
+  )
+  .min(1);
+
+export type IcrcSupportedStandardsSchemaType = z.infer<typeof IcrcSupportedStandardsSchema>;
+
 export const IcrcSupportedStandardsResponse = inferRpcResponse(
   z.object({
-    supportedStandards: z
-      .array(
-        z.object({
-          name: IcrcWalletStandard,
-          url: urlSchema
-        })
-      )
-      .min(1)
+    supportedStandards: IcrcSupportedStandardsSchema
   })
 );
 

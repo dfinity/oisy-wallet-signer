@@ -1,8 +1,8 @@
 import type {Mock} from 'vitest';
-import {SignerErrorCode} from '../constants/signer.constants';
+import {SIGNER_SUPPORTED_STANDARDS, SignerErrorCode} from '../constants/signer.constants';
 import type {IcrcReadyResponseType} from '../types/icrc-responses';
 import {JSON_RPC_VERSION_2, type RpcIdType, type RpcResponseWithErrorType} from '../types/rpc';
-import {notifyError, notifyReady} from './signer.handlers';
+import {notifyError, notifyReady, notifySupportedStandards} from './signer.handlers';
 
 describe('Signer handlers', () => {
   const id: RpcIdType = 'test-123';
@@ -53,6 +53,22 @@ describe('Signer handlers', () => {
         jsonrpc: JSON_RPC_VERSION_2,
         id,
         error
+      };
+
+      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
+    });
+  });
+
+  describe('notifySupportedStandards', () => {
+    it('should post a message with the msg', () => {
+      notifySupportedStandards({id, origin});
+
+      const expectedMessage: IcrcReadyResponseType = {
+        jsonrpc: JSON_RPC_VERSION_2,
+        id,
+        result: {
+          supportedStandards: SIGNER_SUPPORTED_STANDARDS
+        }
       };
 
       expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
