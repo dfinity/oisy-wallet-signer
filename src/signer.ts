@@ -67,8 +67,6 @@ export class Signer {
       return;
     }
 
-    // TODO: assert messages to notify error if methods are not supported.
-
     this.assertAndSetOrigin({msgData, origin});
 
     const {success: isStatusRequest, data} = IcrcWalletStatusRequest.safeParse(msgData);
