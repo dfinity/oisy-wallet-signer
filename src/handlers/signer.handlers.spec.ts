@@ -1,6 +1,9 @@
 import type {Mock} from 'vitest';
 import {SIGNER_SUPPORTED_STANDARDS, SignerErrorCode} from '../constants/signer.constants';
-import type {IcrcReadyResponseType} from '../types/icrc-responses';
+import type {
+  IcrcReadyResponseType,
+  IcrcSupportedStandardsResponseType
+} from '../types/icrc-responses';
 import {JSON_RPC_VERSION_2, type RpcIdType, type RpcResponseWithErrorType} from '../types/rpc';
 import {notifyError, notifyReady, notifySupportedStandards} from './signer.handlers';
 
@@ -63,7 +66,7 @@ describe('Signer handlers', () => {
     it('should post a message with the msg', () => {
       notifySupportedStandards({id, origin});
 
-      const expectedMessage: IcrcReadyResponseType = {
+      const expectedMessage: IcrcSupportedStandardsResponseType = {
         jsonrpc: JSON_RPC_VERSION_2,
         id,
         result: {
