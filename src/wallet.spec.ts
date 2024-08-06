@@ -122,7 +122,7 @@ describe('Wallet', () => {
         expect(removeEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
       });
 
-      it.only('should not process message which are not RpcResponse', async () => {
+      it('should not process message which are not RpcResponse', async () => {
         const safeParseSpy = vi.spyOn(RpcResponseWithResultOrError, 'safeParse');
 
         const promise = Wallet.connect(mockParameters);
