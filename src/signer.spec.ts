@@ -1,6 +1,6 @@
 import {type MockInstance} from 'vitest';
 import * as signerHandlers from './handlers/signer.handlers';
-import {Signer, SignerMessageEventData, type SignerParameters} from './signer';
+import {Signer, type SignerMessageEventData, type SignerParameters} from './signer';
 import {ICRC29_STATUS} from './types/icrc';
 import {JSON_RPC_VERSION_2} from './types/rpc';
 
