@@ -128,16 +128,33 @@ export type RpcResponseWithErrorType = z.infer<typeof RpcResponseWithError>;
 
 export const inferRpcResponse = <T extends z.ZodTypeAny>(
   result: T
-): z.ZodType<RpcResponseType & RpcResponseContentType<T>> =>
+): z.ZodEffects<
+  z.ZodObject<
+    {
+      jsonrpc: z.ZodLiteral<'2.0'>;
+      id: z.ZodUnion<[z.ZodString, z.ZodNumber, z.ZodNull]>;
+      result: z.ZodOptional<T>;
+      error: z.ZodOptional<
+        z.ZodObject<{
+          code: z.ZodUnion<[z.ZodNumber, z.ZodNativeEnum<typeof RpcErrorCode>]>;
+          message: z.ZodString;
+          data: z.ZodOptional<z.ZodNever>;
+        }>
+      >;
+    },
+    'strict'
+  >
+> =>
   RpcResponseWithError.omit({error: true})
-    .and(
+    .merge(
       z
         .object({
-          result,
+          result: result,
           error: RpcResponseError
         })
         .partial()
     )
+    .strict()
     .refine(
       ({result, error}) => result !== undefined || error !== undefined,
       'Either result or error should be provided.'
