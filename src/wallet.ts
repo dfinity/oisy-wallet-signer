@@ -3,6 +3,7 @@ import {nanoid} from 'nanoid';
 import {WALLET_CONNECT_DEFAULT_TIMEOUT_IN_SECONDS} from './constants/wallet.constants';
 import {retryRequestStatus} from './handlers/wallet.handlers';
 import {IcrcReadyResponse} from './types/icrc-responses';
+import {RpcResponseWithResultOrError} from './types/rpc';
 import type {ReadyOrError} from './utils/timeout.utils';
 import {
   WALLET_WINDOW_TOP_RIGHT,
@@ -67,6 +68,13 @@ export class Wallet {
     let response: Wallet | MessageError | undefined;
 
     const onMessage = ({origin, data: msgData}: MessageEvent): void => {
+      const {success} = RpcResponseWithResultOrError.safeParse(msgData);
+
+      if (!success) {
+        // We are only interested in JSON-RPC messages, so we are ignoring any other messages emitted at the window level, as the consumer might be using other events.
+        return;
+      }
+
       // In our test suite, origin is set to empty string when the message originate from the same window - i.e. when retryRequestStatus are emitted.// In our test suite, the origin is set to an empty string when the message originates from the same window. This occurs when `retryRequestStatus` events are emitted to `*`.
       if (notEmptyString(origin) && origin !== url) {
         response = new MessageError(

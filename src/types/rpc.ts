@@ -135,3 +135,5 @@ export const inferRpcResponse = <T extends z.ZodTypeAny>(
       ({result, error}) => result !== undefined || error !== undefined,
       'Either result or error should be provided.'
     );
+
+export const RpcResponseWithResultOrError = inferRpcResponse(z.any());

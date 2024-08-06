@@ -1,5 +1,6 @@
 import * as walletHandlers from './handlers/wallet.handlers';
-import {JSON_RPC_VERSION_2} from './types/rpc';
+import {ICRC29_STATUS} from './types/icrc';
+import {JSON_RPC_VERSION_2, RpcResponseWithResultOrError} from './types/rpc';
 import {WALLET_WINDOW_CENTER, WALLET_WINDOW_TOP_RIGHT, windowFeatures} from './utils/window.utils';
 import {Wallet, type WalletParameters} from './wallet';
 
@@ -89,22 +90,22 @@ describe('Wallet', () => {
         }
       ];
 
+      const messageEventReady = new MessageEvent('message', {
+        origin: mockParameters.url,
+        data: {
+          jsonrpc: JSON_RPC_VERSION_2,
+          id: '123',
+          result: 'ready'
+        }
+      });
+
       it.each(options)('$title', async ({params, expectedOptions}) => {
         const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
         const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
 
         const promise = Wallet.connect(params);
 
-        const messageEvent = new MessageEvent('message', {
-          origin: mockParameters.url,
-          data: {
-            jsonrpc: JSON_RPC_VERSION_2,
-            id: '123',
-            result: 'ready'
-          }
-        });
-
-        window.dispatchEvent(messageEvent);
+        window.dispatchEvent(messageEventReady);
 
         const wallet = await promise;
 
@@ -119,6 +120,38 @@ describe('Wallet', () => {
 
         expect(addEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
         expect(removeEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
+      });
+
+      it('should not process message which are not RpcResponse', async () => {
+        const safeParseSpy = vi.spyOn(RpcResponseWithResultOrError, 'safeParse');
+
+        const promise = Wallet.connect(mockParameters);
+
+        const messageEventNotRpc = new MessageEvent('message', {
+          data: 'test',
+          origin: mockParameters.url
+        });
+
+        window.dispatchEvent(messageEventNotRpc);
+
+        window.dispatchEvent(messageEventReady);
+
+        const wallet = await promise;
+
+        expect(wallet).toBeInstanceOf(Wallet);
+
+        // Two responses as triggered above
+        expect(safeParseSpy).toHaveBeenCalledWith(messageEventNotRpc.data);
+        expect(safeParseSpy).toHaveBeenCalledWith(messageEventReady.data);
+
+        // We are mocking the popup with the window, therefore popup.postMessage({method: ICRC29_STATUS}) results in an additional message detected by window.addEventListener
+        expect(safeParseSpy).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: ICRC29_STATUS
+          })
+        );
+
+        expect(safeParseSpy).toHaveBeenCalledTimes(3);
       });
     });
   });
