@@ -1,8 +1,9 @@
 import {nonNullish} from '@dfinity/utils';
 import {SignerErrorCode} from './constants/signer.constants';
-import {notifyError, notifyReady} from './handlers/signer.handlers';
+import {notifyError, notifyReady, notifySupportedStandards} from './handlers/signer.handlers';
 import {
   IcrcWalletStatusRequest,
+  IcrcWalletSupportedStandardsRequest,
   type IcrcWalletPermissionsRequestType,
   type IcrcWalletRequestPermissionsRequestType,
   type IcrcWalletSupportedStandardsRequestType
@@ -69,11 +70,20 @@ export class Signer {
 
     this.assertAndSetOrigin({msgData, origin});
 
-    const {success: isStatusRequest, data} = IcrcWalletStatusRequest.safeParse(msgData);
+    const {success: isStatusRequest, data: statusData} = IcrcWalletStatusRequest.safeParse(msgData);
 
     if (isStatusRequest) {
-      const {id} = data;
+      const {id} = statusData;
       notifyReady({id, origin});
+      return;
+    }
+
+    const {success: isSupportedStandardsRequest, data: supportedStandardsData} =
+      IcrcWalletSupportedStandardsRequest.safeParse(msgData);
+
+    if (isSupportedStandardsRequest) {
+      const {id} = supportedStandardsData;
+      notifySupportedStandards({id, origin});
       return;
     }
 

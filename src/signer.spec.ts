@@ -1,8 +1,8 @@
 import {type MockInstance} from 'vitest';
-import {SignerErrorCode} from './constants/signer.constants';
+import {SIGNER_SUPPORTED_STANDARDS, SignerErrorCode} from './constants/signer.constants';
 import * as signerHandlers from './handlers/signer.handlers';
 import {Signer, type SignerMessageEventData, type SignerParameters} from './signer';
-import {ICRC29_STATUS} from './types/icrc';
+import {ICRC25_SUPPORTED_STANDARDS, ICRC29_STATUS} from './types/icrc';
 import {JSON_RPC_VERSION_2} from './types/rpc';
 
 describe('Signer', () => {
@@ -212,7 +212,7 @@ describe('Signer', () => {
       vi.restoreAllMocks();
     });
 
-    it('should notify READY', () => {
+    it('should notify READY for icrc29_status', () => {
       const msg = {
         data: {
           id: testId,
@@ -230,6 +230,31 @@ describe('Signer', () => {
           jsonrpc: JSON_RPC_VERSION_2,
           id: testId,
           result: 'ready'
+        },
+        testOrigin
+      );
+    });
+
+    it('should notify supported standards for icrc25_supported_standards', () => {
+      const msg = {
+        data: {
+          id: testId,
+          jsonrpc: JSON_RPC_VERSION_2,
+          method: ICRC25_SUPPORTED_STANDARDS
+        },
+        origin: testOrigin
+      };
+
+      const messageEvent = new MessageEvent('message', msg);
+      window.dispatchEvent(messageEvent);
+
+      expect(postMessageMock).toHaveBeenCalledWith(
+        {
+          jsonrpc: JSON_RPC_VERSION_2,
+          id: testId,
+          result: {
+            supportedStandards: SIGNER_SUPPORTED_STANDARDS
+          }
         },
         testOrigin
       );

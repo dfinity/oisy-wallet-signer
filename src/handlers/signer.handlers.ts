@@ -1,4 +1,8 @@
-import type {IcrcReadyResponseType} from '../types/icrc-responses';
+import {SIGNER_SUPPORTED_STANDARDS} from '../constants/signer.constants';
+import type {
+  IcrcReadyResponseType,
+  IcrcSupportedStandardsResponseType
+} from '../types/icrc-responses';
 import {
   JSON_RPC_VERSION_2,
   type RpcIdType,
@@ -17,6 +21,18 @@ export const notifyReady = ({id, origin}: Notify): void => {
     jsonrpc: JSON_RPC_VERSION_2,
     id,
     result: 'ready'
+  };
+
+  notify({msg, origin});
+};
+
+export const notifySupportedStandards = ({id, origin}: Notify): void => {
+  const msg: IcrcSupportedStandardsResponseType = {
+    jsonrpc: JSON_RPC_VERSION_2,
+    id,
+    result: {
+      supportedStandards: SIGNER_SUPPORTED_STANDARDS
+    }
   };
 
   notify({msg, origin});
