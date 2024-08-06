@@ -126,6 +126,7 @@ const RpcResponseWithError = RpcResponse.extend({
 
 export type RpcResponseWithErrorType = z.infer<typeof RpcResponseWithError>;
 
+// TODO: Simplify the return type to avoid redundancy with other types. Consider using a more concise or existing type definition.
 export const inferRpcResponse = <T extends z.ZodTypeAny>(
   result: T
 ): z.ZodEffects<
