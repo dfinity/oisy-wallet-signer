@@ -7,5 +7,5 @@ export enum SignerErrorCode {
   /**
    * The request sent by the relying party is not supported by the signer.
    */
-  REQUEST_NOT_SUPPORTED
+  REQUEST_NOT_SUPPORTED = 501
 }
