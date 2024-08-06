@@ -16,7 +16,7 @@ import {RpcRequest} from './types/rpc';
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface SignerParameters {}
 
-type SignerMessageEventData = Partial<
+export type SignerMessageEventData = Partial<
   | IcrcWalletRequestPermissionsRequestType
   | IcrcWalletPermissionsRequestType
   | IcrcWalletSupportedStandardsRequestType
@@ -60,7 +60,13 @@ export class Signer {
     data: msgData,
     origin
   }: SignerMessageEvent): Promise<void> => {
-    // TODO: ignore messages that are not Rpc Requests.
+    const {success} = RpcRequest.safeParse(msgData);
+
+    if (!success) {
+      // We are only interested in JSON-RPC messages, so we are ignoring any other messages emitted at the window level, as the consumer might be using other events.
+      return;
+    }
+
     // TODO: assert messages to notify error if methods are not supported.
 
     this.assertAndSetOrigin({msgData, origin});

@@ -1,6 +1,6 @@
 import {type MockInstance} from 'vitest';
 import * as signerHandlers from './handlers/signer.handlers';
-import {Signer, type SignerParameters} from './signer';
+import {Signer, type SignerMessageEventData, type SignerParameters} from './signer';
 import {ICRC29_STATUS} from './types/icrc';
 import {JSON_RPC_VERSION_2} from './types/rpc';
 
@@ -48,12 +48,27 @@ describe('Signer', () => {
     afterEach(() => {
       signer.disconnect();
       onMessageListenerSpy.mockClear();
+
+      vi.clearAllMocks();
     });
 
     it('should process message when a message event is received', () => {
       window.dispatchEvent(messageEvent);
 
       expect(onMessageListenerSpy).toHaveBeenCalledWith(messageEvent);
+    });
+
+    it('should not process message which are not RpcRequest', () => {
+      const spyAssertAndSetOrigin = vi.spyOn(
+        signer as unknown as {
+          assertAndSetOrigin: (params: {origin: string; msgData: SignerMessageEventData}) => void;
+        },
+        'assertAndSetOrigin'
+      );
+
+      window.dispatchEvent(messageEvent);
+
+      expect(spyAssertAndSetOrigin).not.toHaveBeenCalled();
     });
 
     it('should not process message when a message event is received', () => {
