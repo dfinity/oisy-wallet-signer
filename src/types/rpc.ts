@@ -103,14 +103,22 @@ const RpcResponse = Rpc.extend({
 
 export type RpcResponseType = z.infer<typeof RpcResponse>;
 
-const RpcResponseContent = z
-  .object({
-    result: z.any(),
-    error: RpcResponseError
-  })
-  .partial();
+const RpcResponseContent = <T extends z.ZodTypeAny>(
+  result: T
+): z.ZodObject<{
+  result: z.ZodOptional<T>;
+  error: z.ZodOptional<typeof RpcResponseError>;
+}> =>
+  z
+    .object({
+      result,
+      error: RpcResponseError
+    })
+    .partial();
 
-type RpcResponseContentType = z.infer<typeof RpcResponseContent>;
+type RpcResponseContentType<T extends z.ZodTypeAny> = z.infer<
+  ReturnType<typeof RpcResponseContent<T>>
+>;
 
 const RpcResponseWithError = RpcResponse.extend({
   error: RpcResponseError
@@ -120,9 +128,9 @@ export type RpcResponseWithErrorType = z.infer<typeof RpcResponseWithError>;
 
 export const inferRpcResponse = <T extends z.ZodTypeAny>(
   result: T
-): z.ZodType<RpcResponseType & RpcResponseContentType> =>
+): z.ZodType<RpcResponseType & RpcResponseContentType<T>> =>
   RpcResponseWithError.omit({error: true})
-    .merge(
+    .and(
       z
         .object({
           result,
@@ -130,7 +138,6 @@ export const inferRpcResponse = <T extends z.ZodTypeAny>(
         })
         .partial()
     )
-    .strict()
     .refine(
       ({result, error}) => result !== undefined || error !== undefined,
       'Either result or error should be provided.'
