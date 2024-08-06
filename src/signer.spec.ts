@@ -1,4 +1,5 @@
 import {type MockInstance} from 'vitest';
+import {SignerErrorCode} from './constants/signer.constants';
 import * as signerHandlers from './handlers/signer.handlers';
 import {Signer, type SignerMessageEventData, type SignerParameters} from './signer';
 import {ICRC29_STATUS} from './types/icrc';
@@ -80,7 +81,7 @@ describe('Signer', () => {
     });
   });
 
-  describe('origin and postMessage', () => {
+  describe('Origin', () => {
     const testId = 'test-123';
 
     let originalOpener: typeof window.opener;
@@ -184,8 +185,9 @@ describe('Signer', () => {
     });
   });
 
-  describe('READY postMessage', () => {
+  describe('Exchange postMessage', () => {
     const testId = 'test-123';
+    const testOrigin = 'https://hello.com';
 
     let originalOpener: typeof window.opener;
 
@@ -211,8 +213,6 @@ describe('Signer', () => {
     });
 
     it('should notify READY', () => {
-      const testOrigin = 'https://hello.com';
-
       const msg = {
         data: {
           id: testId,
@@ -230,6 +230,34 @@ describe('Signer', () => {
           jsonrpc: JSON_RPC_VERSION_2,
           id: testId,
           result: 'ready'
+        },
+        testOrigin
+      );
+    });
+
+    it('should notify REQUEST_NOT_SUPPORTED', () => {
+      const testOrigin = 'https://hello.com';
+
+      const msg = {
+        data: {
+          id: testId,
+          jsonrpc: JSON_RPC_VERSION_2,
+          method: 'this_is_not_supported'
+        },
+        origin: testOrigin
+      };
+
+      const messageEvent = new MessageEvent('message', msg);
+      window.dispatchEvent(messageEvent);
+
+      expect(postMessageMock).toHaveBeenCalledWith(
+        {
+          jsonrpc: JSON_RPC_VERSION_2,
+          id: testId,
+          error: {
+            code: SignerErrorCode.REQUEST_NOT_SUPPORTED,
+            message: 'The request sent by the relying party is not supported by the signer.'
+          }
         },
         testOrigin
       );
