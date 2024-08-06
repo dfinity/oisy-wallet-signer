@@ -60,7 +60,7 @@ export class Signer {
     data: msgData,
     origin
   }: SignerMessageEvent): Promise<void> => {
-    const {success} = RpcRequest.safeParse(msgData);
+    const {success, data: requestData} = RpcRequest.safeParse(msgData);
 
     if (!success) {
       // We are only interested in JSON-RPC messages, so we are ignoring any other messages emitted at the window level, as the consumer might be using other events.
@@ -76,7 +76,17 @@ export class Signer {
     if (isStatusRequest) {
       const {id} = data;
       notifyReady({id, origin});
+      return;
     }
+
+    notifyError({
+      id: requestData?.id ?? null,
+      origin,
+      error: {
+        code: SignerErrorCode.REQUEST_NOT_SUPPORTED,
+        message: 'The request sent by the relying party is not supported by the signer.'
+      }
+    });
   };
 
   private assertAndSetOrigin({
