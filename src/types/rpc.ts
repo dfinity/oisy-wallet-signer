@@ -116,6 +116,7 @@ const RpcResponseContent = <T extends z.ZodTypeAny>(
     })
     .partial();
 
+// TODO: Maybe we can use this type in inferRpcResponse?
 type _RpcResponseContentType<T extends z.ZodTypeAny> = z.infer<
   ReturnType<typeof RpcResponseContent<T>>
 >;
