@@ -6,11 +6,13 @@ import {retryUntilReady, type ReadyOrError} from '../utils/timeout.utils';
 export const retryRequestStatus = async ({
   popup,
   isReady,
-  id
+  id,
+  timeoutInSeconds
 }: {
   popup: Window;
   isReady: () => ReadyOrError | 'pending';
   id: RpcIdType;
+  timeoutInSeconds: number;
 }): Promise<ReadyOrError | 'timeout'> => {
   const requestStatus = (): void => {
     const msg: IcrcWalletStatusRequestType = {
@@ -23,8 +25,7 @@ export const retryRequestStatus = async ({
   };
 
   return await retryUntilReady({
-    // TODO: extract a variable and default value for the Wallet
-    retries: 60, // 30 seconds
+    retries: timeoutInSeconds * 2, // The default intervalInMs is 0.5 seconds
     isReady,
     fn: requestStatus
   });
