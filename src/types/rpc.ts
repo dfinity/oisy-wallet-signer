@@ -103,14 +103,23 @@ const RpcResponse = Rpc.extend({
 
 export type RpcResponseType = z.infer<typeof RpcResponse>;
 
-const RpcResponseContent = z
-  .object({
-    result: z.any(),
-    error: RpcResponseError
-  })
-  .partial();
+const RpcResponseContent = <T extends z.ZodTypeAny>(
+  result: T
+): z.ZodObject<{
+  result: z.ZodOptional<T>;
+  error: z.ZodOptional<typeof RpcResponseError>;
+}> =>
+  z
+    .object({
+      result,
+      error: RpcResponseError
+    })
+    .partial();
 
-type RpcResponseContentType = z.infer<typeof RpcResponseContent>;
+// TODO: Maybe we can use this type in inferRpcResponse?
+type _RpcResponseContentType<T extends z.ZodTypeAny> = z.infer<
+  ReturnType<typeof RpcResponseContent<T>>
+>;
 
 const RpcResponseWithError = RpcResponse.extend({
   error: RpcResponseError
@@ -118,9 +127,26 @@ const RpcResponseWithError = RpcResponse.extend({
 
 export type RpcResponseWithErrorType = z.infer<typeof RpcResponseWithError>;
 
+// TODO: Simplify the return type to avoid redundancy with other types. Consider using a more concise or existing type definition.
 export const inferRpcResponse = <T extends z.ZodTypeAny>(
   result: T
-): z.ZodType<RpcResponseType & RpcResponseContentType> =>
+): z.ZodEffects<
+  z.ZodObject<
+    {
+      jsonrpc: z.ZodLiteral<'2.0'>;
+      id: z.ZodUnion<[z.ZodString, z.ZodNumber, z.ZodNull]>;
+      result: z.ZodOptional<T>;
+      error: z.ZodOptional<
+        z.ZodObject<{
+          code: z.ZodUnion<[z.ZodNumber, z.ZodNativeEnum<typeof RpcErrorCode>]>;
+          message: z.ZodString;
+          data: z.ZodOptional<z.ZodNever>;
+        }>
+      >;
+    },
+    'strict'
+  >
+> =>
   RpcResponseWithError.omit({error: true})
     .merge(
       z
