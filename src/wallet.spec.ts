@@ -1,3 +1,4 @@
+import {describe} from 'vitest';
 import * as walletHandlers from './handlers/wallet.handlers';
 import {ICRC29_STATUS} from './types/icrc';
 import {JSON_RPC_VERSION_2, RpcResponseWithResultOrError} from './types/rpc';
@@ -10,6 +11,15 @@ describe('Wallet', () => {
   let originalOpen: typeof window.open;
 
   describe('Window success', () => {
+    const messageEventReady = new MessageEvent('message', {
+      origin: mockParameters.url,
+      data: {
+        jsonrpc: JSON_RPC_VERSION_2,
+        id: '123',
+        result: 'ready'
+      }
+    });
+
     beforeEach(() => {
       originalOpen = window.open;
 
@@ -89,15 +99,6 @@ describe('Wallet', () => {
           expectedOptions: 'height=600, width=400'
         }
       ];
-
-      const messageEventReady = new MessageEvent('message', {
-        origin: mockParameters.url,
-        data: {
-          jsonrpc: JSON_RPC_VERSION_2,
-          id: '123',
-          result: 'ready'
-        }
-      });
 
       it.each(options)('$title', async ({params, expectedOptions}) => {
         const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
@@ -185,6 +186,23 @@ describe('Wallet', () => {
 
           await vi.advanceTimersByTimeAsync(2 * 60 * 1000);
         }));
+    });
+
+    describe('Disconnect', () => {
+      it('should close popup on disconnect', async () => {
+        const promise = Wallet.connect(mockParameters);
+
+        window.dispatchEvent(messageEventReady);
+
+        const {disconnect} = await promise;
+
+        expect(window.open).toHaveBeenCalledTimes(1);
+        expect(window.close).not.toHaveBeenCalled();
+
+        await disconnect();
+
+        expect(window.close).toHaveBeenCalled();
+      });
     });
   });
 
