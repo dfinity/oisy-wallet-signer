@@ -139,6 +139,7 @@ describe('Wallet', () => {
           const spy = vi.spyOn(walletHandlers, 'retryRequestStatus');
           const spyPostMessage = vi.spyOn(window, 'postMessage');
 
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
           Wallet.connect(mockParameters);
 
           expect(spy).toHaveBeenCalledTimes(1);
@@ -365,6 +366,7 @@ describe('Wallet', () => {
           const spy = vi.spyOn(walletHandlers, 'requestSupportedStandards');
           const spyPostMessage = vi.spyOn(window, 'postMessage');
 
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
           wallet.supportedStandards();
 
           expect(spy).toHaveBeenCalledTimes(1);
