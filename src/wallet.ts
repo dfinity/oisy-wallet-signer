@@ -1,6 +1,9 @@
 import {assertNonNullish, nonNullish, notEmptyString} from '@dfinity/utils';
 import {nanoid} from 'nanoid';
-import {WALLET_CONNECT_DEFAULT_TIMEOUT_IN_MILLISECONDS} from './constants/wallet.constants';
+import {
+  WALLET_CONNECT_DEFAULT_TIMEOUT_IN_MILLISECONDS,
+  WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD
+} from './constants/wallet.constants';
 import {requestSupportedStandards, retryRequestStatus} from './handlers/wallet.handlers';
 import {
   IcrcReadyResponseSchema,
@@ -8,7 +11,12 @@ import {
   type IcrcSupportedStandards
 } from './types/icrc-responses';
 import {RpcResponseWithResultOrErrorSchema} from './types/rpc';
-import {WalletOptionsSchema, type WalletOptions} from './types/wallet';
+import {
+  WalletOptionsSchema,
+  WalletRequestOptions,
+  WalletRequestOptionsSchema,
+  type WalletOptions
+} from './types/wallet';
 import type {ReadyOrError} from './utils/timeout.utils';
 import {WALLET_WINDOW_TOP_RIGHT, windowFeatures} from './utils/window.utils';
 
@@ -145,14 +153,35 @@ export class Wallet {
     this.#popup.close();
   };
 
-  supportedStandards = async (): Promise<IcrcSupportedStandards> => {
+  /**
+   * List the standards supported by the wallet.
+   *
+   * @async
+   * @param {WalletRequestOptions} options - The options for the wallet request, which may include parameters such as timeout settings and other request-specific configurations.
+   * @returns {Promise<IcrcSupportedStandards>} A promise that resolves to an object containing the supported ICRC standards by the wallet. This includes details about each standard that the wallet can handle.
+   */
+  supportedStandards = async (options: WalletRequestOptions): Promise<IcrcSupportedStandards> => {
     return await new Promise<IcrcSupportedStandards>((resolve, reject) => {
+      const {success: optionsSuccess, error} = WalletRequestOptionsSchema.safeParse(options);
+
+      if (!optionsSuccess) {
+        throw new Error(`Wallet request options cannot be parsed: ${error?.message ?? ''}`);
+      }
+
       const requestId = nanoid();
 
+      const {timeoutInMilliseconds: userTimeoutInMilliseconds} = options;
+      const timeoutInMilliseconds =
+        userTimeoutInMilliseconds ?? WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD;
+
       const timeoutId = setTimeout(() => {
-        reject(new Error('Request timed out after 20 seconds'));
+        reject(
+          new Error(
+            `Supported standards request to wallet timed out after ${timeoutInMilliseconds} milliseconds.`
+          )
+        );
         disconnect();
-      }, 20000);
+      }, timeoutInMilliseconds);
 
       const onMessage = ({origin, data: msgData}: MessageEvent): void => {
         const {success} = RpcResponseWithResultOrErrorSchema.safeParse(msgData);
