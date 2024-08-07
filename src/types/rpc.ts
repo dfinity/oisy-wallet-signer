@@ -27,13 +27,10 @@ export const RpcRequest = Rpc.extend({
   )
   .strict();
 
-type RpcRequestType = z.infer<typeof RpcRequest>;
+type _RpcRequestType = z.infer<typeof RpcRequest>;
 
-export const inferRpcRequestWithoutParams = ({
-  method
-}: {
-  method: string;
-}): z.ZodType<RpcRequestType> =>
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+export const inferRpcRequestWithoutParams = <M extends string>({method}: {method: M}) =>
   RpcRequest.omit({method: true, params: true})
     .strict()
     .extend({
@@ -41,13 +38,20 @@ export const inferRpcRequestWithoutParams = ({
       method: z.literal(method)
     });
 
-export const inferRpcRequestWithParams = <T extends z.ZodTypeAny>({
+type RpcRequestWithoutParamsReturnType<M extends string> = ReturnType<
+  typeof inferRpcRequestWithoutParams<M>
+>;
+
+type _RpcRequestWithoutParamsType<M extends string> = z.infer<RpcRequestWithoutParamsReturnType<M>>;
+
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+export const inferRpcRequestWithParams = <T extends z.ZodTypeAny, M extends string>({
   params,
   method
 }: {
   params: T;
-  method: string;
-}): z.ZodType<RpcRequestType> =>
+  method: M;
+}) =>
   RpcRequest.omit({method: true})
     .extend({
       id: RpcId,
@@ -58,6 +62,7 @@ export const inferRpcRequestWithParams = <T extends z.ZodTypeAny>({
         params
       })
     );
+/* eslint-enable */
 
 export const RpcNotification = RpcRequest.omit({id: true}).strict();
 
