@@ -160,7 +160,7 @@ export class Wallet {
    * @param {WalletRequestOptions} options - The options for the wallet request, which may include parameters such as timeout settings and other request-specific configurations.
    * @returns {Promise<IcrcSupportedStandards>} A promise that resolves to an object containing the supported ICRC standards by the wallet. This includes details about each standard that the wallet can handle.
    */
-  supportedStandards = async (options: WalletRequestOptions): Promise<IcrcSupportedStandards> => {
+  supportedStandards = async (options: WalletRequestOptions = {}): Promise<IcrcSupportedStandards> => {
     return await new Promise<IcrcSupportedStandards>((resolve, reject) => {
       const {success: optionsSuccess, error} = WalletRequestOptionsSchema.safeParse(options);
 

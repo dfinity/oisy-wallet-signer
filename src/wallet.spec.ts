@@ -1,4 +1,5 @@
-import {describe} from 'vitest';
+import {afterEach, beforeEach, describe} from 'vitest';
+import {WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD} from './constants/wallet.constants';
 import * as walletHandlers from './handlers/wallet.handlers';
 import {ICRC29_STATUS} from './types/icrc';
 import {JSON_RPC_VERSION_2, RpcResponseWithResultOrErrorSchema} from './types/rpc';
@@ -37,180 +38,241 @@ describe('Wallet', () => {
       vi.restoreAllMocks();
     });
 
-    describe('Connection errors', () => {
-      it('should throw connection timeout error', async () => {
-        vi.spyOn(walletHandlers, 'retryRequestStatus').mockResolvedValue('timeout');
+    describe('Connect', () => {
+      describe('Connection errors', () => {
+        it('should throw connection timeout error', async () => {
+          vi.spyOn(walletHandlers, 'retryRequestStatus').mockResolvedValue('timeout');
 
-        await expect(Wallet.connect(mockParameters)).rejects.toThrow(
-          'Connection timeout. Unable to connect to the wallet.'
-        );
-      });
-
-      it('should assert edge case wallet not defined but request status success', async () => {
-        vi.spyOn(walletHandlers, 'retryRequestStatus').mockResolvedValue('ready');
-
-        await expect(Wallet.connect(mockParameters)).rejects.toThrow(
-          'Unexpected error. The request status succeeded, but the wallet response is not defined.'
-        );
-      });
-
-      it('should throw error if the message ready received comes from another origin', async () => {
-        const hackerOrigin = 'https://hacker.com';
-
-        const promise = Wallet.connect(mockParameters);
-
-        const messageEvent = new MessageEvent('message', {
-          origin: hackerOrigin,
-          data: {
-            jsonrpc: JSON_RPC_VERSION_2,
-            id: '123',
-            result: 'ready'
-          }
+          await expect(Wallet.connect(mockParameters)).rejects.toThrow(
+            'Connection timeout. Unable to connect to the wallet.'
+          );
         });
 
-        window.dispatchEvent(messageEvent);
+        it('should assert edge case wallet not defined but request status success', async () => {
+          vi.spyOn(walletHandlers, 'retryRequestStatus').mockResolvedValue('ready');
 
-        await expect(promise).rejects.toThrow(
-          `The response origin ${hackerOrigin} does not match the requested wallet URL ${mockParameters.url}.`
-        );
-      });
-
-      it('should throw error if the wallet options are not well formatted', async () => {
-        const incorrectOrigin = 'test';
-
-        await expect(Wallet.connect({url: incorrectOrigin})).rejects.toThrow(
-          'Wallet options cannot be parsed:'
-        );
-      });
-    });
-
-    describe('Connection success', () => {
-      const options = [
-        {
-          title: 'default options',
-          params: mockParameters,
-          expectedOptions: windowFeatures(WALLET_WINDOW_TOP_RIGHT)
-        },
-        {
-          title: 'centered window',
-          params: {
-            ...mockParameters,
-            windowOptions: WALLET_WINDOW_CENTER
-          },
-          expectedOptions: windowFeatures(WALLET_WINDOW_CENTER)
-        },
-        {
-          title: 'custom window',
-          params: {
-            ...mockParameters,
-            windowOptions: 'height=600, width=400'
-          },
-          expectedOptions: 'height=600, width=400'
-        }
-      ];
-
-      it.each(options)('$title', async ({params, expectedOptions}) => {
-        const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
-        const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
-
-        const promise = Wallet.connect(params);
-
-        window.dispatchEvent(messageEventReady);
-
-        const wallet = await promise;
-
-        expect(wallet).toBeInstanceOf(Wallet);
-
-        expect(window.open).toHaveBeenCalledWith(
-          mockParameters.url,
-          'walletWindow',
-          expectedOptions
-        );
-        expect(window.open).toHaveBeenCalledTimes(1);
-
-        expect(addEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
-        expect(removeEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
-      });
-
-      it('should not process message which are not RpcResponse', async () => {
-        const safeParseSpy = vi.spyOn(RpcResponseWithResultOrErrorSchema, 'safeParse');
-
-        const promise = Wallet.connect(mockParameters);
-
-        const messageEventNotRpc = new MessageEvent('message', {
-          data: 'test',
-          origin: mockParameters.url
+          await expect(Wallet.connect(mockParameters)).rejects.toThrow(
+            'Unexpected error. The request status succeeded, but the wallet response is not defined.'
+          );
         });
 
-        window.dispatchEvent(messageEventNotRpc);
+        it('should throw error if the message ready received comes from another origin', async () => {
+          const hackerOrigin = 'https://hacker.com';
 
-        window.dispatchEvent(messageEventReady);
+          const promise = Wallet.connect(mockParameters);
 
-        const wallet = await promise;
-
-        expect(wallet).toBeInstanceOf(Wallet);
-
-        // Two responses as triggered above
-        expect(safeParseSpy).toHaveBeenCalledWith(messageEventNotRpc.data);
-        expect(safeParseSpy).toHaveBeenCalledWith(messageEventReady.data);
-
-        // We are mocking the popup with the window, therefore popup.postMessage({method: ICRC29_STATUS}) results in an additional message detected by window.addEventListener
-        expect(safeParseSpy).toHaveBeenCalledWith(
-          expect.objectContaining({
-            method: ICRC29_STATUS
-          })
-        );
-
-        expect(safeParseSpy).toHaveBeenCalledTimes(3);
-      });
-
-      it('should not close popup on connection success', async () => {
-        const promise = Wallet.connect(mockParameters);
-
-        window.dispatchEvent(messageEventReady);
-
-        const wallet = await promise;
-
-        expect(wallet).toBeInstanceOf(Wallet);
-
-        expect(window.open).toHaveBeenCalledTimes(1);
-        expect(window.close).not.toHaveBeenCalled();
-      });
-
-      it('should close popup on connection not successful', async () =>
-        // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
-        new Promise<void>(async (resolve) => {
-          vi.useFakeTimers();
-
-          Wallet.connect(mockParameters).catch((err: Error) => {
-            expect(err.message).toBe('Connection timeout. Unable to connect to the wallet.');
-
-            expect(window.open).toHaveBeenCalledTimes(1);
-            expect(window.close).toHaveBeenCalledTimes(1);
-
-            vi.useRealTimers();
-
-            resolve();
+          const messageEvent = new MessageEvent('message', {
+            origin: hackerOrigin,
+            data: {
+              jsonrpc: JSON_RPC_VERSION_2,
+              id: '123',
+              result: 'ready'
+            }
           });
 
-          await vi.advanceTimersByTimeAsync(2 * 60 * 1000);
-        }));
+          window.dispatchEvent(messageEvent);
+
+          await expect(promise).rejects.toThrow(
+            `The response origin ${hackerOrigin} does not match the requested wallet URL ${mockParameters.url}.`
+          );
+        });
+
+        it('should throw error if the wallet options are not well formatted', async () => {
+          const incorrectOrigin = 'test';
+
+          await expect(Wallet.connect({url: incorrectOrigin})).rejects.toThrow(
+            'Wallet options cannot be parsed:'
+          );
+        });
+      });
+
+      describe('Connection success', () => {
+        const options = [
+          {
+            title: 'default options',
+            params: mockParameters,
+            expectedOptions: windowFeatures(WALLET_WINDOW_TOP_RIGHT)
+          },
+          {
+            title: 'centered window',
+            params: {
+              ...mockParameters,
+              windowOptions: WALLET_WINDOW_CENTER
+            },
+            expectedOptions: windowFeatures(WALLET_WINDOW_CENTER)
+          },
+          {
+            title: 'custom window',
+            params: {
+              ...mockParameters,
+              windowOptions: 'height=600, width=400'
+            },
+            expectedOptions: 'height=600, width=400'
+          }
+        ];
+
+        it.each(options)('$title', async ({params, expectedOptions}) => {
+          const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
+          const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
+
+          const promise = Wallet.connect(params);
+
+          window.dispatchEvent(messageEventReady);
+
+          const wallet = await promise;
+
+          expect(wallet).toBeInstanceOf(Wallet);
+
+          expect(window.open).toHaveBeenCalledWith(
+            mockParameters.url,
+            'walletWindow',
+            expectedOptions
+          );
+          expect(window.open).toHaveBeenCalledTimes(1);
+
+          expect(addEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
+          expect(removeEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
+        });
+
+        it('should not process message which are not RpcResponse', async () => {
+          const safeParseSpy = vi.spyOn(RpcResponseWithResultOrErrorSchema, 'safeParse');
+
+          const promise = Wallet.connect(mockParameters);
+
+          const messageEventNotRpc = new MessageEvent('message', {
+            data: 'test',
+            origin: mockParameters.url
+          });
+
+          window.dispatchEvent(messageEventNotRpc);
+
+          window.dispatchEvent(messageEventReady);
+
+          const wallet = await promise;
+
+          expect(wallet).toBeInstanceOf(Wallet);
+
+          // Two responses as triggered above
+          expect(safeParseSpy).toHaveBeenCalledWith(messageEventNotRpc.data);
+          expect(safeParseSpy).toHaveBeenCalledWith(messageEventReady.data);
+
+          // We are mocking the popup with the window, therefore popup.postMessage({method: ICRC29_STATUS}) results in an additional message detected by window.addEventListener
+          expect(safeParseSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+              method: ICRC29_STATUS
+            })
+          );
+
+          expect(safeParseSpy).toHaveBeenCalledTimes(3);
+        });
+
+        it('should not close popup on connection success', async () => {
+          const promise = Wallet.connect(mockParameters);
+
+          window.dispatchEvent(messageEventReady);
+
+          const wallet = await promise;
+
+          expect(wallet).toBeInstanceOf(Wallet);
+
+          expect(window.open).toHaveBeenCalledTimes(1);
+          expect(window.close).not.toHaveBeenCalled();
+        });
+
+        it('should close popup on connection not successful', async () =>
+          // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
+          new Promise<void>(async (resolve) => {
+            vi.useFakeTimers();
+
+            Wallet.connect(mockParameters).catch((err: Error) => {
+              expect(err.message).toBe('Connection timeout. Unable to connect to the wallet.');
+
+              expect(window.open).toHaveBeenCalledTimes(1);
+              expect(window.close).toHaveBeenCalledTimes(1);
+
+              vi.useRealTimers();
+
+              resolve();
+            });
+
+            await vi.advanceTimersByTimeAsync(2 * 60 * 1000);
+          }));
+      });
+
+      describe('Disconnect', () => {
+        it('should close popup on disconnect', async () => {
+          const promise = Wallet.connect(mockParameters);
+
+          window.dispatchEvent(messageEventReady);
+
+          const {disconnect} = await promise;
+
+          expect(window.open).toHaveBeenCalledTimes(1);
+          expect(window.close).not.toHaveBeenCalled();
+
+          await disconnect();
+
+          expect(window.close).toHaveBeenCalled();
+        });
+      });
     });
 
-    describe('Disconnect', () => {
-      it('should close popup on disconnect', async () => {
+    describe.only('Supported standards', () => {
+      let wallet: Wallet;
+
+      beforeEach(async () => {
         const promise = Wallet.connect(mockParameters);
 
         window.dispatchEvent(messageEventReady);
 
-        const {disconnect} = await promise;
+        wallet = await promise;
+      });
 
-        expect(window.open).toHaveBeenCalledTimes(1);
-        expect(window.close).not.toHaveBeenCalled();
+      afterEach(async () => {
+        await wallet.disconnect();
+      });
 
-        await disconnect();
+      describe('Request errors', () => {
+        it('should throw error if the wallet request options are not well formatted', async () => {
+          // @ts-expect-error: we are testing this on purpose
+          await expect(wallet.supportedStandards({timeoutInMilliseconds: 'test'})).rejects.toThrow(
+            'Wallet request options cannot be parsed:'
+          );
+        });
 
-        expect(window.close).toHaveBeenCalled();
+        const options = [
+          {
+            title: 'default options',
+          },
+          {
+            title: 'custom timeout',
+            options: {timeoutInMilliseconds: 20000}
+          }
+        ];
+
+        it.each(options)(
+          'should timeout for $title if wallet does not answer with expected standards',
+          async ({options}) => {
+            // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
+            return new Promise<void>(async (resolve) => {
+              vi.useFakeTimers();
+
+              const timeout = options?.timeoutInMilliseconds ?? WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD;
+
+              wallet.supportedStandards(options).catch((err: Error) => {
+                expect(err.message).toBe(
+                  `Supported standards request to wallet timed out after ${timeout} milliseconds.`
+                );
+
+                vi.useRealTimers();
+
+                resolve();
+              });
+
+              await vi.advanceTimersByTimeAsync(timeout);
+            });
+          }
+        );
       });
     });
   });
