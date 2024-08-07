@@ -1,23 +1,20 @@
 import {SIGNER_SUPPORTED_STANDARDS} from '../constants/signer.constants';
-import type {
-  IcrcReadyResponseType,
-  IcrcSupportedStandardsResponseType
-} from '../types/icrc-responses';
+import type {IcrcReadyResponse, IcrcSupportedStandardsResponse} from '../types/icrc-responses';
 import {
   JSON_RPC_VERSION_2,
-  type RpcIdType,
-  type RpcResponseErrorType,
-  type RpcResponseType,
-  type RpcResponseWithErrorType
+  type RpcId,
+  type RpcResponse,
+  type RpcResponseError,
+  type RpcResponseWithError
 } from '../types/rpc';
 
 interface Notify {
-  id: RpcIdType;
+  id: RpcId;
   origin: string;
 }
 
 export const notifyReady = ({id, origin}: Notify): void => {
-  const msg: IcrcReadyResponseType = {
+  const msg: IcrcReadyResponse = {
     jsonrpc: JSON_RPC_VERSION_2,
     id,
     result: 'ready'
@@ -27,7 +24,7 @@ export const notifyReady = ({id, origin}: Notify): void => {
 };
 
 export const notifySupportedStandards = ({id, origin}: Notify): void => {
-  const msg: IcrcSupportedStandardsResponseType = {
+  const msg: IcrcSupportedStandardsResponse = {
     jsonrpc: JSON_RPC_VERSION_2,
     id,
     result: {
@@ -43,9 +40,9 @@ export const notifyError = ({
   error,
   origin
 }: {
-  error: RpcResponseErrorType;
+  error: RpcResponseError;
 } & Notify): void => {
-  const msg: RpcResponseWithErrorType = {
+  const msg: RpcResponseWithError = {
     jsonrpc: JSON_RPC_VERSION_2,
     id,
     error
@@ -54,5 +51,5 @@ export const notifyError = ({
   notify({msg, origin});
 };
 
-const notify = ({msg, origin}: {msg: RpcResponseType} & Pick<Notify, 'origin'>): void =>
+const notify = ({msg, origin}: {msg: RpcResponse} & Pick<Notify, 'origin'>): void =>
   window.opener.postMessage(msg, origin);

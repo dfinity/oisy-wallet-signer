@@ -1,38 +1,44 @@
 import {z} from 'zod';
-import {IcrcWalletPermissionState, IcrcWalletScopedMethod, IcrcWalletStandard} from './icrc';
-import {inferRpcResponse} from './rpc';
+import {
+  IcrcWalletPermissionStateSchema,
+  IcrcWalletScopedMethodSchema,
+  IcrcWalletStandardSchema
+} from './icrc';
+import {inferRpcResponseSchema} from './rpc';
 
-const IcrcWalletScopesResult = z.object({
+const IcrcWalletScopesResultSchema = z.object({
   scopes: z.array(
     z.object({
       scope: z.object({
-        method: IcrcWalletScopedMethod
+        method: IcrcWalletScopedMethodSchema
       }),
-      state: IcrcWalletPermissionState
+      state: IcrcWalletPermissionStateSchema
     })
   )
 });
 
 // icrc25_request_permissions
 // https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_request_permissions
-export const IcrcWalletRequestPermissionsResponse = inferRpcResponse(IcrcWalletScopesResult);
+export const IcrcWalletRequestPermissionsResponseSchema = inferRpcResponseSchema(
+  IcrcWalletScopesResultSchema
+);
 
-export type IcrcWalletRequestPermissionsResponseType = z.infer<
-  typeof IcrcWalletRequestPermissionsResponse
+export type IcrcWalletRequestPermissionsResponse = z.infer<
+  typeof IcrcWalletRequestPermissionsResponseSchema
 >;
 
 // icrc25_permissions
 // https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_permissions
-export const IcrcWalletPermissionsResponse = IcrcWalletRequestPermissionsResponse;
+export const IcrcWalletPermissionsResponseSchema = IcrcWalletRequestPermissionsResponseSchema;
 
-export type IcrcWalletPermissionsResponseType = z.infer<typeof IcrcWalletPermissionsResponse>;
+export type IcrcWalletPermissionsResponse = z.infer<typeof IcrcWalletPermissionsResponseSchema>;
 
 // icrc25_supported_standards
 // https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_supported_standards
 const urlRegex =
   /^https:\/\/github\.com\/dfinity\/ICRC\/blob\/main\/ICRCs\/ICRC-\d+\/ICRC-\d+\.md$/;
 
-const urlSchema = z
+const UrlSchema = z
   .string()
   .url()
   .regex(urlRegex)
@@ -46,7 +52,7 @@ const urlSchema = z
 
       const [_, icrc] = match;
 
-      return Object.keys(IcrcWalletStandard.Values).includes(icrc);
+      return Object.keys(IcrcWalletStandardSchema.Values).includes(icrc);
     },
     {
       message: 'The URL does not match any of the IcrcWalletStandard values.'
@@ -56,25 +62,25 @@ const urlSchema = z
 const IcrcSupportedStandardsSchema = z
   .array(
     z.object({
-      name: IcrcWalletStandard,
-      url: urlSchema
+      name: IcrcWalletStandardSchema,
+      url: UrlSchema
     })
   )
   .min(1);
 
-export type IcrcSupportedStandardsSchemaType = z.infer<typeof IcrcSupportedStandardsSchema>;
+export type IcrcSupportedStandards = z.infer<typeof IcrcSupportedStandardsSchema>;
 
-export const IcrcSupportedStandardsResponse = inferRpcResponse(
+export const IcrcSupportedStandardsResponseSchema = inferRpcResponseSchema(
   z.object({
     supportedStandards: IcrcSupportedStandardsSchema
   })
 );
 
-export type IcrcSupportedStandardsResponseType = z.infer<typeof IcrcSupportedStandardsResponse>;
+export type IcrcSupportedStandardsResponse = z.infer<typeof IcrcSupportedStandardsResponseSchema>;
 
 // icrc29_status
 // https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_29_window_post_message_transport.md
 
-export const IcrcReadyResponse = inferRpcResponse(z.literal('ready'));
+export const IcrcReadyResponseSchema = inferRpcResponseSchema(z.literal('ready'));
 
-export type IcrcReadyResponseType = z.infer<typeof IcrcReadyResponse>;
+export type IcrcReadyResponse = z.infer<typeof IcrcReadyResponseSchema>;

@@ -1,25 +1,26 @@
 import {describe} from 'vitest';
 import * as walletHandlers from './handlers/wallet.handlers';
 import {ICRC29_STATUS} from './types/icrc';
-import {JSON_RPC_VERSION_2, RpcResponseWithResultOrError} from './types/rpc';
+import {JSON_RPC_VERSION_2, RpcResponseWithResultOrErrorSchema} from './types/rpc';
+import type {WalletOptions} from './types/wallet';
 import {WALLET_WINDOW_CENTER, WALLET_WINDOW_TOP_RIGHT, windowFeatures} from './utils/window.utils';
-import {Wallet, type WalletOptions} from './wallet';
+import {Wallet} from './wallet';
 
 describe('Wallet', () => {
   const mockParameters: WalletOptions = {url: 'https://test.com'};
 
+  const messageEventReady = new MessageEvent('message', {
+    origin: mockParameters.url,
+    data: {
+      jsonrpc: JSON_RPC_VERSION_2,
+      id: '123',
+      result: 'ready'
+    }
+  });
+
   let originalOpen: typeof window.open;
 
   describe('Window success', () => {
-    const messageEventReady = new MessageEvent('message', {
-      origin: mockParameters.url,
-      data: {
-        jsonrpc: JSON_RPC_VERSION_2,
-        id: '123',
-        result: 'ready'
-      }
-    });
-
     beforeEach(() => {
       originalOpen = window.open;
 
@@ -73,6 +74,14 @@ describe('Wallet', () => {
           `The response origin ${hackerOrigin} does not match the requested wallet URL ${mockParameters.url}.`
         );
       });
+
+      it('should throw error if the wallet options are not well formatted', async () => {
+        const incorrectOrigin = 'test';
+
+        await expect(Wallet.connect({url: incorrectOrigin})).rejects.toThrow(
+          'Wallet options cannot be parsed:'
+        );
+      });
     });
 
     describe('Connection success', () => {
@@ -124,7 +133,7 @@ describe('Wallet', () => {
       });
 
       it('should not process message which are not RpcResponse', async () => {
-        const safeParseSpy = vi.spyOn(RpcResponseWithResultOrError, 'safeParse');
+        const safeParseSpy = vi.spyOn(RpcResponseWithResultOrErrorSchema, 'safeParse');
 
         const promise = Wallet.connect(mockParameters);
 

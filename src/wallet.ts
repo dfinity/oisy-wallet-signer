@@ -2,53 +2,11 @@ import {assertNonNullish, nonNullish, notEmptyString} from '@dfinity/utils';
 import {nanoid} from 'nanoid';
 import {WALLET_CONNECT_DEFAULT_TIMEOUT_IN_MILLISECONDS} from './constants/wallet.constants';
 import {requestSupportedStandards, retryRequestStatus} from './handlers/wallet.handlers';
-import {IcrcReadyResponse} from './types/icrc-responses';
-import {RpcResponseWithResultOrError} from './types/rpc';
+import {IcrcReadyResponseSchema} from './types/icrc-responses';
+import {RpcResponseWithResultOrErrorSchema} from './types/rpc';
+import {WalletOptionsSchema, type WalletOptions} from './types/wallet';
 import type {ReadyOrError} from './utils/timeout.utils';
-import {
-  WALLET_WINDOW_TOP_RIGHT,
-  windowFeatures,
-  type WalletWindowOptions
-} from './utils/window.utils';
-
-export interface WalletConnectionOptions {
-  /**
-   * Specifies the interval in milliseconds at which the wallet is checked (polled) to determine if it is ready.
-   *
-   * @default 500 - The default polling interval is set to 500 milliseconds.
-   */
-  pollingIntervalInMilliseconds?: number;
-
-  /**
-   * Specifies the maximum duration in milliseconds for attempting to establish a connection to the wallet.
-   * If the connection is not established within this duration, the process will time out.
-   *
-   * @default 120 - The default timeout is set to 120 seconds.
-   */
-  timeoutInMilliseconds?: number;
-}
-
-/**
- * The options to establish a connection with a wallet.
- * @interface
- */
-export interface WalletOptions {
-  /**
-   * The URL of the wallet.
-   */
-  url: string;
-
-  /**
-   * Optional window options to display the wallet, which can be an object of type WalletWindowOptions or a string.
-   * If a string is passed, those are applied as-is to the window that is opened (see https://developer.mozilla.org/en-US/docs/Web/API/Window/open#windowfeatures for more information).
-   */
-  windowOptions?: WalletWindowOptions | string;
-
-  /**
-   * The connection options for establishing the connection with the wallet.
-   */
-  connectionOptions?: WalletConnectionOptions;
-}
+import {WALLET_WINDOW_TOP_RIGHT, windowFeatures} from './utils/window.utils';
 
 export class Wallet {
   readonly #origin: string;
@@ -63,16 +21,22 @@ export class Wallet {
    * Establish a connection with a wallet.
    *
    * @static
-   * @param {Object} WalletOptions - The options to initialize the wallet client.
+   * @param {WalletOptions} options - The options to initialize the wallet client.
    * @returns {Promise<Wallet>} A promise that resolves to an instance of the wallet that was connected.
    */
-  static async connect({
-    url,
-    windowOptions = WALLET_WINDOW_TOP_RIGHT,
-    connectionOptions
-  }: WalletOptions): Promise<Wallet> {
+  static async connect(options: WalletOptions): Promise<Wallet> {
+    const {success: optionsSuccess, error} = WalletOptionsSchema.safeParse(options);
+
+    if (!optionsSuccess) {
+      throw new Error(`Wallet options cannot be parsed: ${error?.message ?? ''}`);
+    }
+
+    const {url, windowOptions, connectionOptions} = options;
+
     const popupFeatures =
-      typeof windowOptions === 'string' ? windowOptions : windowFeatures(windowOptions);
+      typeof windowOptions === 'string'
+        ? windowOptions
+        : windowFeatures(windowOptions ?? WALLET_WINDOW_TOP_RIGHT);
 
     const popup = window.open(url, 'walletWindow', popupFeatures);
 
@@ -87,22 +51,35 @@ export class Wallet {
     let response: Wallet | MessageError | undefined;
 
     const onMessage = ({origin, data: msgData}: MessageEvent): void => {
-      const {success} = RpcResponseWithResultOrError.safeParse(msgData);
+      const {success} = RpcResponseWithResultOrErrorSchema.safeParse(msgData);
 
       if (!success) {
         // We are only interested in JSON-RPC messages, so we are ignoring any other messages emitted at the window level, as the consumer might be using other events.
         return;
       }
 
+      let expectedOrigin: string;
+
+      try {
+        const {origin: walletOrigin} = new URL(url);
+        expectedOrigin = walletOrigin;
+      } catch (err: unknown) {
+        // Unlikely to happen if window.open succeeded
+        response = new MessageError(
+          `The origin ${origin} of the wallet URL ${url} cannot be parsed.`
+        );
+        return;
+      }
+
       // In our test suite, origin is set to empty string when the message originate from the same window - i.e. when retryRequestStatus are emitted.// In our test suite, the origin is set to an empty string when the message originates from the same window. This occurs when `retryRequestStatus` events are emitted to `*`.
-      if (notEmptyString(origin) && origin !== url) {
+      if (notEmptyString(origin) && origin !== expectedOrigin) {
         response = new MessageError(
           `The response origin ${origin} does not match the requested wallet URL ${url}.`
         );
         return;
       }
 
-      const {success: isWalletReady} = IcrcReadyResponse.safeParse(msgData);
+      const {success: isWalletReady} = IcrcReadyResponseSchema.safeParse(msgData);
       if (isWalletReady) {
         response = new Wallet({origin, popup});
       }

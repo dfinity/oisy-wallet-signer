@@ -2,11 +2,11 @@ import {z} from 'zod';
 import {
   JSON_RPC_VERSION_2,
   RpcErrorCode,
-  RpcNotification,
-  RpcRequest,
-  RpcResponseWithResultOrError,
-  inferRpcRequestWithParams,
-  inferRpcRequestWithoutParams
+  RpcNotificationSchema,
+  RpcRequestSchema,
+  RpcResponseWithResultOrErrorSchema,
+  inferRpcRequestWithParamsSchema,
+  inferRpcRequestWithoutParamsSchema
 } from './rpc';
 
 describe('rpc', () => {
@@ -16,7 +16,7 @@ describe('rpc', () => {
         jsonrpc: JSON_RPC_VERSION_2,
         method: 'test'
       };
-      expect(() => RpcNotification.parse(validRpcNotification)).not.toThrow();
+      expect(() => RpcNotificationSchema.parse(validRpcNotification)).not.toThrow();
     });
 
     it('should validate RpcNotification accept params', () => {
@@ -27,7 +27,7 @@ describe('rpc', () => {
           hello: 'world'
         }
       };
-      expect(() => RpcNotification.parse(validRpcNotification)).not.toThrow();
+      expect(() => RpcNotificationSchema.parse(validRpcNotification)).not.toThrow();
     });
 
     it('should throw if RpcNotification has an id', () => {
@@ -37,7 +37,7 @@ describe('rpc', () => {
         method: 'test'
       };
 
-      expect(() => RpcNotification.parse(invalidRpcNotification)).toThrow();
+      expect(() => RpcNotificationSchema.parse(invalidRpcNotification)).toThrow();
     });
 
     it('should throw if RpcNotification has a no jsonrpc', () => {
@@ -45,7 +45,7 @@ describe('rpc', () => {
         method: 'test'
       };
 
-      expect(() => RpcNotification.parse(invalidRpcNotification)).toThrow();
+      expect(() => RpcNotificationSchema.parse(invalidRpcNotification)).toThrow();
     });
 
     it('should throw if RpcNotification has additional fields', () => {
@@ -54,7 +54,7 @@ describe('rpc', () => {
         method: 'test',
         hello: 'world'
       };
-      expect(() => RpcNotification.parse(invalidRpcNotification)).toThrow();
+      expect(() => RpcNotificationSchema.parse(invalidRpcNotification)).toThrow();
     });
 
     it('should throw if RpcNotification has a no method', () => {
@@ -62,7 +62,7 @@ describe('rpc', () => {
         jsonrpc: JSON_RPC_VERSION_2
       };
 
-      expect(() => RpcNotification.parse(invalidRpcNotification)).toThrow();
+      expect(() => RpcNotificationSchema.parse(invalidRpcNotification)).toThrow();
     });
   });
 
@@ -74,7 +74,7 @@ describe('rpc', () => {
           id: 1,
           method: 'test'
         };
-        expect(() => RpcRequest.parse(validRpcRequest)).not.toThrow();
+        expect(() => RpcRequestSchema.parse(validRpcRequest)).not.toThrow();
       });
 
       it('should throw if RpcRequest has additional fields', () => {
@@ -84,7 +84,7 @@ describe('rpc', () => {
           method: 'test',
           hello: 'world'
         };
-        expect(() => RpcRequest.parse(invalidRpcRequest)).toThrow();
+        expect(() => RpcRequestSchema.parse(invalidRpcRequest)).toThrow();
       });
 
       it('should throw if RpcRequest has no id', () => {
@@ -93,7 +93,7 @@ describe('rpc', () => {
           method: 'test',
           params: {hello: 123}
         };
-        expect(() => RpcRequest.parse(invalidRpcRequest)).toThrow();
+        expect(() => RpcRequestSchema.parse(invalidRpcRequest)).toThrow();
       });
 
       it('should throw if RpcRequest has no jsonrpc', () => {
@@ -102,7 +102,7 @@ describe('rpc', () => {
           method: 'test',
           params: {hello: 123}
         };
-        expect(() => RpcRequest.parse(invalidRpcRequest)).toThrow();
+        expect(() => RpcRequestSchema.parse(invalidRpcRequest)).toThrow();
       });
 
       it('should throw if RpcRequest has no method', () => {
@@ -111,12 +111,12 @@ describe('rpc', () => {
           id: 123,
           params: {hello: 123}
         };
-        expect(() => RpcRequest.parse(invalidRpcRequest)).toThrow();
+        expect(() => RpcRequestSchema.parse(invalidRpcRequest)).toThrow();
       });
     });
 
     describe('Without params', () => {
-      const RpcCustomRequest = inferRpcRequestWithoutParams({method: 'test'});
+      const RpcCustomRequest = inferRpcRequestWithoutParamsSchema({method: 'test'});
 
       it('should validate a correct RpcRequest', () => {
         const validRpcRequest = {
@@ -167,7 +167,10 @@ describe('rpc', () => {
 
     describe('With params', () => {
       const paramsSchema = z.object({hello: z.string()});
-      const RpcCustomRequest = inferRpcRequestWithParams({params: paramsSchema, method: 'test'});
+      const RpcCustomRequest = inferRpcRequestWithParamsSchema({
+        params: paramsSchema,
+        method: 'test'
+      });
 
       it('should validate a correct RpcRequest with custom params', () => {
         const validRpcRequest = {
@@ -244,7 +247,7 @@ describe('rpc', () => {
         id: 1,
         result: {success: true}
       };
-      expect(() => RpcResponseWithResultOrError.parse(validRpcResponse)).not.toThrow();
+      expect(() => RpcResponseWithResultOrErrorSchema.parse(validRpcResponse)).not.toThrow();
     });
 
     it('should validate a correct RpcResponse with error', () => {
@@ -256,7 +259,7 @@ describe('rpc', () => {
           message: 'An internal error occurred'
         }
       };
-      expect(() => RpcResponseWithResultOrError.parse(validRpcResponse)).not.toThrow();
+      expect(() => RpcResponseWithResultOrErrorSchema.parse(validRpcResponse)).not.toThrow();
     });
 
     it('should validate a correct RpcResponse with application custom error', () => {
@@ -268,7 +271,7 @@ describe('rpc', () => {
           message: 'A custom application error occurred'
         }
       };
-      expect(() => RpcResponseWithResultOrError.parse(validRpcResponse)).not.toThrow();
+      expect(() => RpcResponseWithResultOrErrorSchema.parse(validRpcResponse)).not.toThrow();
     });
 
     it('should throw if RpcResponse has neither no result nor error', () => {
@@ -276,7 +279,7 @@ describe('rpc', () => {
         jsonrpc: JSON_RPC_VERSION_2,
         id: 1
       };
-      expect(() => RpcResponseWithResultOrError.parse(invalidRpcResponse)).toThrow(
+      expect(() => RpcResponseWithResultOrErrorSchema.parse(invalidRpcResponse)).toThrow(
         'Either result or error should be provided.'
       );
     });
@@ -286,7 +289,7 @@ describe('rpc', () => {
         jsonrpc: JSON_RPC_VERSION_2,
         result: {success: true}
       };
-      expect(() => RpcResponseWithResultOrError.parse(validRpcResponse)).toThrow();
+      expect(() => RpcResponseWithResultOrErrorSchema.parse(validRpcResponse)).toThrow();
     });
 
     it('should throw if RpcResponse with error has no id', () => {
@@ -297,7 +300,7 @@ describe('rpc', () => {
           message: 'An internal error occurred'
         }
       };
-      expect(() => RpcResponseWithResultOrError.parse(validRpcResponse)).toThrow();
+      expect(() => RpcResponseWithResultOrErrorSchema.parse(validRpcResponse)).toThrow();
     });
 
     it('should throw if RpcResponse with result has no jsonrpc', () => {
@@ -305,7 +308,7 @@ describe('rpc', () => {
         id: 1,
         result: {success: true}
       };
-      expect(() => RpcResponseWithResultOrError.parse(validRpcResponse)).toThrow();
+      expect(() => RpcResponseWithResultOrErrorSchema.parse(validRpcResponse)).toThrow();
     });
 
     it('should throw if RpcResponse with error has no jsonrpc', () => {
@@ -316,7 +319,7 @@ describe('rpc', () => {
           message: 'An internal error occurred'
         }
       };
-      expect(() => RpcResponseWithResultOrError.parse(validRpcResponse)).toThrow();
+      expect(() => RpcResponseWithResultOrErrorSchema.parse(validRpcResponse)).toThrow();
     });
 
     it('should throw if RpcResponse has additional fields', () => {
@@ -326,7 +329,7 @@ describe('rpc', () => {
         result: {success: true},
         hello: 'world'
       };
-      expect(() => RpcResponseWithResultOrError.parse(invalidRpcResponse)).toThrow();
+      expect(() => RpcResponseWithResultOrErrorSchema.parse(invalidRpcResponse)).toThrow();
     });
   });
 });

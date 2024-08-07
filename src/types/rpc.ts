@@ -5,19 +5,19 @@ import {z} from 'zod';
 
 export const JSON_RPC_VERSION_2 = '2.0';
 
-const JsonRpc = z.literal(JSON_RPC_VERSION_2);
+const JsonRpcSchema = z.literal(JSON_RPC_VERSION_2);
 
-const RpcId = z.union([z.string(), z.number(), z.null()]);
+const RpcIdSchema = z.union([z.string(), z.number(), z.null()]);
 
-export type RpcIdType = z.infer<typeof RpcId>;
+export type RpcId = z.infer<typeof RpcIdSchema>;
 
-const Rpc = z.object({
-  jsonrpc: JsonRpc,
-  id: z.optional(RpcId)
+const RpcSchema = z.object({
+  jsonrpc: JsonRpcSchema,
+  id: z.optional(RpcIdSchema)
 });
 
-export const RpcRequest = Rpc.extend({
-  id: RpcId
+export const RpcRequestSchema = RpcSchema.extend({
+  id: RpcIdSchema
 })
   .merge(
     z.object({
@@ -27,34 +27,34 @@ export const RpcRequest = Rpc.extend({
   )
   .strict();
 
-type _RpcRequestType = z.infer<typeof RpcRequest>;
+type _RpcRequest = z.infer<typeof RpcRequestSchema>;
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export const inferRpcRequestWithoutParams = <M extends string>({method}: {method: M}) =>
-  RpcRequest.omit({method: true, params: true})
+export const inferRpcRequestWithoutParamsSchema = <M extends string>({method}: {method: M}) =>
+  RpcRequestSchema.omit({method: true, params: true})
     .strict()
     .extend({
-      id: RpcId,
+      id: RpcIdSchema,
       method: z.literal(method)
     });
 
 type RpcRequestWithoutParamsReturnType<M extends string> = ReturnType<
-  typeof inferRpcRequestWithoutParams<M>
+  typeof inferRpcRequestWithoutParamsSchema<M>
 >;
 
-type _RpcRequestWithoutParamsType<M extends string> = z.infer<RpcRequestWithoutParamsReturnType<M>>;
+type _RpcRequestWithoutParams<M extends string> = z.infer<RpcRequestWithoutParamsReturnType<M>>;
 
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-export const inferRpcRequestWithParams = <T extends z.ZodTypeAny, M extends string>({
+export const inferRpcRequestWithParamsSchema = <T extends z.ZodTypeAny, M extends string>({
   params,
   method
 }: {
   params: T;
   method: M;
 }) =>
-  RpcRequest.omit({method: true})
+  RpcRequestSchema.omit({method: true})
     .extend({
-      id: RpcId,
+      id: RpcIdSchema,
       method: z.literal(method)
     })
     .merge(
@@ -64,7 +64,7 @@ export const inferRpcRequestWithParams = <T extends z.ZodTypeAny, M extends stri
     );
 /* eslint-enable */
 
-export const RpcNotification = RpcRequest.omit({id: true}).strict();
+export const RpcNotificationSchema = RpcRequestSchema.omit({id: true}).strict();
 
 export enum RpcErrorCode {
   /**
@@ -94,34 +94,34 @@ export enum RpcErrorCode {
   SERVER_ERROR = -32000
 }
 
-const RpcResponseError = z.object({
+const RpcResponseErrorSchema = z.object({
   code: z.union([z.number(), z.nativeEnum(RpcErrorCode)]),
   message: z.string(),
   data: z.optional(z.never())
 });
 
-export type RpcResponseErrorType = z.infer<typeof RpcResponseError>;
+export type RpcResponseError = z.infer<typeof RpcResponseErrorSchema>;
 
-const RpcResponse = Rpc.extend({
-  id: RpcId
+const RpcResponseSchema = RpcSchema.extend({
+  id: RpcIdSchema
 });
 
-export type RpcResponseType = z.infer<typeof RpcResponse>;
+export type RpcResponse = z.infer<typeof RpcResponseSchema>;
 
-const RpcResponseWithError = RpcResponse.extend({
-  error: RpcResponseError
+const RpcResponseWithErrorSchema = RpcResponseSchema.extend({
+  error: RpcResponseErrorSchema
 });
 
-export type RpcResponseWithErrorType = z.infer<typeof RpcResponseWithError>;
+export type RpcResponseWithError = z.infer<typeof RpcResponseWithErrorSchema>;
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export const inferRpcResponse = <T extends z.ZodTypeAny>(result: T) =>
-  RpcResponseWithError.omit({error: true})
+export const inferRpcResponseSchema = <T extends z.ZodTypeAny>(result: T) =>
+  RpcResponseWithErrorSchema.omit({error: true})
     .merge(
       z
         .object({
           result,
-          error: RpcResponseError
+          error: RpcResponseErrorSchema
         })
         .partial()
     )
@@ -131,4 +131,4 @@ export const inferRpcResponse = <T extends z.ZodTypeAny>(result: T) =>
       'Either result or error should be provided.'
     );
 
-export const RpcResponseWithResultOrError = inferRpcResponse(z.any());
+export const RpcResponseWithResultOrErrorSchema = inferRpcResponseSchema(z.any());
