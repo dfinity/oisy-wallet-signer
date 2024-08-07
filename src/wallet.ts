@@ -94,8 +94,21 @@ export class Wallet {
         return;
       }
 
+      let expectedOrigin: string;
+
+      try {
+        const {origin: walletOrigin} = new URL(url);
+        expectedOrigin = walletOrigin;
+      } catch (err: unknown) {
+        // Unlikely to happen if window.open succeeded
+        response = new MessageError(
+          `The origin ${origin} of the wallet URL ${url} cannot be parsed.`
+        );
+        return;
+      }
+
       // In our test suite, origin is set to empty string when the message originate from the same window - i.e. when retryRequestStatus are emitted.// In our test suite, the origin is set to an empty string when the message originates from the same window. This occurs when `retryRequestStatus` events are emitted to `*`.
-      if (notEmptyString(origin) && origin !== url) {
+      if (notEmptyString(origin) && origin !== expectedOrigin) {
         response = new MessageError(
           `The response origin ${origin} does not match the requested wallet URL ${url}.`
         );
