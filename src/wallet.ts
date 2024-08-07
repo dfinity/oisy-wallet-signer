@@ -155,6 +155,11 @@ export class Wallet {
     }
   }
 
+  /**
+   * Disconnects the wallet by closing the associated popup window.
+   *
+   * @returns {Promise<void>} A promise that resolves when the wallet has been successfully disconnected.
+   */
   disconnect = async (): Promise<void> => {
     this.#popup.close();
   };
