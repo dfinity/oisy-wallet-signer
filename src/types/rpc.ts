@@ -27,13 +27,10 @@ export const RpcRequest = Rpc.extend({
   )
   .strict();
 
-type RpcRequestType = z.infer<typeof RpcRequest>;
+type _RpcRequestType = z.infer<typeof RpcRequest>;
 
-export const inferRpcRequestWithoutParams = ({
-  method
-}: {
-  method: string;
-}): z.ZodType<RpcRequestType> =>
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+export const inferRpcRequestWithoutParams = <M extends string>({method}: {method: M}) =>
   RpcRequest.omit({method: true, params: true})
     .strict()
     .extend({
@@ -41,13 +38,20 @@ export const inferRpcRequestWithoutParams = ({
       method: z.literal(method)
     });
 
-export const inferRpcRequestWithParams = <T extends z.ZodTypeAny>({
+type RpcRequestWithoutParamsReturnType<M extends string> = ReturnType<
+  typeof inferRpcRequestWithoutParams<M>
+>;
+
+type _RpcRequestWithoutParamsType<M extends string> = z.infer<RpcRequestWithoutParamsReturnType<M>>;
+
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+export const inferRpcRequestWithParams = <T extends z.ZodTypeAny, M extends string>({
   params,
   method
 }: {
   params: T;
-  method: string;
-}): z.ZodType<RpcRequestType> =>
+  method: M;
+}) =>
   RpcRequest.omit({method: true})
     .extend({
       id: RpcId,
@@ -58,6 +62,7 @@ export const inferRpcRequestWithParams = <T extends z.ZodTypeAny>({
         params
       })
     );
+/* eslint-enable */
 
 export const RpcNotification = RpcRequest.omit({id: true}).strict();
 
@@ -103,50 +108,14 @@ const RpcResponse = Rpc.extend({
 
 export type RpcResponseType = z.infer<typeof RpcResponse>;
 
-const RpcResponseContent = <T extends z.ZodTypeAny>(
-  result: T
-): z.ZodObject<{
-  result: z.ZodOptional<T>;
-  error: z.ZodOptional<typeof RpcResponseError>;
-}> =>
-  z
-    .object({
-      result,
-      error: RpcResponseError
-    })
-    .partial();
-
-// TODO: Maybe we can use this type in inferRpcResponse?
-type _RpcResponseContentType<T extends z.ZodTypeAny> = z.infer<
-  ReturnType<typeof RpcResponseContent<T>>
->;
-
 const RpcResponseWithError = RpcResponse.extend({
   error: RpcResponseError
 });
 
 export type RpcResponseWithErrorType = z.infer<typeof RpcResponseWithError>;
 
-// TODO: Simplify the return type to avoid redundancy with other types. Consider using a more concise or existing type definition.
-export const inferRpcResponse = <T extends z.ZodTypeAny>(
-  result: T
-): z.ZodEffects<
-  z.ZodObject<
-    {
-      jsonrpc: z.ZodLiteral<'2.0'>;
-      id: z.ZodUnion<[z.ZodString, z.ZodNumber, z.ZodNull]>;
-      result: z.ZodOptional<T>;
-      error: z.ZodOptional<
-        z.ZodObject<{
-          code: z.ZodUnion<[z.ZodNumber, z.ZodNativeEnum<typeof RpcErrorCode>]>;
-          message: z.ZodString;
-          data: z.ZodOptional<z.ZodNever>;
-        }>
-      >;
-    },
-    'strict'
-  >
-> =>
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+export const inferRpcResponse = <T extends z.ZodTypeAny>(result: T) =>
   RpcResponseWithError.omit({error: true})
     .merge(
       z

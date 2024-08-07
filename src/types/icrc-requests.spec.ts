@@ -5,8 +5,7 @@ import {
   IcrcWalletStatusRequest,
   IcrcWalletSupportedStandardsRequest,
   type IcrcWalletPermissionsRequestType,
-  type IcrcWalletRequestPermissionsRequestType,
-  type IcrcWalletSupportedStandardsRequestType
+  type IcrcWalletRequestPermissionsRequestType
 } from './icrc-requests';
 import {JSON_RPC_VERSION_2} from './rpc';
 
@@ -35,6 +34,7 @@ describe('icrc-requests', () => {
         params: {
           scopes: [
             {
+              // @ts-expect-error: we are testing this on purpose
               method: 'test'
             }
           ]
@@ -56,6 +56,7 @@ describe('icrc-requests', () => {
     it('should throw if request has no scopes', () => {
       const invalidRequest: IcrcWalletRequestPermissionsRequestType = {
         ...validRequest,
+        // @ts-expect-error: we are testing this on purpose
         params: {}
       };
       expect(() => IcrcWalletRequestPermissionsRequest.parse(invalidRequest)).toThrow();
@@ -64,6 +65,7 @@ describe('icrc-requests', () => {
     it('should throw if request has no params', () => {
       const {params: _, ...rest} = validRequest;
 
+      // @ts-expect-error: we are testing this on purpose
       const invalidRequest: IcrcWalletRequestPermissionsRequestType = rest;
       expect(() => IcrcWalletRequestPermissionsRequest.parse(invalidRequest)).toThrow();
     });
@@ -71,6 +73,7 @@ describe('icrc-requests', () => {
     it('should throw if request has invalid method', () => {
       const invalidRequest: IcrcWalletRequestPermissionsRequestType = {
         ...validRequest,
+        // @ts-expect-error: we are testing this on purpose
         method: 'test'
       };
       expect(() => IcrcWalletRequestPermissionsRequest.parse(invalidRequest)).toThrow();
@@ -105,6 +108,7 @@ describe('icrc-requests', () => {
     it('should throw if request has params', () => {
       const invalidRequest: IcrcWalletPermissionsRequestType = {
         ...validRequest,
+        // @ts-expect-error: we are testing this on purpose
         params: {}
       };
       expect(() => IcrcWalletPermissionsRequest.parse(invalidRequest)).toThrow();
@@ -113,6 +117,7 @@ describe('icrc-requests', () => {
     it('should throw if request has invalid method', () => {
       const invalidRequest: IcrcWalletPermissionsRequestType = {
         ...validRequest,
+        // @ts-expect-error: we are testing this on purpose
         method: 'test'
       };
       expect(() => IcrcWalletPermissionsRequest.parse(invalidRequest)).toThrow();
@@ -139,7 +144,7 @@ describe('icrc-requests', () => {
   ];
 
   describe.each(requestWithoutParamsSchemas)('$method', ({schema, method}) => {
-    const validRequest: IcrcWalletSupportedStandardsRequestType = {
+    const validRequest = {
       jsonrpc: JSON_RPC_VERSION_2,
       id: 1,
       method
