@@ -21,7 +21,6 @@ export const retryRequestStatus = async ({
   intervalInMilliseconds
 }: Omit<Request, 'origin'> & {
   isReady: () => ReadyOrError | 'pending';
-  id: RpcId;
   timeoutInMilliseconds: number;
   intervalInMilliseconds?: number;
 }): Promise<ReadyOrError | 'timeout'> => {

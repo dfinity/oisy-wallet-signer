@@ -2,7 +2,11 @@ import {assertNonNullish, nonNullish, notEmptyString} from '@dfinity/utils';
 import {nanoid} from 'nanoid';
 import {WALLET_CONNECT_DEFAULT_TIMEOUT_IN_MILLISECONDS} from './constants/wallet.constants';
 import {requestSupportedStandards, retryRequestStatus} from './handlers/wallet.handlers';
-import {IcrcReadyResponseSchema} from './types/icrc-responses';
+import {
+  IcrcReadyResponseSchema,
+  IcrcSupportedStandardsResponseSchema,
+  type IcrcSupportedStandards
+} from './types/icrc-responses';
 import {RpcResponseWithResultOrErrorSchema} from './types/rpc';
 import {WalletOptionsSchema, type WalletOptions} from './types/wallet';
 import type {ReadyOrError} from './utils/timeout.utils';
@@ -141,15 +145,63 @@ export class Wallet {
     this.#popup.close();
   };
 
-  supportedStandards = async (): Promise<void> => {
-    // TODO: onMessage + resolve
+  supportedStandards = async (): Promise<IcrcSupportedStandards> => {
+    return await new Promise<IcrcSupportedStandards>((resolve, reject) => {
+      const requestId = nanoid();
 
-    const requestId = nanoid();
+      const timeoutId = setTimeout(() => {
+        reject(new Error('Request timed out after 20 seconds'));
+        disconnect();
+      }, 20000);
 
-    requestSupportedStandards({
-      popup: this.#popup,
-      origin: this.#origin,
-      id: requestId
+      const onMessage = ({origin, data: msgData}: MessageEvent): void => {
+        const {success} = RpcResponseWithResultOrErrorSchema.safeParse(msgData);
+
+        if (!success) {
+          // We are only interested in JSON-RPC messages, so we are ignoring any other messages emitted at the window level, as the consumer might be using other events.
+          return;
+        }
+
+        if (notEmptyString(origin) && origin !== this.#origin) {
+          reject(
+            new Error(
+              `The response origin ${origin} does not match the wallet origin ${this.#origin}.`
+            )
+          );
+
+          disconnect();
+          return;
+        }
+
+        const {success: isSupportedStandards, data: supportedStandardsData} =
+          IcrcSupportedStandardsResponseSchema.safeParse(msgData);
+
+        if (
+          isSupportedStandards &&
+          requestId === supportedStandardsData?.id &&
+          nonNullish(supportedStandardsData?.result)
+        ) {
+          const {
+            result: {supportedStandards}
+          } = supportedStandardsData;
+          resolve(supportedStandards);
+
+          disconnect();
+        }
+      };
+
+      window.addEventListener('message', onMessage);
+
+      const disconnect = (): void => {
+        clearTimeout(timeoutId);
+        window.removeEventListener('message', onMessage);
+      };
+
+      requestSupportedStandards({
+        popup: this.#popup,
+        origin: this.#origin,
+        id: requestId
+      });
     });
   };
 }
