@@ -153,6 +153,38 @@ describe('Wallet', () => {
 
         expect(safeParseSpy).toHaveBeenCalledTimes(3);
       });
+
+      it('should not close popup on connection success', async () => {
+        const promise = Wallet.connect(mockParameters);
+
+        window.dispatchEvent(messageEventReady);
+
+        const wallet = await promise;
+
+        expect(wallet).toBeInstanceOf(Wallet);
+
+        expect(window.open).toHaveBeenCalledTimes(1);
+        expect(window.close).not.toHaveBeenCalled();
+      });
+
+      it('should close popup on connection not successful', async () =>
+        // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
+        new Promise<void>(async (resolve) => {
+          vi.useFakeTimers();
+
+          Wallet.connect(mockParameters).catch((err: Error) => {
+            expect(err.message).toBe('Connection timeout. Unable to connect to the wallet.');
+
+            expect(window.open).toHaveBeenCalledTimes(1);
+            expect(window.close).toHaveBeenCalledTimes(1);
+
+            vi.useRealTimers();
+
+            resolve();
+          });
+
+          await vi.advanceTimersByTimeAsync(2 * 60 * 1000);
+        }));
     });
   });
 
