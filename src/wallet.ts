@@ -1,7 +1,7 @@
 import {assertNonNullish, nonNullish, notEmptyString} from '@dfinity/utils';
 import {nanoid} from 'nanoid';
 import {WALLET_CONNECT_DEFAULT_TIMEOUT_IN_MILLISECONDS} from './constants/wallet.constants';
-import {retryRequestStatus} from './handlers/wallet.handlers';
+import {requestSupportedStandards, retryRequestStatus} from './handlers/wallet.handlers';
 import {IcrcReadyResponse} from './types/icrc-responses';
 import {RpcResponseWithResultOrError} from './types/rpc';
 import type {ReadyOrError} from './utils/timeout.utils';
@@ -51,11 +51,11 @@ export interface WalletOptions {
 }
 
 export class Wallet {
-  readonly #walletOrigin: string | undefined;
+  readonly #origin: string;
   readonly #popup: Window;
 
   private constructor({origin, popup}: {origin: string; popup: Window}) {
-    this.#walletOrigin = origin;
+    this.#origin = origin;
     this.#popup = popup;
   }
 
@@ -162,5 +162,17 @@ export class Wallet {
    */
   disconnect = async (): Promise<void> => {
     this.#popup.close();
+  };
+
+  supportedStandards = async (): Promise<void> => {
+    // TODO: onMessage + resolve
+
+    const requestId = nanoid();
+
+    requestSupportedStandards({
+      popup: this.#popup,
+      origin: this.#origin,
+      id: requestId
+    });
   };
 }
