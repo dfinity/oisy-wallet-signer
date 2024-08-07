@@ -12,6 +12,10 @@
 		}
 
 		signer = Signer.init({});
+
+		return () => {
+			signer?.disconnect();
+		};
 	});
 </script>
 

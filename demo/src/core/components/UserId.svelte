@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { authStore } from '../stores/auth.store.js';
+	import { authStore } from '../stores/auth.store';
+	import Value from '$core/components/Value.svelte';
 </script>
 
-<label class="font-bold text-sm" for="user-id">User ID:</label>
-<p class="text-sm mb-2">
-	<output id="user-id">{$authStore?.identity?.getPrincipal().toText() ?? ''}</output>
-</p>
+<Value id="user-id" title="User ID">
+	<output>{$authStore?.identity?.getPrincipal().toText() ?? ''}</output>
+</Value>
