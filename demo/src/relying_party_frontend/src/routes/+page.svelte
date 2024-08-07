@@ -11,6 +11,8 @@
 		wallet = await Wallet.connect({
 			url: 'http://localhost:5174'
 		});
+
+		await wallet.disconnect();
 	};
 </script>
 
