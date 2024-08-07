@@ -1,7 +1,7 @@
 import {afterEach, beforeEach, describe} from 'vitest';
 import {WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD} from './constants/wallet.constants';
 import * as walletHandlers from './handlers/wallet.handlers';
-import {ICRC29_STATUS} from './types/icrc';
+import {ICRC25_SUPPORTED_STANDARDS, ICRC29_STATUS} from './types/icrc';
 import {JSON_RPC_VERSION_2, RpcResponseWithResultOrErrorSchema} from './types/rpc';
 import type {WalletOptions} from './types/wallet';
 import {WALLET_WINDOW_CENTER, WALLET_WINDOW_TOP_RIGHT, windowFeatures} from './utils/window.utils';
@@ -134,6 +134,23 @@ describe('Wallet', () => {
           expect(removeEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
         });
 
+        it('should call the wallet to poll for status', async () => {
+          const spy = vi.spyOn(walletHandlers, 'retryRequestStatus');
+          const spyPostMessage = vi.spyOn(window, 'postMessage');
+
+          Wallet.connect(mockParameters);
+
+          expect(spy).toHaveBeenCalledTimes(1);
+
+          expect(spyPostMessage).toHaveBeenCalledWith(
+            expect.objectContaining({
+              jsonrpc: JSON_RPC_VERSION_2,
+              method: ICRC29_STATUS
+            }),
+            '*'
+          );
+        });
+
         it('should not process message which are not RpcResponse', async () => {
           const safeParseSpy = vi.spyOn(RpcResponseWithResultOrErrorSchema, 'safeParse');
 
@@ -217,7 +234,7 @@ describe('Wallet', () => {
       });
     });
 
-    describe.only('Supported standards', () => {
+    describe('Supported standards', () => {
       let wallet: Wallet;
 
       beforeEach(async () => {
@@ -242,7 +259,7 @@ describe('Wallet', () => {
 
         const options = [
           {
-            title: 'default options',
+            title: 'default options'
           },
           {
             title: 'custom timeout',
@@ -257,7 +274,8 @@ describe('Wallet', () => {
             return new Promise<void>(async (resolve) => {
               vi.useFakeTimers();
 
-              const timeout = options?.timeoutInMilliseconds ?? WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD;
+              const timeout =
+                options?.timeoutInMilliseconds ?? WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD;
 
               wallet.supportedStandards(options).catch((err: Error) => {
                 expect(err.message).toBe(
@@ -273,6 +291,54 @@ describe('Wallet', () => {
             });
           }
         );
+
+        it('should throw error if the message signer standards received comes from another origin', async () => {
+          const hackerOrigin = 'https://hacker.com';
+
+          const promise = wallet.supportedStandards();
+
+          const messageEvent = new MessageEvent('message', {
+            origin: hackerOrigin,
+            data: {
+              jsonrpc: JSON_RPC_VERSION_2,
+              id: '123',
+              result: {
+                supportedStandards: [
+                  {
+                    name: 'ICRC-25',
+                    url: 'https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-25/ICRC-25.md'
+                  }
+                ]
+              }
+            }
+          });
+
+          window.dispatchEvent(messageEvent);
+
+          await expect(promise).rejects.toThrow(
+            `The response origin ${hackerOrigin} does not match the wallet origin ${mockParameters.url}.`
+          );
+        });
+      });
+
+      describe('Request success', () => {
+        it('should call the wallet with postMessage', async () => {
+          const spy = vi.spyOn(walletHandlers, 'requestSupportedStandards');
+          const spyPostMessage = vi.spyOn(window, 'postMessage');
+
+          wallet.supportedStandards();
+
+          expect(spy).toHaveBeenCalledTimes(1);
+          expect(spyPostMessage).toHaveBeenCalledTimes(1);
+
+          expect(spyPostMessage).toHaveBeenCalledWith(
+            expect.objectContaining({
+              jsonrpc: JSON_RPC_VERSION_2,
+              method: ICRC25_SUPPORTED_STANDARDS
+            }),
+            mockParameters.url
+          );
+        });
       });
     });
   });
