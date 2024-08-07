@@ -1,3 +1,4 @@
+import {DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS} from '../constants/core.constants';
 import type {ReadyOrError} from '../utils/timeout.utils';
 import {retryRequestStatus} from './wallet.handlers';
 
@@ -63,16 +64,20 @@ describe('Wallet handlers', () => {
     it('should timeout after 30 seconds', async () =>
       // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
       new Promise<void>(async (resolve) => {
+        const retries = (30 * 1000) / DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS;
+
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         retryRequestStatus({popup, isReady, timeoutInMilliseconds: 30000, id: testId}).then(
           (result) => {
             expect(result).toEqual('timeout');
 
+            expect(isReady).toHaveBeenCalledTimes(retries);
+
             resolve();
           }
         );
 
-        await vi.advanceTimersByTimeAsync(60 * 500);
+        await vi.advanceTimersByTimeAsync(retries * DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS);
       }));
   });
 });
