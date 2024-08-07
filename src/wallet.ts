@@ -4,51 +4,9 @@ import {WALLET_CONNECT_DEFAULT_TIMEOUT_IN_MILLISECONDS} from './constants/wallet
 import {retryRequestStatus} from './handlers/wallet.handlers';
 import {IcrcReadyResponse} from './types/icrc-responses';
 import {RpcResponseWithResultOrError} from './types/rpc';
+import {WalletOptionsSchema, type WalletOptions} from './types/wallet';
 import type {ReadyOrError} from './utils/timeout.utils';
-import {
-  WALLET_WINDOW_TOP_RIGHT,
-  windowFeatures,
-  type WalletWindowOptions
-} from './utils/window.utils';
-
-export interface WalletConnectionOptions {
-  /**
-   * Specifies the interval in milliseconds at which the wallet is checked (polled) to determine if it is ready.
-   *
-   * @default 500 - The default polling interval is set to 500 milliseconds.
-   */
-  pollingIntervalInMilliseconds?: number;
-
-  /**
-   * Specifies the maximum duration in milliseconds for attempting to establish a connection to the wallet.
-   * If the connection is not established within this duration, the process will time out.
-   *
-   * @default 120 - The default timeout is set to 120 seconds.
-   */
-  timeoutInMilliseconds?: number;
-}
-
-/**
- * The options to establish a connection with a wallet.
- * @interface
- */
-export interface WalletOptions {
-  /**
-   * The URL of the wallet.
-   */
-  url: string;
-
-  /**
-   * Optional window options to display the wallet, which can be an object of type WalletWindowOptions or a string.
-   * If a string is passed, those are applied as-is to the window that is opened (see https://developer.mozilla.org/en-US/docs/Web/API/Window/open#windowfeatures for more information).
-   */
-  windowOptions?: WalletWindowOptions | string;
-
-  /**
-   * The connection options for establishing the connection with the wallet.
-   */
-  connectionOptions?: WalletConnectionOptions;
-}
+import {WALLET_WINDOW_TOP_RIGHT, windowFeatures} from './utils/window.utils';
 
 export class Wallet {
   readonly #walletOrigin: string | undefined;
@@ -63,16 +21,22 @@ export class Wallet {
    * Establish a connection with a wallet.
    *
    * @static
-   * @param {Object} WalletOptions - The options to initialize the wallet client.
+   * @param {WalletOptions} options - The options to initialize the wallet client.
    * @returns {Promise<Wallet>} A promise that resolves to an instance of the wallet that was connected.
    */
-  static async connect({
-    url,
-    windowOptions = WALLET_WINDOW_TOP_RIGHT,
-    connectionOptions
-  }: WalletOptions): Promise<Wallet> {
+  static async connect(options: WalletOptions): Promise<Wallet> {
+    const {success: optionsSuccess, error} = WalletOptionsSchema.safeParse(options);
+
+    if (!optionsSuccess) {
+      throw new Error(`Wallet options cannot be parsed: ${error?.message ?? ''}`);
+    }
+
+    const {url, windowOptions, connectionOptions} = options;
+
     const popupFeatures =
-      typeof windowOptions === 'string' ? windowOptions : windowFeatures(windowOptions);
+      typeof windowOptions === 'string'
+        ? windowOptions
+        : windowFeatures(windowOptions ?? WALLET_WINDOW_TOP_RIGHT);
 
     const popup = window.open(url, 'walletWindow', popupFeatures);
 
