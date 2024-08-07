@@ -52,9 +52,11 @@ export interface WalletOptions {
 
 export class Wallet {
   readonly #walletOrigin: string | undefined;
+  readonly #popup: Window;
 
-  private constructor({origin}: {origin: string | undefined}) {
+  private constructor({origin, popup}: {origin: string; popup: Window}) {
     this.#walletOrigin = origin;
+    this.#popup = popup;
   }
 
   /**
@@ -75,6 +77,10 @@ export class Wallet {
     const popup = window.open(url, 'walletWindow', popupFeatures);
 
     assertNonNullish(popup, 'Unable to open the wallet window.');
+
+    const close = (): void => {
+      popup.close();
+    };
 
     class MessageError extends Error {}
 
@@ -98,13 +104,17 @@ export class Wallet {
 
       const {success: isWalletReady} = IcrcReadyResponse.safeParse(msgData);
       if (isWalletReady) {
-        response = new Wallet({origin});
+        response = new Wallet({origin, popup});
       }
     };
 
     window.addEventListener('message', onMessage);
 
-    try {
+    const disconnect = (): void => {
+      window.removeEventListener('message', onMessage);
+    };
+
+    const connect = async (): Promise<Wallet> => {
       const result = await retryRequestStatus({
         popup,
         isReady: (): ReadyOrError | 'pending' =>
@@ -130,13 +140,22 @@ export class Wallet {
       }
 
       return response;
-    } finally {
-      const disconnect = (): void => {
-        window.removeEventListener('message', onMessage);
-        popup.close();
-      };
+    };
 
+    try {
+      return await connect();
+    } catch (err: unknown) {
+      // We close the popup only in case of an error. If the connection is successful, the developers will interact with the wallet and are responsible for disconnecting it.
+      close();
+
+      throw err;
+    } finally {
+      // We remove the event listener because this implementation scopes message exchanges to individual functions. Each function subscribes to messages, notifies the wallet, and waits for a response.
       disconnect();
     }
   }
+
+  disconnect = async (): Promise<void> => {
+    this.#popup.close();
+  };
 }

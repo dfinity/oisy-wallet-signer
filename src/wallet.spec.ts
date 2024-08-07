@@ -1,3 +1,4 @@
+import {describe} from 'vitest';
 import * as walletHandlers from './handlers/wallet.handlers';
 import {ICRC29_STATUS} from './types/icrc';
 import {JSON_RPC_VERSION_2, RpcResponseWithResultOrError} from './types/rpc';
@@ -10,6 +11,15 @@ describe('Wallet', () => {
   let originalOpen: typeof window.open;
 
   describe('Window success', () => {
+    const messageEventReady = new MessageEvent('message', {
+      origin: mockParameters.url,
+      data: {
+        jsonrpc: JSON_RPC_VERSION_2,
+        id: '123',
+        result: 'ready'
+      }
+    });
+
     beforeEach(() => {
       originalOpen = window.open;
 
@@ -90,15 +100,6 @@ describe('Wallet', () => {
         }
       ];
 
-      const messageEventReady = new MessageEvent('message', {
-        origin: mockParameters.url,
-        data: {
-          jsonrpc: JSON_RPC_VERSION_2,
-          id: '123',
-          result: 'ready'
-        }
-      });
-
       it.each(options)('$title', async ({params, expectedOptions}) => {
         const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
         const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
@@ -152,6 +153,55 @@ describe('Wallet', () => {
         );
 
         expect(safeParseSpy).toHaveBeenCalledTimes(3);
+      });
+
+      it('should not close popup on connection success', async () => {
+        const promise = Wallet.connect(mockParameters);
+
+        window.dispatchEvent(messageEventReady);
+
+        const wallet = await promise;
+
+        expect(wallet).toBeInstanceOf(Wallet);
+
+        expect(window.open).toHaveBeenCalledTimes(1);
+        expect(window.close).not.toHaveBeenCalled();
+      });
+
+      it('should close popup on connection not successful', async () =>
+        // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
+        new Promise<void>(async (resolve) => {
+          vi.useFakeTimers();
+
+          Wallet.connect(mockParameters).catch((err: Error) => {
+            expect(err.message).toBe('Connection timeout. Unable to connect to the wallet.');
+
+            expect(window.open).toHaveBeenCalledTimes(1);
+            expect(window.close).toHaveBeenCalledTimes(1);
+
+            vi.useRealTimers();
+
+            resolve();
+          });
+
+          await vi.advanceTimersByTimeAsync(2 * 60 * 1000);
+        }));
+    });
+
+    describe('Disconnect', () => {
+      it('should close popup on disconnect', async () => {
+        const promise = Wallet.connect(mockParameters);
+
+        window.dispatchEvent(messageEventReady);
+
+        const {disconnect} = await promise;
+
+        expect(window.open).toHaveBeenCalledTimes(1);
+        expect(window.close).not.toHaveBeenCalled();
+
+        await disconnect();
+
+        expect(window.close).toHaveBeenCalled();
       });
     });
   });
