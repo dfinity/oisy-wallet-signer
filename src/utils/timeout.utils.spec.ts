@@ -99,7 +99,12 @@ describe('retryUntilReady', () => {
       counter++;
     });
 
-    const promise = retryUntilReady({retries: 3, isReady, fn, intervalInMs});
+    const promise = retryUntilReady({
+      retries: 3,
+      isReady,
+      fn,
+      intervalInMilliseconds: intervalInMs
+    });
 
     await vi.advanceTimersByTimeAsync(intervalInMs * 2);
 

@@ -33,21 +33,23 @@ describe('Wallet handlers', () => {
       // eslint-disable-next-line @typescript-eslint/return-await
       new Promise<void>((resolve) => {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        retryRequestStatus({popup, isReady, timeoutInSeconds: 120, id: testId}).then((result) => {
-          // eslint-disable-next-line @typescript-eslint/unbound-method
-          expect(popup.postMessage).toHaveBeenCalledWith(
-            {
-              id: testId,
-              jsonrpc: '2.0',
-              method: 'icrc29_status'
-            },
-            '*'
-          );
+        retryRequestStatus({popup, isReady, timeoutInMilliseconds: 120000, id: testId}).then(
+          (result) => {
+            // eslint-disable-next-line @typescript-eslint/unbound-method
+            expect(popup.postMessage).toHaveBeenCalledWith(
+              {
+                id: testId,
+                jsonrpc: '2.0',
+                method: 'icrc29_status'
+              },
+              '*'
+            );
 
-          expect(result).toEqual('ready');
+            expect(result).toEqual('ready');
 
-          resolve();
-        });
+            resolve();
+          }
+        );
 
         vi.advanceTimersByTime(1000);
       }));
@@ -62,11 +64,13 @@ describe('Wallet handlers', () => {
       // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
       new Promise<void>(async (resolve) => {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        retryRequestStatus({popup, isReady, timeoutInSeconds: 30, id: testId}).then((result) => {
-          expect(result).toEqual('timeout');
+        retryRequestStatus({popup, isReady, timeoutInMilliseconds: 30000, id: testId}).then(
+          (result) => {
+            expect(result).toEqual('timeout');
 
-          resolve();
-        });
+            resolve();
+          }
+        );
 
         await vi.advanceTimersByTimeAsync(60 * 500);
       }));
