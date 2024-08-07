@@ -8,18 +8,18 @@ import {Wallet, type WalletOptions} from './wallet';
 describe('Wallet', () => {
   const mockParameters: WalletOptions = {url: 'https://test.com'};
 
+  const messageEventReady = new MessageEvent('message', {
+    origin: mockParameters.url,
+    data: {
+      jsonrpc: JSON_RPC_VERSION_2,
+      id: '123',
+      result: 'ready'
+    }
+  });
+
   let originalOpen: typeof window.open;
 
   describe('Window success', () => {
-    const messageEventReady = new MessageEvent('message', {
-      origin: mockParameters.url,
-      data: {
-        jsonrpc: JSON_RPC_VERSION_2,
-        id: '123',
-        result: 'ready'
-      }
-    });
-
     beforeEach(() => {
       originalOpen = window.open;
 
@@ -71,6 +71,18 @@ describe('Wallet', () => {
 
         await expect(promise).rejects.toThrow(
           `The response origin ${hackerOrigin} does not match the requested wallet URL ${mockParameters.url}.`
+        );
+      });
+
+      it('should throw error if the wallet url is not well formatted', async () => {
+        const incorrectOrigin = 'test';
+
+        const promise = Wallet.connect({url: incorrectOrigin});
+
+        window.dispatchEvent(messageEventReady);
+
+        await expect(promise).rejects.toThrow(
+          `The origin ${mockParameters.url} of the wallet URL ${incorrectOrigin} cannot be parsed.`
         );
       });
     });
