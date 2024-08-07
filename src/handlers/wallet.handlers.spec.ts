@@ -30,7 +30,7 @@ describe('Wallet handlers', () => {
       });
     });
 
-    it('should call icrc29_status postMessage and returns ready', () =>
+    it('should call icrc29_status postMessage and returns ready', async () =>
       // eslint-disable-next-line @typescript-eslint/return-await
       new Promise<void>((resolve) => {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -61,7 +61,7 @@ describe('Wallet handlers', () => {
       isReady = vi.fn(() => 'pending');
     });
 
-    it('should timeout after 30 seconds', () =>
+    it('should timeout after 30 seconds', async () =>
       // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
       new Promise<void>(async (resolve) => {
         const retries = (30 * 1000) / DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS;
@@ -78,19 +78,17 @@ describe('Wallet handlers', () => {
         await vi.advanceTimersByTimeAsync(retries * DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS);
       }));
 
-    it('should poll ready function', () =>
+    it('should poll ready function', async () =>
       // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
       new Promise<void>(async (resolve) => {
         const retries = (30 * 1000) / DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS;
 
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        retryRequestStatus({popup, isReady, timeoutInMilliseconds: 30000, id: testId}).then(
-          (result) => {
-            expect(isReady).toHaveBeenCalledTimes(retries);
+        retryRequestStatus({popup, isReady, timeoutInMilliseconds: 30000, id: testId}).then(() => {
+          expect(isReady).toHaveBeenCalledTimes(retries);
 
-            resolve();
-          }
-        );
+          resolve();
+        });
 
         await vi.advanceTimersByTimeAsync(retries * DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS);
       }));
