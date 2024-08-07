@@ -1,6 +1,6 @@
 import {DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS} from '../constants/core.constants';
 import {ICRC25_SUPPORTED_STANDARDS, ICRC29_STATUS} from '../types/icrc';
-import {
+import type {
   IcrcWalletStatusRequestType,
   IcrcWalletSupportedStandardsRequestType
 } from '../types/icrc-requests';
@@ -43,7 +43,7 @@ export const retryRequestStatus = async ({
   });
 };
 
-export const requestSupportedStandards = ({popup, id, origin}: Request) => {
+export const requestSupportedStandards = ({popup, id, origin}: Request): void => {
   const msg: IcrcWalletSupportedStandardsRequestType = {
     jsonrpc: JSON_RPC_VERSION_2,
     id,
