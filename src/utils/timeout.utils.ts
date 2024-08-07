@@ -1,3 +1,5 @@
+import {DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS} from '../constants/core.constants';
+
 export const waitForMilliseconds = async (milliseconds: number): Promise<void> => {
   await new Promise((resolve) => {
     setTimeout(resolve, milliseconds);
@@ -10,12 +12,12 @@ export const retryUntilReady = async ({
   retries,
   isReady,
   fn,
-  intervalInMs = 500
+  intervalInMilliseconds = DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS
 }: {
   retries: number;
   isReady: () => ReadyOrError | 'pending';
   fn: () => void;
-  intervalInMs?: number;
+  intervalInMilliseconds?: number;
 }): Promise<ReadyOrError | 'timeout'> => {
   const ready = isReady();
 
@@ -31,7 +33,7 @@ export const retryUntilReady = async ({
 
   fn();
 
-  await waitForMilliseconds(intervalInMs);
+  await waitForMilliseconds(intervalInMilliseconds);
 
-  return await retryUntilReady({retries: remainingRetries, intervalInMs, isReady, fn});
+  return await retryUntilReady({retries: remainingRetries, intervalInMilliseconds, isReady, fn});
 };

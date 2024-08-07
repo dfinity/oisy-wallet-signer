@@ -2,10 +2,10 @@ import * as walletHandlers from './handlers/wallet.handlers';
 import {ICRC29_STATUS} from './types/icrc';
 import {JSON_RPC_VERSION_2, RpcResponseWithResultOrError} from './types/rpc';
 import {WALLET_WINDOW_CENTER, WALLET_WINDOW_TOP_RIGHT, windowFeatures} from './utils/window.utils';
-import {Wallet, type WalletParameters} from './wallet';
+import {Wallet, type WalletOptions} from './wallet';
 
 describe('Wallet', () => {
-  const mockParameters: WalletParameters = {url: 'https://test.com'};
+  const mockParameters: WalletOptions = {url: 'https://test.com'};
 
   let originalOpen: typeof window.open;
 

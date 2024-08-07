@@ -1,3 +1,4 @@
+import {DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS} from '../constants/core.constants';
 import {ICRC29_STATUS} from '../types/icrc';
 import type {IcrcWalletStatusRequestType} from '../types/icrc-requests';
 import {JSON_RPC_VERSION_2, type RpcIdType} from '../types/rpc';
@@ -7,12 +8,14 @@ export const retryRequestStatus = async ({
   popup,
   isReady,
   id,
-  timeoutInSeconds
+  timeoutInMilliseconds,
+  intervalInMilliseconds
 }: {
   popup: Window;
   isReady: () => ReadyOrError | 'pending';
   id: RpcIdType;
-  timeoutInSeconds: number;
+  timeoutInMilliseconds: number;
+  intervalInMilliseconds?: number;
 }): Promise<ReadyOrError | 'timeout'> => {
   const requestStatus = (): void => {
     const msg: IcrcWalletStatusRequestType = {
@@ -25,7 +28,9 @@ export const retryRequestStatus = async ({
   };
 
   return await retryUntilReady({
-    retries: timeoutInSeconds * 2, // The default intervalInMs is 0.5 seconds
+    retries:
+      timeoutInMilliseconds / (intervalInMilliseconds ?? DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS),
+    intervalInMilliseconds,
     isReady,
     fn: requestStatus
   });

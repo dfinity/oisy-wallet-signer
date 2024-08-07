@@ -1,6 +1,6 @@
 import {assertNonNullish, nonNullish, notEmptyString} from '@dfinity/utils';
 import {nanoid} from 'nanoid';
-import {WALLET_CONNECT_DEFAULT_TIMEOUT_IN_SECONDS} from './constants/wallet.constants';
+import {WALLET_CONNECT_DEFAULT_TIMEOUT_IN_MILLISECONDS} from './constants/wallet.constants';
 import {retryRequestStatus} from './handlers/wallet.handlers';
 import {IcrcReadyResponse} from './types/icrc-responses';
 import {RpcResponseWithResultOrError} from './types/rpc';
@@ -11,11 +11,28 @@ import {
   type WalletWindowOptions
 } from './utils/window.utils';
 
+export interface WalletConnectionOptions {
+  /**
+   * Specifies the interval in milliseconds at which the wallet is checked (polled) to determine if it is ready.
+   *
+   * @default 500 - The default polling interval is set to 500 milliseconds.
+   */
+  pollingIntervalInMilliseconds?: number;
+
+  /**
+   * Specifies the maximum duration in milliseconds for attempting to establish a connection to the wallet.
+   * If the connection is not established within this duration, the process will time out.
+   *
+   * @default 120 - The default timeout is set to 120 seconds.
+   */
+  timeoutInMilliseconds?: number;
+}
+
 /**
- * The parameters to establish a connection with a wallet.
+ * The options to establish a connection with a wallet.
  * @interface
  */
-export interface WalletParameters {
+export interface WalletOptions {
   /**
    * The URL of the wallet.
    */
@@ -28,13 +45,9 @@ export interface WalletParameters {
   windowOptions?: WalletWindowOptions | string;
 
   /**
-   * Specifies the timeout duration in seconds for establishing a connection to the wallet.
-   * The wallet is checked (polled) every 500 milliseconds to determine if it is ready.
-   * If the connection is not established within this duration, the process will time out.
-   *
-   * @default 120 - The default timeout is set to 120 seconds.
+   * The connection options for establishing the connection with the wallet.
    */
-  connectionTimeoutInSeconds?: number;
+  connectionOptions?: WalletConnectionOptions;
 }
 
 export class Wallet {
@@ -48,14 +61,14 @@ export class Wallet {
    * Establish a connection with a wallet.
    *
    * @static
-   * @param {Object} WalletParameters - The parameters to initialize the wallet connection.
+   * @param {Object} WalletOptions - The options to initialize the wallet client.
    * @returns {Promise<Wallet>} A promise that resolves to an instance of the wallet that was connected.
    */
   static async connect({
     url,
     windowOptions = WALLET_WINDOW_TOP_RIGHT,
-    connectionTimeoutInSeconds = WALLET_CONNECT_DEFAULT_TIMEOUT_IN_SECONDS
-  }: WalletParameters): Promise<Wallet> {
+    connectionOptions
+  }: WalletOptions): Promise<Wallet> {
     const popupFeatures =
       typeof windowOptions === 'string' ? windowOptions : windowFeatures(windowOptions);
 
@@ -97,7 +110,10 @@ export class Wallet {
         isReady: (): ReadyOrError | 'pending' =>
           nonNullish(response) ? (response instanceof Wallet ? 'ready' : 'error') : 'pending',
         id: nanoid(),
-        timeoutInSeconds: connectionTimeoutInSeconds
+        timeoutInMilliseconds:
+          connectionOptions?.timeoutInMilliseconds ??
+          WALLET_CONNECT_DEFAULT_TIMEOUT_IN_MILLISECONDS,
+        intervalInMilliseconds: connectionOptions?.pollingIntervalInMilliseconds
       });
 
       if (result === 'timeout') {
