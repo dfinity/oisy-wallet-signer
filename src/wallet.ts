@@ -154,4 +154,8 @@ export class Wallet {
       disconnect();
     }
   }
+
+  async disconnect(): Promise<void> {
+    this.#popup.close();
+  }
 }
