@@ -1,4 +1,4 @@
-import type {IcrcSupportedStandardsSchemaType} from '../types/icrc-responses';
+import type {IcrcSupportedStandards} from '../types/icrc-responses';
 
 export enum SignerErrorCode {
   /**
@@ -12,7 +12,7 @@ export enum SignerErrorCode {
   REQUEST_NOT_SUPPORTED = 501
 }
 
-export const SIGNER_SUPPORTED_STANDARDS: IcrcSupportedStandardsSchemaType = [
+export const SIGNER_SUPPORTED_STANDARDS: IcrcSupportedStandards = [
   {
     name: 'ICRC-25',
     url: 'https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-25/ICRC-25.md'
