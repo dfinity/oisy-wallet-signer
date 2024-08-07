@@ -2,13 +2,13 @@ import {nonNullish} from '@dfinity/utils';
 import {SignerErrorCode} from './constants/signer.constants';
 import {notifyError, notifyReady, notifySupportedStandards} from './handlers/signer.handlers';
 import {
-  IcrcWalletStatusRequest,
-  IcrcWalletSupportedStandardsRequest,
-  type IcrcWalletPermissionsRequestType,
-  type IcrcWalletRequestPermissionsRequestType,
-  type IcrcWalletSupportedStandardsRequestType
+  IcrcWalletStatusRequestSchema,
+  IcrcWalletSupportedStandardsRequestSchema,
+  type IcrcWalletPermissionsRequest,
+  type IcrcWalletRequestPermissionsRequest,
+  type IcrcWalletSupportedStandardsRequest
 } from './types/icrc-requests';
-import {RpcRequest} from './types/rpc';
+import {RpcRequestSchema} from './types/rpc';
 
 /**
  * The parameters to initialize a signer.
@@ -18,9 +18,9 @@ import {RpcRequest} from './types/rpc';
 export interface SignerParameters {}
 
 export type SignerMessageEventData = Partial<
-  | IcrcWalletRequestPermissionsRequestType
-  | IcrcWalletPermissionsRequestType
-  | IcrcWalletSupportedStandardsRequestType
+  | IcrcWalletRequestPermissionsRequest
+  | IcrcWalletPermissionsRequest
+  | IcrcWalletSupportedStandardsRequest
 >;
 
 type SignerMessageEvent = MessageEvent<SignerMessageEventData>;
@@ -61,7 +61,7 @@ export class Signer {
     data: msgData,
     origin
   }: SignerMessageEvent): Promise<void> => {
-    const {success, data: requestData} = RpcRequest.safeParse(msgData);
+    const {success, data: requestData} = RpcRequestSchema.safeParse(msgData);
 
     if (!success) {
       // We are only interested in JSON-RPC messages, so we are ignoring any other messages emitted at the window level, as the consumer might be using other events.
@@ -70,7 +70,8 @@ export class Signer {
 
     this.assertAndSetOrigin({msgData, origin});
 
-    const {success: isStatusRequest, data: statusData} = IcrcWalletStatusRequest.safeParse(msgData);
+    const {success: isStatusRequest, data: statusData} =
+      IcrcWalletStatusRequestSchema.safeParse(msgData);
 
     if (isStatusRequest) {
       const {id} = statusData;
@@ -79,7 +80,7 @@ export class Signer {
     }
 
     const {success: isSupportedStandardsRequest, data: supportedStandardsData} =
-      IcrcWalletSupportedStandardsRequest.safeParse(msgData);
+      IcrcWalletSupportedStandardsRequestSchema.safeParse(msgData);
 
     if (isSupportedStandardsRequest) {
       const {id} = supportedStandardsData;
@@ -105,7 +106,7 @@ export class Signer {
     msgData: SignerMessageEventData;
   }): void {
     if (nonNullish(this.#walletOrigin) && this.#walletOrigin !== origin) {
-      const {data} = RpcRequest.safeParse(msgData);
+      const {data} = RpcRequestSchema.safeParse(msgData);
 
       notifyError({
         id: data?.id ?? null,

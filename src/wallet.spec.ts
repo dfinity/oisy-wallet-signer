@@ -1,7 +1,7 @@
 import {describe} from 'vitest';
 import * as walletHandlers from './handlers/wallet.handlers';
 import {ICRC29_STATUS} from './types/icrc';
-import {JSON_RPC_VERSION_2, RpcResponseWithResultOrError} from './types/rpc';
+import {JSON_RPC_VERSION_2, RpcResponseWithResultOrErrorSchema} from './types/rpc';
 import type {WalletOptions} from './types/wallet';
 import {WALLET_WINDOW_CENTER, WALLET_WINDOW_TOP_RIGHT, windowFeatures} from './utils/window.utils';
 import {Wallet} from './wallet';
@@ -133,7 +133,7 @@ describe('Wallet', () => {
       });
 
       it('should not process message which are not RpcResponse', async () => {
-        const safeParseSpy = vi.spyOn(RpcResponseWithResultOrError, 'safeParse');
+        const safeParseSpy = vi.spyOn(RpcResponseWithResultOrErrorSchema, 'safeParse');
 
         const promise = Wallet.connect(mockParameters);
 
