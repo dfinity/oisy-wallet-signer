@@ -139,8 +139,7 @@ describe('Wallet', () => {
           const spy = vi.spyOn(walletHandlers, 'retryRequestStatus');
           const spyPostMessage = vi.spyOn(window, 'postMessage');
 
-          // eslint-disable-next-line @typescript-eslint/no-floating-promises
-          Wallet.connect(mockParameters);
+          const promise = Wallet.connect(mockParameters);
 
           expect(spy).toHaveBeenCalledTimes(1);
 
@@ -151,6 +150,10 @@ describe('Wallet', () => {
             }),
             '*'
           );
+
+          // Consume promise to clean-up internal listener
+          window.dispatchEvent(messageEventReady);
+          await promise;
         });
 
         it('should not process message which are not RpcResponse', async () => {
