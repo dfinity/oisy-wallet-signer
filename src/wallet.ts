@@ -2,8 +2,8 @@ import {assertNonNullish, nonNullish, notEmptyString} from '@dfinity/utils';
 import {nanoid} from 'nanoid';
 import {WALLET_CONNECT_DEFAULT_TIMEOUT_IN_MILLISECONDS} from './constants/wallet.constants';
 import {retryRequestStatus} from './handlers/wallet.handlers';
-import {IcrcReadyResponse} from './types/icrc-responses';
-import {RpcResponseWithResultOrError} from './types/rpc';
+import {IcrcReadyResponseSchema} from './types/icrc-responses';
+import {RpcResponseWithResultOrErrorSchema} from './types/rpc';
 import {WalletOptionsSchema, type WalletOptions} from './types/wallet';
 import type {ReadyOrError} from './utils/timeout.utils';
 import {WALLET_WINDOW_TOP_RIGHT, windowFeatures} from './utils/window.utils';
@@ -51,7 +51,7 @@ export class Wallet {
     let response: Wallet | MessageError | undefined;
 
     const onMessage = ({origin, data: msgData}: MessageEvent): void => {
-      const {success} = RpcResponseWithResultOrError.safeParse(msgData);
+      const {success} = RpcResponseWithResultOrErrorSchema.safeParse(msgData);
 
       if (!success) {
         // We are only interested in JSON-RPC messages, so we are ignoring any other messages emitted at the window level, as the consumer might be using other events.
@@ -79,7 +79,7 @@ export class Wallet {
         return;
       }
 
-      const {success: isWalletReady} = IcrcReadyResponse.safeParse(msgData);
+      const {success: isWalletReady} = IcrcReadyResponseSchema.safeParse(msgData);
       if (isWalletReady) {
         response = new Wallet({origin, popup});
       }

@@ -1,14 +1,11 @@
 import type {Mock} from 'vitest';
 import {SIGNER_SUPPORTED_STANDARDS, SignerErrorCode} from '../constants/signer.constants';
-import type {
-  IcrcReadyResponseType,
-  IcrcSupportedStandardsResponseType
-} from '../types/icrc-responses';
-import {JSON_RPC_VERSION_2, type RpcIdType, type RpcResponseWithErrorType} from '../types/rpc';
+import type {IcrcReadyResponse, IcrcSupportedStandardsResponse} from '../types/icrc-responses';
+import {JSON_RPC_VERSION_2, type RpcId, type RpcResponseWithError} from '../types/rpc';
 import {notifyError, notifyReady, notifySupportedStandards} from './signer.handlers';
 
 describe('Signer handlers', () => {
-  const id: RpcIdType = 'test-123';
+  const id: RpcId = 'test-123';
   const origin = 'https://hello.com';
 
   let originalOpener: typeof window.opener;
@@ -33,7 +30,7 @@ describe('Signer handlers', () => {
     it('should post a message with the msg', () => {
       notifyReady({id, origin});
 
-      const expectedMessage: IcrcReadyResponseType = {
+      const expectedMessage: IcrcReadyResponse = {
         jsonrpc: JSON_RPC_VERSION_2,
         id,
         result: 'ready'
@@ -52,7 +49,7 @@ describe('Signer handlers', () => {
 
       notifyError({id, origin, error});
 
-      const expectedMessage: RpcResponseWithErrorType = {
+      const expectedMessage: RpcResponseWithError = {
         jsonrpc: JSON_RPC_VERSION_2,
         id,
         error
@@ -66,7 +63,7 @@ describe('Signer handlers', () => {
     it('should post a message with the msg', () => {
       notifySupportedStandards({id, origin});
 
-      const expectedMessage: IcrcSupportedStandardsResponseType = {
+      const expectedMessage: IcrcSupportedStandardsResponse = {
         jsonrpc: JSON_RPC_VERSION_2,
         id,
         result: {

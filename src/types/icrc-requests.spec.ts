@@ -1,17 +1,17 @@
 import {ICRC27_ACCOUNTS} from './icrc';
 import {
-  IcrcWalletPermissionsRequest,
-  IcrcWalletRequestPermissionsRequest,
-  IcrcWalletStatusRequest,
-  IcrcWalletSupportedStandardsRequest,
-  type IcrcWalletPermissionsRequestType,
-  type IcrcWalletRequestPermissionsRequestType
+  IcrcWalletPermissionsRequestSchema,
+  IcrcWalletRequestPermissionsRequestSchema,
+  IcrcWalletStatusRequestSchema,
+  IcrcWalletSupportedStandardsRequestSchema,
+  type IcrcWalletPermissionsRequest,
+  type IcrcWalletRequestPermissionsRequest
 } from './icrc-requests';
 import {JSON_RPC_VERSION_2} from './rpc';
 
 describe('icrc-requests', () => {
   describe('icrc25_request_permissions', () => {
-    const validRequest: IcrcWalletRequestPermissionsRequestType = {
+    const validRequest: IcrcWalletRequestPermissionsRequest = {
       jsonrpc: JSON_RPC_VERSION_2,
       id: 1,
       method: 'icrc25_request_permissions',
@@ -25,11 +25,11 @@ describe('icrc-requests', () => {
     };
 
     it('should validate a correct request', () => {
-      expect(() => IcrcWalletRequestPermissionsRequest.parse(validRequest)).not.toThrow();
+      expect(() => IcrcWalletRequestPermissionsRequestSchema.parse(validRequest)).not.toThrow();
     });
 
     it('should throw if request has invalid method', () => {
-      const invalidRequest: IcrcWalletRequestPermissionsRequestType = {
+      const invalidRequest: IcrcWalletRequestPermissionsRequest = {
         ...validRequest,
         params: {
           scopes: [
@@ -40,107 +40,107 @@ describe('icrc-requests', () => {
           ]
         }
       };
-      expect(() => IcrcWalletRequestPermissionsRequest.parse(invalidRequest)).toThrow();
+      expect(() => IcrcWalletRequestPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
 
     it('should throw if request has no method', () => {
-      const invalidRequest: IcrcWalletRequestPermissionsRequestType = {
+      const invalidRequest: IcrcWalletRequestPermissionsRequest = {
         ...validRequest,
         params: {
           scopes: []
         }
       };
-      expect(() => IcrcWalletRequestPermissionsRequest.parse(invalidRequest)).toThrow();
+      expect(() => IcrcWalletRequestPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
 
     it('should throw if request has no scopes', () => {
-      const invalidRequest: IcrcWalletRequestPermissionsRequestType = {
+      const invalidRequest: IcrcWalletRequestPermissionsRequest = {
         ...validRequest,
         // @ts-expect-error: we are testing this on purpose
         params: {}
       };
-      expect(() => IcrcWalletRequestPermissionsRequest.parse(invalidRequest)).toThrow();
+      expect(() => IcrcWalletRequestPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
 
     it('should throw if request has no params', () => {
       const {params: _, ...rest} = validRequest;
 
       // @ts-expect-error: we are testing this on purpose
-      const invalidRequest: IcrcWalletRequestPermissionsRequestType = rest;
-      expect(() => IcrcWalletRequestPermissionsRequest.parse(invalidRequest)).toThrow();
+      const invalidRequest: IcrcWalletRequestPermissionsRequest = rest;
+      expect(() => IcrcWalletRequestPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
 
     it('should throw if request has invalid method', () => {
-      const invalidRequest: IcrcWalletRequestPermissionsRequestType = {
+      const invalidRequest: IcrcWalletRequestPermissionsRequest = {
         ...validRequest,
         // @ts-expect-error: we are testing this on purpose
         method: 'test'
       };
-      expect(() => IcrcWalletRequestPermissionsRequest.parse(invalidRequest)).toThrow();
+      expect(() => IcrcWalletRequestPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
 
     it('should throw if request has no id', () => {
       const {id: _, ...rest} = validRequest;
 
-      const invalidRequest: Partial<IcrcWalletRequestPermissionsRequestType> = rest;
-      expect(() => IcrcWalletRequestPermissionsRequest.parse(invalidRequest)).toThrow();
+      const invalidRequest: Partial<IcrcWalletRequestPermissionsRequest> = rest;
+      expect(() => IcrcWalletRequestPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
 
     it('should throw if request has no jsonrpc', () => {
       const {jsonrpc: _, ...rest} = validRequest;
 
-      const invalidRequest: Partial<IcrcWalletRequestPermissionsRequestType> = rest;
-      expect(() => IcrcWalletRequestPermissionsRequest.parse(invalidRequest)).toThrow();
+      const invalidRequest: Partial<IcrcWalletRequestPermissionsRequest> = rest;
+      expect(() => IcrcWalletRequestPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
   });
 
   describe('icrc25_permissions', () => {
-    const validRequest: IcrcWalletPermissionsRequestType = {
+    const validRequest: IcrcWalletPermissionsRequest = {
       jsonrpc: JSON_RPC_VERSION_2,
       id: 1,
       method: 'icrc25_permissions'
     };
 
     it('should validate a correct request', () => {
-      expect(() => IcrcWalletPermissionsRequest.parse(validRequest)).not.toThrow();
+      expect(() => IcrcWalletPermissionsRequestSchema.parse(validRequest)).not.toThrow();
     });
 
     it('should throw if request has params', () => {
-      const invalidRequest: IcrcWalletPermissionsRequestType = {
+      const invalidRequest: IcrcWalletPermissionsRequest = {
         ...validRequest,
         // @ts-expect-error: we are testing this on purpose
         params: {}
       };
-      expect(() => IcrcWalletPermissionsRequest.parse(invalidRequest)).toThrow();
+      expect(() => IcrcWalletPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
 
     it('should throw if request has invalid method', () => {
-      const invalidRequest: IcrcWalletPermissionsRequestType = {
+      const invalidRequest: IcrcWalletPermissionsRequest = {
         ...validRequest,
         // @ts-expect-error: we are testing this on purpose
         method: 'test'
       };
-      expect(() => IcrcWalletPermissionsRequest.parse(invalidRequest)).toThrow();
+      expect(() => IcrcWalletPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
 
     it('should throw if request has no id', () => {
       const {id: _, ...rest} = validRequest;
 
-      const invalidRequest: Partial<IcrcWalletPermissionsRequestType> = rest;
-      expect(() => IcrcWalletPermissionsRequest.parse(invalidRequest)).toThrow();
+      const invalidRequest: Partial<IcrcWalletPermissionsRequest> = rest;
+      expect(() => IcrcWalletPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
 
     it('should throw if request has no jsonrpc', () => {
       const {jsonrpc: _, ...rest} = validRequest;
 
-      const invalidRequest: Partial<IcrcWalletPermissionsRequestType> = rest;
-      expect(() => IcrcWalletPermissionsRequest.parse(invalidRequest)).toThrow();
+      const invalidRequest: Partial<IcrcWalletPermissionsRequest> = rest;
+      expect(() => IcrcWalletPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
   });
 
   const requestWithoutParamsSchemas = [
-    {method: 'icrc25_supported_standards', schema: IcrcWalletSupportedStandardsRequest},
-    {method: 'icrc29_status', schema: IcrcWalletStatusRequest}
+    {method: 'icrc25_supported_standards', schema: IcrcWalletSupportedStandardsRequestSchema},
+    {method: 'icrc29_status', schema: IcrcWalletStatusRequestSchema}
   ];
 
   describe.each(requestWithoutParamsSchemas)('$method', ({schema, method}) => {

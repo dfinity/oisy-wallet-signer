@@ -1,18 +1,18 @@
 import {ICRC25_PERMISSION_GRANTED, ICRC27_ACCOUNTS} from './icrc';
 import {
-  IcrcReadyResponse,
-  IcrcSupportedStandardsResponse,
-  IcrcWalletPermissionsResponse,
-  IcrcWalletRequestPermissionsResponse,
-  type IcrcReadyResponseType,
-  type IcrcSupportedStandardsResponseType
+  IcrcReadyResponseSchema,
+  IcrcSupportedStandardsResponseSchema,
+  IcrcWalletPermissionsResponseSchema,
+  IcrcWalletRequestPermissionsResponseSchema,
+  type IcrcReadyResponse,
+  type IcrcSupportedStandardsResponse
 } from './icrc-responses';
 import {JSON_RPC_VERSION_2} from './rpc';
 
 describe('icrc-responses', () => {
   const responseSchemas = [
-    {icrc: 'icrc25_request_permissions', schema: IcrcWalletRequestPermissionsResponse},
-    {icrc: 'icrc25_permissions', schema: IcrcWalletPermissionsResponse}
+    {icrc: 'icrc25_request_permissions', schema: IcrcWalletRequestPermissionsResponseSchema},
+    {icrc: 'icrc25_permissions', schema: IcrcWalletPermissionsResponseSchema}
   ];
 
   describe.each(responseSchemas)('$icrc', ({schema}) => {
@@ -161,7 +161,7 @@ describe('icrc-responses', () => {
   });
 
   describe('icrc25_supported_standards', () => {
-    const validResponse: IcrcSupportedStandardsResponseType = {
+    const validResponse: IcrcSupportedStandardsResponse = {
       jsonrpc: JSON_RPC_VERSION_2,
       id: 1,
       result: {
@@ -175,11 +175,11 @@ describe('icrc-responses', () => {
     };
 
     it('should validate a correct response', () => {
-      expect(() => IcrcSupportedStandardsResponse.parse(validResponse)).not.toThrow();
+      expect(() => IcrcSupportedStandardsResponseSchema.parse(validResponse)).not.toThrow();
     });
 
     it('should throw if response has no valid url', () => {
-      const invalidResponse: IcrcSupportedStandardsResponseType = {
+      const invalidResponse: IcrcSupportedStandardsResponse = {
         ...validResponse,
         result: {
           supportedStandards: [
@@ -190,11 +190,11 @@ describe('icrc-responses', () => {
           ]
         }
       };
-      expect(() => IcrcSupportedStandardsResponse.parse(invalidResponse)).toThrow();
+      expect(() => IcrcSupportedStandardsResponseSchema.parse(invalidResponse)).toThrow();
     });
 
     it('should throw if response has no matching url pattern', () => {
-      const invalidResponse: IcrcSupportedStandardsResponseType = {
+      const invalidResponse: IcrcSupportedStandardsResponse = {
         ...validResponse,
         result: {
           supportedStandards: [
@@ -205,11 +205,11 @@ describe('icrc-responses', () => {
           ]
         }
       };
-      expect(() => IcrcSupportedStandardsResponse.parse(invalidResponse)).toThrow();
+      expect(() => IcrcSupportedStandardsResponseSchema.parse(invalidResponse)).toThrow();
     });
 
     it('should throw if response has no valid url', () => {
-      const invalidResponse: IcrcSupportedStandardsResponseType = {
+      const invalidResponse: IcrcSupportedStandardsResponse = {
         ...validResponse,
         result: {
           supportedStandards: [
@@ -220,11 +220,11 @@ describe('icrc-responses', () => {
           ]
         }
       };
-      expect(() => IcrcSupportedStandardsResponse.parse(invalidResponse)).toThrow();
+      expect(() => IcrcSupportedStandardsResponseSchema.parse(invalidResponse)).toThrow();
     });
 
     it('should throw if response has name not matching URL', () => {
-      const invalidResponse: IcrcSupportedStandardsResponseType = {
+      const invalidResponse: IcrcSupportedStandardsResponse = {
         ...validResponse,
         result: {
           supportedStandards: [
@@ -235,11 +235,11 @@ describe('icrc-responses', () => {
           ]
         }
       };
-      expect(() => IcrcSupportedStandardsResponse.parse(invalidResponse)).toThrow();
+      expect(() => IcrcSupportedStandardsResponseSchema.parse(invalidResponse)).toThrow();
     });
 
     it('should throw if response has no name', () => {
-      const invalidResponse: IcrcSupportedStandardsResponseType = {
+      const invalidResponse: IcrcSupportedStandardsResponse = {
         ...validResponse,
         result: {
           supportedStandards: [
@@ -250,109 +250,109 @@ describe('icrc-responses', () => {
           ]
         }
       };
-      expect(() => IcrcSupportedStandardsResponse.parse(invalidResponse)).toThrow();
+      expect(() => IcrcSupportedStandardsResponseSchema.parse(invalidResponse)).toThrow();
     });
 
     it('should throw if response has no empty supported standards', () => {
-      const invalidResponse: IcrcSupportedStandardsResponseType = {
+      const invalidResponse: IcrcSupportedStandardsResponse = {
         ...validResponse,
         result: {
           supportedStandards: []
         }
       };
-      expect(() => IcrcSupportedStandardsResponse.parse(invalidResponse)).toThrow();
+      expect(() => IcrcSupportedStandardsResponseSchema.parse(invalidResponse)).toThrow();
     });
 
     it('should throw if response has no supported standards', () => {
       const {result: _, ...rest} = validResponse;
 
-      const response: IcrcSupportedStandardsResponseType = {
+      const response: IcrcSupportedStandardsResponse = {
         ...rest,
         // @ts-expect-error: we are testing this on purpose
         result: {}
       };
 
-      expect(() => IcrcSupportedStandardsResponse.parse(response)).toThrow();
+      expect(() => IcrcSupportedStandardsResponseSchema.parse(response)).toThrow();
     });
 
     it('should throw if response has no result', () => {
       const {result: _, ...rest} = validResponse;
 
-      const response: IcrcSupportedStandardsResponseType = rest;
+      const response: IcrcSupportedStandardsResponse = rest;
 
-      expect(() => IcrcSupportedStandardsResponse.parse(response)).toThrow();
+      expect(() => IcrcSupportedStandardsResponseSchema.parse(response)).toThrow();
     });
 
     it('should throw if response has no id', () => {
       const {id: _, ...rest} = validResponse;
 
-      const response: Partial<IcrcSupportedStandardsResponseType> = rest;
+      const response: Partial<IcrcSupportedStandardsResponse> = rest;
 
-      expect(() => IcrcSupportedStandardsResponse.parse(response)).toThrow();
+      expect(() => IcrcSupportedStandardsResponseSchema.parse(response)).toThrow();
     });
 
     it('should throw if response has no jsonrpc', () => {
       const {jsonrpc: _, ...rest} = validResponse;
 
-      const response: Partial<IcrcSupportedStandardsResponseType> = rest;
+      const response: Partial<IcrcSupportedStandardsResponse> = rest;
 
-      expect(() => IcrcSupportedStandardsResponse.parse(response)).toThrow();
+      expect(() => IcrcSupportedStandardsResponseSchema.parse(response)).toThrow();
     });
   });
 
   describe('icrc29_status', () => {
-    const validResponse: IcrcReadyResponseType = {
+    const validResponse: IcrcReadyResponse = {
       jsonrpc: JSON_RPC_VERSION_2,
       id: 1,
       result: 'ready'
     };
 
     it('should validate a correct response', () => {
-      expect(() => IcrcReadyResponse.parse(validResponse)).not.toThrow();
+      expect(() => IcrcReadyResponseSchema.parse(validResponse)).not.toThrow();
     });
 
     it('should throw if response has no valid result string', () => {
-      const invalidResponse: IcrcReadyResponseType = {
+      const invalidResponse: IcrcReadyResponse = {
         ...validResponse,
         // @ts-expect-error: we are testing this on purpose
         result: 'test'
       };
-      expect(() => IcrcReadyResponse.parse(invalidResponse)).toThrow();
+      expect(() => IcrcReadyResponseSchema.parse(invalidResponse)).toThrow();
     });
 
     it('should throw if response has no valid result type', () => {
-      const invalidResponse: IcrcReadyResponseType = {
+      const invalidResponse: IcrcReadyResponse = {
         ...validResponse,
         // @ts-expect-error: we are testing this on purpose
         result: {
           hello: 'world'
         }
       };
-      expect(() => IcrcReadyResponse.parse(invalidResponse)).toThrow();
+      expect(() => IcrcReadyResponseSchema.parse(invalidResponse)).toThrow();
     });
 
     it('should throw if response has no result', () => {
       const {result: _, ...rest} = validResponse;
 
-      const response: IcrcReadyResponseType = rest;
+      const response: IcrcReadyResponse = rest;
 
-      expect(() => IcrcReadyResponse.parse(response)).toThrow();
+      expect(() => IcrcReadyResponseSchema.parse(response)).toThrow();
     });
 
     it('should throw if response has no id', () => {
       const {id: _, ...rest} = validResponse;
 
-      const response: Partial<IcrcReadyResponseType> = rest;
+      const response: Partial<IcrcReadyResponse> = rest;
 
-      expect(() => IcrcReadyResponse.parse(response)).toThrow();
+      expect(() => IcrcReadyResponseSchema.parse(response)).toThrow();
     });
 
     it('should throw if response has no jsonrpc', () => {
       const {jsonrpc: _, ...rest} = validResponse;
 
-      const response: Partial<IcrcReadyResponseType> = rest;
+      const response: Partial<IcrcReadyResponse> = rest;
 
-      expect(() => IcrcReadyResponse.parse(response)).toThrow();
+      expect(() => IcrcReadyResponseSchema.parse(response)).toThrow();
     });
   });
 });
