@@ -168,11 +168,11 @@ export class Wallet {
         throw new Error(`Wallet request options cannot be parsed: ${error?.message ?? ''}`);
       }
 
-      const requestId = nanoid();
-
-      const {timeoutInMilliseconds: userTimeoutInMilliseconds} = options;
+      const {timeoutInMilliseconds: userTimeoutInMilliseconds, requestId: userRequestId} = options;
       const timeoutInMilliseconds =
         userTimeoutInMilliseconds ?? WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD;
+
+      const requestId = userRequestId ?? nanoid();
 
       const timeoutId = setTimeout(() => {
         reject(

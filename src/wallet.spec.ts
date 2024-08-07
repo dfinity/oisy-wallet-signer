@@ -2,6 +2,7 @@ import {afterEach, beforeEach, describe} from 'vitest';
 import {WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD} from './constants/wallet.constants';
 import * as walletHandlers from './handlers/wallet.handlers';
 import {ICRC25_SUPPORTED_STANDARDS, ICRC29_STATUS} from './types/icrc';
+import {IcrcSupportedStandardsResponseSchema} from './types/icrc-responses';
 import {JSON_RPC_VERSION_2, RpcResponseWithResultOrErrorSchema} from './types/rpc';
 import type {WalletOptions} from './types/wallet';
 import {WALLET_WINDOW_CENTER, WALLET_WINDOW_TOP_RIGHT, windowFeatures} from './utils/window.utils';
@@ -237,6 +238,13 @@ describe('Wallet', () => {
     describe('Supported standards', () => {
       let wallet: Wallet;
 
+      const supportedStandards = [
+        {
+          name: 'ICRC-25',
+          url: 'https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-25/ICRC-25.md'
+        }
+      ];
+
       beforeEach(async () => {
         const promise = Wallet.connect(mockParameters);
 
@@ -292,6 +300,42 @@ describe('Wallet', () => {
           }
         );
 
+        it('should timeout if response ID is not the same as requst ID', async () => {
+          // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
+          return new Promise<void>(async (resolve) => {
+            vi.useFakeTimers();
+
+            const spy = vi.spyOn(IcrcSupportedStandardsResponseSchema, 'safeParse');
+
+            wallet.supportedStandards().catch((err: Error) => {
+              expect(err.message).toBe(
+                `Supported standards request to wallet timed out after ${WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD} milliseconds.`
+              );
+
+              expect(spy).toHaveBeenCalledTimes(1);
+
+              vi.useRealTimers();
+
+              resolve();
+            });
+
+            const messageEventSupportedStandards = new MessageEvent('message', {
+              origin: mockParameters.url,
+              data: {
+                jsonrpc: JSON_RPC_VERSION_2,
+                id: '123',
+                result: {
+                  supportedStandards
+                }
+              }
+            });
+
+            window.dispatchEvent(messageEventSupportedStandards);
+
+            await vi.advanceTimersByTimeAsync(WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD);
+          });
+        });
+
         it('should throw error if the message signer standards received comes from another origin', async () => {
           const hackerOrigin = 'https://hacker.com';
 
@@ -303,12 +347,7 @@ describe('Wallet', () => {
               jsonrpc: JSON_RPC_VERSION_2,
               id: '123',
               result: {
-                supportedStandards: [
-                  {
-                    name: 'ICRC-25',
-                    url: 'https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-25/ICRC-25.md'
-                  }
-                ]
+                supportedStandards
               }
             }
           });
@@ -339,6 +378,29 @@ describe('Wallet', () => {
             mockParameters.url
           );
         });
+      });
+
+      it('should respond with the supported standards', async () => {
+        const requestId = '12345';
+
+        const promise = wallet.supportedStandards({requestId});
+
+        const messageEventSupportedStandards = new MessageEvent('message', {
+          origin: mockParameters.url,
+          data: {
+            jsonrpc: JSON_RPC_VERSION_2,
+            id: requestId,
+            result: {
+              supportedStandards
+            }
+          }
+        });
+
+        window.dispatchEvent(messageEventSupportedStandards);
+
+        const result = await promise;
+
+        expect(result).toEqual(supportedStandards);
       });
     });
   });
