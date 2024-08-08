@@ -1,12 +1,15 @@
 import {nonNullish} from '@dfinity/utils';
 import {SignerErrorCode} from './constants/signer.constants';
-import {notifyError, notifyReady, notifySupportedStandards} from './handlers/signer.handlers';
 import {
-  IcrcWalletStatusRequestSchema,
-  IcrcWalletSupportedStandardsRequestSchema,
-  type IcrcWalletPermissionsRequest,
-  type IcrcWalletRequestPermissionsRequest,
-  type IcrcWalletSupportedStandardsRequest
+  handleStatusRequest,
+  handleSupportedStandards,
+  notifyError
+} from './handlers/signer.handlers';
+import type {
+  IcrcWalletPermissionsRequest,
+  IcrcWalletRequestPermissionsRequest,
+  IcrcWalletStatusRequest,
+  IcrcWalletSupportedStandardsRequest
 } from './types/icrc-requests';
 import {RpcRequestSchema} from './types/rpc';
 
@@ -18,6 +21,7 @@ import {RpcRequestSchema} from './types/rpc';
 export interface SignerParameters {}
 
 export type SignerMessageEventData = Partial<
+  | IcrcWalletStatusRequest
   | IcrcWalletRequestPermissionsRequest
   | IcrcWalletPermissionsRequest
   | IcrcWalletSupportedStandardsRequest
@@ -70,21 +74,16 @@ export class Signer {
 
     this.assertAndSetOrigin({msgData, origin});
 
-    const {success: isStatusRequest, data: statusData} =
-      IcrcWalletStatusRequestSchema.safeParse(msgData);
-
-    if (isStatusRequest) {
-      const {id} = statusData;
-      notifyReady({id, origin});
+    const {handled: statusRequestHandled} = handleStatusRequest({origin, data: msgData});
+    if (statusRequestHandled) {
       return;
     }
 
-    const {success: isSupportedStandardsRequest, data: supportedStandardsData} =
-      IcrcWalletSupportedStandardsRequestSchema.safeParse(msgData);
-
-    if (isSupportedStandardsRequest) {
-      const {id} = supportedStandardsData;
-      notifySupportedStandards({id, origin});
+    const {handled: supportedStandardsRequestHandled} = handleSupportedStandards({
+      origin,
+      data: msgData
+    });
+    if (supportedStandardsRequestHandled) {
       return;
     }
 

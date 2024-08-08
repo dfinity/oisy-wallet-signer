@@ -86,14 +86,14 @@ describe('Signer', () => {
 
     let originalOpener: typeof window.opener;
 
-    let notifyReadySpy: MockInstance;
+    let handleStatusRequestSpy: MockInstance;
     let signer: Signer;
 
     let postMessageMock: MockInstance;
 
     beforeEach(() => {
       signer = Signer.init(mockParameters);
-      notifyReadySpy = vi.spyOn(signerHandlers, 'notifyReady');
+      handleStatusRequestSpy = vi.spyOn(signerHandlers, 'handleStatusRequest');
       postMessageMock = vi.fn();
       vi.stubGlobal('opener', {postMessage: postMessageMock});
     });
@@ -121,8 +121,8 @@ describe('Signer', () => {
 
       window.dispatchEvent(messageEvent);
 
-      expect(notifyReadySpy).toHaveBeenCalledWith({
-        id: testId,
+      expect(handleStatusRequestSpy).toHaveBeenCalledWith({
+        data: messageEvent.data,
         origin: testOrigin
       });
     });
