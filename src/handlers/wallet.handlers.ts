@@ -1,19 +1,26 @@
 import {DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS} from '../constants/core.constants';
-import {ICRC29_STATUS} from '../types/icrc';
-import type {IcrcWalletStatusRequest} from '../types/icrc-requests';
+import {ICRC25_SUPPORTED_STANDARDS, ICRC29_STATUS} from '../types/icrc';
+import type {
+  IcrcWalletStatusRequest,
+  IcrcWalletSupportedStandardsRequest
+} from '../types/icrc-requests';
 import {JSON_RPC_VERSION_2, type RpcId} from '../types/rpc';
 import {retryUntilReady, type ReadyOrError} from '../utils/timeout.utils';
 
+interface Request {
+  id: RpcId;
+  popup: Window;
+  origin: string;
+}
+
 export const retryRequestStatus = async ({
   popup,
-  isReady,
   id,
+  isReady,
   timeoutInMilliseconds,
   intervalInMilliseconds
-}: {
-  popup: Window;
+}: Omit<Request, 'origin'> & {
   isReady: () => ReadyOrError | 'pending';
-  id: RpcId;
   timeoutInMilliseconds: number;
   intervalInMilliseconds?: number;
 }): Promise<ReadyOrError | 'timeout'> => {
@@ -34,4 +41,14 @@ export const retryRequestStatus = async ({
     isReady,
     fn: requestStatus
   });
+};
+
+export const requestSupportedStandards = ({popup, id, origin}: Request): void => {
+  const msg: IcrcWalletSupportedStandardsRequest = {
+    jsonrpc: JSON_RPC_VERSION_2,
+    id,
+    method: ICRC25_SUPPORTED_STANDARDS
+  };
+
+  popup.postMessage(msg, origin);
 };
