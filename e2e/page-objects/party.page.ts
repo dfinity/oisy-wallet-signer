@@ -5,36 +5,31 @@ import {IdentityPage, IdentityPageParams} from './identity.page';
 import {WalletPage} from './wallet.page';
 
 export class PartyPage extends IdentityPage {
+  #partyIIPage: InternetIdentityPage;
   #walletPage: WalletPage | undefined;
 
   constructor(params: IdentityPageParams) {
     super(params);
+
+    this.#partyIIPage = new InternetIdentityPage({
+      page: this.page,
+      context: this.context,
+      browser: this.browser
+    });
   }
 
   /**
    * @override
    */
   async signIn(): Promise<void> {
-    const partyIIPage = new InternetIdentityPage({
-      page: this.page,
-      context: this.context,
-      browser: this.browser
-    });
-
-    this.identity = await partyIIPage.signInWithNewIdentity();
+    this.identity = await this.#partyIIPage.signInWithNewIdentity();
   }
 
   async waitReady(): Promise<void> {
-    const partyIIPage = new InternetIdentityPage({
-      page: this.page,
-      context: this.context,
-      browser: this.browser
-    });
-
     const REPLICA_URL = 'http://localhost:4943';
     const INTERNET_IDENTITY_ID = 'rdmx6-jaaaa-aaaaa-aaadq-cai';
 
-    await partyIIPage.waitReady({url: REPLICA_URL, canisterId: INTERNET_IDENTITY_ID});
+    await this.#partyIIPage.waitReady({url: REPLICA_URL, canisterId: INTERNET_IDENTITY_ID});
   }
 
   async goto(): Promise<void> {
