@@ -12,6 +12,18 @@ describe('Signer handlers', () => {
   const id: RpcId = 'test-123';
   const origin = 'https://hello.com';
 
+  const statusRequest: IcrcWalletStatusRequest = {
+    jsonrpc: JSON_RPC_VERSION_2,
+    id,
+    method: 'icrc29_status'
+  };
+
+  const supportedStandardsRequest: IcrcWalletSupportedStandardsRequest = {
+    jsonrpc: JSON_RPC_VERSION_2,
+    id,
+    method: 'icrc25_supported_standards'
+  };
+
   let originalOpener: typeof window.opener;
 
   let postMessageMock: Mock;
@@ -32,13 +44,7 @@ describe('Signer handlers', () => {
 
   describe('notifyReady', () => {
     it('should post a message with the msg', () => {
-      const data: IcrcWalletStatusRequest = {
-        jsonrpc: JSON_RPC_VERSION_2,
-        id,
-        method: 'icrc29_status'
-      };
-
-      const {handled} = handleStatusRequest({data, origin});
+      const {handled} = handleStatusRequest({data: statusRequest, origin});
 
       expect(handled).toBeTruthy();
 
@@ -49,6 +55,12 @@ describe('Signer handlers', () => {
       };
 
       expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
+    });
+
+    it('should not handle msg if not status request', () => {
+      const {handled} = handleStatusRequest({data: supportedStandardsRequest, origin});
+
+      expect(handled).toBeFalsy();
     });
   });
 
@@ -73,13 +85,7 @@ describe('Signer handlers', () => {
 
   describe('notifySupportedStandards', () => {
     it('should post a message with the msg', () => {
-      const data: IcrcWalletSupportedStandardsRequest = {
-        jsonrpc: JSON_RPC_VERSION_2,
-        id,
-        method: 'icrc25_supported_standards'
-      };
-
-      const {handled} = handleSupportedStandards({data, origin});
+      const {handled} = handleSupportedStandards({data: supportedStandardsRequest, origin});
 
       expect(handled).toBeTruthy();
 
@@ -92,6 +98,11 @@ describe('Signer handlers', () => {
       };
 
       expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
+    });
+    it('should not handle msg if not status request', () => {
+      const {handled} = handleSupportedStandards({data: statusRequest, origin});
+
+      expect(handled).toBeFalsy();
     });
   });
 });
