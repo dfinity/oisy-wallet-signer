@@ -20,6 +20,8 @@ const IcrcWalletScopesParamsSchema = z.object({
     .min(1)
 });
 
+export type IcrcWalletScopesParams = z.infer<typeof IcrcWalletScopesParamsSchema>;
+
 export const IcrcWalletRequestPermissionsRequestSchema = inferRpcRequestWithParamsSchema({
   method: ICRC25_REQUEST_PERMISSIONS,
   params: IcrcWalletScopesParamsSchema

@@ -15,6 +15,10 @@ export const IcrcWalletMethodSchema = z.enum([
   ICRC29_STATUS
 ]);
 
+export const IcrcWalletApproveMethodSchema = z.enum([ICRC25_REQUEST_PERMISSIONS, ICRC27_ACCOUNTS]);
+
+export type IcrcWalletApproveMethod = z.infer<typeof IcrcWalletApproveMethodSchema>;
+
 export const IcrcWalletScopedMethodSchema = IcrcWalletMethodSchema.extract([ICRC27_ACCOUNTS]);
 
 export const ICRC25_PERMISSION_GRANTED = 'granted';
