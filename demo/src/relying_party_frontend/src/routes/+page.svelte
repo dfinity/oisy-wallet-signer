@@ -40,7 +40,7 @@
 {/if}
 
 {#if nonNullish(supportedStandards)}
-	<Value id="user-id" title="Supported standards">
+	<Value id="supported-standards" title="Supported standards">
 		<ul in:fade>
 			{#each supportedStandards as standard}
 				<li>{standard.name}</li>
