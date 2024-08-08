@@ -6,6 +6,7 @@ import {
   IcrcWalletSupportedStandardsRequestSchema,
   type IcrcWalletPermissionsRequest,
   type IcrcWalletRequestPermissionsRequest,
+  type IcrcWalletStatusRequest,
   type IcrcWalletSupportedStandardsRequest
 } from './types/icrc-requests';
 import {RpcRequestSchema} from './types/rpc';
@@ -18,6 +19,7 @@ import {RpcRequestSchema} from './types/rpc';
 export interface SignerParameters {}
 
 export type SignerMessageEventData = Partial<
+  | IcrcWalletStatusRequest
   | IcrcWalletRequestPermissionsRequest
   | IcrcWalletPermissionsRequest
   | IcrcWalletSupportedStandardsRequest
