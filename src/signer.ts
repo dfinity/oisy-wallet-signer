@@ -7,8 +7,8 @@ import {
 } from './handlers/signer.handlers';
 import type {
   IcrcWalletPermissionsRequest,
-  IcrcWalletRequestPermissionsRequest,
   IcrcWalletStatusRequest,
+  IcrcWalletRequestPermissionsRequest,
   IcrcWalletSupportedStandardsRequest
 } from './types/icrc-requests';
 import {RpcRequestSchema} from './types/rpc';
