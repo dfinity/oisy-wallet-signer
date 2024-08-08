@@ -79,12 +79,12 @@ export class Signer {
     });
   };
 
-  private assertAndSetOrigin({data, origin}: SignerMessageEvent): void {
+  private assertAndSetOrigin({data: msgData, origin}: SignerMessageEvent): void {
     if (nonNullish(this.#walletOrigin) && this.#walletOrigin !== origin) {
-      const {data: msgData} = RpcRequestSchema.safeParse(data);
+      const {data} = RpcRequestSchema.safeParse(msgData);
 
       notifyError({
-        id: msgData?.id ?? null,
+        id: data?.id ?? null,
         origin,
         error: {
           code: SignerErrorCode.ORIGIN_ERROR,
