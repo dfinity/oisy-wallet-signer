@@ -1,48 +1,39 @@
-import {InternetIdentityPage, testWithII} from '@dfinity/internet-identity-playwright';
-import {expect} from '@playwright/test';
-import {waitForFadeAnimation} from './utils/test.utils';
+import {testWithII} from '@dfinity/internet-identity-playwright';
+import {PartyPage} from './page-objects/party.page';
 
-testWithII.beforeEach(async ({iiPage, browser}) => {
-  const REPLICA_URL = 'http://localhost:4943';
-  const INTERNET_IDENTITY_ID = 'rdmx6-jaaaa-aaaaa-aaadq-cai';
+testWithII.describe.configure({mode: 'serial'});
 
-  await iiPage.waitReady({url: REPLICA_URL, canisterId: INTERNET_IDENTITY_ID});
+let partyPage: PartyPage;
+
+testWithII.beforeAll(async ({playwright}) => {
+  const browser = await playwright.chromium.launch();
+
+  const context = await browser.newContext();
+  const page = await context.newPage();
+
+  partyPage = new PartyPage({
+    page,
+    context,
+    browser
+  });
+
+  await partyPage.waitReady();
+
+  await partyPage.goto();
 });
 
-const RELYING_PARTY_URL = 'http://localhost:5173';
+testWithII.afterAll(async () => {
+  await partyPage.close();
+});
 
-testWithII(
-  'should sign-in relying-party with a new user',
-  async ({page: partyPage, iiPage: partyIIPage, context, browser}) => {
-    await partyPage.goto(RELYING_PARTY_URL);
+testWithII('should sign-in relying-party with a new user', async ({context, browser}) => {
+  await partyPage.signIn();
+});
 
-    const identity = await partyIIPage.signInWithNewIdentity();
+testWithII('should connect the wallet', async ({context, browser}) => {
+  await partyPage.connect();
+});
 
-    await expect(partyPage.getByTestId('connect-wallet-button')).toBeVisible();
-
-    const walletPagePromise = context.waitForEvent('page');
-
-    await partyPage.getByTestId('connect-wallet-button').click();
-
-    const walletPage = await walletPagePromise;
-    await expect(walletPage).toHaveTitle('Wallet');
-
-    await expect(walletPage.getByTestId('login-button')).toBeVisible();
-
-    const walletIIPage = new InternetIdentityPage({
-      page: walletPage,
-      context,
-      browser
-    });
-
-    await walletIIPage.signInWithIdentity({identity});
-
-    await walletPage.waitForEvent('close');
-
-    await expect(partyPage.getByTestId('wallet-connected')).toBeVisible();
-
-    await waitForFadeAnimation(partyPage);
-
-    await expect(partyPage.getByTestId('wallet-connected')).toHaveScreenshot();
-  }
-);
+testWithII('should list supported standards', async ({context, browser}) => {
+  await partyPage.assertSupportedStandards();
+});
