@@ -7,7 +7,7 @@ export const JSON_RPC_VERSION_2 = '2.0';
 
 const JsonRpcSchema = z.literal(JSON_RPC_VERSION_2);
 
-const RpcIdSchema = z.union([z.string(), z.number(), z.null()]);
+export const RpcIdSchema = z.union([z.string(), z.number(), z.null()]);
 
 export type RpcId = z.infer<typeof RpcIdSchema>;
 

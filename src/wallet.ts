@@ -1,19 +1,31 @@
 import {assertNonNullish, nonNullish, notEmptyString} from '@dfinity/utils';
 import {nanoid} from 'nanoid';
-import {WALLET_CONNECT_DEFAULT_TIMEOUT_IN_MILLISECONDS} from './constants/wallet.constants';
-import {retryRequestStatus} from './handlers/wallet.handlers';
-import {IcrcReadyResponseSchema} from './types/icrc-responses';
+import {
+  WALLET_CONNECT_DEFAULT_TIMEOUT_IN_MILLISECONDS,
+  WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD
+} from './constants/wallet.constants';
+import {requestSupportedStandards, retryRequestStatus} from './handlers/wallet.handlers';
+import {
+  IcrcReadyResponseSchema,
+  IcrcSupportedStandardsResponseSchema,
+  type IcrcSupportedStandards
+} from './types/icrc-responses';
 import {RpcResponseWithResultOrErrorSchema} from './types/rpc';
-import {WalletOptionsSchema, type WalletOptions} from './types/wallet';
+import {
+  WalletOptionsSchema,
+  WalletRequestOptionsSchema,
+  type WalletOptions,
+  type WalletRequestOptions
+} from './types/wallet';
 import type {ReadyOrError} from './utils/timeout.utils';
 import {WALLET_WINDOW_TOP_RIGHT, windowFeatures} from './utils/window.utils';
 
 export class Wallet {
-  readonly #walletOrigin: string | undefined;
+  readonly #origin: string;
   readonly #popup: Window;
 
   private constructor({origin, popup}: {origin: string; popup: Window}) {
-    this.#walletOrigin = origin;
+    this.#origin = origin;
     this.#popup = popup;
   }
 
@@ -139,5 +151,88 @@ export class Wallet {
    */
   disconnect = async (): Promise<void> => {
     this.#popup.close();
+  };
+
+  /**
+   * List the standards supported by the wallet.
+   *
+   * @async
+   * @param {WalletRequestOptions} options - The options for the wallet request, which may include parameters such as timeout settings and other request-specific configurations.
+   * @returns {Promise<IcrcSupportedStandards>} A promise that resolves to an object containing the supported ICRC standards by the wallet. This includes details about each standard that the wallet can handle.
+   */
+  supportedStandards = async (
+    options: WalletRequestOptions = {}
+  ): Promise<IcrcSupportedStandards> => {
+    return await new Promise<IcrcSupportedStandards>((resolve, reject) => {
+      const {success: optionsSuccess, error} = WalletRequestOptionsSchema.safeParse(options);
+
+      if (!optionsSuccess) {
+        throw new Error(`Wallet request options cannot be parsed: ${error?.message ?? ''}`);
+      }
+
+      const {timeoutInMilliseconds: userTimeoutInMilliseconds, requestId: userRequestId} = options;
+      const timeoutInMilliseconds =
+        userTimeoutInMilliseconds ?? WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD;
+
+      const requestId = userRequestId ?? nanoid();
+
+      const timeoutId = setTimeout(() => {
+        reject(
+          new Error(
+            `Supported standards request to wallet timed out after ${timeoutInMilliseconds} milliseconds.`
+          )
+        );
+        disconnect();
+      }, timeoutInMilliseconds);
+
+      const onMessage = ({origin, data: msgData}: MessageEvent): void => {
+        const {success} = RpcResponseWithResultOrErrorSchema.safeParse(msgData);
+
+        if (!success) {
+          // We are only interested in JSON-RPC messages, so we are ignoring any other messages emitted at the window level, as the consumer might be using other events.
+          return;
+        }
+
+        if (notEmptyString(origin) && origin !== this.#origin) {
+          reject(
+            new Error(
+              `The response origin ${origin} does not match the wallet origin ${this.#origin}.`
+            )
+          );
+
+          disconnect();
+          return;
+        }
+
+        const {success: isSupportedStandards, data: supportedStandardsData} =
+          IcrcSupportedStandardsResponseSchema.safeParse(msgData);
+
+        if (
+          isSupportedStandards &&
+          requestId === supportedStandardsData?.id &&
+          nonNullish(supportedStandardsData?.result)
+        ) {
+          const {
+            result: {supportedStandards}
+          } = supportedStandardsData;
+          resolve(supportedStandards);
+
+          disconnect();
+        }
+      };
+
+      window.addEventListener('message', onMessage);
+
+      const disconnect = (): void => {
+        clearTimeout(timeoutId);
+        window.removeEventListener('message', onMessage);
+      };
+
+      requestSupportedStandards({
+        popup: this.#popup,
+        origin: this.#origin,
+        id: requestId
+      });
+    });
   };
 }
