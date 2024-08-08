@@ -24,6 +24,12 @@ export class Wallet {
   readonly #origin: string;
   readonly #popup: Window;
 
+  // TODO: we cannot destroy the wallet but the popup might be destroyed / closed manually
+  // - should we set origin and popup to null when closed?
+  // - should we expose a callback event to inform the consumer?
+  //
+  // PS: setInterval(() => if popup.closed {reset}, 1000)
+
   private constructor({origin, popup}: {origin: string; popup: Window}) {
     this.#origin = origin;
     this.#popup = popup;
