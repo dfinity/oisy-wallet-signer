@@ -19,5 +19,9 @@ export abstract class IdentityPage {
     this.browser = browser;
   }
 
-  abstract signInWithNewIdentity(): Promise<void>;
+  abstract signIn(): Promise<void>;
+
+  async close(): Promise<void> {
+    await this.page.close();
+  }
 }

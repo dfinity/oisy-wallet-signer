@@ -13,7 +13,7 @@ export class WalletPage extends IdentityPage {
   /**
    * @override
    */
-  async signInWithNewIdentity(): Promise<void> {
+  async signIn(): Promise<void> {
     await expect(this.page.getByTestId('login-button')).toBeVisible();
 
     const walletIIPage = new InternetIdentityPage({

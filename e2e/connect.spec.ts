@@ -1,27 +1,39 @@
 import {testWithII} from '@dfinity/internet-identity-playwright';
 import {PartyPage} from './page-objects/party.page';
 
-testWithII.beforeEach(async ({iiPage, browser}) => {
-  const REPLICA_URL = 'http://localhost:4943';
-  const INTERNET_IDENTITY_ID = 'rdmx6-jaaaa-aaaaa-aaadq-cai';
+testWithII.describe.configure({mode: 'serial'});
 
-  await iiPage.waitReady({url: REPLICA_URL, canisterId: INTERNET_IDENTITY_ID});
+let partyPage: PartyPage;
+
+testWithII.beforeAll(async ({playwright}) => {
+  const browser = await playwright.chromium.launch();
+
+  const context = await browser.newContext();
+  const page = await context.newPage();
+
+  partyPage = new PartyPage({
+    page,
+    context,
+    browser
+  });
+
+  await partyPage.waitReady();
+
+  await partyPage.goto();
 });
 
-testWithII(
-  'should sign-in relying-party with a new user',
-  async ({page, iiPage, context, browser}) => {
-    const partyPage = new PartyPage({
-      page,
-      iiPage,
-      context,
-      browser
-    });
+testWithII.afterAll(async () => {
+  await partyPage.close();
+});
 
-    await partyPage.goto();
+testWithII('should sign-in relying-party with a new user', async ({context, browser}) => {
+  await partyPage.signIn();
+});
 
-    await partyPage.signInWithNewIdentity();
+testWithII('should connect the wallet', async ({context, browser}) => {
+  await partyPage.connect();
+});
 
-    await partyPage.connect();
-  }
-);
+testWithII('should list supported standards', async ({context, browser}) => {
+  await partyPage.assertSupportedStandards();
+});
