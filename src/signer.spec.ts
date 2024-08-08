@@ -1,9 +1,10 @@
 import {type MockInstance} from 'vitest';
 import {SIGNER_SUPPORTED_STANDARDS, SignerErrorCode} from './constants/signer.constants';
 import * as signerHandlers from './handlers/signer.handlers';
-import {Signer, type SignerMessageEventData, type SignerParameters} from './signer';
+import {Signer, type SignerParameters} from './signer';
 import {ICRC25_SUPPORTED_STANDARDS, ICRC29_STATUS} from './types/icrc';
 import {JSON_RPC_VERSION_2} from './types/rpc';
+import type {SignerMessageEventData} from './types/signer';
 
 describe('Signer', () => {
   const mockParameters: SignerParameters = {};
@@ -121,10 +122,12 @@ describe('Signer', () => {
 
       window.dispatchEvent(messageEvent);
 
-      expect(handleStatusRequestSpy).toHaveBeenCalledWith({
-        data: messageEvent.data,
-        origin: testOrigin
-      });
+      expect(handleStatusRequestSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: messageEvent.data,
+          origin: testOrigin
+        })
+      );
     });
 
     it('should notify an error if a message from different origin is dispatched', () => {
