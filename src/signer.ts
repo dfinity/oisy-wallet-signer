@@ -5,13 +5,8 @@ import {
   handleSupportedStandards,
   notifyError
 } from './handlers/signer.handlers';
-import type {
-  IcrcWalletPermissionsRequest,
-  IcrcWalletRequestPermissionsRequest,
-  IcrcWalletStatusRequest,
-  IcrcWalletSupportedStandardsRequest
-} from './types/icrc-requests';
 import {RpcRequestSchema} from './types/rpc';
+import type {SignerMessageEvent} from './types/signer';
 
 /**
  * The parameters to initialize a signer.
@@ -19,15 +14,6 @@ import {RpcRequestSchema} from './types/rpc';
  */
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface SignerParameters {}
-
-export type SignerMessageEventData = Partial<
-  | IcrcWalletStatusRequest
-  | IcrcWalletRequestPermissionsRequest
-  | IcrcWalletPermissionsRequest
-  | IcrcWalletSupportedStandardsRequest
->;
-
-type SignerMessageEvent = MessageEvent<SignerMessageEventData>;
 
 export class Signer {
   #walletOrigin: string | undefined | null;
@@ -61,28 +47,24 @@ export class Signer {
     void this.onMessage(message);
   };
 
-  private readonly onMessage = async ({
-    data: msgData,
-    origin
-  }: SignerMessageEvent): Promise<void> => {
-    const {success, data: requestData} = RpcRequestSchema.safeParse(msgData);
+  private readonly onMessage = async (message: SignerMessageEvent): Promise<void> => {
+    const {data, origin} = message;
+
+    const {success, data: requestData} = RpcRequestSchema.safeParse(data);
 
     if (!success) {
       // We are only interested in JSON-RPC messages, so we are ignoring any other messages emitted at the window level, as the consumer might be using other events.
       return;
     }
 
-    this.assertAndSetOrigin({msgData, origin});
+    this.assertAndSetOrigin(message);
 
-    const {handled: statusRequestHandled} = handleStatusRequest({origin, data: msgData});
+    const {handled: statusRequestHandled} = handleStatusRequest(message);
     if (statusRequestHandled) {
       return;
     }
 
-    const {handled: supportedStandardsRequestHandled} = handleSupportedStandards({
-      origin,
-      data: msgData
-    });
+    const {handled: supportedStandardsRequestHandled} = handleSupportedStandards(message);
     if (supportedStandardsRequestHandled) {
       return;
     }
@@ -97,13 +79,7 @@ export class Signer {
     });
   };
 
-  private assertAndSetOrigin({
-    msgData,
-    origin
-  }: {
-    origin: string;
-    msgData: SignerMessageEventData;
-  }): void {
+  private assertAndSetOrigin({data: msgData, origin}: SignerMessageEvent): void {
     if (nonNullish(this.#walletOrigin) && this.#walletOrigin !== origin) {
       const {data} = RpcRequestSchema.safeParse(msgData);
 

@@ -6,6 +6,7 @@ import type {
 } from '../types/icrc-requests';
 import type {IcrcReadyResponse, IcrcSupportedStandardsResponse} from '../types/icrc-responses';
 import {JSON_RPC_VERSION_2, type RpcId, type RpcResponseWithError} from '../types/rpc';
+import type {SignerMessageEvent} from '../types/signer';
 import {handleStatusRequest, handleSupportedStandards, notifyError} from './signer.handlers';
 
 describe('Signer handlers', () => {
@@ -44,7 +45,10 @@ describe('Signer handlers', () => {
 
   describe('notifyReady', () => {
     it('should post a message with the msg', () => {
-      const {handled} = handleStatusRequest({data: statusRequest, origin});
+      const {handled} = handleStatusRequest({
+        data: statusRequest,
+        origin
+      } as unknown as SignerMessageEvent);
 
       expect(handled).toBeTruthy();
 
@@ -58,7 +62,10 @@ describe('Signer handlers', () => {
     });
 
     it('should not handle msg if not status request', () => {
-      const {handled} = handleStatusRequest({data: supportedStandardsRequest, origin});
+      const {handled} = handleStatusRequest({
+        data: supportedStandardsRequest,
+        origin
+      } as unknown as SignerMessageEvent);
 
       expect(handled).toBeFalsy();
     });
@@ -85,7 +92,10 @@ describe('Signer handlers', () => {
 
   describe('notifySupportedStandards', () => {
     it('should post a message with the msg', () => {
-      const {handled} = handleSupportedStandards({data: supportedStandardsRequest, origin});
+      const {handled} = handleSupportedStandards({
+        data: supportedStandardsRequest,
+        origin
+      } as unknown as SignerMessageEvent);
 
       expect(handled).toBeTruthy();
 
@@ -100,7 +110,10 @@ describe('Signer handlers', () => {
       expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
     });
     it('should not handle msg if not status request', () => {
-      const {handled} = handleSupportedStandards({data: statusRequest, origin});
+      const {handled} = handleSupportedStandards({
+        data: statusRequest,
+        origin
+      } as unknown as SignerMessageEvent);
 
       expect(handled).toBeFalsy();
     });
