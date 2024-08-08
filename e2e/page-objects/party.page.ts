@@ -71,5 +71,14 @@ export class PartyPage extends IdentityPage {
 
   async assertSupportedStandards(): Promise<void> {
     await expect(this.page.getByTestId('supported-standards')).toBeVisible();
+
+    const div = this.page.getByTestId('supported-standards');
+
+    const icrc25ListItem = div.locator('ul > li', {
+      hasText: 'ICRC-25'
+    });
+
+    await expect(icrc25ListItem).toBeVisible();
+    await expect(icrc25ListItem).toHaveText('ICRC-25');
   }
 }
