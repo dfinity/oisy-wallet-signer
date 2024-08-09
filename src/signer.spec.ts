@@ -1,4 +1,4 @@
-import {describe, type MockInstance} from 'vitest';
+import type {MockInstance} from 'vitest';
 import {
   ICRC25_REQUEST_PERMISSIONS,
   ICRC25_SUPPORTED_STANDARDS,
