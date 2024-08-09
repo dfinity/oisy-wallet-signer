@@ -16,4 +16,4 @@ export type * from './types/icrc-responses';
 export type * from './types/rpc';
 export type * from './types/wallet';
 
-throw new Error('no root entry-point: consult README for usage');
+export * from './constants/icrc.constants';
