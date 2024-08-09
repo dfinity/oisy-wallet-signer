@@ -1,4 +1,3 @@
-import {describe, expect, it} from 'vitest';
 import {
   ICRC25,
   ICRC25_PERMISSIONS,
