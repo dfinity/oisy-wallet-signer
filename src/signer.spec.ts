@@ -1,8 +1,13 @@
 import {describe, type MockInstance} from 'vitest';
-import {ICRC25_SUPPORTED_STANDARDS, ICRC29_STATUS} from './constants/icrc.constants';
+import {
+  ICRC25_REQUEST_PERMISSIONS,
+  ICRC25_SUPPORTED_STANDARDS,
+  ICRC29_STATUS
+} from './constants/icrc.constants';
 import {SIGNER_SUPPORTED_STANDARDS, SignerErrorCode} from './constants/signer.constants';
 import * as signerHandlers from './handlers/signer.handlers';
 import {Signer, type SignerParameters} from './signer';
+import type {IcrcWalletRequestPermissionsRequest} from './types/icrc-requests';
 import {JSON_RPC_VERSION_2} from './types/rpc';
 import type {SignerMessageEventData} from './types/signer';
 
@@ -190,6 +195,20 @@ describe('Signer', () => {
     const testId = 'test-123';
     const testOrigin = 'https://hello.com';
 
+    const requestPermissionsData: IcrcWalletRequestPermissionsRequest = {
+      id: testId,
+      jsonrpc: JSON_RPC_VERSION_2,
+      method: ICRC25_REQUEST_PERMISSIONS,
+      params: {
+        scopes: [{method: 'icrc27_accounts'}]
+      }
+    };
+
+    const requestPermissionsMsg = {
+      data: requestPermissionsData,
+      origin: testOrigin
+    };
+
     let originalOpener: typeof window.opener;
 
     let signer: Signer;
@@ -297,7 +316,60 @@ describe('Signer', () => {
       });
     });
 
-    it('should notify REQUEST_NOT_SUPPORTED', () => {
+    describe('request permissions', () => {
+      it('should notify REQUEST_NOT_SUPPORTED for invalid request permissions', () => {
+        const testOrigin = 'https://hello.com';
+
+        const {params: _, ...rest} = requestPermissionsData;
+
+        const msg = {
+          data: {
+            ...rest
+          },
+          origin: testOrigin
+        };
+
+        const messageEvent = new MessageEvent('message', msg);
+        window.dispatchEvent(messageEvent);
+
+        expect(postMessageMock).toHaveBeenCalledWith(
+          {
+            jsonrpc: JSON_RPC_VERSION_2,
+            id: testId,
+            error: {
+              code: SignerErrorCode.REQUEST_NOT_SUPPORTED,
+              message: 'The request sent by the relying party is not supported by the signer.'
+            }
+          },
+          testOrigin
+        );
+      });
+
+      it('should not post message for icrc25_request_permissions', () => {
+        const messageEvent = new MessageEvent('message', requestPermissionsMsg);
+        window.dispatchEvent(messageEvent);
+
+        expect(postMessageMock).not.toHaveBeenCalled();
+      });
+
+      it('should trigger client subscriber for icrc25_request_permissions', () => {
+        const spy = vi.fn();
+
+        signer.on({
+          method: ICRC25_REQUEST_PERMISSIONS,
+          callback: spy
+        });
+
+        const messageEvent = new MessageEvent('message', requestPermissionsMsg);
+        window.dispatchEvent(messageEvent);
+
+        expect(spy).toHaveBeenNthCalledWith(1, requestPermissionsData.params);
+
+        spy.mockClear();
+      });
+    });
+
+    it('should notify REQUEST_NOT_SUPPORTED for unknown standard', () => {
       const testOrigin = 'https://hello.com';
 
       const msg = {
@@ -323,6 +395,28 @@ describe('Signer', () => {
         },
         testOrigin
       );
+    });
+
+    it('should not trigger client subscriber if unsubscribed', () => {
+      const spy = vi.fn();
+
+      const off = signer.on({
+        method: ICRC25_REQUEST_PERMISSIONS,
+        callback: spy
+      });
+
+      const messageEvent = new MessageEvent('message', requestPermissionsMsg);
+      window.dispatchEvent(messageEvent);
+
+      expect(spy).toHaveBeenCalledTimes(1);
+
+      off();
+
+      window.dispatchEvent(messageEvent);
+
+      expect(spy).toHaveBeenCalledTimes(1);
+
+      spy.mockClear();
     });
   });
 });

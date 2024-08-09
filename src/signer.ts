@@ -1,12 +1,17 @@
 import {nonNullish} from '@dfinity/utils';
+import {ICRC25_REQUEST_PERMISSIONS} from './constants/icrc.constants';
 import {SignerErrorCode} from './constants/signer.constants';
 import {notifyError, notifyReady, notifySupportedStandards} from './handlers/signer.handlers';
+import type {IcrcWalletApproveMethod} from './types/icrc';
 import {
+  IcrcWalletRequestPermissionsRequestSchema,
   IcrcWalletStatusRequestSchema,
-  IcrcWalletSupportedStandardsRequestSchema
+  IcrcWalletSupportedStandardsRequestSchema,
+  type IcrcWalletScopesParams
 } from './types/icrc-requests';
 import {RpcRequestSchema} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
+import {Observable} from './utils/observable';
 
 /**
  * The parameters to initialize a signer.
@@ -17,6 +22,9 @@ export interface SignerParameters {}
 
 export class Signer {
   #walletOrigin: string | undefined | null;
+
+  readonly #requestsPermissionsEvents: Observable<IcrcWalletScopesParams> =
+    new Observable<IcrcWalletScopesParams>();
 
   private constructor(_parameters: SignerParameters) {
     window.addEventListener('message', this.onMessageListener);
@@ -69,6 +77,11 @@ export class Signer {
       return;
     }
 
+    const {handled: requestsPermissionsHandled} = this.handleRequestPermissionsRequest(message);
+    if (requestsPermissionsHandled) {
+      return;
+    }
+
     notifyError({
       id: requestData?.id ?? null,
       origin,
@@ -102,6 +115,26 @@ export class Signer {
 
     this.#walletOrigin = origin;
   }
+
+  /**
+   * TODO: to be documented when fully implemented.
+   */
+  on = ({
+    method,
+    callback
+  }: {
+    method: IcrcWalletApproveMethod;
+    callback: (data: IcrcWalletScopesParams) => void;
+  }): (() => void) => {
+    switch (method) {
+      case ICRC25_REQUEST_PERMISSIONS:
+        return this.#requestsPermissionsEvents.subscribe({callback});
+    }
+
+    throw new Error(
+      'The specified method is not supported. Please ensure you are using a supported standard.'
+    );
+  };
 
   /**
    * Handles incoming status requests.
@@ -139,6 +172,29 @@ export class Signer {
     if (isSupportedStandardsRequest) {
       const {id} = supportedStandardsData;
       notifySupportedStandards({id, origin});
+      return {handled: true};
+    }
+
+    return {handled: false};
+  }
+
+  /**
+   * Handles incoming messages to request permissions.
+   *
+   * Parses the message data to determine if it conforms to a request permissions schema. If it does,
+   * forwards the parameters to the clients, as requesting permissions requires the user to review
+   * and approve or decline them.
+   *
+   * @param {SignerMessageEvent} message - The incoming message event containing the data and origin.
+   * @returns {Object} An object with a boolean property `handled` indicating whether the request was processed as a permissions request.
+   */
+  private handleRequestPermissionsRequest({data}: SignerMessageEvent): {handled: boolean} {
+    const {success: isRequestPermissionsRequest, data: requestPermissionsData} =
+      IcrcWalletRequestPermissionsRequestSchema.safeParse(data);
+
+    if (isRequestPermissionsRequest) {
+      const {params} = requestPermissionsData;
+      this.#requestsPermissionsEvents.next(params);
       return {handled: true};
     }
 
