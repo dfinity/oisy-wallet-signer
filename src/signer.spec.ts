@@ -3,7 +3,7 @@ import {SIGNER_SUPPORTED_STANDARDS, SignerErrorCode} from './constants/signer.co
 import * as signerHandlers from './handlers/signer.handlers';
 import {Signer, type SignerParameters} from './signer';
 import {ICRC25_REQUEST_PERMISSIONS, ICRC25_SUPPORTED_STANDARDS, ICRC29_STATUS} from './types/icrc';
-import {IcrcWalletRequestPermissionsRequest} from './types/icrc-requests';
+import type {IcrcWalletRequestPermissionsRequest} from './types/icrc-requests';
 import {JSON_RPC_VERSION_2} from './types/rpc';
 import type {SignerMessageEventData} from './types/signer';
 
