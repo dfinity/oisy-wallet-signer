@@ -255,9 +255,9 @@ export class Wallet {
    * @returns {Promise<IcrcSupportedStandards>} A promise that resolves to an object containing the supported ICRC standards by the wallet. This includes details about each standard that the wallet can handle.
    * @see [ICRC25 Supported Standards](https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_supported_standards)
    */
-  supportedStandards = async (
-    options: WalletRequestOptions = {}
-  ): Promise<IcrcSupportedStandards> => {
+  supportedStandards = async ({
+    options = {}
+  }: {options?: WalletRequestOptions} = {}): Promise<IcrcSupportedStandards> => {
     const handleMessage = async ({
       data,
       id

@@ -262,10 +262,10 @@ describe('Wallet', () => {
 
       describe('Request errors', () => {
         it('should throw error if the wallet request options are not well formatted', async () => {
-          // @ts-expect-error: we are testing this on purpose
-          await expect(wallet.supportedStandards({timeoutInMilliseconds: 'test'})).rejects.toThrow(
-            'Wallet request options cannot be parsed:'
-          );
+          await expect(
+            // @ts-expect-error: we are testing this on purpose
+            wallet.supportedStandards({options: {timeoutInMilliseconds: 'test'}})
+          ).rejects.toThrow('Wallet request options cannot be parsed:');
         });
 
         const options = [
@@ -288,7 +288,7 @@ describe('Wallet', () => {
               const timeout =
                 options?.timeoutInMilliseconds ?? WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD;
 
-              wallet.supportedStandards(options).catch((err: Error) => {
+              wallet.supportedStandards({options}).catch((err: Error) => {
                 expect(err.message).toBe(
                   `Request to wallet timed out after ${timeout} milliseconds.`
                 );
@@ -387,7 +387,7 @@ describe('Wallet', () => {
       it('should respond with the supported standards', async () => {
         const requestId = '12345';
 
-        const promise = wallet.supportedStandards({requestId});
+        const promise = wallet.supportedStandards({options: {requestId}});
 
         const messageEventSupportedStandards = new MessageEvent('message', {
           origin: mockParameters.url,
