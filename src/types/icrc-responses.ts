@@ -6,7 +6,7 @@ import {
 } from './icrc';
 import {inferRpcResponseSchema} from './rpc';
 
-const IcrcWalletScopesResultSchema = z.object({
+const IcrcScopesSchema = z.object({
   scopes: z.array(
     z.object({
       scope: z.object({
@@ -19,19 +19,15 @@ const IcrcWalletScopesResultSchema = z.object({
 
 // icrc25_request_permissions
 // https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_request_permissions
-export const IcrcWalletRequestPermissionsResponseSchema = inferRpcResponseSchema(
-  IcrcWalletScopesResultSchema
-);
+export const IcrcRequestPermissionsResponseSchema = inferRpcResponseSchema(IcrcScopesSchema);
 
-export type IcrcWalletRequestPermissionsResponse = z.infer<
-  typeof IcrcWalletRequestPermissionsResponseSchema
->;
+export type IcrcRequestPermissionsResponse = z.infer<typeof IcrcRequestPermissionsResponseSchema>;
 
 // icrc25_permissions
 // https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_permissions
-export const IcrcWalletPermissionsResponseSchema = IcrcWalletRequestPermissionsResponseSchema;
+export const IcrcPermissionsResponseSchema = IcrcRequestPermissionsResponseSchema;
 
-export type IcrcWalletPermissionsResponse = z.infer<typeof IcrcWalletPermissionsResponseSchema>;
+export type IcrcPermissionsResponse = z.infer<typeof IcrcPermissionsResponseSchema>;
 
 // icrc25_supported_standards
 // https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_supported_standards

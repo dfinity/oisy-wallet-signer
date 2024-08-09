@@ -1,15 +1,15 @@
 import type {
-  IcrcWalletPermissionsRequest,
-  IcrcWalletRequestPermissionsRequest,
-  IcrcWalletStatusRequest,
-  IcrcWalletSupportedStandardsRequest
+  IcrcPermissionsRequest,
+  IcrcRequestPermissionsRequest,
+  IcrcStatusRequest,
+  IcrcSupportedStandardsRequest
 } from './icrc-requests';
 
 export type SignerMessageEventData = Partial<
-  | IcrcWalletStatusRequest
-  | IcrcWalletRequestPermissionsRequest
-  | IcrcWalletPermissionsRequest
-  | IcrcWalletSupportedStandardsRequest
+  | IcrcStatusRequest
+  | IcrcRequestPermissionsRequest
+  | IcrcPermissionsRequest
+  | IcrcSupportedStandardsRequest
 >;
 
 export type SignerMessageEvent = MessageEvent<SignerMessageEventData>;

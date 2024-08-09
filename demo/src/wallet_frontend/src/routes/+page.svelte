@@ -4,7 +4,7 @@
 	import UserId from '$core/components/UserId.svelte';
 	import {
 		ICRC25_REQUEST_PERMISSIONS,
-		type IcrcWalletScopesParams
+		type IcrcRequestedScopes
 	} from '@dfinity/oisy-wallet-signer';
 
 	let signer: Signer | undefined;
@@ -19,7 +19,7 @@
 
 		signer.on({
 			method: ICRC25_REQUEST_PERMISSIONS,
-			callback: (data: IcrcWalletScopesParams) => {
+			callback: (data: IcrcRequestedScopes) => {
 				console.log('TODO: Handle permissions requests:', data);
 			}
 		});

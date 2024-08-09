@@ -7,7 +7,7 @@ import {
 import {SIGNER_SUPPORTED_STANDARDS, SignerErrorCode} from './constants/signer.constants';
 import * as signerHandlers from './handlers/signer.handlers';
 import {Signer, type SignerParameters} from './signer';
-import type {IcrcWalletRequestPermissionsRequest} from './types/icrc-requests';
+import type {IcrcRequestPermissionsRequest} from './types/icrc-requests';
 import {JSON_RPC_VERSION_2} from './types/rpc';
 import type {SignerMessageEventData} from './types/signer';
 
@@ -195,7 +195,7 @@ describe('Signer', () => {
     const testId = 'test-123';
     const testOrigin = 'https://hello.com';
 
-    const requestPermissionsData: IcrcWalletRequestPermissionsRequest = {
+    const requestPermissionsData: IcrcRequestPermissionsRequest = {
       id: testId,
       jsonrpc: JSON_RPC_VERSION_2,
       method: ICRC25_REQUEST_PERMISSIONS,

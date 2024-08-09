@@ -10,7 +10,7 @@ import {inferRpcRequestWithParamsSchema, inferRpcRequestWithoutParamsSchema} fro
 
 // icrc25_request_permissions
 // https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_request_permissions
-const IcrcWalletScopesParamsSchema = z.object({
+const IcrcRequestedScopesSchema = z.object({
   scopes: z
     .array(
       z.object({
@@ -20,39 +20,35 @@ const IcrcWalletScopesParamsSchema = z.object({
     .min(1)
 });
 
-export type IcrcWalletScopesParams = z.infer<typeof IcrcWalletScopesParamsSchema>;
+export type IcrcRequestedScopes = z.infer<typeof IcrcRequestedScopesSchema>;
 
-export const IcrcWalletRequestPermissionsRequestSchema = inferRpcRequestWithParamsSchema({
+export const IcrcRequestPermissionsRequestSchema = inferRpcRequestWithParamsSchema({
   method: ICRC25_REQUEST_PERMISSIONS,
-  params: IcrcWalletScopesParamsSchema
+  params: IcrcRequestedScopesSchema
 });
 
-export type IcrcWalletRequestPermissionsRequest = z.infer<
-  typeof IcrcWalletRequestPermissionsRequestSchema
->;
+export type IcrcRequestPermissionsRequest = z.infer<typeof IcrcRequestPermissionsRequestSchema>;
 
 // icrc25_permissions
 // https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_permissions
-export const IcrcWalletPermissionsRequestSchema = inferRpcRequestWithoutParamsSchema({
+export const IcrcPermissionsRequestSchema = inferRpcRequestWithoutParamsSchema({
   method: ICRC25_PERMISSIONS
 });
 
-export type IcrcWalletPermissionsRequest = z.infer<typeof IcrcWalletPermissionsRequestSchema>;
+export type IcrcPermissionsRequest = z.infer<typeof IcrcPermissionsRequestSchema>;
 
 // icrc25_supported_standards
 // https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_supported_standards
-export const IcrcWalletSupportedStandardsRequestSchema = inferRpcRequestWithoutParamsSchema({
+export const IcrcSupportedStandardsRequestSchema = inferRpcRequestWithoutParamsSchema({
   method: ICRC25_SUPPORTED_STANDARDS
 });
 
-export type IcrcWalletSupportedStandardsRequest = z.infer<
-  typeof IcrcWalletSupportedStandardsRequestSchema
->;
+export type IcrcSupportedStandardsRequest = z.infer<typeof IcrcSupportedStandardsRequestSchema>;
 
 // icrc29_status
 // https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_29_window_post_message_transport.md
-export const IcrcWalletStatusRequestSchema = inferRpcRequestWithoutParamsSchema({
+export const IcrcStatusRequestSchema = inferRpcRequestWithoutParamsSchema({
   method: ICRC29_STATUS
 });
 
-export type IcrcWalletStatusRequest = z.infer<typeof IcrcWalletStatusRequestSchema>;
+export type IcrcStatusRequest = z.infer<typeof IcrcStatusRequestSchema>;

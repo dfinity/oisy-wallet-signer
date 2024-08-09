@@ -4,10 +4,10 @@ import {SignerErrorCode} from './constants/signer.constants';
 import {notifyError, notifyReady, notifySupportedStandards} from './handlers/signer.handlers';
 import type {IcrcWalletApproveMethod} from './types/icrc';
 import {
-  IcrcWalletRequestPermissionsRequestSchema,
-  IcrcWalletStatusRequestSchema,
-  IcrcWalletSupportedStandardsRequestSchema,
-  type IcrcWalletScopesParams
+  IcrcRequestPermissionsRequestSchema,
+  IcrcStatusRequestSchema,
+  IcrcSupportedStandardsRequestSchema,
+  type IcrcRequestedScopes
 } from './types/icrc-requests';
 import {RpcRequestSchema} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
@@ -23,8 +23,8 @@ export interface SignerParameters {}
 export class Signer {
   #walletOrigin: string | undefined | null;
 
-  readonly #requestsPermissionsEvents: Observable<IcrcWalletScopesParams> =
-    new Observable<IcrcWalletScopesParams>();
+  readonly #requestsPermissionsEvents: Observable<IcrcRequestedScopes> =
+    new Observable<IcrcRequestedScopes>();
 
   private constructor(_parameters: SignerParameters) {
     window.addEventListener('message', this.onMessageListener);
@@ -124,7 +124,7 @@ export class Signer {
     callback
   }: {
     method: IcrcWalletApproveMethod;
-    callback: (data: IcrcWalletScopesParams) => void;
+    callback: (data: IcrcRequestedScopes) => void;
   }): (() => void) => {
     switch (method) {
       case ICRC25_REQUEST_PERMISSIONS:
@@ -145,8 +145,7 @@ export class Signer {
    * @returns {Object} An object with a boolean property `handled` indicating whether the request was handled.
    */
   private handleStatusRequest({data, origin}: SignerMessageEvent): {handled: boolean} {
-    const {success: isStatusRequest, data: statusData} =
-      IcrcWalletStatusRequestSchema.safeParse(data);
+    const {success: isStatusRequest, data: statusData} = IcrcStatusRequestSchema.safeParse(data);
 
     if (isStatusRequest) {
       const {id} = statusData;
@@ -167,7 +166,7 @@ export class Signer {
    */
   private handleSupportedStandards({data, origin}: SignerMessageEvent): {handled: boolean} {
     const {success: isSupportedStandardsRequest, data: supportedStandardsData} =
-      IcrcWalletSupportedStandardsRequestSchema.safeParse(data);
+      IcrcSupportedStandardsRequestSchema.safeParse(data);
 
     if (isSupportedStandardsRequest) {
       const {id} = supportedStandardsData;
@@ -190,7 +189,7 @@ export class Signer {
    */
   private handleRequestPermissionsRequest({data}: SignerMessageEvent): {handled: boolean} {
     const {success: isRequestPermissionsRequest, data: requestPermissionsData} =
-      IcrcWalletRequestPermissionsRequestSchema.safeParse(data);
+      IcrcRequestPermissionsRequestSchema.safeParse(data);
 
     if (isRequestPermissionsRequest) {
       const {params} = requestPermissionsData;
