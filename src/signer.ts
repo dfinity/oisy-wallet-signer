@@ -1,18 +1,16 @@
 import {nonNullish} from '@dfinity/utils';
 import {SignerErrorCode} from './constants/signer.constants';
-import {Observable} from './utils/observable';
-import {
-  handleStatusRequest,
-  handleSupportedStandards,
-  notifyError
-} from './handlers/signer.handlers';
+import {notifyError, notifyReady, notifySupportedStandards} from './handlers/signer.handlers';
 import {ICRC25_REQUEST_PERMISSIONS, IcrcWalletApproveMethod} from './types/icrc';
 import {
   IcrcWalletRequestPermissionsRequestSchema,
-  IcrcWalletScopesParams
+  IcrcWalletScopesParams,
+  IcrcWalletStatusRequestSchema,
+  IcrcWalletSupportedStandardsRequestSchema
 } from './types/icrc-requests';
 import {RpcRequestSchema} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
+import {Observable} from './utils/observable';
 
 /**
  * The parameters to initialize a signer.
@@ -68,12 +66,12 @@ export class Signer {
 
     this.assertAndSetOrigin(message);
 
-    const {handled: statusRequestHandled} = handleStatusRequest(message);
+    const {handled: statusRequestHandled} = this.#handleStatusRequest(message);
     if (statusRequestHandled) {
       return;
     }
 
-    const {handled: supportedStandardsRequestHandled} = handleSupportedStandards(message);
+    const {handled: supportedStandardsRequestHandled} = this.#handleSupportedStandards(message);
     if (supportedStandardsRequestHandled) {
       return;
     }
@@ -130,6 +128,48 @@ export class Signer {
     }
 
     throw new Error('TODO events not supported');
+  };
+
+  /**
+   * Handles incoming status requests.
+   *
+   * Parses the message data to determine if it conforms to a status request and sends a notification indicating that the signer is ready.
+   *
+   * @param {SignerMessageEvent} message - The incoming message event containing the data and origin.
+   * @returns {Object} An object with a boolean property `handled` indicating whether the request was handled.
+   */
+  readonly #handleStatusRequest = ({data, origin}: SignerMessageEvent): {handled: boolean} => {
+    const {success: isStatusRequest, data: statusData} =
+      IcrcWalletStatusRequestSchema.safeParse(data);
+
+    if (isStatusRequest) {
+      const {id} = statusData;
+      notifyReady({id, origin});
+      return {handled: true};
+    }
+
+    return {handled: false};
+  };
+
+  /**
+   * Handles incoming messages to list the supported standards.
+   *
+   * Parses the message data to determine if it conforms to a supported standards request and responds with a notification with the supported standards.
+   *
+   * @param {SignerMessageEvent} message - The incoming message event containing the data and origin.
+   * @returns {Object} An object with a boolean property `handled` indicating whether the request was handled.
+   */
+  readonly #handleSupportedStandards = ({data, origin}: SignerMessageEvent): {handled: boolean} => {
+    const {success: isSupportedStandardsRequest, data: supportedStandardsData} =
+      IcrcWalletSupportedStandardsRequestSchema.safeParse(data);
+
+    if (isSupportedStandardsRequest) {
+      const {id} = supportedStandardsData;
+      notifySupportedStandards({id, origin});
+      return {handled: true};
+    }
+
+    return {handled: false};
   };
 
   #handleRequestPermissionsRequest = ({data}: SignerMessageEvent): {handled: boolean} => {
