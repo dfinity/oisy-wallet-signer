@@ -10,7 +10,8 @@ import {
   IcrcSupportedStandardsResponseSchema,
   type IcrcSupportedStandards
 } from './types/icrc-responses';
-import {RpcResponseWithResultOrErrorSchema} from './types/rpc';
+import {RpcResponseWithResultOrErrorSchema, type RpcId} from './types/rpc';
+import type {WalletMessageEvent, WalletMessageEventData} from './types/wallet';
 import {WalletOptionsSchema, type WalletOptions} from './types/wallet-options';
 import {WalletRequestOptionsSchema, type WalletRequestOptions} from './types/wallet-request';
 import type {ReadyOrError} from './utils/timeout.utils';
@@ -156,16 +157,35 @@ export class Wallet {
   };
 
   /**
-   * List the standards supported by the wallet.
+   * Sends an asynchronous request to the wallet and handles the response with the provided handlers.
    *
-   * @async
-   * @param {WalletRequestOptions} options - The options for the wallet request, which may include parameters such as timeout settings and other request-specific configurations.
-   * @returns {Promise<IcrcSupportedStandards>} A promise that resolves to an object containing the supported ICRC standards by the wallet. This includes details about each standard that the wallet can handle.
+   * @template T - The type of the result expected from the response.
+   *
+   * @param {Object} params - Parameters for the request.
+   * @param {WalletRequestOptions} params.options - Options for configuring the wallet request.
+   * @param {(id: RpcId) => void} params.postRequest - The request function that sends the request to the wallet using either the provided ID or a generated ID.
+   * @param {(params: { data: WalletMessageEventData; id: RpcId }) => Promise<{ handled: boolean; result?: T }>} params.handleMessage -
+   *        A function to handle incoming messages, which should return an object indicating whether the message was handled and optionally include the result. If both `handled` is `true` and the `result` is not `null`, the process is disconnected, i.e., no more listeners will await an answer from the wallet.
+   *
+   * @returns {Promise<T>} A promise that resolves with the result of the request.
+   *
+   * @throws {Error} If the wallet request options cannot be parsed or if the request times out.
+   *
+   * @private
    */
-  supportedStandards = async (
-    options: WalletRequestOptions = {}
-  ): Promise<IcrcSupportedStandards> => {
-    return await new Promise<IcrcSupportedStandards>((resolve, reject) => {
+  private readonly request = async <T>({
+    options,
+    postRequest,
+    handleMessage
+  }: {
+    options: WalletRequestOptions;
+    postRequest: (id: RpcId) => void;
+    handleMessage: (params: {
+      data: WalletMessageEventData;
+      id: RpcId;
+    }) => Promise<{handled: boolean; result?: T}>;
+  }): Promise<T> => {
+    return await new Promise<T>((resolve, reject) => {
       const {success: optionsSuccess, error} = WalletRequestOptionsSchema.safeParse(options);
 
       if (!optionsSuccess) {
@@ -180,15 +200,13 @@ export class Wallet {
 
       const timeoutId = setTimeout(() => {
         reject(
-          new Error(
-            `Supported standards request to wallet timed out after ${timeoutInMilliseconds} milliseconds.`
-          )
+          new Error(`Request to wallet timed out after ${timeoutInMilliseconds} milliseconds.`)
         );
         disconnect();
       }, timeoutInMilliseconds);
 
-      const onMessage = ({origin, data: msgData}: MessageEvent): void => {
-        const {success} = RpcResponseWithResultOrErrorSchema.safeParse(msgData);
+      const onMessage = async ({origin, data}: WalletMessageEvent): Promise<void> => {
+        const {success} = RpcResponseWithResultOrErrorSchema.safeParse(data);
 
         if (!success) {
           // We are only interested in JSON-RPC messages, so we are ignoring any other messages emitted at the window level, as the consumer might be using other events.
@@ -206,35 +224,71 @@ export class Wallet {
           return;
         }
 
-        const {success: isSupportedStandards, data: supportedStandardsData} =
-          IcrcSupportedStandardsResponseSchema.safeParse(msgData);
+        const {handled, result} = await handleMessage({data, id: requestId});
 
-        if (
-          isSupportedStandards &&
-          requestId === supportedStandardsData?.id &&
-          nonNullish(supportedStandardsData?.result)
-        ) {
-          const {
-            result: {supportedStandards}
-          } = supportedStandardsData;
-          resolve(supportedStandards);
-
+        if (handled && nonNullish(result)) {
+          resolve(result);
           disconnect();
         }
       };
 
-      window.addEventListener('message', onMessage);
+      const onMessageListener = (message: WalletMessageEvent): void => {
+        void onMessage(message);
+      };
+
+      window.addEventListener('message', onMessageListener);
 
       const disconnect = (): void => {
         clearTimeout(timeoutId);
-        window.removeEventListener('message', onMessage);
+        window.removeEventListener('message', onMessageListener);
       };
 
+      postRequest(requestId);
+    });
+  };
+
+  /**
+   * List the standards supported by the wallet.
+   *
+   * @async
+   * @param {WalletRequestOptions} options - The options for the wallet request, which may include parameters such as timeout settings and other request-specific configurations.
+   * @returns {Promise<IcrcSupportedStandards>} A promise that resolves to an object containing the supported ICRC standards by the wallet. This includes details about each standard that the wallet can handle.
+   */
+  supportedStandards = async (
+    options: WalletRequestOptions = {}
+  ): Promise<IcrcSupportedStandards> => {
+    const handleMessage = async ({
+      data,
+      id
+    }: {
+      data: WalletMessageEventData;
+      id: RpcId;
+    }): Promise<{handled: boolean; result?: IcrcSupportedStandards}> => {
+      const {success: isSupportedStandards, data: supportedStandardsData} =
+        IcrcSupportedStandardsResponseSchema.safeParse(data);
+
+      if (
+        isSupportedStandards &&
+        id === supportedStandardsData?.id &&
+        nonNullish(supportedStandardsData?.result)
+      ) {
+        const {
+          result: {supportedStandards: result}
+        } = supportedStandardsData;
+        return {handled: true, result};
+      }
+
+      return {handled: false};
+    };
+
+    const postRequest = (id: RpcId): void => {
       requestSupportedStandards({
         popup: this.#popup,
         origin: this.#origin,
-        id: requestId
+        id
       });
-    });
+    };
+
+    return await this.request<IcrcSupportedStandards>({options, postRequest, handleMessage});
   };
 }
