@@ -1,6 +1,6 @@
 import {nonNullish} from '@dfinity/utils';
 import {SignerErrorCode} from './constants/signer.constants';
-import {SignerEvents} from './events/signer.events';
+import {Observable} from './utils/observable';
 import {
   handleStatusRequest,
   handleSupportedStandards,
@@ -24,8 +24,8 @@ export interface SignerParameters {}
 export class Signer {
   #walletOrigin: string | undefined | null;
 
-  #requestsPermissionsEvents: SignerEvents<IcrcWalletScopesParams> =
-    new SignerEvents<IcrcWalletScopesParams>();
+  #requestsPermissionsEvents: Observable<IcrcWalletScopesParams> =
+    new Observable<IcrcWalletScopesParams>();
 
   private constructor(_parameters: SignerParameters) {
     window.addEventListener('message', this.onMessageListener);
@@ -126,7 +126,7 @@ export class Signer {
   }): (() => void) => {
     switch (method) {
       case ICRC25_REQUEST_PERMISSIONS:
-        return this.#requestsPermissionsEvents.on({callback});
+        return this.#requestsPermissionsEvents.subscribe({callback});
     }
 
     throw new Error('TODO events not supported');
@@ -138,7 +138,7 @@ export class Signer {
 
     if (isRequestPermissionsRequest) {
       const {params} = requestPermissionsData;
-      this.#requestsPermissionsEvents.emit(params);
+      this.#requestsPermissionsEvents.next(params);
     }
 
     return {handled: false};

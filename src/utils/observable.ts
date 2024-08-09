@@ -1,13 +1,13 @@
-type SignerEventsCallback<T> = {id: symbol; callback: (data: T) => void};
+type ObservableCallback<T> = {id: symbol; callback: (data: T) => void};
 
-export class SignerEvents<T> {
-  #callbacks: SignerEventsCallback<T>[] = [];
+export class Observable<T> {
+  #callbacks: ObservableCallback<T>[] = [];
 
-  emit(data: T) {
+  next(data: T): void {
     this.#callbacks.forEach(({callback}) => callback(data));
   }
 
-  on({callback}: Pick<SignerEventsCallback<T>, 'callback'>): () => void {
+  subscribe({callback}: Pick<ObservableCallback<T>, 'callback'>): () => void {
     const callbackId = Symbol();
     this.#callbacks.push({id: callbackId, callback});
 
