@@ -11,12 +11,8 @@ import {
   type IcrcSupportedStandards
 } from './types/icrc-responses';
 import {RpcResponseWithResultOrErrorSchema} from './types/rpc';
-import {
-  WalletOptionsSchema,
-  WalletRequestOptionsSchema,
-  type WalletOptions,
-  type WalletRequestOptions
-} from './types/wallet';
+import {WalletOptionsSchema, type WalletOptions} from './types/wallet-options';
+import {WalletRequestOptionsSchema, type WalletRequestOptions} from './types/wallet-request';
 import type {ReadyOrError} from './utils/timeout.utils';
 import {WALLET_WINDOW_TOP_RIGHT, windowFeatures} from './utils/window.utils';
 
