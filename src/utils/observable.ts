@@ -1,21 +1,21 @@
-interface ObservableCallback<T> {
+interface Observer<T> {
   id: symbol;
   callback: (data: T) => void;
 }
 
 export class Observable<T> {
-  #callbacks: ObservableCallback<T>[] = [];
+  #observers: Observer<T>[] = [];
 
   next(data: T): void {
-    this.#callbacks.forEach(({callback}) => {
+    this.#observers.forEach(({callback}) => {
       callback(data);
     });
   }
 
-  subscribe({callback}: Pick<ObservableCallback<T>, 'callback'>): () => void {
-    const callbackId = Symbol();
-    this.#callbacks.push({id: callbackId, callback});
+  subscribe({callback}: Pick<Observer<T>, 'callback'>): () => void {
+    const observedId = Symbol();
+    this.#observers.push({id: observedId, callback});
 
-    return () => (this.#callbacks = this.#callbacks.filter(({id}) => id !== callbackId));
+    return () => (this.#observers = this.#observers.filter(({id}) => id !== observedId));
   }
 }
