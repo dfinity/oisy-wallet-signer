@@ -76,7 +76,7 @@ export class Signer {
       return;
     }
 
-    const {handled: requestsPermissionsHandled} = this.#handleRequestPermissionsRequest(message);
+    const {handled: requestsPermissionsHandled} = this.handleRequestPermissionsRequest(message);
     if (requestsPermissionsHandled) {
       return;
     }
@@ -172,7 +172,17 @@ export class Signer {
     return {handled: false};
   };
 
-  #handleRequestPermissionsRequest = ({data}: SignerMessageEvent): {handled: boolean} => {
+  /**
+   * Handles incoming messages to request permissions.
+   *
+   * Parses the message data to determine if it conforms to a request permissions schema. If it does,
+   * forwards the parameters to the clients, as requesting permissions requires the user to review
+   * and approve or decline them.
+   *
+   * @param {SignerMessageEvent} message - The incoming message event containing the data and origin.
+   * @returns {Object} An object with a boolean property `handled` indicating whether the request was processed as a permissions request.
+   */
+  private handleRequestPermissionsRequest({data}: SignerMessageEvent): {handled: boolean} {
     const {success: isRequestPermissionsRequest, data: requestPermissionsData} =
       IcrcWalletRequestPermissionsRequestSchema.safeParse(data);
 
@@ -182,5 +192,5 @@ export class Signer {
     }
 
     return {handled: false};
-  };
+  }
 }
