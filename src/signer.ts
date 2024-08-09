@@ -7,7 +7,10 @@ import {
   notifyError
 } from './handlers/signer.handlers';
 import {ICRC25_REQUEST_PERMISSIONS, IcrcWalletApproveMethod} from './types/icrc';
-import {IcrcWalletScopesParams} from './types/icrc-requests';
+import {
+  IcrcWalletRequestPermissionsRequestSchema,
+  IcrcWalletScopesParams
+} from './types/icrc-requests';
 import {RpcRequestSchema} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
 
@@ -75,6 +78,11 @@ export class Signer {
       return;
     }
 
+    const {handled: requestsPermissionsHandled} = this.#handleRequestPermissionsRequest(message);
+    if (requestsPermissionsHandled) {
+      return;
+    }
+
     notifyError({
       id: requestData?.id ?? null,
       origin,
@@ -122,5 +130,17 @@ export class Signer {
     }
 
     throw new Error('TODO events not supported');
+  };
+
+  #handleRequestPermissionsRequest = ({data}: SignerMessageEvent): {handled: boolean} => {
+    const {success: isRequestPermissionsRequest, data: requestPermissionsData} =
+      IcrcWalletRequestPermissionsRequestSchema.safeParse(data);
+
+    if (isRequestPermissionsRequest) {
+      const {params} = requestPermissionsData;
+      this.#requestsPermissionsEvents.emit(params);
+    }
+
+    return {handled: false};
   };
 }
