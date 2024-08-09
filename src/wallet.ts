@@ -253,6 +253,7 @@ export class Wallet {
    * @async
    * @param {WalletRequestOptions} options - The options for the wallet request, which may include parameters such as timeout settings and other request-specific configurations.
    * @returns {Promise<IcrcSupportedStandards>} A promise that resolves to an object containing the supported ICRC standards by the wallet. This includes details about each standard that the wallet can handle.
+   * @see [ICRC25 Supported Standards](https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_supported_standards)
    */
   supportedStandards = async (
     options: WalletRequestOptions = {}
