@@ -1,8 +1,8 @@
 import {describe, type MockInstance} from 'vitest';
+import {ICRC25_SUPPORTED_STANDARDS, ICRC29_STATUS} from './constants/icrc.constants';
 import {SIGNER_SUPPORTED_STANDARDS, SignerErrorCode} from './constants/signer.constants';
 import * as signerHandlers from './handlers/signer.handlers';
 import {Signer, type SignerParameters} from './signer';
-import {ICRC25_SUPPORTED_STANDARDS, ICRC29_STATUS} from './types/icrc';
 import {JSON_RPC_VERSION_2} from './types/rpc';
 import type {SignerMessageEventData} from './types/signer';
 

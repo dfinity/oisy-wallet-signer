@@ -1,4 +1,4 @@
-import {ICRC25_PERMISSION_GRANTED, ICRC27_ACCOUNTS} from './icrc';
+import {ICRC25_PERMISSION_GRANTED, ICRC27_ACCOUNTS} from '../constants/icrc.constants';
 import {
   IcrcReadyResponseSchema,
   IcrcSupportedStandardsResponseSchema,
