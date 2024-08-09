@@ -59,12 +59,12 @@ export class Signer {
 
     this.assertAndSetOrigin(message);
 
-    const {handled: statusRequestHandled} = this.#handleStatusRequest(message);
+    const {handled: statusRequestHandled} = this.handleStatusRequest(message);
     if (statusRequestHandled) {
       return;
     }
 
-    const {handled: supportedStandardsRequestHandled} = this.#handleSupportedStandards(message);
+    const {handled: supportedStandardsRequestHandled} = this.handleSupportedStandards(message);
     if (supportedStandardsRequestHandled) {
       return;
     }
@@ -111,7 +111,7 @@ export class Signer {
    * @param {SignerMessageEvent} message - The incoming message event containing the data and origin.
    * @returns {Object} An object with a boolean property `handled` indicating whether the request was handled.
    */
-  readonly #handleStatusRequest = ({data, origin}: SignerMessageEvent): {handled: boolean} => {
+  private handleStatusRequest({data, origin}: SignerMessageEvent): {handled: boolean} {
     const {success: isStatusRequest, data: statusData} =
       IcrcWalletStatusRequestSchema.safeParse(data);
 
@@ -122,7 +122,7 @@ export class Signer {
     }
 
     return {handled: false};
-  };
+  }
 
   /**
    * Handles incoming messages to list the supported standards.
@@ -132,7 +132,7 @@ export class Signer {
    * @param {SignerMessageEvent} message - The incoming message event containing the data and origin.
    * @returns {Object} An object with a boolean property `handled` indicating whether the request was handled.
    */
-  readonly #handleSupportedStandards = ({data, origin}: SignerMessageEvent): {handled: boolean} => {
+  private handleSupportedStandards({data, origin}: SignerMessageEvent): {handled: boolean} {
     const {success: isSupportedStandardsRequest, data: supportedStandardsData} =
       IcrcWalletSupportedStandardsRequestSchema.safeParse(data);
 
@@ -143,5 +143,5 @@ export class Signer {
     }
 
     return {handled: false};
-  };
+  }
 }
