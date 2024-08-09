@@ -17,15 +17,12 @@
 
 		signer = Signer.init({});
 
-		const unsubscribeRequestPermissions = signer.on({
+		signer.on({
 			method: ICRC25_REQUEST_PERMISSIONS,
 			callback: (data: IcrcWalletScopesParams) => {
 				console.log('TODO: Handle permissions requests:', data);
 			}
 		});
-
-		// I can unsubscribe just one listener.
-		setTimeout(() => unsubscribeRequestPermissions(), 2000);
 
 		return () => {
 			signer?.disconnect();
