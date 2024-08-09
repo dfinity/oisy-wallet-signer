@@ -17,6 +17,8 @@ const IcrcScopesSchema = z.object({
   )
 });
 
+export type IcrcScopes = z.infer<typeof IcrcScopesSchema>;
+
 // icrc25_request_permissions
 // https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_request_permissions
 export const IcrcRequestPermissionsResponseSchema = inferRpcResponseSchema(IcrcScopesSchema);

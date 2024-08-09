@@ -12,4 +12,4 @@ export type SignerMessageEventData = Partial<
   | IcrcSupportedStandardsRequest
 >;
 
-export type SignerMessageEvent = MessageEvent<SignerMessageEventData>;
+export type SignerMessageEvent = MessageEvent<SignerMessageEventData | never>;

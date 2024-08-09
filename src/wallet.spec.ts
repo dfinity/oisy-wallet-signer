@@ -290,7 +290,7 @@ describe('Wallet', () => {
 
               wallet.supportedStandards(options).catch((err: Error) => {
                 expect(err.message).toBe(
-                  `Supported standards request to wallet timed out after ${timeout} milliseconds.`
+                  `Request to wallet timed out after ${timeout} milliseconds.`
                 );
 
                 vi.useRealTimers();
@@ -303,7 +303,7 @@ describe('Wallet', () => {
           }
         );
 
-        it('should timeout if response ID is not the same as requst ID', async () => {
+        it('should timeout if response ID is not the same as request ID', async () => {
           // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
           return new Promise<void>(async (resolve) => {
             vi.useFakeTimers();
@@ -312,7 +312,7 @@ describe('Wallet', () => {
 
             wallet.supportedStandards().catch((err: Error) => {
               expect(err.message).toBe(
-                `Supported standards request to wallet timed out after ${WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD} milliseconds.`
+                `Request to wallet timed out after ${WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD} milliseconds.`
               );
 
               expect(spy).toHaveBeenCalledTimes(1);
