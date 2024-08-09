@@ -3,7 +3,7 @@ import {WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD} from './constants/wal
 import * as walletHandlers from './handlers/wallet.handlers';
 import {IcrcSupportedStandardsResponseSchema} from './types/icrc-responses';
 import {JSON_RPC_VERSION_2, RpcResponseWithResultOrErrorSchema} from './types/rpc';
-import type {WalletOptions} from './types/wallet';
+import type {WalletOptions} from './types/wallet-options';
 import {WALLET_WINDOW_CENTER, WALLET_WINDOW_TOP_RIGHT, windowFeatures} from './utils/window.utils';
 import {Wallet} from './wallet';
 

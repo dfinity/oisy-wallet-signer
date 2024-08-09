@@ -14,6 +14,7 @@ export type * from './types/icrc';
 export type * from './types/icrc-requests';
 export type * from './types/icrc-responses';
 export type * from './types/rpc';
-export type * from './types/wallet';
+export type * from './types/wallet-options';
+export type * from './types/wallet-request';
 
 export * from './constants/icrc.constants';
