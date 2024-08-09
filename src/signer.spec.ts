@@ -1,4 +1,4 @@
-import {type MockInstance} from 'vitest';
+import {describe, type MockInstance} from 'vitest';
 import {SIGNER_SUPPORTED_STANDARDS, SignerErrorCode} from './constants/signer.constants';
 import * as signerHandlers from './handlers/signer.handlers';
 import {Signer, type SignerParameters} from './signer';
@@ -87,14 +87,14 @@ describe('Signer', () => {
 
     let originalOpener: typeof window.opener;
 
-    let handleStatusRequestSpy: MockInstance;
+    let notifyReadySpy: MockInstance;
     let signer: Signer;
 
     let postMessageMock: MockInstance;
 
     beforeEach(() => {
       signer = Signer.init(mockParameters);
-      handleStatusRequestSpy = vi.spyOn(signerHandlers, 'handleStatusRequest');
+      notifyReadySpy = vi.spyOn(signerHandlers, 'notifyReady');
       postMessageMock = vi.fn();
       vi.stubGlobal('opener', {postMessage: postMessageMock});
     });
@@ -122,12 +122,10 @@ describe('Signer', () => {
 
       window.dispatchEvent(messageEvent);
 
-      expect(handleStatusRequestSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          data: messageEvent.data,
-          origin: testOrigin
-        })
-      );
+      expect(notifyReadySpy).toHaveBeenCalledWith({
+        id: testId,
+        origin: testOrigin
+      });
     });
 
     it('should notify an error if a message from different origin is dispatched', () => {
@@ -215,7 +213,7 @@ describe('Signer', () => {
       vi.restoreAllMocks();
     });
 
-    it('should notify READY for icrc29_status', () => {
+    describe('ready', () => {
       const msg = {
         data: {
           id: testId,
@@ -225,20 +223,38 @@ describe('Signer', () => {
         origin: testOrigin
       };
 
-      const messageEvent = new MessageEvent('message', msg);
-      window.dispatchEvent(messageEvent);
+      let notifySupportedStandardsSpy: MockInstance;
+      let notifyErrorSpy: MockInstance;
 
-      expect(postMessageMock).toHaveBeenCalledWith(
-        {
-          jsonrpc: JSON_RPC_VERSION_2,
-          id: testId,
-          result: 'ready'
-        },
-        testOrigin
-      );
+      beforeEach(() => {
+        notifySupportedStandardsSpy = vi.spyOn(signerHandlers, 'notifySupportedStandards');
+        notifyErrorSpy = vi.spyOn(signerHandlers, 'notifyError');
+      });
+
+      it('should notify READY for icrc29_status', () => {
+        const messageEvent = new MessageEvent('message', msg);
+        window.dispatchEvent(messageEvent);
+
+        expect(postMessageMock).toHaveBeenCalledWith(
+          {
+            jsonrpc: JSON_RPC_VERSION_2,
+            id: testId,
+            result: 'ready'
+          },
+          testOrigin
+        );
+      });
+
+      it('should not notify any other messages than ready icrc29_status', () => {
+        const messageEvent = new MessageEvent('message', msg);
+        window.dispatchEvent(messageEvent);
+
+        expect(notifySupportedStandardsSpy).not.toHaveBeenCalled();
+        expect(notifyErrorSpy).not.toHaveBeenCalled();
+      });
     });
 
-    it('should notify supported standards for icrc25_supported_standards', () => {
+    describe('supported standards', () => {
       const msg = {
         data: {
           id: testId,
@@ -248,19 +264,37 @@ describe('Signer', () => {
         origin: testOrigin
       };
 
-      const messageEvent = new MessageEvent('message', msg);
-      window.dispatchEvent(messageEvent);
+      let notifyReadySpy: MockInstance;
+      let notifyErrorSpy: MockInstance;
 
-      expect(postMessageMock).toHaveBeenCalledWith(
-        {
-          jsonrpc: JSON_RPC_VERSION_2,
-          id: testId,
-          result: {
-            supportedStandards: SIGNER_SUPPORTED_STANDARDS
-          }
-        },
-        testOrigin
-      );
+      beforeEach(() => {
+        notifyReadySpy = vi.spyOn(signerHandlers, 'notifyReady');
+        notifyErrorSpy = vi.spyOn(signerHandlers, 'notifyError');
+      });
+
+      it('should notify supported standards for icrc25_supported_standards', () => {
+        const messageEvent = new MessageEvent('message', msg);
+        window.dispatchEvent(messageEvent);
+
+        expect(postMessageMock).toHaveBeenCalledWith(
+          {
+            jsonrpc: JSON_RPC_VERSION_2,
+            id: testId,
+            result: {
+              supportedStandards: SIGNER_SUPPORTED_STANDARDS
+            }
+          },
+          testOrigin
+        );
+      });
+
+      it('should not notify any other messages than ready icrc25_supported_standards', () => {
+        const messageEvent = new MessageEvent('message', msg);
+        window.dispatchEvent(messageEvent);
+
+        expect(notifyReadySpy).not.toHaveBeenCalled();
+        expect(notifyErrorSpy).not.toHaveBeenCalled();
+      });
     });
 
     it('should notify REQUEST_NOT_SUPPORTED', () => {

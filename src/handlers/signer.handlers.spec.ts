@@ -1,29 +1,12 @@
 import type {Mock} from 'vitest';
 import {SIGNER_SUPPORTED_STANDARDS, SignerErrorCode} from '../constants/signer.constants';
-import type {
-  IcrcWalletStatusRequest,
-  IcrcWalletSupportedStandardsRequest
-} from '../types/icrc-requests';
 import type {IcrcReadyResponse, IcrcSupportedStandardsResponse} from '../types/icrc-responses';
 import {JSON_RPC_VERSION_2, type RpcId, type RpcResponseWithError} from '../types/rpc';
-import type {SignerMessageEvent} from '../types/signer';
-import {handleStatusRequest, handleSupportedStandards, notifyError} from './signer.handlers';
+import {notifyError, notifyReady, notifySupportedStandards} from './signer.handlers';
 
 describe('Signer handlers', () => {
   const id: RpcId = 'test-123';
   const origin = 'https://hello.com';
-
-  const statusRequest: IcrcWalletStatusRequest = {
-    jsonrpc: JSON_RPC_VERSION_2,
-    id,
-    method: 'icrc29_status'
-  };
-
-  const supportedStandardsRequest: IcrcWalletSupportedStandardsRequest = {
-    jsonrpc: JSON_RPC_VERSION_2,
-    id,
-    method: 'icrc25_supported_standards'
-  };
 
   let originalOpener: typeof window.opener;
 
@@ -45,12 +28,7 @@ describe('Signer handlers', () => {
 
   describe('notifyReady', () => {
     it('should post a message with the msg', () => {
-      const {handled} = handleStatusRequest({
-        data: statusRequest,
-        origin
-      } as unknown as SignerMessageEvent);
-
-      expect(handled).toBeTruthy();
+      notifyReady({id, origin});
 
       const expectedMessage: IcrcReadyResponse = {
         jsonrpc: JSON_RPC_VERSION_2,
@@ -59,15 +37,6 @@ describe('Signer handlers', () => {
       };
 
       expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
-    });
-
-    it('should not handle msg if not status request', () => {
-      const {handled} = handleStatusRequest({
-        data: supportedStandardsRequest,
-        origin
-      } as unknown as SignerMessageEvent);
-
-      expect(handled).toBeFalsy();
     });
   });
 
@@ -92,12 +61,7 @@ describe('Signer handlers', () => {
 
   describe('notifySupportedStandards', () => {
     it('should post a message with the msg', () => {
-      const {handled} = handleSupportedStandards({
-        data: supportedStandardsRequest,
-        origin
-      } as unknown as SignerMessageEvent);
-
-      expect(handled).toBeTruthy();
+      notifySupportedStandards({id, origin});
 
       const expectedMessage: IcrcSupportedStandardsResponse = {
         jsonrpc: JSON_RPC_VERSION_2,
@@ -108,14 +72,6 @@ describe('Signer handlers', () => {
       };
 
       expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
-    });
-    it('should not handle msg if not status request', () => {
-      const {handled} = handleSupportedStandards({
-        data: statusRequest,
-        origin
-      } as unknown as SignerMessageEvent);
-
-      expect(handled).toBeFalsy();
     });
   });
 });
