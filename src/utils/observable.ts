@@ -1,10 +1,15 @@
-type ObservableCallback<T> = {id: symbol; callback: (data: T) => void};
+interface ObservableCallback<T> {
+  id: symbol;
+  callback: (data: T) => void;
+}
 
 export class Observable<T> {
   #callbacks: ObservableCallback<T>[] = [];
 
   next(data: T): void {
-    this.#callbacks.forEach(({callback}) => callback(data));
+    this.#callbacks.forEach(({callback}) => {
+      callback(data);
+    });
   }
 
   subscribe({callback}: Pick<ObservableCallback<T>, 'callback'>): () => void {

@@ -1,12 +1,12 @@
 import {nonNullish} from '@dfinity/utils';
 import {SignerErrorCode} from './constants/signer.constants';
 import {notifyError, notifyReady, notifySupportedStandards} from './handlers/signer.handlers';
-import {ICRC25_REQUEST_PERMISSIONS, IcrcWalletApproveMethod} from './types/icrc';
+import {ICRC25_REQUEST_PERMISSIONS, type IcrcWalletApproveMethod} from './types/icrc';
 import {
   IcrcWalletRequestPermissionsRequestSchema,
-  IcrcWalletScopesParams,
   IcrcWalletStatusRequestSchema,
-  IcrcWalletSupportedStandardsRequestSchema
+  IcrcWalletSupportedStandardsRequestSchema,
+  type IcrcWalletScopesParams
 } from './types/icrc-requests';
 import {RpcRequestSchema} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
@@ -22,7 +22,7 @@ export interface SignerParameters {}
 export class Signer {
   #walletOrigin: string | undefined | null;
 
-  #requestsPermissionsEvents: Observable<IcrcWalletScopesParams> =
+  readonly #requestsPermissionsEvents: Observable<IcrcWalletScopesParams> =
     new Observable<IcrcWalletScopesParams>();
 
   private constructor(_parameters: SignerParameters) {
