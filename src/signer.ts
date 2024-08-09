@@ -115,6 +115,9 @@ export class Signer {
     this.#walletOrigin = origin;
   }
 
+  /**
+   * TODO: to be documented when fully implemented.
+   */
   on = ({
     method,
     callback
@@ -127,7 +130,9 @@ export class Signer {
         return this.#requestsPermissionsEvents.subscribe({callback});
     }
 
-    throw new Error('TODO events not supported');
+    throw new Error(
+      'The specified method is not supported. Please ensure you are using a supported standard.'
+    );
   };
 
   /**
@@ -189,6 +194,7 @@ export class Signer {
     if (isRequestPermissionsRequest) {
       const {params} = requestPermissionsData;
       this.#requestsPermissionsEvents.next(params);
+      return {handled: true};
     }
 
     return {handled: false};
