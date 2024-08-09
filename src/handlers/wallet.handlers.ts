@@ -1,5 +1,5 @@
 import {DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS} from '../constants/core.constants';
-import {ICRC25_SUPPORTED_STANDARDS, ICRC29_STATUS} from '../types/icrc';
+import {ICRC25_SUPPORTED_STANDARDS, ICRC29_STATUS} from '../constants/icrc.constants';
 import type {
   IcrcWalletStatusRequest,
   IcrcWalletSupportedStandardsRequest

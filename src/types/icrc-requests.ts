@@ -3,9 +3,9 @@ import {
   ICRC25_PERMISSIONS,
   ICRC25_REQUEST_PERMISSIONS,
   ICRC25_SUPPORTED_STANDARDS,
-  ICRC29_STATUS,
-  IcrcWalletScopedMethodSchema
-} from './icrc';
+  ICRC29_STATUS
+} from '../constants/icrc.constants';
+import {IcrcWalletScopedMethodSchema} from './icrc';
 import {inferRpcRequestWithParamsSchema, inferRpcRequestWithoutParamsSchema} from './rpc';
 
 // icrc25_request_permissions

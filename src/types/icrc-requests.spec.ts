@@ -1,4 +1,4 @@
-import {ICRC27_ACCOUNTS} from './icrc';
+import {ICRC27_ACCOUNTS} from '../constants/icrc.constants';
 import {
   IcrcWalletPermissionsRequestSchema,
   IcrcWalletRequestPermissionsRequestSchema,
