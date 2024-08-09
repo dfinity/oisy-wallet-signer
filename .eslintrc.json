@@ -13,6 +13,7 @@
   },
   "rules": {
     "no-unused-vars": "off",
+    "symbol-description": "off",
     "@typescript-eslint/no-unused-vars": [
       "warn",
       {
@@ -20,6 +21,7 @@
         "varsIgnorePattern": "^_",
         "caughtErrorsIgnorePattern": "^_"
       }
-    ]
+    ],
+    "@typescript-eslint/array-type": ["error", {"default": "array"}]
   }
 }
