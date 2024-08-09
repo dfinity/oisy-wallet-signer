@@ -1,7 +1,7 @@
 import {afterEach, beforeEach, describe} from 'vitest';
+import {ICRC25_SUPPORTED_STANDARDS, ICRC29_STATUS} from './constants/icrc.constants';
 import {WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD} from './constants/wallet.constants';
 import * as walletHandlers from './handlers/wallet.handlers';
-import {ICRC25_SUPPORTED_STANDARDS, ICRC29_STATUS} from './types/icrc';
 import {IcrcSupportedStandardsResponseSchema} from './types/icrc-responses';
 import {JSON_RPC_VERSION_2, RpcResponseWithResultOrErrorSchema} from './types/rpc';
 import type {WalletOptions} from './types/wallet';

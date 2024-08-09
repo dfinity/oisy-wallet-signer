@@ -1,7 +1,8 @@
 import {nonNullish} from '@dfinity/utils';
+import {ICRC25_REQUEST_PERMISSIONS} from './constants/icrc.constants';
 import {SignerErrorCode} from './constants/signer.constants';
 import {notifyError, notifyReady, notifySupportedStandards} from './handlers/signer.handlers';
-import {ICRC25_REQUEST_PERMISSIONS, type IcrcWalletApproveMethod} from './types/icrc';
+import type {IcrcWalletApproveMethod} from './types/icrc';
 import {
   IcrcWalletRequestPermissionsRequestSchema,
   IcrcWalletStatusRequestSchema,
