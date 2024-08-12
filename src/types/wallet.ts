@@ -1,5 +1,10 @@
-import type {IcrcScopes, IcrcSupportedStandards} from './icrc-responses';
+import {z} from 'zod';
+import {IcrcScopesSchema, IcrcSupportedStandardsSchema} from './icrc-responses';
 
-export type WalletMessageEventData = Partial<IcrcSupportedStandards | IcrcScopes>;
+const WalletMessageEventDataSchema = z
+  .union([IcrcSupportedStandardsSchema, IcrcScopesSchema])
+  .optional();
+
+export type WalletMessageEventData = z.infer<typeof WalletMessageEventDataSchema>;
 
 export type WalletMessageEvent = MessageEvent<WalletMessageEventData | never>;
