@@ -104,11 +104,20 @@ describe('Wallet handlers', () => {
         }));
     });
 
-    it('should not bring the popup in front with focus', () => {
-      retryRequestStatus({popup, isReady, timeoutInMilliseconds: 120000, id: testId});
+    it('should not bring the popup in front with focus', async () =>
+      // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
+      new Promise<void>(async (resolve) => {
+        const retries = (30 * 1000) / DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS;
 
-      expect(focusMock).not.toHaveBeenCalled();
-    });
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        retryRequestStatus({popup, isReady, timeoutInMilliseconds: 30000, id: testId}).then(() => {
+          expect(focusMock).not.toHaveBeenCalled();
+
+          resolve();
+        });
+
+        await vi.advanceTimersByTimeAsync(retries * DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS);
+      }));
   });
 
   describe('requestSupportedStandards', () => {
