@@ -2,12 +2,9 @@
 	import { notSignedIn } from '$core/derived/auth.derived';
 	import { Signer } from '@dfinity/oisy-wallet-signer/signer';
 	import UserId from '$core/components/UserId.svelte';
-	import {
-		ICRC25_REQUEST_PERMISSIONS,
-		type IcrcRequestedScopes
-	} from '@dfinity/oisy-wallet-signer';
+	import ApprovePermissions from '$lib/ApprovePermissions.svelte';
 
-	let signer: Signer | undefined;
+	let signer: Signer | undefined = $state(undefined);
 
 	$effect(() => {
 		if ($notSignedIn) {
@@ -17,13 +14,6 @@
 
 		signer = Signer.init({});
 
-		signer.on({
-			method: ICRC25_REQUEST_PERMISSIONS,
-			callback: (data: IcrcRequestedScopes) => {
-				console.log('TODO: Handle permissions requests:', data);
-			}
-		});
-
 		return () => {
 			signer?.disconnect();
 		};
@@ -31,3 +21,5 @@
 </script>
 
 <UserId />
+
+<ApprovePermissions {signer} />
