@@ -1,22 +1,18 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
 	import { Wallet } from '@dfinity/oisy-wallet-signer/wallet';
-	import { isNullish, nonNullish } from '@dfinity/utils';
+	import { isNullish } from '@dfinity/utils';
 	import Button from '$core/components/Button.svelte';
 	import UserId from '$core/components/UserId.svelte';
-	import type { IcrcSupportedStandards } from '@dfinity/oisy-wallet-signer';
 	import Value from '$core/components/Value.svelte';
+	import SupportedStandards from '$lib/components/SupportedStandards.svelte';
 
 	let wallet: Wallet | undefined = $state(undefined);
-
-	let supportedStandards: IcrcSupportedStandards | undefined = $state(undefined);
 
 	const onclick = async () => {
 		wallet = await Wallet.connect({
 			url: 'http://localhost:5174'
 		});
-
-		supportedStandards = await wallet.supportedStandards();
 	};
 
 	$effect(() => {
@@ -39,12 +35,4 @@
 	</div>
 {/if}
 
-{#if nonNullish(supportedStandards)}
-	<Value id="supported-standards" testId="supported-standards" title="Supported standards">
-		<ul in:fade>
-			{#each supportedStandards as standard}
-				<li>{standard.name}</li>
-			{/each}
-		</ul>
-	</Value>
-{/if}
+<SupportedStandards {wallet} />
