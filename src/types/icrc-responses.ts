@@ -10,10 +10,12 @@ const IcrcScopeMethodSchema = z.object({
   method: IcrcWalletScopedMethodSchema
 });
 
-const IcrcScopeSchema = z.object({
-  scope: IcrcScopeMethodSchema,
-  state: IcrcWalletPermissionStateSchema
-});
+export const IcrcScopeSchema = z
+  .object({
+    scope: IcrcScopeMethodSchema,
+    state: IcrcWalletPermissionStateSchema
+  })
+  .strict();
 
 export type IcrcScope = z.infer<typeof IcrcScopeSchema>;
 

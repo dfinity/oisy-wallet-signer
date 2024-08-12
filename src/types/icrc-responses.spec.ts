@@ -1,6 +1,7 @@
 import {ICRC25_PERMISSION_GRANTED, ICRC27_ACCOUNTS} from '../constants/icrc.constants';
 import {
   IcrcReadyResponseSchema,
+  IcrcScopeSchema,
   IcrcScopesResponseSchema,
   IcrcSupportedStandardsResponseSchema,
   type IcrcReadyResponse,
@@ -156,6 +157,71 @@ describe('icrc-responses', () => {
       const response = rest;
 
       expect(() => schema.parse(response)).toThrow();
+    });
+  });
+
+  describe('IcrcScopeSchema', () => {
+    it('should validate a correct IcrcScope payload', () => {
+      const validPayload = {
+        scope: {
+          method: ICRC27_ACCOUNTS
+        },
+        state: ICRC25_PERMISSION_GRANTED
+      };
+
+      expect(() => IcrcScopeSchema.parse(validPayload)).not.toThrow();
+    });
+
+    it('should invalidate a payload with missing scope', () => {
+      const invalidPayload = {
+        state: ICRC25_PERMISSION_GRANTED
+      };
+
+      expect(() => IcrcScopeSchema.parse(invalidPayload)).toThrow();
+    });
+
+    it('should invalidate a payload with missing state', () => {
+      const invalidPayload = {
+        scope: {
+          method: ICRC27_ACCOUNTS
+        }
+      };
+
+      expect(() => IcrcScopeSchema.parse(invalidPayload)).toThrow();
+    });
+
+    it('should invalidate a payload with an incorrect method', () => {
+      const invalidPayload = {
+        scope: {
+          method: 'INVALID_METHOD'
+        },
+        state: ICRC25_PERMISSION_GRANTED
+      };
+
+      expect(() => IcrcScopeSchema.parse(invalidPayload)).toThrow();
+    });
+
+    it('should invalidate a payload with an incorrect state', () => {
+      const invalidPayload = {
+        scope: {
+          method: ICRC27_ACCOUNTS
+        },
+        state: 'INVALID_STATE'
+      };
+
+      expect(() => IcrcScopeSchema.parse(invalidPayload)).toThrow();
+    });
+
+    it('should invalidate a payload with additional fields', () => {
+      const invalidPayload = {
+        scope: {
+          method: ICRC27_ACCOUNTS
+        },
+        state: ICRC25_PERMISSION_GRANTED,
+        extraField: 'EXTRA' // Unwanted field
+      };
+
+      expect(() => IcrcScopeSchema.parse(invalidPayload)).toThrow();
     });
   });
 
