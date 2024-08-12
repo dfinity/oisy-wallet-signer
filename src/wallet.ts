@@ -313,7 +313,7 @@ export class Wallet {
   requestPermissions = async ({
     options = {},
     scopes
-  }: {options?: WalletRequestOptions} & Partial<IcrcRequestedScopes>): Promise<IcrcScopes> => {
+  }: {options?: WalletRequestOptions} & Partial<IcrcRequestedScopes> = {}): Promise<IcrcScopes> => {
     const handleMessage = async ({
       data,
       id

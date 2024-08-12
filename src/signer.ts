@@ -1,15 +1,24 @@
-import {nonNullish} from '@dfinity/utils';
+import {assertNonNullish, nonNullish} from '@dfinity/utils';
 import {ICRC25_REQUEST_PERMISSIONS} from './constants/icrc.constants';
-import {SIGNER_SUPPORTED_SCOPES, SignerErrorCode} from './constants/signer.constants';
-import {notifyError, notifyReady, notifySupportedStandards} from './handlers/signer.handlers';
-import type {IcrcWalletApproveMethod} from './types/icrc';
+import {SignerErrorCode} from './constants/signer.constants';
+import {
+  notifyApprovedPermissions,
+  notifyError,
+  notifyReady,
+  notifySupportedStandards
+} from './handlers/signer.handlers';
+import {
+  IcrcWalletPermissionStateSchema,
+  IcrcWalletScopedMethodSchema,
+  type IcrcWalletApproveMethod
+} from './types/icrc';
 import {
   IcrcRequestPermissionsRequestSchema,
   IcrcStatusRequestSchema,
   IcrcSupportedStandardsRequestSchema
 } from './types/icrc-requests';
-import type {IcrcScopes} from './types/icrc-responses';
-import {RpcRequestSchema} from './types/rpc';
+import type {IcrcScope} from './types/icrc-responses';
+import {RpcRequestSchema, type RpcId} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
 import {Observable} from './utils/observable';
 
@@ -23,7 +32,8 @@ export interface SignerParameters {}
 export class Signer {
   #walletOrigin: string | undefined | null;
 
-  readonly #requestsPermissionsEvents: Observable<IcrcScopes> = new Observable<IcrcScopes>();
+  readonly #requestsPermissionsEvents: Observable<{id: RpcId; scopes: IcrcScope[]}> =
+    new Observable<{id: RpcId; scopes: IcrcScope[]}>();
 
   private constructor(_parameters: SignerParameters) {
     window.addEventListener('message', this.onMessageListener);
@@ -123,7 +133,7 @@ export class Signer {
     callback
   }: {
     method: IcrcWalletApproveMethod;
-    callback: (data: IcrcScopes) => void;
+    callback: (data: {id: RpcId; scopes: IcrcScope[]}) => void;
   }): (() => void) => {
     switch (method) {
       case ICRC25_REQUEST_PERMISSIONS:
@@ -192,19 +202,34 @@ export class Signer {
 
     if (isRequestPermissionsRequest) {
       const {
+        id,
         params: {scopes: requestedScopes}
       } = requestPermissionsData;
 
-      const scopes = SIGNER_SUPPORTED_SCOPES.filter(
-        ({scope: {method}}) =>
-          requestedScopes.find(({method: requestedMethod}) => requestedMethod === method) !==
-          undefined
-      );
+      const scopes = requestedScopes
+        .filter(
+          ({method: requestedMethod}) =>
+            IcrcWalletScopedMethodSchema.safeParse(requestedMethod).success
+        )
+        .map(({method}) => ({
+          scope: {method},
+          state: IcrcWalletPermissionStateSchema.enum.denied
+        }));
 
-      this.#requestsPermissionsEvents.next({scopes});
+      this.#requestsPermissionsEvents.next({id, scopes});
       return {handled: true};
     }
 
     return {handled: false};
   }
+
+  approvePermissions = ({scopes, id}: {id: RpcId; scopes: IcrcScope[]}): void => {
+    assertNonNullish(this.#walletOrigin, "The relying party's origin is unknown.");
+
+    notifyApprovedPermissions({
+      id,
+      origin: this.#walletOrigin,
+      scopes
+    });
+  };
 }

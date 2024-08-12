@@ -37,6 +37,7 @@ export const retryRequestStatus = async ({
       method: ICRC29_STATUS
     };
 
+    // Since we are polling, we don't want to force the popup to the front in case the user has intentionally brought another window to the forefront.
     popup.postMessage(msg, '*');
   };
 
@@ -49,28 +50,30 @@ export const retryRequestStatus = async ({
   });
 };
 
-export const requestSupportedStandards = ({popup, id, origin}: Request): void => {
+export const requestSupportedStandards = ({id, ...rest}: Request): void => {
   const msg: IcrcSupportedStandardsRequest = {
     jsonrpc: JSON_RPC_VERSION_2,
     id,
     method: ICRC25_SUPPORTED_STANDARDS
   };
 
-  popup.postMessage(msg, origin);
+  postMsg({msg, ...rest});
 };
 
-export const requestPermissions = ({
-  popup,
-  id,
-  origin,
-  scopes
-}: Request & IcrcRequestedScopes): void => {
+export const requestPermissions = ({id, scopes, ...rest}: Request & IcrcRequestedScopes): void => {
   const msg: IcrcRequestPermissionsRequest = {
     jsonrpc: JSON_RPC_VERSION_2,
     id,
     method: ICRC25_REQUEST_PERMISSIONS,
     params: {scopes}
   };
+
+  postMsg({msg, ...rest});
+};
+
+const postMsg = <T>({popup, msg, origin}: {msg: T} & Pick<Request, 'origin' | 'popup'>): void => {
+  // We focus the popup to bring it to front.
+  popup.focus();
 
   popup.postMessage(msg, origin);
 };
