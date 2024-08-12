@@ -33,6 +33,4 @@ export const IcrcWalletPermissionStateSchema = z.enum([
   ICRC25_PERMISSION_ASK_ON_USE
 ]);
 
-export type IcrcWalletPermissionState = z.infer<typeof IcrcWalletPermissionStateSchema>;
-
 export const IcrcWalletStandardSchema = z.enum([ICRC25, ICRC27, ICRC29]);
