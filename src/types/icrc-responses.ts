@@ -23,17 +23,12 @@ const IcrcScopesSchema = z.object({
 
 export type IcrcScopes = z.infer<typeof IcrcScopesSchema>;
 
-// icrc25_request_permissions
+// icrc25_request_permissions and icrc25_permissions
 // https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_request_permissions
-export const IcrcRequestPermissionsResponseSchema = inferRpcResponseSchema(IcrcScopesSchema);
-
-export type IcrcRequestPermissionsResponse = z.infer<typeof IcrcRequestPermissionsResponseSchema>;
-
-// icrc25_permissions
 // https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_permissions
-export const IcrcPermissionsResponseSchema = IcrcRequestPermissionsResponseSchema;
+export const IcrcScopesResponseSchema = inferRpcResponseSchema(IcrcScopesSchema);
 
-export type IcrcPermissionsResponse = z.infer<typeof IcrcPermissionsResponseSchema>;
+export type IcrcScopesResponse = z.infer<typeof IcrcScopesResponseSchema>;
 
 // icrc25_supported_standards
 // https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_supported_standards

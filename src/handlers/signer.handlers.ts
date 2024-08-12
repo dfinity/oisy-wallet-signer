@@ -1,8 +1,8 @@
 import {SIGNER_SUPPORTED_STANDARDS} from '../constants/signer.constants';
 import type {
   IcrcReadyResponse,
-  IcrcRequestPermissionsResponse,
   IcrcScope,
+  IcrcScopesResponse,
   IcrcSupportedStandardsResponse
 } from '../types/icrc-responses';
 import {
@@ -40,12 +40,12 @@ export const notifySupportedStandards = ({id, origin}: Notify): void => {
   notify({msg, origin});
 };
 
-export const notifyApprovedPermissions = ({
+export const notifyPermissionScopes = ({
   id,
   origin,
   scopes
 }: Notify & {scopes: IcrcScope[]}): void => {
-  const msg: IcrcRequestPermissionsResponse = {
+  const msg: IcrcScopesResponse = {
     jsonrpc: JSON_RPC_VERSION_2,
     id,
     result: {scopes}
