@@ -1,7 +1,12 @@
-import {nonNullish} from '@dfinity/utils';
+import {assertNonNullish, nonNullish} from '@dfinity/utils';
 import {ICRC25_REQUEST_PERMISSIONS} from './constants/icrc.constants';
 import {SignerErrorCode} from './constants/signer.constants';
-import {notifyError, notifyReady, notifySupportedStandards} from './handlers/signer.handlers';
+import {
+  notifyError,
+  notifyPermissionScopes,
+  notifyReady,
+  notifySupportedStandards
+} from './handlers/signer.handlers';
 import {
   IcrcWalletPermissionStateSchema,
   IcrcWalletScopedMethodSchema,
@@ -218,4 +223,14 @@ export class Signer {
 
     return {handled: false};
   }
+
+  approvePermissions = ({scopes, requestId}: RequestPermissionPayload): void => {
+    assertNonNullish(this.#walletOrigin, "The relying party's origin is unknown.");
+
+    notifyPermissionScopes({
+      id: requestId,
+      origin: this.#walletOrigin,
+      scopes
+    });
+  };
 }
