@@ -1,5 +1,4 @@
 import {assertNonNullish, nonNullish, notEmptyString} from '@dfinity/utils';
-import {nanoid} from 'nanoid';
 import {
   WALLET_CONNECT_DEFAULT_TIMEOUT_IN_MILLISECONDS,
   WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD
@@ -111,7 +110,7 @@ export class Wallet {
         popup,
         isReady: (): ReadyOrError | 'pending' =>
           nonNullish(response) ? (response instanceof Wallet ? 'ready' : 'error') : 'pending',
-        id: nanoid(),
+        id: crypto.randomUUID(),
         timeoutInMilliseconds:
           connectionOptions?.timeoutInMilliseconds ??
           WALLET_CONNECT_DEFAULT_TIMEOUT_IN_MILLISECONDS,
@@ -196,7 +195,7 @@ export class Wallet {
       const timeoutInMilliseconds =
         userTimeoutInMilliseconds ?? WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD;
 
-      const requestId = userRequestId ?? nanoid();
+      const requestId = userRequestId ?? crypto.randomUUID();
 
       const timeoutId = setTimeout(() => {
         reject(
