@@ -7,7 +7,7 @@ export const ICRC29_STATUS = 'icrc29_status';
 
 export const ICRC25_PERMISSION_GRANTED = 'granted';
 export const ICRC25_PERMISSION_DENIED = 'denied';
-export const ICRC25_PERMISSION_ASK_ON_USE = 'ask_on_user';
+export const ICRC25_PERMISSION_ASK_ON_USE = 'ask_on_use';
 
 export const ICRC25 = 'ICRC-25';
 export const ICRC27 = 'ICRC-27';
