@@ -1,6 +1,15 @@
 import {DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS} from '../constants/core.constants';
-import {ICRC25_SUPPORTED_STANDARDS, ICRC29_STATUS} from '../constants/icrc.constants';
-import type {IcrcStatusRequest, IcrcSupportedStandardsRequest} from '../types/icrc-requests';
+import {
+  ICRC25_REQUEST_PERMISSIONS,
+  ICRC25_SUPPORTED_STANDARDS,
+  ICRC29_STATUS
+} from '../constants/icrc.constants';
+import type {
+  IcrcRequestPermissionsRequest,
+  IcrcRequestedScopes,
+  IcrcStatusRequest,
+  IcrcSupportedStandardsRequest
+} from '../types/icrc-requests';
 import {JSON_RPC_VERSION_2, type RpcId} from '../types/rpc';
 import {retryUntilReady, type ReadyOrError} from '../utils/timeout.utils';
 
@@ -46,6 +55,17 @@ export const requestSupportedStandards = ({id, ...rest}: Request): void => {
     jsonrpc: JSON_RPC_VERSION_2,
     id,
     method: ICRC25_SUPPORTED_STANDARDS
+  };
+
+  postMsg({msg, ...rest});
+};
+
+export const requestPermissions = ({id, scopes, ...rest}: Request & IcrcRequestedScopes): void => {
+  const msg: IcrcRequestPermissionsRequest = {
+    jsonrpc: JSON_RPC_VERSION_2,
+    id,
+    method: ICRC25_REQUEST_PERMISSIONS,
+    params: {scopes}
   };
 
   postMsg({msg, ...rest});
