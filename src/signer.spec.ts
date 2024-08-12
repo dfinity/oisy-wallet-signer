@@ -2,13 +2,16 @@ import type {MockInstance} from 'vitest';
 import {
   ICRC25_REQUEST_PERMISSIONS,
   ICRC25_SUPPORTED_STANDARDS,
-  ICRC29_STATUS
+  ICRC27_ACCOUNTS,
+  ICRC29_STATUS,
+  ICRC49_CALL_CANISTER
 } from './constants/icrc.constants';
 import {SIGNER_SUPPORTED_STANDARDS, SignerErrorCode} from './constants/signer.constants';
 import * as signerHandlers from './handlers/signer.handlers';
 import {Signer, type SignerParameters} from './signer';
 import {IcrcWalletPermissionStateSchema} from './types/icrc';
 import type {IcrcRequestPermissionsRequest} from './types/icrc-requests';
+import type {IcrcScope} from './types/icrc-responses';
 import {JSON_RPC_VERSION_2} from './types/rpc';
 import type {SignerMessageEventData} from './types/signer';
 
@@ -461,6 +464,83 @@ describe('Signer', () => {
       expect(spy).toHaveBeenCalledTimes(1);
 
       spy.mockClear();
+    });
+
+    describe('approve permission', () => {
+      let notifyReadySpy: MockInstance;
+
+      beforeEach(() => {
+        notifyReadySpy = vi.spyOn(signerHandlers, 'notifyReady');
+      });
+
+      const scopes: IcrcScope[] = [
+        {
+          scope: {
+            method: ICRC27_ACCOUNTS
+          },
+          state: 'granted'
+        },
+        {
+          scope: {
+            method: ICRC49_CALL_CANISTER
+          },
+          state: 'denied'
+        }
+      ];
+
+      const msg = {
+        data: {
+          id: 'test-987',
+          jsonrpc: JSON_RPC_VERSION_2,
+          method: {
+            scopes
+          }
+        },
+        origin: testOrigin
+      };
+
+      it('should throw error if origin of the relying party is not set', () => {
+        expect(() => {
+          signer.approvePermissions({
+            requestId: msg.data.id,
+            scopes
+          });
+        }).toThrowError("The relying party's origin is unknown.");
+      });
+
+      it('should notify scopes for selected permission', () => {
+        const messageEvent = new MessageEvent('message', {
+          data: {
+            id: testId,
+            jsonrpc: JSON_RPC_VERSION_2,
+            method: ICRC29_STATUS
+          },
+          origin: testOrigin
+        });
+
+        window.dispatchEvent(messageEvent);
+
+        expect(notifyReadySpy).toHaveBeenCalledWith({
+          id: testId,
+          origin: testOrigin
+        });
+
+        signer.approvePermissions({
+          requestId: msg.data.id,
+          scopes
+        });
+
+        expect(postMessageMock).toHaveBeenCalledWith(
+          {
+            jsonrpc: JSON_RPC_VERSION_2,
+            id: msg.data.id,
+            result: {
+              scopes
+            }
+          },
+          testOrigin
+        );
+      });
     });
   });
 });
