@@ -1,8 +1,19 @@
 import type {Mock} from 'vitest';
+import {ICRC27_ACCOUNTS} from '../constants/icrc.constants';
 import {SIGNER_SUPPORTED_STANDARDS, SignerErrorCode} from '../constants/signer.constants';
-import type {IcrcReadyResponse, IcrcSupportedStandardsResponse} from '../types/icrc-responses';
+import type {
+  IcrcReadyResponse,
+  IcrcScope,
+  IcrcScopesResponse,
+  IcrcSupportedStandardsResponse
+} from '../types/icrc-responses';
 import {JSON_RPC_VERSION_2, type RpcId, type RpcResponseWithError} from '../types/rpc';
-import {notifyError, notifyReady, notifySupportedStandards} from './signer.handlers';
+import {
+  notifyError,
+  notifyPermissionScopes,
+  notifyReady,
+  notifySupportedStandards
+} from './signer.handlers';
 
 describe('Signer handlers', () => {
   const id: RpcId = 'test-123';
@@ -68,6 +79,31 @@ describe('Signer handlers', () => {
         id,
         result: {
           supportedStandards: SIGNER_SUPPORTED_STANDARDS
+        }
+      };
+
+      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
+    });
+  });
+
+  describe('notifyPermissionScopes', () => {
+    it('should post a message with the msg', () => {
+      const scopes: IcrcScope[] = [
+        {
+          scope: {
+            method: ICRC27_ACCOUNTS
+          },
+          state: 'granted'
+        }
+      ];
+
+      notifyPermissionScopes({id, origin, scopes});
+
+      const expectedMessage: IcrcScopesResponse = {
+        jsonrpc: JSON_RPC_VERSION_2,
+        id,
+        result: {
+          scopes
         }
       };
 
