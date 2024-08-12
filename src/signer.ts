@@ -2,15 +2,20 @@ import {nonNullish} from '@dfinity/utils';
 import {ICRC25_REQUEST_PERMISSIONS} from './constants/icrc.constants';
 import {SignerErrorCode} from './constants/signer.constants';
 import {notifyError, notifyReady, notifySupportedStandards} from './handlers/signer.handlers';
-import type {IcrcWalletApproveMethod} from './types/icrc';
+import {
+  IcrcWalletPermissionStateSchema,
+  IcrcWalletScopedMethodSchema,
+  type IcrcWalletApproveMethod
+} from './types/icrc';
 import {
   IcrcRequestPermissionsRequestSchema,
   IcrcStatusRequestSchema,
-  IcrcSupportedStandardsRequestSchema,
-  type IcrcRequestedScopes
+  IcrcSupportedStandardsRequestSchema
 } from './types/icrc-requests';
+import type {IcrcScopes} from './types/icrc-responses';
 import {RpcRequestSchema} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
+import type {RequestPermissionPayload} from './types/signer-subscribers';
 import {Observable} from './utils/observable';
 
 /**
@@ -23,8 +28,8 @@ export interface SignerParameters {}
 export class Signer {
   #walletOrigin: string | undefined | null;
 
-  readonly #requestsPermissionsEvents: Observable<IcrcRequestedScopes> =
-    new Observable<IcrcRequestedScopes>();
+  readonly #requestsPermissionsSubscribers: Observable<RequestPermissionPayload> =
+    new Observable<RequestPermissionPayload>();
 
   private constructor(_parameters: SignerParameters) {
     window.addEventListener('message', this.onMessageListener);
@@ -124,11 +129,11 @@ export class Signer {
     callback
   }: {
     method: IcrcWalletApproveMethod;
-    callback: (data: IcrcRequestedScopes) => void;
+    callback: (data: IcrcScopes) => void;
   }): (() => void) => {
     switch (method) {
       case ICRC25_REQUEST_PERMISSIONS:
-        return this.#requestsPermissionsEvents.subscribe({callback});
+        return this.#requestsPermissionsSubscribers.subscribe({callback});
     }
 
     throw new Error(
@@ -192,8 +197,22 @@ export class Signer {
       IcrcRequestPermissionsRequestSchema.safeParse(data);
 
     if (isRequestPermissionsRequest) {
-      const {params} = requestPermissionsData;
-      this.#requestsPermissionsEvents.next(params);
+      const {
+        id: requestId,
+        params: {scopes: requestedScopes}
+      } = requestPermissionsData;
+
+      const scopes = requestedScopes
+        .filter(
+          ({method: requestedMethod}) =>
+            IcrcWalletScopedMethodSchema.safeParse(requestedMethod).success
+        )
+        .map(({method}) => ({
+          scope: {method},
+          state: IcrcWalletPermissionStateSchema.enum.denied
+        }));
+
+      this.#requestsPermissionsSubscribers.next({requestId, scopes});
       return {handled: true};
     }
 

@@ -7,6 +7,7 @@ import {
 import {SIGNER_SUPPORTED_STANDARDS, SignerErrorCode} from './constants/signer.constants';
 import * as signerHandlers from './handlers/signer.handlers';
 import {Signer, type SignerParameters} from './signer';
+import {IcrcWalletPermissionStateSchema} from './types/icrc';
 import type {IcrcRequestPermissionsRequest} from './types/icrc-requests';
 import {JSON_RPC_VERSION_2} from './types/rpc';
 import type {SignerMessageEventData} from './types/signer';
@@ -363,7 +364,50 @@ describe('Signer', () => {
         const messageEvent = new MessageEvent('message', requestPermissionsMsg);
         window.dispatchEvent(messageEvent);
 
-        expect(spy).toHaveBeenNthCalledWith(1, requestPermissionsData.params);
+        expect(spy).toHaveBeenNthCalledWith(1, {
+          requestId: requestPermissionsData.id,
+          scopes: requestPermissionsData.params.scopes.map((scope) => ({
+            scope: {...scope},
+            state: IcrcWalletPermissionStateSchema.enum.denied
+          }))
+        });
+
+        spy.mockClear();
+      });
+
+      // TODO: does not work currently as invalid scopes does not match the zod schema of IcrcRequestPermissionsRequestSchema
+      it.skip('should filter the supported scopes on request permissions', () => {
+        const spy = vi.fn();
+
+        signer.on({
+          method: ICRC25_REQUEST_PERMISSIONS,
+          callback: spy
+        });
+
+        const requestPermissionsMsg = {
+          data: {
+            ...requestPermissionsData,
+            params: {
+              scopes: [
+                ...requestPermissionsData.params.scopes,
+                {method: 'icrc25_request_permissions'},
+                {method: 'icrc25_permissions'}
+              ]
+            }
+          },
+          origin: testOrigin
+        };
+
+        const messageEvent = new MessageEvent('message', requestPermissionsMsg);
+        window.dispatchEvent(messageEvent);
+
+        expect(spy).toHaveBeenNthCalledWith(1, {
+          requestId: requestPermissionsData.id,
+          scopes: requestPermissionsData.params.scopes.map((scope) => ({
+            scope: {...scope},
+            state: IcrcWalletPermissionStateSchema.enum.denied
+          }))
+        });
 
         spy.mockClear();
       });
