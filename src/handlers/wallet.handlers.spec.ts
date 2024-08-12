@@ -1,18 +1,25 @@
 import {DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS} from '../constants/core.constants';
+import {ICRC25_SUPPORTED_STANDARDS} from '../constants/icrc.constants';
+import {JSON_RPC_VERSION_2} from '../types/rpc';
 import type {ReadyOrError} from '../utils/timeout.utils';
-import {retryRequestStatus} from './wallet.handlers';
+import {requestSupportedStandards, retryRequestStatus} from './wallet.handlers';
 
 describe('Wallet handlers', () => {
   const testId = '1234_test';
+  const testOrigin = 'https://hello.com';
 
   let popup: Window;
   let isReady: () => ReadyOrError | 'pending';
+
+  const focusMock = vi.fn();
+  const postMessageMock = vi.fn();
 
   beforeEach(() => {
     vi.useFakeTimers();
 
     popup = {
-      postMessage: vi.fn()
+      focus: focusMock,
+      postMessage: postMessageMock
     } as unknown as Window;
   });
 
@@ -21,76 +28,107 @@ describe('Wallet handlers', () => {
     vi.clearAllMocks();
   });
 
-  describe('Success', () => {
-    beforeEach(() => {
-      let counter = 0;
-      isReady = vi.fn(() => {
-        counter++;
-        return counter > 1 ? 'ready' : 'pending';
+  describe('retryRequestStatus', () => {
+    describe('Success', () => {
+      beforeEach(() => {
+        let counter = 0;
+        isReady = vi.fn(() => {
+          counter++;
+          return counter > 1 ? 'ready' : 'pending';
+        });
       });
+
+      it('should call icrc29_status postMessage and returns ready', async () =>
+        // eslint-disable-next-line @typescript-eslint/return-await
+        new Promise<void>((resolve) => {
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
+          retryRequestStatus({popup, isReady, timeoutInMilliseconds: 120000, id: testId}).then(
+            (result) => {
+              // eslint-disable-next-line @typescript-eslint/unbound-method
+              expect(postMessageMock).toHaveBeenCalledWith(
+                {
+                  id: testId,
+                  jsonrpc: '2.0',
+                  method: 'icrc29_status'
+                },
+                '*'
+              );
+
+              expect(result).toEqual('ready');
+
+              resolve();
+            }
+          );
+
+          vi.advanceTimersByTime(1000);
+        }));
     });
 
-    it('should call icrc29_status postMessage and returns ready', async () =>
-      // eslint-disable-next-line @typescript-eslint/return-await
-      new Promise<void>((resolve) => {
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        retryRequestStatus({popup, isReady, timeoutInMilliseconds: 120000, id: testId}).then(
-          (result) => {
-            // eslint-disable-next-line @typescript-eslint/unbound-method
-            expect(popup.postMessage).toHaveBeenCalledWith(
-              {
-                id: testId,
-                jsonrpc: '2.0',
-                method: 'icrc29_status'
-              },
-              '*'
-            );
+    describe('Pending', () => {
+      beforeEach(() => {
+        isReady = vi.fn(() => 'pending');
+      });
 
-            expect(result).toEqual('ready');
+      it('should timeout after 30 seconds', async () =>
+        // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
+        new Promise<void>(async (resolve) => {
+          const retries = (30 * 1000) / DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS;
 
-            resolve();
-          }
-        );
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
+          retryRequestStatus({popup, isReady, timeoutInMilliseconds: 30000, id: testId}).then(
+            (result) => {
+              expect(result).toEqual('timeout');
 
-        vi.advanceTimersByTime(1000);
-      }));
+              resolve();
+            }
+          );
+
+          await vi.advanceTimersByTimeAsync(retries * DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS);
+        }));
+
+      it('should poll ready function', async () =>
+        // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
+        new Promise<void>(async (resolve) => {
+          const retries = (30 * 1000) / DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS;
+
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
+          retryRequestStatus({popup, isReady, timeoutInMilliseconds: 30000, id: testId}).then(
+            () => {
+              expect(isReady).toHaveBeenCalledTimes(retries);
+
+              resolve();
+            }
+          );
+
+          await vi.advanceTimersByTimeAsync(retries * DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS);
+        }));
+    });
+
+    it('should not bring the popup in front with focus', () => {
+      retryRequestStatus({popup, isReady, timeoutInMilliseconds: 120000, id: testId});
+
+      expect(focusMock).not.toHaveBeenCalled();
+    });
   });
 
-  describe('Pending', () => {
-    beforeEach(() => {
-      isReady = vi.fn(() => 'pending');
+  describe('requestSupportedStandards', () => {
+    it('should send the correct message to the popup', () => {
+      requestSupportedStandards({id: testId, popup, origin: testOrigin});
+
+      expect(postMessageMock).toHaveBeenCalledWith(
+        {
+          jsonrpc: JSON_RPC_VERSION_2,
+          id: testId,
+          method: ICRC25_SUPPORTED_STANDARDS
+        },
+        testOrigin
+      );
     });
 
-    it('should timeout after 30 seconds', async () =>
-      // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
-      new Promise<void>(async (resolve) => {
-        const retries = (30 * 1000) / DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS;
+    it('should bring the popup in front with focus', () => {
+      requestSupportedStandards({id: testId, popup, origin: testOrigin});
 
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        retryRequestStatus({popup, isReady, timeoutInMilliseconds: 30000, id: testId}).then(
-          (result) => {
-            expect(result).toEqual('timeout');
-
-            resolve();
-          }
-        );
-
-        await vi.advanceTimersByTimeAsync(retries * DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS);
-      }));
-
-    it('should poll ready function', async () =>
-      // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
-      new Promise<void>(async (resolve) => {
-        const retries = (30 * 1000) / DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS;
-
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        retryRequestStatus({popup, isReady, timeoutInMilliseconds: 30000, id: testId}).then(() => {
-          expect(isReady).toHaveBeenCalledTimes(retries);
-
-          resolve();
-        });
-
-        await vi.advanceTimersByTimeAsync(retries * DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS);
-      }));
+      expect(focusMock).toHaveBeenCalledTimes(1);
+    });
   });
 });
