@@ -4,7 +4,7 @@
 	import UserId from '$core/components/UserId.svelte';
 	import ApprovePermissions from '$lib/ApprovePermissions.svelte';
 
-	let signer: Signer | undefined;
+	let signer: Signer | undefined = $state(undefined);
 
 	$effect(() => {
 		if ($notSignedIn) {
