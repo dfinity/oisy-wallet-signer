@@ -1,10 +1,14 @@
 import {DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS} from '../constants/core.constants';
-import {ICRC25_REQUEST_PERMISSIONS, ICRC25_SUPPORTED_STANDARDS, ICRC29_STATUS} from '../constants/icrc.constants';
+import {
+  ICRC25_REQUEST_PERMISSIONS,
+  ICRC25_SUPPORTED_STANDARDS,
+  ICRC29_STATUS
+} from '../constants/icrc.constants';
 import type {
-    IcrcRequestedScopes,
-    IcrcRequestPermissionsRequest,
-    IcrcStatusRequest,
-    IcrcSupportedStandardsRequest
+  IcrcRequestPermissionsRequest,
+  IcrcRequestedScopes,
+  IcrcStatusRequest,
+  IcrcSupportedStandardsRequest
 } from '../types/icrc-requests';
 import {JSON_RPC_VERSION_2, type RpcId} from '../types/rpc';
 import {retryUntilReady, type ReadyOrError} from '../utils/timeout.utils';
@@ -53,23 +57,23 @@ export const requestSupportedStandards = ({id, ...rest}: Request): void => {
     method: ICRC25_SUPPORTED_STANDARDS
   };
 
-    postMsg({msg, ...rest});
+  postMsg({msg, ...rest});
 };
 
 export const requestPermissions = ({id, scopes, ...rest}: Request & IcrcRequestedScopes): void => {
-    const msg: IcrcRequestPermissionsRequest = {
-        jsonrpc: JSON_RPC_VERSION_2,
-        id,
-        method: ICRC25_REQUEST_PERMISSIONS,
-        params: {scopes}
-    };
+  const msg: IcrcRequestPermissionsRequest = {
+    jsonrpc: JSON_RPC_VERSION_2,
+    id,
+    method: ICRC25_REQUEST_PERMISSIONS,
+    params: {scopes}
+  };
 
-    postMsg({msg, ...rest});
+  postMsg({msg, ...rest});
 };
 
 const postMsg = <T>({popup, msg, origin}: {msg: T} & Pick<Request, 'origin' | 'popup'>): void => {
-    // We focus the popup to bring it to front.
-    popup.focus();
+  // We focus the popup to bring it to front.
+  popup.focus();
 
-    popup.postMessage(msg, origin);
+  popup.postMessage(msg, origin);
 };
