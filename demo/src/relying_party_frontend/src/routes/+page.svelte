@@ -11,12 +11,16 @@
 
 	let supportedStandards: IcrcSupportedStandards | undefined = $state(undefined);
 
-	const onclick = async () => {
+	const onConnect = async () => {
 		wallet = await Wallet.connect({
 			url: 'http://localhost:5174'
 		});
 
 		supportedStandards = await wallet.supportedStandards();
+	};
+
+	const onRequestPermissions = async () => {
+		await wallet?.requestPermissions({});
 	};
 
 	$effect(() => {
@@ -30,7 +34,7 @@
 
 {#if isNullish(wallet)}
 	<div class="pt-6">
-		<Button {onclick} testId="connect-wallet-button">Connect Wallet</Button>
+		<Button onclick={onConnect} testId="connect-wallet-button">Connect Wallet</Button>
 	</div>
 {:else}
 	<div in:fade>
@@ -47,4 +51,12 @@
 			{/each}
 		</ul>
 	</Value>
+{/if}
+
+{#if nonNullish(wallet)}
+	<div class="pt-6" in:fade>
+		<Button onclick={onRequestPermissions} testId="request-permissions-button"
+			>Request permissions</Button
+		>
+	</div>
 {/if}

@@ -1,4 +1,5 @@
-import type {IcrcSupportedStandards} from '../types/icrc-responses';
+import type {IcrcScope, IcrcSupportedStandards} from '../types/icrc-responses';
+import {ICRC25_PERMISSION_ASK_ON_USE, ICRC27_ACCOUNTS} from './icrc.constants';
 
 export enum SignerErrorCode {
   /**
@@ -16,5 +17,18 @@ export const SIGNER_SUPPORTED_STANDARDS: IcrcSupportedStandards = [
   {
     name: 'ICRC-25',
     url: 'https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-25/ICRC-25.md'
+  },
+  {
+    name: 'ICRC-27',
+    url: 'https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-27/ICRC-27.md'
+  }
+];
+
+export const SIGNER_SUPPORTED_SCOPES: IcrcScope[] = [
+  {
+    scope: {
+      method: ICRC27_ACCOUNTS
+    },
+    state: ICRC25_PERMISSION_ASK_ON_USE
   }
 ];

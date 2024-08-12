@@ -1,14 +1,14 @@
 import {nonNullish} from '@dfinity/utils';
 import {ICRC25_REQUEST_PERMISSIONS} from './constants/icrc.constants';
-import {SignerErrorCode} from './constants/signer.constants';
+import {SIGNER_SUPPORTED_SCOPES, SignerErrorCode} from './constants/signer.constants';
 import {notifyError, notifyReady, notifySupportedStandards} from './handlers/signer.handlers';
 import type {IcrcWalletApproveMethod} from './types/icrc';
 import {
   IcrcRequestPermissionsRequestSchema,
   IcrcStatusRequestSchema,
-  IcrcSupportedStandardsRequestSchema,
-  type IcrcRequestedScopes
+  IcrcSupportedStandardsRequestSchema
 } from './types/icrc-requests';
+import type {IcrcScopes} from './types/icrc-responses';
 import {RpcRequestSchema} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
 import {Observable} from './utils/observable';
@@ -23,8 +23,7 @@ export interface SignerParameters {}
 export class Signer {
   #walletOrigin: string | undefined | null;
 
-  readonly #requestsPermissionsEvents: Observable<IcrcRequestedScopes> =
-    new Observable<IcrcRequestedScopes>();
+  readonly #requestsPermissionsEvents: Observable<IcrcScopes> = new Observable<IcrcScopes>();
 
   private constructor(_parameters: SignerParameters) {
     window.addEventListener('message', this.onMessageListener);
@@ -124,7 +123,7 @@ export class Signer {
     callback
   }: {
     method: IcrcWalletApproveMethod;
-    callback: (data: IcrcRequestedScopes) => void;
+    callback: (data: IcrcScopes) => void;
   }): (() => void) => {
     switch (method) {
       case ICRC25_REQUEST_PERMISSIONS:
@@ -192,8 +191,17 @@ export class Signer {
       IcrcRequestPermissionsRequestSchema.safeParse(data);
 
     if (isRequestPermissionsRequest) {
-      const {params} = requestPermissionsData;
-      this.#requestsPermissionsEvents.next(params);
+      const {
+        params: {scopes: requestedScopes}
+      } = requestPermissionsData;
+
+      const scopes = SIGNER_SUPPORTED_SCOPES.filter(
+        ({scope: {method}}) =>
+          requestedScopes.find(({method: requestedMethod}) => requestedMethod === method) !==
+          undefined
+      );
+
+      this.#requestsPermissionsEvents.next({scopes});
       return {handled: true};
     }
 

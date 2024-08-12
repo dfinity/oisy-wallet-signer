@@ -10,4 +10,5 @@ export const ICRC25_PERMISSION_DENIED = 'denied';
 export const ICRC25_PERMISSION_ASK_ON_USE = 'ask_on_user';
 
 export const ICRC25 = 'ICRC-25';
+export const ICRC27 = 'ICRC-27';
 export const ICRC29 = 'ICRC-29';

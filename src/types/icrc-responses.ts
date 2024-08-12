@@ -6,15 +6,17 @@ import {
 } from './icrc';
 import {inferRpcResponseSchema} from './rpc';
 
+const IcrcScopeSchema = z.object({
+  scope: z.object({
+    method: IcrcWalletScopedMethodSchema
+  }),
+  state: IcrcWalletPermissionStateSchema
+});
+
+export type IcrcScope = z.infer<typeof IcrcScopeSchema>;
+
 const IcrcScopesSchema = z.object({
-  scopes: z.array(
-    z.object({
-      scope: z.object({
-        method: IcrcWalletScopedMethodSchema
-      }),
-      state: IcrcWalletPermissionStateSchema
-    })
-  )
+  scopes: z.array(IcrcScopeSchema)
 });
 
 export type IcrcScopes = z.infer<typeof IcrcScopesSchema>;
