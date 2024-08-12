@@ -1,8 +1,11 @@
 import {ICRC25_PERMISSION_GRANTED, ICRC27_ACCOUNTS} from '../constants/icrc.constants';
 import {
   IcrcReadyResponseSchema,
+  IcrcScopeSchema,
   IcrcScopesResponseSchema,
+  IcrcScopesSchema,
   IcrcSupportedStandardsResponseSchema,
+  IcrcSupportedStandardsSchema,
   type IcrcReadyResponse,
   type IcrcSupportedStandardsResponse
 } from './icrc-responses';
@@ -156,6 +159,182 @@ describe('icrc-responses', () => {
       const response = rest;
 
       expect(() => schema.parse(response)).toThrow();
+    });
+  });
+
+  describe('IcrcScopeSchema', () => {
+    it('should validate a correct IcrcScope payload', () => {
+      const validPayload = {
+        scope: {
+          method: ICRC27_ACCOUNTS
+        },
+        state: ICRC25_PERMISSION_GRANTED
+      };
+
+      expect(() => IcrcScopeSchema.parse(validPayload)).not.toThrow();
+    });
+
+    it('should invalidate a payload with missing scope', () => {
+      const invalidPayload = {
+        state: ICRC25_PERMISSION_GRANTED
+      };
+
+      expect(() => IcrcScopeSchema.parse(invalidPayload)).toThrow();
+    });
+
+    it('should invalidate a payload with missing state', () => {
+      const invalidPayload = {
+        scope: {
+          method: ICRC27_ACCOUNTS
+        }
+      };
+
+      expect(() => IcrcScopeSchema.parse(invalidPayload)).toThrow();
+    });
+
+    it('should invalidate a payload with an incorrect method', () => {
+      const invalidPayload = {
+        scope: {
+          method: 'INVALID_METHOD'
+        },
+        state: ICRC25_PERMISSION_GRANTED
+      };
+
+      expect(() => IcrcScopeSchema.parse(invalidPayload)).toThrow();
+    });
+
+    it('should invalidate a payload with an incorrect state', () => {
+      const invalidPayload = {
+        scope: {
+          method: ICRC27_ACCOUNTS
+        },
+        state: 'INVALID_STATE'
+      };
+
+      expect(() => IcrcScopeSchema.parse(invalidPayload)).toThrow();
+    });
+
+    it('should invalidate a payload with additional fields', () => {
+      const invalidPayload = {
+        scope: {
+          method: ICRC27_ACCOUNTS
+        },
+        state: ICRC25_PERMISSION_GRANTED,
+        extraField: 'EXTRA' // Unwanted field
+      };
+
+      expect(() => IcrcScopeSchema.parse(invalidPayload)).toThrow();
+    });
+  });
+
+  describe('IcrcScopesSchema', () => {
+    it('should validate a correct IcrcScopes payload', () => {
+      const validPayload = {
+        scopes: [
+          {
+            scope: {method: ICRC27_ACCOUNTS},
+            state: ICRC25_PERMISSION_GRANTED
+          }
+        ]
+      };
+
+      expect(() => IcrcScopesSchema.parse(validPayload)).not.toThrow();
+    });
+
+    it('should validate a payload with an empty scopes array', () => {
+      const invalidPayload = {
+        scopes: []
+      };
+
+      expect(() => IcrcScopesSchema.parse(invalidPayload)).not.toThrow();
+    });
+
+    it('should invalidate a payload with missing scopes property', () => {
+      const invalidPayload = {};
+
+      expect(() => IcrcScopesSchema.parse(invalidPayload)).toThrow();
+    });
+
+    it('should invalidate a payload with incorrect scope structure', () => {
+      const invalidPayload = {
+        scopes: [
+          {scope: {method: 123}} // Invalid method type}
+        ]
+      };
+
+      expect(() => IcrcScopesSchema.parse(invalidPayload)).toThrow();
+    });
+
+    it('should invalidate a payload with extra fields', () => {
+      const invalidPayload = {
+        scopes: [
+          {
+            scope: {method: ICRC27_ACCOUNTS},
+            state: ICRC25_PERMISSION_GRANTED
+          }
+        ],
+        extraField: 'unexpected'
+      };
+
+      expect(() => IcrcScopesSchema.parse(invalidPayload)).toThrow();
+    });
+  });
+
+  describe('IcrcSupportedStandardsSchema', () => {
+    it('should validate a correct array of standards', () => {
+      const validPayload = [
+        {
+          name: 'ICRC-25',
+          url: 'https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-25/ICRC-25.md'
+        }
+      ];
+
+      expect(() => IcrcSupportedStandardsSchema.parse(validPayload)).not.toThrow();
+    });
+
+    it('should invalidate an empty array', () => {
+      const invalidPayload: unknown = [];
+
+      expect(() => IcrcSupportedStandardsSchema.parse(invalidPayload)).toThrow();
+    });
+
+    it('should invalidate a payload with an invalid URL', () => {
+      const invalidPayload = [{name: 'ICRC-27', url: 'invalid-url'}];
+
+      expect(() => IcrcSupportedStandardsSchema.parse(invalidPayload)).toThrow();
+    });
+
+    it('should invalidate a payload with missing name', () => {
+      const invalidPayload = [
+        {
+          url: 'https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-25/ICRC-25.md'
+        }
+      ];
+
+      expect(() => IcrcSupportedStandardsSchema.parse(invalidPayload)).toThrow();
+    });
+
+    it('should invalidate a payload with extra fields', () => {
+      const invalidPayload = [
+        {
+          name: 'ICRC-25',
+          url: 'https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-25/ICRC-25.md',
+          extra: 'field'
+        }
+      ];
+
+      expect(() => IcrcSupportedStandardsSchema.parse(invalidPayload)).toThrow();
+    });
+
+    it('should invalidate a payload with incorrect name type', () => {
+      const invalidPayload = [
+        {
+          name: 'test',
+          url: 'https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-25/ICRC-25.md'
+        }
+      ];
+
+      expect(() => IcrcSupportedStandardsSchema.parse(invalidPayload)).toThrow();
     });
   });
 

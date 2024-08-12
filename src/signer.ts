@@ -17,9 +17,10 @@ import {
   IcrcStatusRequestSchema,
   IcrcSupportedStandardsRequestSchema
 } from './types/icrc-requests';
-import type {IcrcScope} from './types/icrc-responses';
-import {RpcRequestSchema, type RpcId} from './types/rpc';
+import type {IcrcScopes} from './types/icrc-responses';
+import {RpcRequestSchema} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
+import type {RequestPermissionPayload} from './types/signer-subscribers';
 import {Observable} from './utils/observable';
 
 /**
@@ -32,8 +33,8 @@ export interface SignerParameters {}
 export class Signer {
   #walletOrigin: string | undefined | null;
 
-  readonly #requestsPermissionsEvents: Observable<{id: RpcId; scopes: IcrcScope[]}> =
-    new Observable<{id: RpcId; scopes: IcrcScope[]}>();
+  readonly #requestsPermissionsSubscribers: Observable<RequestPermissionPayload> =
+    new Observable<RequestPermissionPayload>();
 
   private constructor(_parameters: SignerParameters) {
     window.addEventListener('message', this.onMessageListener);
@@ -133,11 +134,11 @@ export class Signer {
     callback
   }: {
     method: IcrcWalletApproveMethod;
-    callback: (data: {id: RpcId; scopes: IcrcScope[]}) => void;
+    callback: (data: IcrcScopes) => void;
   }): (() => void) => {
     switch (method) {
       case ICRC25_REQUEST_PERMISSIONS:
-        return this.#requestsPermissionsEvents.subscribe({callback});
+        return this.#requestsPermissionsSubscribers.subscribe({callback});
     }
 
     throw new Error(
@@ -202,7 +203,7 @@ export class Signer {
 
     if (isRequestPermissionsRequest) {
       const {
-        id,
+        id: requestId,
         params: {scopes: requestedScopes}
       } = requestPermissionsData;
 
@@ -216,18 +217,18 @@ export class Signer {
           state: IcrcWalletPermissionStateSchema.enum.denied
         }));
 
-      this.#requestsPermissionsEvents.next({id, scopes});
+      this.#requestsPermissionsSubscribers.next({requestId, scopes});
       return {handled: true};
     }
 
     return {handled: false};
   }
 
-  approvePermissions = ({scopes, id}: {id: RpcId; scopes: IcrcScope[]}): void => {
+  approvePermissions = ({scopes, requestId}: RequestPermissionPayload): void => {
     assertNonNullish(this.#walletOrigin, "The relying party's origin is unknown.");
 
     notifyPermissionScopes({
-      id,
+      id: requestId,
       origin: this.#walletOrigin,
       scopes
     });

@@ -10,16 +10,20 @@ const IcrcScopeMethodSchema = z.object({
   method: IcrcWalletScopedMethodSchema
 });
 
-const IcrcScopeSchema = z.object({
-  scope: IcrcScopeMethodSchema,
-  state: IcrcWalletPermissionStateSchema
-});
+export const IcrcScopeSchema = z
+  .object({
+    scope: IcrcScopeMethodSchema,
+    state: IcrcWalletPermissionStateSchema
+  })
+  .strict();
 
 export type IcrcScope = z.infer<typeof IcrcScopeSchema>;
 
-const IcrcScopesSchema = z.object({
-  scopes: z.array(IcrcScopeSchema)
-});
+export const IcrcScopesSchema = z
+  .object({
+    scopes: z.array(IcrcScopeSchema)
+  })
+  .strict();
 
 export type IcrcScopes = z.infer<typeof IcrcScopesSchema>;
 
@@ -56,12 +60,14 @@ const UrlSchema = z
     }
   );
 
-const IcrcSupportedStandardsSchema = z
+export const IcrcSupportedStandardsSchema = z
   .array(
-    z.object({
-      name: IcrcWalletStandardSchema,
-      url: UrlSchema
-    })
+    z
+      .object({
+        name: IcrcWalletStandardSchema,
+        url: UrlSchema
+      })
+      .strict()
   )
   .min(1);
 
