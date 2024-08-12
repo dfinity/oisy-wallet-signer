@@ -3,6 +3,7 @@ import {
   ICRC25_PERMISSIONS,
   ICRC25_REQUEST_PERMISSIONS,
   ICRC25_SUPPORTED_STANDARDS,
+  ICRC27,
   ICRC27_ACCOUNTS,
   ICRC29,
   ICRC29_STATUS
@@ -133,6 +134,10 @@ describe('icrc', () => {
     {
       title: 'ICRC25',
       validEnum: ICRC25
+    },
+    {
+      title: 'ICRC27',
+      validEnum: ICRC27
     },
     {
       title: 'ICRC29',
