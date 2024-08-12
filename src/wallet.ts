@@ -12,7 +12,7 @@ import {
 import type {IcrcRequestedScopes} from './types/icrc-requests';
 import {
   IcrcReadyResponseSchema,
-  IcrcRequestPermissionsResponseSchema,
+  IcrcScopesResponseSchema,
   IcrcSupportedStandardsResponseSchema,
   type IcrcScopes,
   type IcrcSupportedStandards
@@ -321,7 +321,7 @@ export class Wallet {
       id: RpcId;
     }): Promise<{handled: boolean; result?: IcrcScopes}> => {
       const {success: isRequestPermissions, data: requestPermissionsData} =
-        IcrcRequestPermissionsResponseSchema.safeParse(data);
+        IcrcScopesResponseSchema.safeParse(data);
 
       if (
         isRequestPermissions &&
@@ -343,7 +343,7 @@ export class Wallet {
         popup: this.#popup,
         origin: this.#origin,
         id,
-        scopes: scopes ?? WALLET_DEFAULT_SCOPES.scopes
+        scopes: scopes ?? WALLET_DEFAULT_SCOPES
       });
     };
 
