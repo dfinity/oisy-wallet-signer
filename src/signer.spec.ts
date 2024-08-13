@@ -204,7 +204,7 @@ describe('Signer', () => {
       jsonrpc: JSON_RPC_VERSION_2,
       method: ICRC25_REQUEST_PERMISSIONS,
       params: {
-        scopes: [{method: 'icrc27_accounts'}]
+        scopes: [{method: ICRC27_ACCOUNTS}]
       }
     };
 
