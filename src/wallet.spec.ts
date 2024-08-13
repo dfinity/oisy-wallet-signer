@@ -378,30 +378,7 @@ describe('Wallet', () => {
       });
 
       describe('Request success', () => {
-        it('should call the wallet with postMessage', async () => {
-          const spy = vi.spyOn(walletHandlers, 'requestSupportedStandards');
-          const spyPostMessage = vi.spyOn(window, 'postMessage');
-
-          // eslint-disable-next-line @typescript-eslint/no-floating-promises
-          wallet.supportedStandards();
-
-          expect(spy).toHaveBeenCalledTimes(1);
-          expect(spyPostMessage).toHaveBeenCalledTimes(1);
-
-          expect(spyPostMessage).toHaveBeenCalledWith(
-            expect.objectContaining({
-              jsonrpc: JSON_RPC_VERSION_2,
-              method: ICRC25_SUPPORTED_STANDARDS
-            }),
-            mockParameters.url
-          );
-        });
-      });
-
-      it('should respond with the supported standards', async () => {
         const requestId = '12345';
-
-        const promise = wallet.supportedStandards({options: {requestId}});
 
         const messageEventSupportedStandards = new MessageEvent('message', {
           origin: mockParameters.url,
@@ -414,11 +391,37 @@ describe('Wallet', () => {
           }
         });
 
-        window.dispatchEvent(messageEventSupportedStandards);
+        it('should call the wallet with postMessage', async () => {
+          const spy = vi.spyOn(walletHandlers, 'requestSupportedStandards');
+          const spyPostMessage = vi.spyOn(window, 'postMessage');
 
-        const result = await promise;
+          const promise = wallet.supportedStandards({options: {requestId}});
 
-        expect(result).toEqual(supportedStandards);
+          window.dispatchEvent(messageEventSupportedStandards);
+
+          await promise;
+
+          expect(spy).toHaveBeenCalledTimes(1);
+          expect(spyPostMessage).toHaveBeenCalledTimes(1);
+
+          expect(spyPostMessage).toHaveBeenCalledWith(
+            expect.objectContaining({
+              jsonrpc: JSON_RPC_VERSION_2,
+              method: ICRC25_SUPPORTED_STANDARDS
+            }),
+            mockParameters.url
+          );
+        });
+
+        it('should respond with the supported standards', async () => {
+          const promise = wallet.supportedStandards({options: {requestId}});
+
+          window.dispatchEvent(messageEventSupportedStandards);
+
+          const result = await promise;
+
+          expect(result).toEqual(supportedStandards);
+        });
       });
     });
 
@@ -546,12 +549,28 @@ describe('Wallet', () => {
       });
 
       describe('Request success', () => {
+        const requestId = '12345';
+
+        const messageEventScopes = new MessageEvent('message', {
+          origin: mockParameters.url,
+          data: {
+            jsonrpc: JSON_RPC_VERSION_2,
+            id: requestId,
+            result: {
+              scopes
+            }
+          }
+        });
+
         it('should call the wallet with postMessage and default scopes', async () => {
           const spy = vi.spyOn(walletHandlers, 'requestPermissions');
           const spyPostMessage = vi.spyOn(window, 'postMessage');
 
-          // eslint-disable-next-line @typescript-eslint/no-floating-promises
-          wallet.requestPermissions();
+          const promise = wallet.requestPermissions({options: {requestId}});
+
+          window.dispatchEvent(messageEventScopes);
+
+          await promise;
 
           expect(spy).toHaveBeenCalledTimes(1);
           expect(spyPostMessage).toHaveBeenCalledTimes(1);
@@ -574,8 +593,11 @@ describe('Wallet', () => {
 
           const selectedScopes: IcrcRequestedScopes = {scopes: [{method: ICRC27_ACCOUNTS}]};
 
-          // eslint-disable-next-line @typescript-eslint/no-floating-promises
-          wallet.requestPermissions(selectedScopes);
+          const promise = wallet.requestPermissions({options: {requestId}, ...selectedScopes});
+
+          window.dispatchEvent(messageEventScopes);
+
+          await promise;
 
           expect(spy).toHaveBeenCalledTimes(1);
           expect(spyPostMessage).toHaveBeenCalledTimes(1);
@@ -591,29 +613,16 @@ describe('Wallet', () => {
             mockParameters.url
           );
         });
-      });
 
-      it('should respond with the selected permissions', async () => {
-        const requestId = '12345';
+        it('should respond with the selected permissions', async () => {
+          const promise = wallet.requestPermissions({options: {requestId}});
 
-        const promise = wallet.requestPermissions({options: {requestId}});
+          window.dispatchEvent(messageEventScopes);
 
-        const messageEventScopes = new MessageEvent('message', {
-          origin: mockParameters.url,
-          data: {
-            jsonrpc: JSON_RPC_VERSION_2,
-            id: requestId,
-            result: {
-              scopes
-            }
-          }
+          const result = await promise;
+
+          expect(result).toEqual({scopes});
         });
-
-        window.dispatchEvent(messageEventScopes);
-
-        const result = await promise;
-
-        expect(result).toEqual({scopes});
       });
     });
   });
