@@ -6,6 +6,7 @@ import {
   ICRC49_CALL_CANISTER
 } from './constants/icrc.constants';
 import {
+  WALLET_CONNECT_TIMEOUT_REQUEST_PERMISSIONS,
   WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD,
   WALLET_DEFAULT_SCOPES
 } from './constants/wallet.constants';
@@ -459,7 +460,7 @@ describe('Wallet', () => {
           },
           {
             title: 'custom timeout',
-            options: {timeoutInMilliseconds: 20000}
+            options: {timeoutInMilliseconds: 120000}
           }
         ];
 
@@ -471,7 +472,7 @@ describe('Wallet', () => {
               vi.useFakeTimers();
 
               const timeout =
-                options?.timeoutInMilliseconds ?? WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD;
+                options?.timeoutInMilliseconds ?? WALLET_CONNECT_TIMEOUT_REQUEST_PERMISSIONS;
 
               wallet.requestPermissions({options}).catch((err: Error) => {
                 expect(err.message).toBe(
@@ -497,7 +498,7 @@ describe('Wallet', () => {
 
             wallet.requestPermissions().catch((err: Error) => {
               expect(err.message).toBe(
-                `Request to wallet timed out after ${WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD} milliseconds.`
+                `Request to wallet timed out after ${WALLET_CONNECT_TIMEOUT_REQUEST_PERMISSIONS} milliseconds.`
               );
 
               expect(spy).toHaveBeenCalledTimes(1);
@@ -520,7 +521,7 @@ describe('Wallet', () => {
 
             window.dispatchEvent(messageEventScopes);
 
-            await vi.advanceTimersByTimeAsync(WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD);
+            await vi.advanceTimersByTimeAsync(WALLET_CONNECT_TIMEOUT_REQUEST_PERMISSIONS);
           });
         });
 
