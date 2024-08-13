@@ -1,6 +1,7 @@
 import {assertNonNullish, nonNullish, notEmptyString} from '@dfinity/utils';
 import {
   WALLET_CONNECT_DEFAULT_TIMEOUT_IN_MILLISECONDS,
+  WALLET_CONNECT_TIMEOUT_REQUEST_PERMISSIONS,
   WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD,
   WALLET_DEFAULT_SCOPES
 } from './constants/wallet.constants';
@@ -185,7 +186,8 @@ export class Wallet {
     postRequest,
     handleMessage
   }: {
-    options: WalletRequestOptions;
+    options: Omit<WalletRequestOptions, 'timeoutInMilliseconds'> &
+      Required<Pick<WalletRequestOptions, 'timeoutInMilliseconds'>>;
     postRequest: (id: RpcId) => void;
     handleMessage: (params: {
       data: WalletMessageEventData;
@@ -199,9 +201,7 @@ export class Wallet {
         throw new Error(`Wallet request options cannot be parsed: ${error?.message ?? ''}`);
       }
 
-      const {timeoutInMilliseconds: userTimeoutInMilliseconds, requestId: userRequestId} = options;
-      const timeoutInMilliseconds =
-        userTimeoutInMilliseconds ?? WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD;
+      const {requestId: userRequestId, timeoutInMilliseconds} = options;
 
       const requestId = userRequestId ?? crypto.randomUUID();
 
@@ -263,7 +263,7 @@ export class Wallet {
    * @see [ICRC25 Supported Standards](https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_supported_standards)
    */
   supportedStandards = async ({
-    options = {}
+    options: {timeoutInMilliseconds, ...rest} = {}
   }: {options?: WalletRequestOptions} = {}): Promise<IcrcSupportedStandards> => {
     const handleMessage = async ({
       data,
@@ -297,7 +297,15 @@ export class Wallet {
       });
     };
 
-    return await this.request<IcrcSupportedStandards>({options, postRequest, handleMessage});
+    return await this.request<IcrcSupportedStandards>({
+      options: {
+        timeoutInMilliseconds:
+          timeoutInMilliseconds ?? WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD,
+        ...rest
+      },
+      postRequest,
+      handleMessage
+    });
   };
 
   /**
@@ -310,7 +318,7 @@ export class Wallet {
    * @see [ICRC25 Request Permissions](https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_request_permissions)
    */
   requestPermissions = async ({
-    options = {},
+    options: {timeoutInMilliseconds, ...rest} = {},
     scopes
   }: {options?: WalletRequestOptions} & Partial<IcrcRequestedScopes> = {}): Promise<IcrcScopes> => {
     const handleMessage = async ({
@@ -347,6 +355,13 @@ export class Wallet {
       });
     };
 
-    return await this.request<IcrcScopes>({options, postRequest, handleMessage});
+    return await this.request<IcrcScopes>({
+      options: {
+        timeoutInMilliseconds: timeoutInMilliseconds ?? WALLET_CONNECT_TIMEOUT_REQUEST_PERMISSIONS,
+        ...rest
+      },
+      postRequest,
+      handleMessage
+    });
   };
 }
