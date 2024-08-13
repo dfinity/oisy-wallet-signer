@@ -32,11 +32,14 @@ export class WalletPage extends IdentityPage {
 
     const ul = this.page.getByTestId('requested-permissions-list');
 
-    const li = ul.locator('li');
+    const checkboxes = ul.locator('input');
 
-    expect(await li.count()).toBe(2);
+    expect(await checkboxes.count()).toBe(2);
 
-    await li.nth(0).click();
+    await checkboxes.nth(0).click();
+
+    const block = this.page.getByTestId('requested-permissions');
+    await expect(block.getByText('1 permissions approved')).toBeVisible();
 
     await this.page.getByTestId('submit-permissions-button').click();
   }

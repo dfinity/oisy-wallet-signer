@@ -4,7 +4,8 @@
 	import { isNullish, nonNullish } from '@dfinity/utils';
 	import {
 		ICRC25_REQUEST_PERMISSIONS,
-		type IcrcScope, type RequestPermissionPayload,
+		type IcrcScope,
+		type RequestPermissionPayload,
 		type RpcId
 	} from '@dfinity/oisy-wallet-signer';
 	import Button from '$core/components/Button.svelte';
@@ -18,8 +19,10 @@
 	let scopes: IcrcScope[] | undefined = $state(undefined);
 	let id: RpcId | undefined = $state(undefined);
 
-	const sortScope = ({ scope: {method: methodA} }: IcrcScope, { scope: {method: methodB} }: IcrcScope): number =>
-			methodA.localeCompare(methodB)
+	const sortScope = (
+		{ scope: { method: methodA } }: IcrcScope,
+		{ scope: { method: methodB } }: IcrcScope
+	): number => methodA.localeCompare(methodB);
 
 	$effect(() => {
 		if (isNullish(signer)) {
@@ -28,10 +31,7 @@
 
 		signer.on({
 			method: ICRC25_REQUEST_PERMISSIONS,
-			callback: ({
-				scopes: scopesToApprove,
-				requestId
-			}: RequestPermissionPayload) => {
+			callback: ({ scopes: scopesToApprove, requestId }: RequestPermissionPayload) => {
 				scopes = scopesToApprove.sort(sortScope);
 				id = requestId;
 			}
@@ -61,6 +61,8 @@
 			} as IcrcScope
 		].sort(sortScope);
 	};
+
+	let countApproved = $derived((scopes ?? []).filter(({ state }) => state === 'granted').length);
 </script>
 
 {#if nonNullish(scopes)}
@@ -83,5 +85,7 @@
 		</ul>
 
 		<Button type="submit" testId="submit-permissions-button">Submit</Button>
+
+		<p><small>{countApproved} permissions approved</small></p>
 	</form>
 {/if}
