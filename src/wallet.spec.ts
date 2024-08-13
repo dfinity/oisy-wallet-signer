@@ -524,7 +524,7 @@ describe('Wallet', () => {
         it('should throw error if the message received comes from another origin', async () => {
           const hackerOrigin = 'https://hacker.com';
 
-          const promise = wallet.supportedStandards();
+          const promise = wallet.requestPermissions();
 
           const messageEvent = new MessageEvent('message', {
             origin: hackerOrigin,
