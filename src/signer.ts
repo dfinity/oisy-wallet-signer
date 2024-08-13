@@ -20,15 +20,9 @@ import {
 import type {IcrcScope} from './types/icrc-responses';
 import {RpcRequestSchema} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
+import {SignerOptions} from './types/signer-options';
 import type {RequestPermissionPayload} from './types/signer-subscribers';
 import {Observable} from './utils/observable';
-
-/**
- * The parameters to initialize a signer.
- * @interface
- */
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface SignerParameters {}
 
 export class Signer {
   #walletOrigin: string | undefined | null;
@@ -36,7 +30,7 @@ export class Signer {
   readonly #requestsPermissionsSubscribers: Observable<RequestPermissionPayload> =
     new Observable<RequestPermissionPayload>();
 
-  private constructor(_parameters: SignerParameters) {
+  private constructor(_options: SignerOptions) {
     window.addEventListener('message', this.onMessageListener);
   }
 
@@ -44,12 +38,11 @@ export class Signer {
    * Creates a signer that listens and communicates with a relying party.
    *
    * @static
-   * @param {SignerParameters} parameters - The parameters for the signer.
+   * @param {SignerOptions} options - The options for the signer.
    * @returns {Signer} The connected signer.
    */
-  static init(parameters: SignerParameters): Signer {
-    const signer = new Signer(parameters);
-    return signer;
+  static init(options: SignerOptions): Signer {
+    return new Signer(options);
   }
 
   /**
