@@ -32,7 +32,7 @@
 	{:else}
 		<div in:fade>
 			<Value id="request-permissions" testId="request-permissions" title="Permissions">
-				<Button {onclick} testId="grant-permissions-button">Request permissions</Button>
+				<Button {onclick} testId="request-permissions-button">Request permissions</Button>
 			</Value>
 		</div>
 	{/if}

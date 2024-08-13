@@ -63,10 +63,16 @@
 </script>
 
 {#if nonNullish(scopes)}
-	<form {onsubmit} method="POST" class="bg-grey rounded-md px-4 py-6 mt-4 max-w-xl" in:fade>
-		<p class="font-bold">Grant Permissions</p>
+	<form
+		{onsubmit}
+		method="POST"
+		class="bg-grey rounded-md px-4 py-6 mt-4 max-w-xl"
+		in:fade
+		data-tid="requested-permissions"
+	>
+		<p class="font-bold">Requested Permissions</p>
 
-		<ul class="mt-2 mb-4 text-sm">
+		<ul class="mt-2 mb-4 text-sm" data-tid="requested-permissions-list">
 			{#each scopes as scope}
 				<li>
 					<input type="checkbox" onchange={() => onToggle(scope)} class="mr-1" />
@@ -75,6 +81,6 @@
 			{/each}
 		</ul>
 
-		<Button type="submit" testId="grant-permissions-button">Grant permissions</Button>
+		<Button type="submit" testId="submit-permissions-button">Submit</Button>
 	</form>
 {/if}
