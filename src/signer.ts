@@ -17,7 +17,6 @@ import {
   IcrcStatusRequestSchema,
   IcrcSupportedStandardsRequestSchema
 } from './types/icrc-requests';
-import type {IcrcScopes} from './types/icrc-responses';
 import {RpcRequestSchema} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
 import type {RequestPermissionPayload} from './types/signer-subscribers';
@@ -134,7 +133,7 @@ export class Signer {
     callback
   }: {
     method: IcrcWalletApproveMethod;
-    callback: (data: IcrcScopes) => void;
+    callback: (data: RequestPermissionPayload) => void;
   }): (() => void) => {
     switch (method) {
       case ICRC25_REQUEST_PERMISSIONS:
