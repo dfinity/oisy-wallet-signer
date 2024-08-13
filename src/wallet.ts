@@ -1,12 +1,20 @@
 import {assertNonNullish, nonNullish, notEmptyString} from '@dfinity/utils';
 import {
   WALLET_CONNECT_DEFAULT_TIMEOUT_IN_MILLISECONDS,
-  WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD
+  WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD,
+  WALLET_DEFAULT_SCOPES
 } from './constants/wallet.constants';
-import {requestSupportedStandards, retryRequestStatus} from './handlers/wallet.handlers';
+import {
+  requestPermissions,
+  requestSupportedStandards,
+  retryRequestStatus
+} from './handlers/wallet.handlers';
+import type {IcrcRequestedScopes} from './types/icrc-requests';
 import {
   IcrcReadyResponseSchema,
+  IcrcScopesResponseSchema,
   IcrcSupportedStandardsResponseSchema,
+  type IcrcScopes,
   type IcrcSupportedStandards
 } from './types/icrc-responses';
 import {RpcResponseWithResultOrErrorSchema, type RpcId} from './types/rpc';
@@ -290,5 +298,55 @@ export class Wallet {
     };
 
     return await this.request<IcrcSupportedStandards>({options, postRequest, handleMessage});
+  };
+
+  /**
+   * Request permissions to the wallet.
+   *
+   * @async
+   * @param {WalletRequestOptions} options - The options for the wallet request, which may include parameters such as timeout settings and other request-specific configurations.
+   * @param {Partial<IcrcRequestedScopes>} scopes - The specific scopes being requested from the wallet. These define the permissions that the wallet may grant.
+   * @returns {Promise<IcrcScopes>} A promise that resolves to an object containing the permissions that were approved by the user of the wallet.
+   * @see [ICRC25 Request Permissions](https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_request_permissions)
+   */
+  requestPermissions = async ({
+    options = {},
+    scopes
+  }: {options?: WalletRequestOptions} & Partial<IcrcRequestedScopes> = {}): Promise<IcrcScopes> => {
+    const handleMessage = async ({
+      data,
+      id
+    }: {
+      data: WalletMessageEventData;
+      id: RpcId;
+    }): Promise<{handled: boolean; result?: IcrcScopes}> => {
+      const {success: isRequestPermissions, data: requestPermissionsData} =
+        IcrcScopesResponseSchema.safeParse(data);
+
+      if (
+        isRequestPermissions &&
+        id === requestPermissionsData?.id &&
+        nonNullish(requestPermissionsData?.result)
+      ) {
+        const {
+          result: {scopes}
+        } = requestPermissionsData;
+
+        return {handled: true, result: {scopes}};
+      }
+
+      return {handled: false};
+    };
+
+    const postRequest = (id: RpcId): void => {
+      requestPermissions({
+        popup: this.#popup,
+        origin: this.#origin,
+        id,
+        scopes: scopes ?? WALLET_DEFAULT_SCOPES
+      });
+    };
+
+    return await this.request<IcrcScopes>({options, postRequest, handleMessage});
   };
 }
