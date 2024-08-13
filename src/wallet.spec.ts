@@ -1,7 +1,21 @@
-import {ICRC25_SUPPORTED_STANDARDS, ICRC29_STATUS} from './constants/icrc.constants';
-import {WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD} from './constants/wallet.constants';
+import {
+  ICRC25_REQUEST_PERMISSIONS,
+  ICRC25_SUPPORTED_STANDARDS,
+  ICRC27_ACCOUNTS,
+  ICRC29_STATUS,
+  ICRC49_CALL_CANISTER
+} from './constants/icrc.constants';
+import {
+  WALLET_CONNECT_TIMEOUT_REQUEST_PERMISSIONS,
+  WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD,
+  WALLET_DEFAULT_SCOPES
+} from './constants/wallet.constants';
 import * as walletHandlers from './handlers/wallet.handlers';
-import {IcrcSupportedStandardsResponseSchema} from './types/icrc-responses';
+import type {IcrcRequestedScopes} from './types/icrc-requests';
+import {
+  IcrcScopesResponseSchema,
+  IcrcSupportedStandardsResponseSchema
+} from './types/icrc-responses';
 import {JSON_RPC_VERSION_2, RpcResponseWithResultOrErrorSchema} from './types/rpc';
 import type {WalletOptions} from './types/wallet-options';
 import {WALLET_WINDOW_CENTER, WALLET_WINDOW_TOP_RIGHT, windowFeatures} from './utils/window.utils';
@@ -30,6 +44,7 @@ describe('Wallet', () => {
         vi.fn(() => window)
       );
       vi.stubGlobal('close', vi.fn());
+      vi.stubGlobal('focus', vi.fn());
     });
 
     afterEach(() => {
@@ -364,30 +379,7 @@ describe('Wallet', () => {
       });
 
       describe('Request success', () => {
-        it('should call the wallet with postMessage', async () => {
-          const spy = vi.spyOn(walletHandlers, 'requestSupportedStandards');
-          const spyPostMessage = vi.spyOn(window, 'postMessage');
-
-          // eslint-disable-next-line @typescript-eslint/no-floating-promises
-          wallet.supportedStandards();
-
-          expect(spy).toHaveBeenCalledTimes(1);
-          expect(spyPostMessage).toHaveBeenCalledTimes(1);
-
-          expect(spyPostMessage).toHaveBeenCalledWith(
-            expect.objectContaining({
-              jsonrpc: JSON_RPC_VERSION_2,
-              method: ICRC25_SUPPORTED_STANDARDS
-            }),
-            mockParameters.url
-          );
-        });
-      });
-
-      it('should respond with the supported standards', async () => {
         const requestId = '12345';
-
-        const promise = wallet.supportedStandards({options: {requestId}});
 
         const messageEventSupportedStandards = new MessageEvent('message', {
           origin: mockParameters.url,
@@ -400,11 +392,238 @@ describe('Wallet', () => {
           }
         });
 
-        window.dispatchEvent(messageEventSupportedStandards);
+        it('should call the wallet with postMessage', async () => {
+          const spy = vi.spyOn(walletHandlers, 'requestSupportedStandards');
+          const spyPostMessage = vi.spyOn(window, 'postMessage');
 
-        const result = await promise;
+          const promise = wallet.supportedStandards({options: {requestId}});
 
-        expect(result).toEqual(supportedStandards);
+          window.dispatchEvent(messageEventSupportedStandards);
+
+          await promise;
+
+          expect(spy).toHaveBeenCalledTimes(1);
+          expect(spyPostMessage).toHaveBeenCalledTimes(1);
+
+          expect(spyPostMessage).toHaveBeenCalledWith(
+            expect.objectContaining({
+              jsonrpc: JSON_RPC_VERSION_2,
+              method: ICRC25_SUPPORTED_STANDARDS
+            }),
+            mockParameters.url
+          );
+        });
+
+        it('should respond with the supported standards', async () => {
+          const promise = wallet.supportedStandards({options: {requestId}});
+
+          window.dispatchEvent(messageEventSupportedStandards);
+
+          const result = await promise;
+
+          expect(result).toEqual(supportedStandards);
+        });
+      });
+    });
+
+    describe('Request permissions', () => {
+      let wallet: Wallet;
+
+      const scopes = [
+        {scope: {method: ICRC27_ACCOUNTS}, state: 'granted'},
+        {scope: {method: ICRC49_CALL_CANISTER}, state: 'denied'}
+      ];
+
+      beforeEach(async () => {
+        const promise = Wallet.connect(mockParameters);
+
+        window.dispatchEvent(messageEventReady);
+
+        wallet = await promise;
+      });
+
+      afterEach(async () => {
+        await wallet.disconnect();
+      });
+
+      describe('Request errors', () => {
+        it('should throw error if the wallet request options are not well formatted', async () => {
+          await expect(
+            // @ts-expect-error: we are testing this on purpose
+            wallet.requestPermissions({options: {timeoutInMilliseconds: 'test'}})
+          ).rejects.toThrow('Wallet request options cannot be parsed:');
+        });
+
+        const options = [
+          {
+            title: 'default options'
+          },
+          {
+            title: 'custom timeout',
+            options: {timeoutInMilliseconds: 120000}
+          }
+        ];
+
+        it.each(options)(
+          'should timeout for $title if wallet does not answer with expected permissions',
+          async ({options}) => {
+            // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
+            return new Promise<void>(async (resolve) => {
+              vi.useFakeTimers();
+
+              const timeout =
+                options?.timeoutInMilliseconds ?? WALLET_CONNECT_TIMEOUT_REQUEST_PERMISSIONS;
+
+              wallet.requestPermissions({options}).catch((err: Error) => {
+                expect(err.message).toBe(
+                  `Request to wallet timed out after ${timeout} milliseconds.`
+                );
+
+                vi.useRealTimers();
+
+                resolve();
+              });
+
+              await vi.advanceTimersByTimeAsync(timeout);
+            });
+          }
+        );
+
+        it('should timeout if response ID is not the same as request ID', async () => {
+          // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
+          return new Promise<void>(async (resolve) => {
+            vi.useFakeTimers();
+
+            const spy = vi.spyOn(IcrcScopesResponseSchema, 'safeParse');
+
+            wallet.requestPermissions().catch((err: Error) => {
+              expect(err.message).toBe(
+                `Request to wallet timed out after ${WALLET_CONNECT_TIMEOUT_REQUEST_PERMISSIONS} milliseconds.`
+              );
+
+              expect(spy).toHaveBeenCalledTimes(1);
+
+              vi.useRealTimers();
+
+              resolve();
+            });
+
+            const messageEventScopes = new MessageEvent('message', {
+              origin: mockParameters.url,
+              data: {
+                jsonrpc: JSON_RPC_VERSION_2,
+                id: '123',
+                result: {
+                  scopes
+                }
+              }
+            });
+
+            window.dispatchEvent(messageEventScopes);
+
+            await vi.advanceTimersByTimeAsync(WALLET_CONNECT_TIMEOUT_REQUEST_PERMISSIONS);
+          });
+        });
+
+        it('should throw error if the message received comes from another origin', async () => {
+          const hackerOrigin = 'https://hacker.com';
+
+          const promise = wallet.requestPermissions();
+
+          const messageEvent = new MessageEvent('message', {
+            origin: hackerOrigin,
+            data: {
+              jsonrpc: JSON_RPC_VERSION_2,
+              id: '123',
+              result: {
+                scopes
+              }
+            }
+          });
+
+          window.dispatchEvent(messageEvent);
+
+          await expect(promise).rejects.toThrow(
+            `The response origin ${hackerOrigin} does not match the wallet origin ${mockParameters.url}.`
+          );
+        });
+      });
+
+      describe('Request success', () => {
+        const requestId = '12345';
+
+        const messageEventScopes = new MessageEvent('message', {
+          origin: mockParameters.url,
+          data: {
+            jsonrpc: JSON_RPC_VERSION_2,
+            id: requestId,
+            result: {
+              scopes
+            }
+          }
+        });
+
+        it('should call the wallet with postMessage and default scopes', async () => {
+          const spy = vi.spyOn(walletHandlers, 'requestPermissions');
+          const spyPostMessage = vi.spyOn(window, 'postMessage');
+
+          const promise = wallet.requestPermissions({options: {requestId}});
+
+          window.dispatchEvent(messageEventScopes);
+
+          await promise;
+
+          expect(spy).toHaveBeenCalledTimes(1);
+          expect(spyPostMessage).toHaveBeenCalledTimes(1);
+
+          expect(spyPostMessage).toHaveBeenCalledWith(
+            expect.objectContaining({
+              jsonrpc: JSON_RPC_VERSION_2,
+              method: ICRC25_REQUEST_PERMISSIONS,
+              params: {
+                scopes: WALLET_DEFAULT_SCOPES
+              }
+            }),
+            mockParameters.url
+          );
+        });
+
+        it('should call the wallet with postMessage selected scopes', async () => {
+          const spy = vi.spyOn(walletHandlers, 'requestPermissions');
+          const spyPostMessage = vi.spyOn(window, 'postMessage');
+
+          const selectedScopes: IcrcRequestedScopes = {scopes: [{method: ICRC27_ACCOUNTS}]};
+
+          const promise = wallet.requestPermissions({options: {requestId}, ...selectedScopes});
+
+          window.dispatchEvent(messageEventScopes);
+
+          await promise;
+
+          expect(spy).toHaveBeenCalledTimes(1);
+          expect(spyPostMessage).toHaveBeenCalledTimes(1);
+
+          expect(spyPostMessage).toHaveBeenCalledWith(
+            expect.objectContaining({
+              jsonrpc: JSON_RPC_VERSION_2,
+              method: ICRC25_REQUEST_PERMISSIONS,
+              params: {
+                scopes: selectedScopes.scopes
+              }
+            }),
+            mockParameters.url
+          );
+        });
+
+        it('should respond with the selected permissions', async () => {
+          const promise = wallet.requestPermissions({options: {requestId}});
+
+          window.dispatchEvent(messageEventScopes);
+
+          const result = await promise;
+
+          expect(result).toEqual({scopes});
+        });
       });
     });
   });
