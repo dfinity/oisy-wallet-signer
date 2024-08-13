@@ -6,6 +6,7 @@
 	import UserId from '$core/components/UserId.svelte';
 	import Value from '$core/components/Value.svelte';
 	import SupportedStandards from '$lib/components/SupportedStandards.svelte';
+	import RequestPermissions from '$lib/components/RequestPermissions.svelte';
 
 	let wallet: Wallet | undefined = $state(undefined);
 
@@ -36,3 +37,5 @@
 {/if}
 
 <SupportedStandards {wallet} />
+
+<RequestPermissions {wallet} />

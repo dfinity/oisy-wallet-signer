@@ -20,22 +20,16 @@ testWithII.beforeAll(async ({playwright}) => {
   await partyPage.waitReady();
 
   await partyPage.goto();
+
+  await partyPage.signIn();
+
+  await partyPage.connect();
 });
 
 testWithII.afterAll(async () => {
   await partyPage.close();
 });
 
-testWithII('should sign-in relying-party with a new user', async () => {
-  await partyPage.signIn();
-});
-
-testWithII('should connect the wallet', async () => {
-  await partyPage.connect();
-
-  await partyPage.assertConnected();
-});
-
-testWithII('should list supported standards', async () => {
-  await partyPage.assertSupportedStandards();
+testWithII('should request permissions', async () => {
+  await partyPage.requestPermissions();
 });

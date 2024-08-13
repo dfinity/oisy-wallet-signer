@@ -26,4 +26,21 @@ export class WalletPage extends IdentityPage {
 
     await walletIIPage.signInWithIdentity({identity: this.identity});
   }
+
+  async approvePermissions(): Promise<void> {
+    await expect(this.page.getByTestId('requested-permissions')).toBeVisible();
+
+    const ul = this.page.getByTestId('requested-permissions-list');
+
+    const checkboxes = ul.locator('input');
+
+    expect(await checkboxes.count()).toBe(2);
+
+    await checkboxes.nth(0).click();
+
+    const block = this.page.getByTestId('requested-permissions');
+    await expect(block.getByText('1 permissions approved')).toBeVisible();
+
+    await this.page.getByTestId('submit-permissions-button').click();
+  }
 }

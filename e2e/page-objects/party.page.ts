@@ -60,7 +60,9 @@ export class PartyPage extends IdentityPage {
     await expect(this.page.getByTestId('wallet-connected')).toBeVisible();
 
     await waitForFadeAnimation(this.page);
+  }
 
+  async assertConnected(): Promise<void> {
     await expect(this.page.getByTestId('wallet-connected')).toHaveScreenshot();
   }
 
@@ -75,5 +77,20 @@ export class PartyPage extends IdentityPage {
 
     await expect(icrc25ListItem).toBeVisible();
     await expect(icrc25ListItem).toHaveText('ICRC-25');
+  }
+
+  async requestPermissions(): Promise<void> {
+    await expect(this.page.getByTestId('request-permissions-button')).toBeVisible();
+
+    await this.page.getByTestId('request-permissions-button').click();
+
+    await this.#walletPage?.approvePermissions();
+
+    await expect(this.page.getByTestId('response-permissions')).toBeVisible();
+
+    const permissions = this.page.getByTestId('response-permissions');
+
+    await expect(permissions.getByText('icrc27_accounts: granted')).toBeVisible();
+    await expect(permissions.getByText('icrc49_call_canister: denied')).toBeVisible();
   }
 }
