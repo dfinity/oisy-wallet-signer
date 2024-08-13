@@ -5,8 +5,8 @@ import {
   ICRC29_STATUS
 } from '../constants/icrc.constants';
 import type {
-  IcrcRequestPermissionsRequest,
-  IcrcRequestedScopes,
+  IcrcAnyRequestedScopes,
+  IcrcRequestAnyPermissionsRequest,
   IcrcStatusRequest,
   IcrcSupportedStandardsRequest
 } from '../types/icrc-requests';
@@ -60,8 +60,12 @@ export const requestSupportedStandards = ({id, ...rest}: Request): void => {
   postMsg({msg, ...rest});
 };
 
-export const requestPermissions = ({id, scopes, ...rest}: Request & IcrcRequestedScopes): void => {
-  const msg: IcrcRequestPermissionsRequest = {
+export const requestPermissions = ({
+  id,
+  scopes,
+  ...rest
+}: Request & IcrcAnyRequestedScopes): void => {
+  const msg: IcrcRequestAnyPermissionsRequest = {
     jsonrpc: JSON_RPC_VERSION_2,
     id,
     method: ICRC25_REQUEST_PERMISSIONS,

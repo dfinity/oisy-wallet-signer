@@ -1,7 +1,7 @@
 import {z} from 'zod';
 import {
   IcrcPermissionsRequestSchema,
-  IcrcRequestPermissionsRequestSchema,
+  IcrcRequestAnyPermissionsRequestSchema,
   IcrcStatusRequestSchema,
   IcrcSupportedStandardsRequestSchema
 } from './icrc-requests';
@@ -9,7 +9,7 @@ import {
 const SignerMessageEventDataSchema = z
   .union([
     IcrcStatusRequestSchema,
-    IcrcRequestPermissionsRequestSchema,
+    IcrcRequestAnyPermissionsRequestSchema,
     IcrcPermissionsRequestSchema,
     IcrcSupportedStandardsRequestSchema
   ])

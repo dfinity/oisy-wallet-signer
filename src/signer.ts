@@ -13,10 +13,11 @@ import {
   type IcrcWalletApproveMethod
 } from './types/icrc';
 import {
-  IcrcRequestPermissionsRequestSchema,
+  IcrcRequestAnyPermissionsRequestSchema,
   IcrcStatusRequestSchema,
   IcrcSupportedStandardsRequestSchema
 } from './types/icrc-requests';
+import type {IcrcScope} from './types/icrc-responses';
 import {RpcRequestSchema} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
 import type {RequestPermissionPayload} from './types/signer-subscribers';
@@ -198,7 +199,7 @@ export class Signer {
    */
   private handleRequestPermissionsRequest({data}: SignerMessageEvent): {handled: boolean} {
     const {success: isRequestPermissionsRequest, data: requestPermissionsData} =
-      IcrcRequestPermissionsRequestSchema.safeParse(data);
+      IcrcRequestAnyPermissionsRequestSchema.safeParse(data);
 
     if (isRequestPermissionsRequest) {
       const {
@@ -206,15 +207,19 @@ export class Signer {
         params: {scopes: requestedScopes}
       } = requestPermissionsData;
 
+      // TODO: Can the newer version of TypeScript infer "as IcrcScope"?
       const scopes = requestedScopes
         .filter(
           ({method: requestedMethod}) =>
             IcrcWalletScopedMethodSchema.safeParse(requestedMethod).success
         )
-        .map(({method}) => ({
-          scope: {method},
-          state: IcrcWalletPermissionStateSchema.enum.denied
-        }));
+        .map(
+          ({method}) =>
+            ({
+              scope: {method},
+              state: IcrcWalletPermissionStateSchema.enum.denied
+            }) as const as IcrcScope
+        );
 
       this.#requestsPermissionsSubscribers.next({requestId, scopes});
       return {handled: true};
