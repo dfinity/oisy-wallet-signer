@@ -22,12 +22,27 @@ const IcrcRequestedScopesSchema = z.object({
 
 export type IcrcRequestedScopes = z.infer<typeof IcrcRequestedScopesSchema>;
 
-export const IcrcRequestPermissionsRequestSchema = inferRpcRequestWithParamsSchema({
-  method: ICRC25_REQUEST_PERMISSIONS,
-  params: IcrcRequestedScopesSchema
+const IcrcAnyRequestedScopesSchema = z.object({
+  scopes: z
+    .array(
+      z.object({
+        // According specification, relying party can request permissions for random unspecified methods and those should "just" be ignored by the wallet.
+        method: z.string()
+      })
+    )
+    .min(1)
 });
 
-export type IcrcRequestPermissionsRequest = z.infer<typeof IcrcRequestPermissionsRequestSchema>;
+export type IcrcAnyRequestedScopes = z.infer<typeof IcrcAnyRequestedScopesSchema>;
+
+export const IcrcRequestAnyPermissionsRequestSchema = inferRpcRequestWithParamsSchema({
+  method: ICRC25_REQUEST_PERMISSIONS,
+  params: IcrcAnyRequestedScopesSchema
+});
+
+export type IcrcRequestAnyPermissionsRequest = z.infer<
+  typeof IcrcRequestAnyPermissionsRequestSchema
+>;
 
 // icrc25_permissions
 // https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_permissions

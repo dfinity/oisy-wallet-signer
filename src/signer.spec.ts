@@ -10,7 +10,7 @@ import {SIGNER_SUPPORTED_STANDARDS, SignerErrorCode} from './constants/signer.co
 import * as signerHandlers from './handlers/signer.handlers';
 import {Signer, type SignerParameters} from './signer';
 import {IcrcWalletPermissionStateSchema} from './types/icrc';
-import type {IcrcRequestPermissionsRequest} from './types/icrc-requests';
+import type {IcrcRequestAnyPermissionsRequest} from './types/icrc-requests';
 import type {IcrcScope} from './types/icrc-responses';
 import {JSON_RPC_VERSION_2} from './types/rpc';
 import type {SignerMessageEventData} from './types/signer';
@@ -199,7 +199,7 @@ describe('Signer', () => {
     const testId = 'test-123';
     const testOrigin = 'https://hello.com';
 
-    const requestPermissionsData: IcrcRequestPermissionsRequest = {
+    const requestPermissionsData: IcrcRequestAnyPermissionsRequest = {
       id: testId,
       jsonrpc: JSON_RPC_VERSION_2,
       method: ICRC25_REQUEST_PERMISSIONS,
@@ -378,8 +378,7 @@ describe('Signer', () => {
         spy.mockClear();
       });
 
-      // TODO: does not work currently as invalid scopes does not match the zod schema of IcrcRequestPermissionsRequestSchema
-      it.skip('should filter the supported scopes on request permissions', () => {
+      it('should filter the supported scopes on request permissions', () => {
         const spy = vi.fn();
 
         signer.on({

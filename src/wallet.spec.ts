@@ -11,7 +11,7 @@ import {
   WALLET_DEFAULT_SCOPES
 } from './constants/wallet.constants';
 import * as walletHandlers from './handlers/wallet.handlers';
-import type {IcrcRequestedScopes} from './types/icrc-requests';
+import type {IcrcAnyRequestedScopes} from './types/icrc-requests';
 import {
   IcrcScopesResponseSchema,
   IcrcSupportedStandardsResponseSchema
@@ -592,7 +592,7 @@ describe('Wallet', () => {
           const spy = vi.spyOn(walletHandlers, 'requestPermissions');
           const spyPostMessage = vi.spyOn(window, 'postMessage');
 
-          const selectedScopes: IcrcRequestedScopes = {scopes: [{method: ICRC27_ACCOUNTS}]};
+          const selectedScopes: IcrcAnyRequestedScopes = {scopes: [{method: ICRC27_ACCOUNTS}]};
 
           const promise = wallet.requestPermissions({options: {requestId}, ...selectedScopes});
 

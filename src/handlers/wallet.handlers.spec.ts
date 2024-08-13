@@ -4,7 +4,7 @@ import {
   ICRC25_SUPPORTED_STANDARDS,
   ICRC27_ACCOUNTS
 } from '../constants/icrc.constants';
-import type {IcrcRequestedScopes} from '../types/icrc-requests';
+import type {IcrcAnyRequestedScopes} from '../types/icrc-requests';
 import {JSON_RPC_VERSION_2} from '../types/rpc';
 import type {ReadyOrError} from '../utils/timeout.utils';
 import {requestPermissions, requestSupportedStandards, retryRequestStatus} from './wallet.handlers';
@@ -147,7 +147,7 @@ describe('Wallet handlers', () => {
   });
 
   describe('requestPermissions', () => {
-    const scopes: IcrcRequestedScopes = {
+    const scopes: IcrcAnyRequestedScopes = {
       scopes: [
         {
           method: ICRC27_ACCOUNTS

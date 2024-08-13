@@ -1,17 +1,17 @@
 import {ICRC27_ACCOUNTS} from '../constants/icrc.constants';
 import {
   IcrcPermissionsRequestSchema,
-  IcrcRequestPermissionsRequestSchema,
+  IcrcRequestAnyPermissionsRequestSchema,
   IcrcStatusRequestSchema,
   IcrcSupportedStandardsRequestSchema,
   type IcrcPermissionsRequest,
-  type IcrcRequestPermissionsRequest
+  type IcrcRequestAnyPermissionsRequest
 } from './icrc-requests';
 import {JSON_RPC_VERSION_2} from './rpc';
 
 describe('icrc-requests', () => {
   describe('icrc25_request_permissions', () => {
-    const validRequest: IcrcRequestPermissionsRequest = {
+    const validRequest: IcrcRequestAnyPermissionsRequest = {
       jsonrpc: JSON_RPC_VERSION_2,
       id: 1,
       method: 'icrc25_request_permissions',
@@ -25,72 +25,71 @@ describe('icrc-requests', () => {
     };
 
     it('should validate a correct request', () => {
-      expect(() => IcrcRequestPermissionsRequestSchema.parse(validRequest)).not.toThrow();
+      expect(() => IcrcRequestAnyPermissionsRequestSchema.parse(validRequest)).not.toThrow();
     });
 
-    it('should throw if request has invalid method', () => {
-      const invalidRequest: IcrcRequestPermissionsRequest = {
+    it('should accept request with "random" method names', () => {
+      const randomMethodRequest: IcrcRequestAnyPermissionsRequest = {
         ...validRequest,
         params: {
           scopes: [
             {
-              // @ts-expect-error: we are testing this on purpose
               method: 'test'
             }
           ]
         }
       };
-      expect(() => IcrcRequestPermissionsRequestSchema.parse(invalidRequest)).toThrow();
+      expect(() => IcrcRequestAnyPermissionsRequestSchema.parse(randomMethodRequest)).not.toThrow();
     });
 
     it('should throw if request has no method', () => {
-      const invalidRequest: IcrcRequestPermissionsRequest = {
+      const invalidRequest: IcrcRequestAnyPermissionsRequest = {
         ...validRequest,
         params: {
           scopes: []
         }
       };
-      expect(() => IcrcRequestPermissionsRequestSchema.parse(invalidRequest)).toThrow();
+      expect(() => IcrcRequestAnyPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
 
     it('should throw if request has no scopes', () => {
-      const invalidRequest: IcrcRequestPermissionsRequest = {
+      const invalidRequest: IcrcRequestAnyPermissionsRequest = {
         ...validRequest,
         // @ts-expect-error: we are testing this on purpose
         params: {}
       };
-      expect(() => IcrcRequestPermissionsRequestSchema.parse(invalidRequest)).toThrow();
+      expect(() => IcrcRequestAnyPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
 
     it('should throw if request has no params', () => {
       const {params: _, ...rest} = validRequest;
 
       // @ts-expect-error: we are testing this on purpose
-      const invalidRequest: IcrcRequestPermissionsRequest = rest;
-      expect(() => IcrcRequestPermissionsRequestSchema.parse(invalidRequest)).toThrow();
+      const invalidRequest: IcrcRequestAnyPermissionsRequest = rest;
+      expect(() => IcrcRequestAnyPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
 
     it('should throw if request has invalid method', () => {
-      const invalidRequest: IcrcRequestPermissionsRequest = {
+      const invalidRequest: IcrcRequestAnyPermissionsRequest = {
         ...validRequest,
         // @ts-expect-error: we are testing this on purpose
         method: 'test'
       };
-      expect(() => IcrcRequestPermissionsRequestSchema.parse(invalidRequest)).toThrow();
+      expect(() => IcrcRequestAnyPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
 
     it('should throw if request has no id', () => {
       const {id: _, ...rest} = validRequest;
 
-      const invalidRequest: Partial<IcrcRequestPermissionsRequest> = rest;
-      expect(() => IcrcRequestPermissionsRequestSchema.parse(invalidRequest)).toThrow();
+      const invalidRequest: Partial<IcrcRequestAnyPermissionsRequest> = rest;
+      expect(() => IcrcRequestAnyPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
 
     it('should throw if request has no jsonrpc', () => {
       const {jsonrpc: _, ...rest} = validRequest;
 
-      const invalidRequest: Partial<IcrcRequestPermissionsRequest> = rest;
-      expect(() => IcrcRequestPermissionsRequestSchema.parse(invalidRequest)).toThrow();
+      const invalidRequest: Partial<IcrcRequestAnyPermissionsRequest> = rest;
+      expect(() => IcrcRequestAnyPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
   });
 
