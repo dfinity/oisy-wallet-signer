@@ -30,6 +30,7 @@ describe('Wallet', () => {
         vi.fn(() => window)
       );
       vi.stubGlobal('close', vi.fn());
+      vi.stubGlobal('focus', vi.fn());
     });
 
     afterEach(() => {
