@@ -26,7 +26,7 @@ const IcrcAnyRequestedScopesSchema = z.object({
   scopes: z
     .array(
       z.object({
-        // According specification, relying party can request permissions for random unspecified methods and those should "just" be ignored by the wallet.
+        // According to the specification, the relying party can request permissions for random, unspecified methods, and these should "just" be ignored by the wallet.
         method: z.string()
       })
     )
