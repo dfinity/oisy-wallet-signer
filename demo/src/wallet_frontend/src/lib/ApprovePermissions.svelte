@@ -4,7 +4,7 @@
 	import { isNullish, nonNullish } from '@dfinity/utils';
 	import {
 		ICRC25_REQUEST_PERMISSIONS,
-		type IcrcScope,
+		type IcrcScope, type RequestPermissionPayload,
 		type RpcId
 	} from '@dfinity/oisy-wallet-signer';
 	import Button from '$core/components/Button.svelte';
@@ -18,6 +18,9 @@
 	let scopes: IcrcScope[] | undefined = $state(undefined);
 	let id: RpcId | undefined = $state(undefined);
 
+	const sortScope = ({ scope: {method: methodA} }: IcrcScope, { scope: {method: methodB} }: IcrcScope): number =>
+			methodA.localeCompare(methodB)
+
 	$effect(() => {
 		if (isNullish(signer)) {
 			return;
@@ -27,12 +30,9 @@
 			method: ICRC25_REQUEST_PERMISSIONS,
 			callback: ({
 				scopes: scopesToApprove,
-				id: requestId
-			}: {
-				id: RpcId;
-				scopes: IcrcScope[];
-			}) => {
-				scopes = scopesToApprove;
+				requestId
+			}: RequestPermissionPayload) => {
+				scopes = scopesToApprove.sort(sortScope);
 				id = requestId;
 			}
 		});
@@ -44,11 +44,12 @@
 		// TODO: alert errors
 
 		signer?.approvePermissions({
-			id: $state.snapshot(id)!,
+			requestId: $state.snapshot(id)!,
 			scopes: $state.snapshot(scopes)!
 		});
 
-		// TODO: reset
+		scopes = undefined;
+		id = undefined;
 	};
 
 	const onToggle = (scope: IcrcScope) => {
@@ -57,8 +58,8 @@
 			{
 				...scope,
 				state: scope.state === 'denied' ? 'granted' : 'denied'
-			}
-		];
+			} as IcrcScope
+		].sort(sortScope);
 	};
 </script>
 

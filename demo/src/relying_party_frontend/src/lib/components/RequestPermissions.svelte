@@ -23,7 +23,7 @@
 {#if nonNullish(wallet)}
 	{#if nonNullish(scopes)}
 		<div in:fade>
-			<Value id="granted-permissions" testId="granted-permissions" title="Permissions">
+			<Value id="granted-permissions" testId="response-permissions" title="Permissions">
 				{#each scopes as scope}
 					<p>{scope.scope.method}: <strong>{scope.state}</strong></p>
 				{/each}
