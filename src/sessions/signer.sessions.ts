@@ -18,7 +18,7 @@ export const savePermissions = ({
 
   const value: SessionPermissions = {
     scopes,
-    created_at: Date.now()
+    createdAt: Date.now()
   };
 
   set({key, value});

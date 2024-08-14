@@ -556,7 +556,7 @@ describe('Signer', () => {
           const expectedKey = `oisy_signer_${testOrigin}_${signerOptions.owner.toText()}`;
           const expectedData = {
             scopes,
-            created_at: expect.any(Number)
+            createdAt: expect.any(Number)
           };
 
           const storedData = get({key: expectedKey});

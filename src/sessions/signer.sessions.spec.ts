@@ -40,7 +40,7 @@ describe('Signer sessions', () => {
       const expectedKey = `oisy_signer_${origin}_${owner.toText()}`;
       const expectedValue = {
         scopes,
-        created_at: expect.any(Number)
+        createdAt: expect.any(Number)
       };
 
       expect(setSpy).toHaveBeenCalledWith({key: expectedKey, value: expectedValue});

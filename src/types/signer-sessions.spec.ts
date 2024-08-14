@@ -15,23 +15,23 @@ describe('Signer-sessions', () => {
   it('should validate a correct SessionPermissions object', () => {
     const validData = {
       scopes,
-      created_at: Date.now()
+      createdAt: Date.now()
     };
 
     const parsedData = SessionPermissionsSchema.parse(validData);
     expect(parsedData).toEqual(validData);
   });
 
-  it('should fail validation if created_at is not a number', () => {
+  it('should fail validation if createdAt is not a number', () => {
     const invalidData = {
       scopes,
-      created_at: 'not-a-number'
+      createdAt: 'not-a-number'
     };
 
     expect(() => SessionPermissionsSchema.parse(invalidData)).toThrow();
   });
 
-  it('should fail validation if created_at is missing', () => {
+  it('should fail validation if createdAt is missing', () => {
     const invalidData = {
       scopes
     };
@@ -41,7 +41,7 @@ describe('Signer-sessions', () => {
 
   it('should fail validation if scopes is missing', () => {
     const invalidData = {
-      created_at: Date.now()
+      createdAt: Date.now()
     };
 
     expect(() => SessionPermissionsSchema.parse(invalidData)).toThrow();
