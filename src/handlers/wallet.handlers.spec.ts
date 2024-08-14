@@ -139,10 +139,10 @@ describe('Wallet handlers', () => {
       );
     });
 
-    it('should bring the popup in front with focus', () => {
+    it('should not bring the popup in front with focus', () => {
       requestSupportedStandards({id: testId, popup, origin: testOrigin});
 
-      expect(focusMock).toHaveBeenCalledTimes(1);
+      expect(focusMock).not.toHaveBeenCalled();
     });
   });
 

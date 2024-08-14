@@ -19,6 +19,8 @@ interface Request {
   origin: string;
 }
 
+type Response<T> = {msg: T} & Pick<Request, 'origin' | 'popup'>;
+
 export const retryRequestStatus = async ({
   popup,
   id,
@@ -38,7 +40,7 @@ export const retryRequestStatus = async ({
     };
 
     // Since we are polling, we don't want to force the popup to the front in case the user has intentionally brought another window to the forefront.
-    popup.postMessage(msg, '*');
+    postMsg({popup, msg, origin: '*'});
   };
 
   return await retryUntilReady({
@@ -57,6 +59,7 @@ export const requestSupportedStandards = ({id, ...rest}: Request): void => {
     method: ICRC25_SUPPORTED_STANDARDS
   };
 
+  // Requesting supported standards does not require user interaction therefore it can be queried without focusing the popup.
   postMsg({msg, ...rest});
 };
 
@@ -72,12 +75,16 @@ export const requestPermissions = ({
     params: {scopes}
   };
 
-  postMsg({msg, ...rest});
+  focusAndPostMsg({msg, ...rest});
 };
 
-const postMsg = <T>({popup, msg, origin}: {msg: T} & Pick<Request, 'origin' | 'popup'>): void => {
+const focusAndPostMsg = <T>({popup, ...rest}: Response<T>): void => {
   // We focus the popup to bring it to front.
   popup.focus();
 
+  postMsg({popup, ...rest});
+};
+
+const postMsg = <T>({popup, msg, origin}: Response<T>): void => {
   popup.postMessage(msg, origin);
 };
