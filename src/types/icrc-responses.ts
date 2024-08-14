@@ -19,9 +19,13 @@ export const IcrcScopeSchema = z
 
 export type IcrcScope = z.infer<typeof IcrcScopeSchema>;
 
+export const IcrcScopesArraySchema = z.array(IcrcScopeSchema);
+
+export type IcrcScopesArray = z.infer<typeof IcrcScopesArraySchema>;
+
 export const IcrcScopesSchema = z
   .object({
-    scopes: z.array(IcrcScopeSchema)
+    scopes: IcrcScopesArraySchema
   })
   .strict();
 
