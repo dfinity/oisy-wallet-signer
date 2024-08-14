@@ -5,7 +5,7 @@ import {
   ICRC25_SUPPORTED_STANDARDS,
   ICRC29_STATUS
 } from '../constants/icrc.constants';
-import {
+import type {
   IcrcAnyRequestedScopes,
   IcrcPermissionsRequest,
   IcrcRequestAnyPermissionsRequest,
