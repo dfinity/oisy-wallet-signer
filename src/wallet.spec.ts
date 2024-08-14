@@ -14,7 +14,7 @@ import {
   WALLET_TIMEOUT_REQUEST_SUPPORTED_STANDARD
 } from './constants/wallet.constants';
 import * as walletHandlers from './handlers/wallet.handlers';
-import {IcrcAnyRequestedScopes} from './types/icrc-requests';
+import type {IcrcAnyRequestedScopes} from './types/icrc-requests';
 import {
   IcrcScopesResponseSchema,
   IcrcSupportedStandardsResponseSchema
