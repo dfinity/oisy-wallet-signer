@@ -15,7 +15,7 @@ import {
   IcrcReadyResponseSchema,
   IcrcScopesResponseSchema,
   IcrcSupportedStandardsResponseSchema,
-  type IcrcScopes,
+  type IcrcScopesArray,
   type IcrcSupportedStandards
 } from './types/icrc-responses';
 import {
@@ -335,14 +335,14 @@ export class Wallet {
     scopes
   }: {
     options?: WalletRequestOptions;
-  } & Partial<IcrcAnyRequestedScopes> = {}): Promise<IcrcScopes> => {
+  } & Partial<IcrcAnyRequestedScopes> = {}): Promise<IcrcScopesArray> => {
     const handleMessage = async ({
       data,
       id
     }: {
       data: WalletMessageEventData;
       id: RpcId;
-    }): Promise<{handled: boolean; result?: IcrcScopes}> => {
+    }): Promise<{handled: boolean; result?: IcrcScopesArray}> => {
       const {success: isRequestPermissions, data: requestPermissionsData} =
         IcrcScopesResponseSchema.safeParse(data);
 
@@ -355,7 +355,7 @@ export class Wallet {
           result: {scopes}
         } = requestPermissionsData;
 
-        return {handled: true, result: {scopes}};
+        return {handled: true, result: scopes};
       }
 
       return {handled: false};
@@ -370,7 +370,7 @@ export class Wallet {
       });
     };
 
-    return await this.request<IcrcScopes>({
+    return await this.request<IcrcScopesArray>({
       options: {
         timeoutInMilliseconds: timeoutInMilliseconds ?? WALLET_CONNECT_TIMEOUT_REQUEST_PERMISSIONS,
         ...rest
