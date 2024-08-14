@@ -15,8 +15,7 @@
 	let scopes: IcrcScope[] | undefined = $state(undefined);
 
 	const onclick = async () => {
-		const result = await wallet?.requestPermissions();
-		scopes = result?.scopes;
+		scopes = await wallet?.requestPermissions();
 	};
 </script>
 
