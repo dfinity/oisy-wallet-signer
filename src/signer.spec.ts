@@ -12,7 +12,7 @@ import * as signerHandlers from './handlers/signer.handlers';
 import {Signer} from './signer';
 import {IcrcWalletPermissionStateSchema} from './types/icrc';
 import type {IcrcRequestAnyPermissionsRequest} from './types/icrc-requests';
-import type {IcrcScope} from './types/icrc-responses';
+import type {IcrcScopesArray} from './types/icrc-responses';
 import {JSON_RPC_VERSION_2} from './types/rpc';
 import type {SignerMessageEventData} from './types/signer';
 import type {SignerOptions} from './types/signer-options';
@@ -471,7 +471,7 @@ describe('Signer', () => {
     });
 
     describe('Confirm permissions', () => {
-      const scopes: IcrcScope[] = [
+      const scopes: IcrcScopesArray = [
         {
           scope: {
             method: ICRC27_ACCOUNTS

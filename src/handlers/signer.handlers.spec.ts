@@ -3,7 +3,7 @@ import {ICRC27_ACCOUNTS} from '../constants/icrc.constants';
 import {SIGNER_SUPPORTED_STANDARDS, SignerErrorCode} from '../constants/signer.constants';
 import type {
   IcrcReadyResponse,
-  IcrcScope,
+  IcrcScopesArray,
   IcrcScopesResponse,
   IcrcSupportedStandardsResponse
 } from '../types/icrc-responses';
@@ -88,7 +88,7 @@ describe('Signer handlers', () => {
 
   describe('notifyPermissionScopes', () => {
     it('should post a message with the msg', () => {
-      const scopes: IcrcScope[] = [
+      const scopes: IcrcScopesArray = [
         {
           scope: {
             method: ICRC27_ACCOUNTS
