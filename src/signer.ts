@@ -1,3 +1,4 @@
+import type {Principal} from '@dfinity/principal';
 import {assertNonNullish, nonNullish} from '@dfinity/utils';
 import {ICRC25_REQUEST_PERMISSIONS} from './constants/icrc.constants';
 import {SignerErrorCode} from './constants/signer.constants';
@@ -7,6 +8,7 @@ import {
   notifyReady,
   notifySupportedStandards
 } from './handlers/signer.handlers';
+import {savePermissions} from './sessions/signer.sessions';
 import {
   IcrcWalletPermissionStateSchema,
   IcrcWalletScopedMethodSchema,
@@ -25,12 +27,15 @@ import type {RequestPermissionPayload} from './types/signer-subscribers';
 import {Observable} from './utils/observable';
 
 export class Signer {
+  readonly #owner: Principal;
   #walletOrigin: string | undefined | null;
 
   readonly #requestsPermissionsSubscribers: Observable<RequestPermissionPayload> =
     new Observable<RequestPermissionPayload>();
 
-  private constructor(_parameters: SignerOptions) {
+  private constructor({owner}: SignerOptions) {
+    this.#owner = owner;
+
     window.addEventListener('message', this.onMessageListener);
   }
 
@@ -229,5 +234,7 @@ export class Signer {
       origin: this.#walletOrigin,
       scopes
     });
+
+    savePermissions({owner: this.#owner, origin: this.#walletOrigin, scopes});
   };
 }
