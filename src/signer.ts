@@ -1,20 +1,21 @@
 import type {Principal} from '@dfinity/principal';
 import {assertNonNullish, nonNullish} from '@dfinity/utils';
 import {ICRC25_REQUEST_PERMISSIONS} from './constants/icrc.constants';
-import {SignerErrorCode} from './constants/signer.constants';
+import {SIGNER_DEFAULT_SCOPES, SignerErrorCode} from './constants/signer.constants';
 import {
   notifyError,
   notifyPermissionScopes,
   notifyReady,
   notifySupportedStandards
 } from './handlers/signer.handlers';
-import {savePermissions} from './sessions/signer.sessions';
+import {readPermissions, savePermissions} from './sessions/signer.sessions';
 import {
   IcrcWalletPermissionStateSchema,
   IcrcWalletScopedMethodSchema,
   type IcrcWalletApproveMethod
 } from './types/icrc';
 import {
+  IcrcPermissionsRequestSchema,
   IcrcRequestAnyPermissionsRequestSchema,
   IcrcStatusRequestSchema,
   IcrcSupportedStandardsRequestSchema
@@ -82,6 +83,11 @@ export class Signer {
 
     const {handled: supportedStandardsRequestHandled} = this.handleSupportedStandards(message);
     if (supportedStandardsRequestHandled) {
+      return;
+    }
+
+    const {handled: permissionsHandled} = this.handlePermissionsRequest(message);
+    if (permissionsHandled) {
       return;
     }
 
@@ -186,6 +192,34 @@ export class Signer {
   }
 
   /**
+   * Handles incoming messages to list the permissions.
+   *
+   * Parses the message data to determine if it conforms to a permissions request and responds with a notification with the scopes of the permissions.
+   *
+   * @param {SignerMessageEvent} message - The incoming message event containing the data and origin.
+   * @returns {Object} An object with a boolean property `handled` indicating whether the request was handled.
+   */
+  private handlePermissionsRequest({data, origin}: SignerMessageEvent): {handled: boolean} {
+    const {success: isPermissionsRequestRequest, data: permissionsRequestData} =
+      IcrcPermissionsRequestSchema.safeParse(data);
+
+    if (isPermissionsRequestRequest) {
+      const {id} = permissionsRequestData;
+
+      const permissions = readPermissions({owner: this.#owner, origin});
+
+      notifyPermissionScopes({
+        id,
+        origin,
+        scopes: permissions?.scopes ?? SIGNER_DEFAULT_SCOPES
+      });
+      return {handled: true};
+    }
+
+    return {handled: false};
+  }
+
+  /**
    * Handles incoming messages to request permissions.
    *
    * Parses the message data to determine if it conforms to a request permissions schema. If it does,
@@ -218,6 +252,10 @@ export class Signer {
               state: IcrcWalletPermissionStateSchema.enum.denied
             }) as const as IcrcScope
         );
+
+      // TODO: Maybe validating that the list of requested scopes contains at least one scope would be cool?
+      // Additionally, it may be beneficial to define a type that ensures at least one scope is present when responding to permission queries ([IcrcScope, ...IcrcScop[]] in Zod).
+      // Overall, it would be handy to enforce a minimum of one permission through types and behavior?
 
       this.#requestsPermissionsSubscribers.next({requestId, scopes});
       return {handled: true};

@@ -1,5 +1,6 @@
-import {IcrcWalletStandardSchema} from '../types/icrc';
-import type {IcrcSupportedStandards} from '../types/icrc-responses';
+import {IcrcWalletScopedMethodSchema, IcrcWalletStandardSchema} from '../types/icrc';
+import type {IcrcScopesArray, IcrcSupportedStandards} from '../types/icrc-responses';
+import {ICRC25_PERMISSION_ASK_ON_USE} from './icrc.constants';
 
 export enum SignerErrorCode {
   /**
@@ -31,3 +32,7 @@ export const SIGNER_SUPPORTED_STANDARDS: IcrcSupportedStandards = Object.values(
   name,
   url: `https://github.com/dfinity/ICRC/blob/main/ICRCs/${name}/${name}.md`
 }));
+
+export const SIGNER_DEFAULT_SCOPES: IcrcScopesArray = Object.values(
+  IcrcWalletScopedMethodSchema.Values
+).map((method) => ({scope: {method}, state: ICRC25_PERMISSION_ASK_ON_USE}));
