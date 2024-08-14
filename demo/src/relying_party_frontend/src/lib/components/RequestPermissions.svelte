@@ -4,7 +4,9 @@
 	import { fade } from 'svelte/transition';
 	import Button from '$core/components/Button.svelte';
 	import Value from '$core/components/Value.svelte';
-	import type { IcrcScope } from '@dfinity/oisy-wallet-signer';
+	import type { IcrcScopesArray } from '@dfinity/oisy-wallet-signer';
+	import PermissionsScopes from '$lib/components/PermissionsScopes.svelte';
+	import { emit } from '$core/utils/events.utils';
 
 	type Props = {
 		wallet: Wallet | undefined;
@@ -12,10 +14,14 @@
 
 	let { wallet }: Props = $props();
 
-	let scopes: IcrcScope[] | undefined = $state(undefined);
+	let scopes: IcrcScopesArray | undefined = $state(undefined);
 
 	const onclick = async () => {
 		scopes = await wallet?.requestPermissions();
+
+		emit({
+			message: 'oisyDemoReloadPermissions'
+		});
 	};
 </script>
 
@@ -23,9 +29,7 @@
 	<div in:fade>
 		<Value id="request-permissions" testId="request-permissions" title="Permissions requests">
 			{#if nonNullish(scopes)}
-				{#each scopes as scope}
-					<p>{scope.scope.method}: <strong>{scope.state}</strong></p>
-				{/each}
+				<PermissionsScopes {scopes} />
 			{:else}
 				<Button {onclick} testId="request-permissions-button">Request permissions</Button>
 			{/if}

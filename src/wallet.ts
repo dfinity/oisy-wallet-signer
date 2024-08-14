@@ -6,6 +6,7 @@ import {
   WALLET_DEFAULT_SCOPES
 } from './constants/wallet.constants';
 import {
+  permissions,
   requestPermissions,
   requestSupportedStandards,
   retryRequestStatus
@@ -335,7 +336,7 @@ export class Wallet {
     options?: WalletRequestOptions;
   } = {}): Promise<IcrcScopesArray> => {
     const postRequest = (id: RpcId): void => {
-      requestSupportedStandards({
+      permissions({
         popup: this.#popup,
         origin: this.#origin,
         id

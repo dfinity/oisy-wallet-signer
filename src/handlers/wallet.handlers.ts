@@ -1,11 +1,13 @@
 import {DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS} from '../constants/core.constants';
 import {
+  ICRC25_PERMISSIONS,
   ICRC25_REQUEST_PERMISSIONS,
   ICRC25_SUPPORTED_STANDARDS,
   ICRC29_STATUS
 } from '../constants/icrc.constants';
-import type {
+import {
   IcrcAnyRequestedScopes,
+  IcrcPermissionsRequest,
   IcrcRequestAnyPermissionsRequest,
   IcrcStatusRequest,
   IcrcSupportedStandardsRequest
@@ -55,6 +57,16 @@ export const requestSupportedStandards = ({id, ...rest}: Request): void => {
     jsonrpc: JSON_RPC_VERSION_2,
     id,
     method: ICRC25_SUPPORTED_STANDARDS
+  };
+
+  postMsg({msg, ...rest});
+};
+
+export const permissions = ({id, ...rest}: Request): void => {
+  const msg: IcrcPermissionsRequest = {
+    jsonrpc: JSON_RPC_VERSION_2,
+    id,
+    method: ICRC25_PERMISSIONS
   };
 
   postMsg({msg, ...rest});
