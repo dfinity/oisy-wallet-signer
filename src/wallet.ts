@@ -1,9 +1,10 @@
 import {assertNonNullish, nonNullish, notEmptyString} from '@dfinity/utils';
 import {
-  WALLET_CONNECT_DEFAULT_TIMEOUT_IN_MILLISECONDS,
-  WALLET_CONNECT_TIMEOUT_REQUEST_PERMISSIONS,
-  WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD,
-  WALLET_DEFAULT_SCOPES
+  WALLET_CONNECT_TIMEOUT_IN_MILLISECONDS,
+  WALLET_DEFAULT_SCOPES,
+  WALLET_TIMEOUT_PERMISSIONS,
+  WALLET_TIMEOUT_REQUEST_PERMISSIONS,
+  WALLET_TIMEOUT_REQUEST_SUPPORTED_STANDARD
 } from './constants/wallet.constants';
 import {
   permissions,
@@ -131,8 +132,7 @@ export class Wallet {
           nonNullish(response) ? (response instanceof Wallet ? 'ready' : 'error') : 'pending',
         id: crypto.randomUUID(),
         timeoutInMilliseconds:
-          connectionOptions?.timeoutInMilliseconds ??
-          WALLET_CONNECT_DEFAULT_TIMEOUT_IN_MILLISECONDS,
+          connectionOptions?.timeoutInMilliseconds ?? WALLET_CONNECT_TIMEOUT_IN_MILLISECONDS,
         intervalInMilliseconds: connectionOptions?.pollingIntervalInMilliseconds
       });
 
@@ -317,8 +317,7 @@ export class Wallet {
 
     return await this.request<IcrcSupportedStandards>({
       options: {
-        timeoutInMilliseconds:
-          timeoutInMilliseconds ?? WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD,
+        timeoutInMilliseconds: timeoutInMilliseconds ?? WALLET_TIMEOUT_REQUEST_SUPPORTED_STANDARD,
         ...rest
       },
       postRequest,
@@ -349,7 +348,7 @@ export class Wallet {
 
     return await this.requestPermissionsScopes({
       options: {
-        timeoutInMilliseconds: timeoutInMilliseconds ?? WALLET_CONNECT_TIMEOUT_REQUEST_PERMISSIONS,
+        timeoutInMilliseconds: timeoutInMilliseconds ?? WALLET_TIMEOUT_PERMISSIONS,
         ...rest
       },
       postRequest
@@ -382,7 +381,7 @@ export class Wallet {
 
     return await this.requestPermissionsScopes({
       options: {
-        timeoutInMilliseconds: timeoutInMilliseconds ?? WALLET_CONNECT_TIMEOUT_REQUEST_PERMISSIONS,
+        timeoutInMilliseconds: timeoutInMilliseconds ?? WALLET_TIMEOUT_REQUEST_PERMISSIONS,
         ...rest
       },
       postRequest
