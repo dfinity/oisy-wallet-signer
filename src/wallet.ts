@@ -331,11 +331,33 @@ export class Wallet {
    * @see [ICRC25 Request Permissions](https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_request_permissions)
    */
   requestPermissions = async ({
-    options: {timeoutInMilliseconds, ...rest} = {},
+    options,
     scopes
   }: {
     options?: WalletRequestOptions;
   } & Partial<IcrcAnyRequestedScopes> = {}): Promise<IcrcScopesArray> => {
+    const postRequest = (id: RpcId): void => {
+      requestPermissions({
+        popup: this.#popup,
+        origin: this.#origin,
+        id,
+        scopes: scopes ?? WALLET_DEFAULT_SCOPES
+      });
+    };
+
+    return await this.requestPermissionsScopes({
+      options,
+      postRequest
+    });
+  };
+
+  private readonly requestPermissionsScopes = async ({
+    options: {timeoutInMilliseconds, ...rest} = {},
+    postRequest
+  }: {
+    options?: WalletRequestOptions;
+    postRequest: (id: RpcId) => void;
+  }): Promise<IcrcScopesArray> => {
     const handleMessage = async ({
       data,
       id
@@ -359,15 +381,6 @@ export class Wallet {
       }
 
       return {handled: false};
-    };
-
-    const postRequest = (id: RpcId): void => {
-      requestPermissions({
-        popup: this.#popup,
-        origin: this.#origin,
-        id,
-        scopes: scopes ?? WALLET_DEFAULT_SCOPES
-      });
     };
 
     return await this.request<IcrcScopesArray>({
