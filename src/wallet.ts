@@ -327,7 +327,7 @@ export class Wallet {
    * @async
    * @param {WalletRequestOptions} options - The options for the wallet request, which may include parameters such as timeout settings and other request-specific configurations.
    * @param {Partial<IcrcAnyRequestedScopes>} scopes - The specific scopes being requested from the wallet. These define the permissions that the wallet may grant.
-   * @returns {Promise<IcrcScopes>} A promise that resolves to an object containing the permissions that were approved by the user of the wallet.
+   * @returns {Promise<IcrcScopes>} A promise that resolves to an object containing the permissions that were confirmed by the user of the wallet.
    * @see [ICRC25 Request Permissions](https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_request_permissions)
    */
   requestPermissions = async ({
