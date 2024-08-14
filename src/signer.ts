@@ -253,6 +253,10 @@ export class Signer {
             }) as const as IcrcScope
         );
 
+      // TODO: Maybe validating that the list of requested scopes contains at least one scope would be cool?
+      // Additionally, it may be beneficial to define a type that ensures at least one scope is present when responding to permission queries ([IcrcScope, ...IcrcScop[]] in Zod).
+      // Overall, it would be handy to enforce a minimum of one permission through types and behavior?
+
       this.#requestsPermissionsSubscribers.next({requestId, scopes});
       return {handled: true};
     }
