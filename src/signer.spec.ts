@@ -469,7 +469,7 @@ describe('Signer', () => {
       spy.mockClear();
     });
 
-    describe('approve permission', () => {
+    describe('Confirm permissions', () => {
       let notifyReadySpy: MockInstance;
 
       beforeEach(() => {
@@ -504,14 +504,14 @@ describe('Signer', () => {
 
       it('should throw error if origin of the relying party is not set', () => {
         expect(() => {
-          signer.approvePermissions({
+          signer.confirmPermissions({
             requestId: msg.data.id,
             scopes
           });
         }).toThrowError("The relying party's origin is unknown.");
       });
 
-      it('should notify scopes for selected permission', () => {
+      it('should notify scopes for selected permissions', () => {
         const messageEvent = new MessageEvent('message', {
           data: {
             id: testId,
@@ -528,7 +528,7 @@ describe('Signer', () => {
           origin: testOrigin
         });
 
-        signer.approvePermissions({
+        signer.confirmPermissions({
           requestId: msg.data.id,
           scopes
         });

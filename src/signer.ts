@@ -221,7 +221,7 @@ export class Signer {
     return {handled: false};
   }
 
-  approvePermissions = ({scopes, requestId}: RequestPermissionPayload): void => {
+  confirmPermissions = ({scopes, requestId}: RequestPermissionPayload): void => {
     assertNonNullish(this.#walletOrigin, "The relying party's origin is unknown.");
 
     notifyPermissionScopes({
