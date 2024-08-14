@@ -15,7 +15,7 @@ import {
   IcrcReadyResponseSchema,
   IcrcScopesResponseSchema,
   IcrcSupportedStandardsResponseSchema,
-  type IcrcScopes,
+  type IcrcScopesArray,
   type IcrcSupportedStandards
 } from './types/icrc-responses';
 import {
@@ -326,14 +326,14 @@ export class Wallet {
    *
    * @async
    * @param {WalletRequestOptions} options - The options for the wallet request, which may include parameters such as timeout settings and other request-specific configurations.
-   * @returns {Promise<IcrcScopes>} A promise that resolves to an object containing all permissions the wallet knows about. The result might be empty if no permissions were ever requested or if the permissions are outdated.
+   * @returns {Promise<IcrcScopes>} A promise that resolves to all permissions the wallet knows about. The result might be empty if no permissions were ever requested or if the permissions are outdated.
    * @see [ICRC25 Permissions](https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_permissions)
    */
   permissions = async ({
     options
   }: {
     options?: WalletRequestOptions;
-  } = {}): Promise<IcrcScopes> => {
+  } = {}): Promise<IcrcScopesArray> => {
     const postRequest = (id: RpcId): void => {
       requestSupportedStandards({
         popup: this.#popup,
@@ -354,7 +354,7 @@ export class Wallet {
    * @async
    * @param {WalletRequestOptions} options - The options for the wallet request, which may include parameters such as timeout settings and other request-specific configurations.
    * @param {Partial<IcrcAnyRequestedScopes>} scopes - The specific scopes being requested from the wallet. These define the permissions that the wallet may grant.
-   * @returns {Promise<IcrcScopes>} A promise that resolves to an object containing the permissions that were confirmed by the user of the wallet.
+   * @returns {Promise<IcrcScopesArray>} A promise that resolves to the permissions that were confirmed by the user of the wallet.
    * @see [ICRC25 Request Permissions](https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_request_permissions)
    */
   requestPermissions = async ({
@@ -362,7 +362,7 @@ export class Wallet {
     scopes
   }: {
     options?: WalletRequestOptions;
-  } & Partial<IcrcAnyRequestedScopes> = {}): Promise<IcrcScopes> => {
+  } & Partial<IcrcAnyRequestedScopes> = {}): Promise<IcrcScopesArray> => {
     const postRequest = (id: RpcId): void => {
       requestPermissions({
         popup: this.#popup,
@@ -384,14 +384,14 @@ export class Wallet {
   }: {
     options?: WalletRequestOptions;
     postRequest: (id: RpcId) => void;
-  }): Promise<IcrcScopes> => {
+  }): Promise<IcrcScopesArray> => {
     const handleMessage = async ({
       data,
       id
     }: {
       data: WalletMessageEventData;
       id: RpcId;
-    }): Promise<{handled: boolean; result?: IcrcScopes}> => {
+    }): Promise<{handled: boolean; result?: IcrcScopesArray}> => {
       const {success: isRequestPermissions, data: requestPermissionsData} =
         IcrcScopesResponseSchema.safeParse(data);
 
@@ -404,13 +404,13 @@ export class Wallet {
           result: {scopes}
         } = requestPermissionsData;
 
-        return {handled: true, result: {scopes}};
+        return {handled: true, result: scopes};
       }
 
       return {handled: false};
     };
 
-    return await this.request<IcrcScopes>({
+    return await this.request<IcrcScopesArray>({
       options: {
         timeoutInMilliseconds: timeoutInMilliseconds ?? WALLET_CONNECT_TIMEOUT_REQUEST_PERMISSIONS,
         ...rest

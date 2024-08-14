@@ -682,7 +682,7 @@ describe('Wallet', () => {
 
           const result = await promise;
 
-          expect(result).toEqual({scopes});
+          expect(result).toEqual(scopes);
         });
       });
     });
