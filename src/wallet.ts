@@ -26,7 +26,11 @@ import {
 import type {WalletMessageEvent, WalletMessageEventData} from './types/wallet';
 import {WalletResponseError} from './types/wallet-errors';
 import {WalletOptionsSchema, type WalletOptions} from './types/wallet-options';
-import {WalletRequestOptionsSchema, type WalletRequestOptions} from './types/wallet-request';
+import {
+  WalletRequestOptionsSchema,
+  type WalletRequestOptions,
+  type WalletRequestOptionsWithTimeout
+} from './types/wallet-request';
 import type {ReadyOrError} from './utils/timeout.utils';
 import {WALLET_WINDOW_TOP_RIGHT, windowFeatures} from './utils/window.utils';
 
@@ -336,6 +340,31 @@ export class Wallet {
   }: {
     options?: WalletRequestOptions;
   } & Partial<IcrcAnyRequestedScopes> = {}): Promise<IcrcScopesArray> => {
+    const postRequest = (id: RpcId): void => {
+      requestPermissions({
+        popup: this.#popup,
+        origin: this.#origin,
+        id,
+        scopes: scopes ?? WALLET_DEFAULT_SCOPES
+      });
+    };
+
+    return await this.requestPermissionsScopes({
+      options: {
+        timeoutInMilliseconds: timeoutInMilliseconds ?? WALLET_CONNECT_TIMEOUT_REQUEST_PERMISSIONS,
+        ...rest
+      },
+      postRequest
+    });
+  };
+
+  private readonly requestPermissionsScopes = async ({
+    options,
+    postRequest
+  }: {
+    options: WalletRequestOptionsWithTimeout;
+    postRequest: (id: RpcId) => void;
+  }): Promise<IcrcScopesArray> => {
     const handleMessage = async ({
       data,
       id
@@ -361,20 +390,8 @@ export class Wallet {
       return {handled: false};
     };
 
-    const postRequest = (id: RpcId): void => {
-      requestPermissions({
-        popup: this.#popup,
-        origin: this.#origin,
-        id,
-        scopes: scopes ?? WALLET_DEFAULT_SCOPES
-      });
-    };
-
     return await this.request<IcrcScopesArray>({
-      options: {
-        timeoutInMilliseconds: timeoutInMilliseconds ?? WALLET_CONNECT_TIMEOUT_REQUEST_PERMISSIONS,
-        ...rest
-      },
+      options,
       postRequest,
       handleMessage
     });
