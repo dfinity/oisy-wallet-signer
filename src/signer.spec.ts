@@ -470,7 +470,7 @@ describe('Signer', () => {
       spy.mockClear();
     });
 
-    describe('approve permission', () => {
+    describe('Confirm permissions', () => {
       const scopes: IcrcScope[] = [
         {
           scope: {
@@ -499,7 +499,7 @@ describe('Signer', () => {
 
       it('should throw error if origin of the relying party is not set', () => {
         expect(() => {
-          signer.approvePermissions({
+          signer.confirmPermissions({
             requestId: msg.data.id,
             scopes
           });
@@ -529,8 +529,8 @@ describe('Signer', () => {
           });
         });
 
-        it('should notify scopes for selected permission', () => {
-          signer.approvePermissions({
+        it('should notify scopes for selected permissions', () => {
+          signer.confirmPermissions({
             requestId: msg.data.id,
             scopes
           });
@@ -548,7 +548,7 @@ describe('Signer', () => {
         });
 
         it('should save permissions in storage', () => {
-          signer.approvePermissions({
+          signer.confirmPermissions({
             requestId: msg.data.id,
             scopes
           });

@@ -43,7 +43,7 @@
 
 		// TODO: alert errors
 
-		signer?.approvePermissions({
+		signer?.confirmPermissions({
 			requestId: $state.snapshot(id)!,
 			scopes: $state.snapshot(scopes)!
 		});
