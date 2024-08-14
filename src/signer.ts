@@ -8,13 +8,14 @@ import {
   notifyReady,
   notifySupportedStandards
 } from './handlers/signer.handlers';
-import {savePermissions} from './sessions/signer.sessions';
+import {readPermissions, savePermissions} from './sessions/signer.sessions';
 import {
   IcrcWalletPermissionStateSchema,
   IcrcWalletScopedMethodSchema,
   type IcrcWalletApproveMethod
 } from './types/icrc';
 import {
+  IcrcPermissionsRequestSchema,
   IcrcRequestAnyPermissionsRequestSchema,
   IcrcStatusRequestSchema,
   IcrcSupportedStandardsRequestSchema
@@ -82,6 +83,11 @@ export class Signer {
 
     const {handled: supportedStandardsRequestHandled} = this.handleSupportedStandards(message);
     if (supportedStandardsRequestHandled) {
+      return;
+    }
+
+    const {handled: permissionsHandled} = this.handlePermissionsRequest(message);
+    if (permissionsHandled) {
       return;
     }
 
@@ -179,6 +185,34 @@ export class Signer {
     if (isSupportedStandardsRequest) {
       const {id} = supportedStandardsData;
       notifySupportedStandards({id, origin});
+      return {handled: true};
+    }
+
+    return {handled: false};
+  }
+
+  /**
+   * Handles incoming messages to list the permissions.
+   *
+   * Parses the message data to determine if it conforms to a permissions request and responds with a notification with the scopes of the permissions.
+   *
+   * @param {SignerMessageEvent} message - The incoming message event containing the data and origin.
+   * @returns {Object} An object with a boolean property `handled` indicating whether the request was handled.
+   */
+  private handlePermissionsRequest({data, origin}: SignerMessageEvent): {handled: boolean} {
+    const {success: isPermissionsRequestRequest, data: permissionsRequestData} =
+      IcrcPermissionsRequestSchema.safeParse(data);
+
+    if (isPermissionsRequestRequest) {
+      const {id} = permissionsRequestData;
+
+      const scopes = readPermissions({owner: this.#owner, origin});
+
+      notifyPermissionScopes({
+        id,
+        origin,
+        scopes
+      });
       return {handled: true};
     }
 

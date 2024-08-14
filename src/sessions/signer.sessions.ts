@@ -1,25 +1,31 @@
 import type {Principal} from '@dfinity/principal';
 import type {IcrcScopesArray} from '../types/icrc-responses';
 import type {SessionPermissions} from '../types/signer-sessions';
-import {set} from '../utils/storage.utils';
+import {get, set} from '../utils/storage.utils';
 
 const KEY_PREFIX = 'oisy_signer';
 
-export const savePermissions = ({
-  owner,
-  origin,
-  scopes
-}: {
+interface SessionParams {
   owner: Principal;
   origin: string;
+}
+
+const key = ({owner, origin}: SessionParams): string => `${KEY_PREFIX}_${origin}_${owner.toText()}`;
+
+export const savePermissions = ({
+  scopes,
+  ...rest
+}: SessionParams & {
   scopes: IcrcScopesArray;
 }): void => {
-  const key = `${KEY_PREFIX}_${origin}_${owner.toText()}`;
-
   const value: SessionPermissions = {
     scopes,
     createdAt: Date.now()
   };
 
-  set({key, value});
+  set({key: key(rest), value});
+};
+
+export const readPermissions = (params: SessionParams): SessionPermissions | undefined => {
+  return get<SessionPermissions>({key: key(params)});
 };
