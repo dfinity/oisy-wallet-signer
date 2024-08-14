@@ -86,9 +86,9 @@ export class PartyPage extends IdentityPage {
 
     await this.#walletPage?.approvePermissions();
 
-    await expect(this.page.getByTestId('response-permissions')).toBeVisible();
+    await expect(this.page.getByTestId('request-permissions')).toBeVisible();
 
-    const permissions = this.page.getByTestId('response-permissions');
+    const permissions = this.page.getByTestId('request-permissions');
 
     await expect(permissions.getByText('icrc27_accounts: granted')).toBeVisible();
     await expect(permissions.getByText('icrc49_call_canister: denied')).toBeVisible();

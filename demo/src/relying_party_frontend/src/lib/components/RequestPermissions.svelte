@@ -21,19 +21,15 @@
 </script>
 
 {#if nonNullish(wallet)}
-	{#if nonNullish(scopes)}
-		<div in:fade>
-			<Value id="granted-permissions" testId="response-permissions" title="Permissions">
+	<div in:fade>
+		<Value id="request-permissions" testId="request-permissions" title="Permissions requests">
+			{#if nonNullish(scopes)}
 				{#each scopes as scope}
 					<p>{scope.scope.method}: <strong>{scope.state}</strong></p>
 				{/each}
-			</Value>
-		</div>
-	{:else}
-		<div in:fade>
-			<Value id="request-permissions" testId="request-permissions" title="Permissions">
+			{:else}
 				<Button {onclick} testId="request-permissions-button">Request permissions</Button>
-			</Value>
-		</div>
-	{/if}
+			{/if}
+		</Value>
+	</div>
 {/if}
