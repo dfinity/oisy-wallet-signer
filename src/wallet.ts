@@ -18,8 +18,13 @@ import {
   type IcrcScopes,
   type IcrcSupportedStandards
 } from './types/icrc-responses';
-import {RpcResponseWithResultOrErrorSchema, type RpcId} from './types/rpc';
+import {
+  RpcResponseWithErrorSchema,
+  RpcResponseWithResultOrErrorSchema,
+  type RpcId
+} from './types/rpc';
 import type {WalletMessageEvent, WalletMessageEventData} from './types/wallet';
+import {WalletResponseError} from './types/wallet-errors';
 import {WalletOptionsSchema, type WalletOptions} from './types/wallet-options';
 import {WalletRequestOptionsSchema, type WalletRequestOptions} from './types/wallet-request';
 import type {ReadyOrError} from './utils/timeout.utils';
@@ -236,6 +241,14 @@ export class Wallet {
         if (handled && nonNullish(result)) {
           resolve(result);
           disconnect();
+          return;
+        }
+
+        const checkError = this.handleErrorMessage({data, id: requestId});
+
+        if (!checkError.valid) {
+          reject(checkError.error);
+          disconnect();
         }
       };
 
@@ -365,5 +378,24 @@ export class Wallet {
       postRequest,
       handleMessage
     });
+  };
+
+  private readonly handleErrorMessage = ({
+    data,
+    id
+  }: {
+    data: WalletMessageEventData;
+    id: RpcId;
+  }): {valid: true} | {valid: false; error: WalletResponseError | Error} => {
+    const {success: isError, data: errorData} = RpcResponseWithErrorSchema.safeParse(data);
+
+    if (!isError || id !== errorData?.id) {
+      return {valid: true};
+    }
+
+    return {
+      valid: false,
+      error: new WalletResponseError(errorData.error)
+    };
   };
 }
