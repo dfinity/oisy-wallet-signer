@@ -1,7 +1,7 @@
 import type {Principal} from '@dfinity/principal';
 import {assertNonNullish, nonNullish} from '@dfinity/utils';
 import {ICRC25_REQUEST_PERMISSIONS} from './constants/icrc.constants';
-import {SignerErrorCode} from './constants/signer.constants';
+import {SIGNER_DEFAULT_SCOPES, SignerErrorCode} from './constants/signer.constants';
 import {
   notifyError,
   notifyPermissionScopes,
@@ -211,7 +211,7 @@ export class Signer {
       notifyPermissionScopes({
         id,
         origin,
-        scopes: permissions?.scopes ?? []
+        scopes: permissions?.scopes ?? SIGNER_DEFAULT_SCOPES
       });
       return {handled: true};
     }
