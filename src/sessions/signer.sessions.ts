@@ -27,5 +27,7 @@ export const savePermissions = ({
 };
 
 export const readPermissions = (params: SessionParams): SessionPermissions | undefined => {
+  // TODO: cleanup expired permissions
+
   return get<SessionPermissions>({key: key(params)});
 };

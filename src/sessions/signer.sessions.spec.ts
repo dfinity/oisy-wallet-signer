@@ -3,47 +3,66 @@ import {afterEach, beforeEach, type MockInstance} from 'vitest';
 import {ICRC25_PERMISSION_GRANTED, ICRC27_ACCOUNTS} from '../constants/icrc.constants';
 import type {IcrcScopesArray} from '../types/icrc-responses';
 import * as storageUtils from '../utils/storage.utils';
-import {savePermissions} from './signer.sessions';
+import {del} from '../utils/storage.utils';
+import {readPermissions, savePermissions} from './signer.sessions';
 
 describe('Signer sessions', () => {
-  describe('savePermissions', () => {
-    const owner = Ed25519KeyIdentity.generate().getPrincipal();
+  const owner = Ed25519KeyIdentity.generate().getPrincipal();
 
-    const scopes: IcrcScopesArray = [
-      {
-        scope: {
-          method: ICRC27_ACCOUNTS
-        },
-        state: ICRC25_PERMISSION_GRANTED
-      }
-    ];
+  const scopes: IcrcScopesArray = [
+    {
+      scope: {
+        method: ICRC27_ACCOUNTS
+      },
+      state: ICRC25_PERMISSION_GRANTED
+    }
+  ];
 
-    const origin = 'https://example.com';
+  const origin = 'https://example.com';
 
-    let setSpy: MockInstance;
+  const expectedKey = `oisy_signer_${origin}_${owner.toText()}`;
 
-    beforeEach(() => {
-      setSpy = vi.spyOn(storageUtils, 'set');
+  let setSpy: MockInstance;
+
+  beforeEach(() => {
+    setSpy = vi.spyOn(storageUtils, 'set');
+  });
+
+  afterEach(() => {
+    del({key: expectedKey});
+
+    vi.clearAllMocks();
+  });
+
+  it('should save the permissions to local storage', () => {
+    savePermissions({
+      owner,
+      origin,
+      scopes
     });
 
-    afterEach(() => {
-      vi.clearAllMocks();
+    const expectedValue = {
+      scopes,
+      createdAt: expect.any(Number)
+    };
+
+    expect(setSpy).toHaveBeenCalledWith({key: expectedKey, value: expectedValue});
+  });
+
+  it('should read the permissions from local storage', () => {
+    savePermissions({
+      owner,
+      origin,
+      scopes
     });
 
-    it('should save the permissions to local storage', () => {
-      savePermissions({
-        owner,
-        origin,
-        scopes
-      });
+    const permissions = readPermissions({owner, origin});
 
-      const expectedKey = `oisy_signer_${origin}_${owner.toText()}`;
-      const expectedValue = {
-        scopes,
-        createdAt: expect.any(Number)
-      };
+    const expectedValue = {
+      scopes,
+      createdAt: expect.any(Number)
+    };
 
-      expect(setSpy).toHaveBeenCalledWith({key: expectedKey, value: expectedValue});
-    });
+    expect(permissions).toEqual(expect.objectContaining(expectedValue));
   });
 });
