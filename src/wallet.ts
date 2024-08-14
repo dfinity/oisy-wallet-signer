@@ -322,6 +322,33 @@ export class Wallet {
   };
 
   /**
+   * Query the state of all permissions of the wallet.
+   *
+   * @async
+   * @param {WalletRequestOptions} options - The options for the wallet request, which may include parameters such as timeout settings and other request-specific configurations.
+   * @returns {Promise<IcrcScopes>} A promise that resolves to an object containing all permissions the wallet knows about. The result might be empty if no permissions were ever requested or if the permissions are outdated.
+   * @see [ICRC25 Permissions](https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_permissions)
+   */
+  permissions = async ({
+    options
+  }: {
+    options?: WalletRequestOptions;
+  } = {}): Promise<IcrcScopes> => {
+    const postRequest = (id: RpcId): void => {
+      requestSupportedStandards({
+        popup: this.#popup,
+        origin: this.#origin,
+        id
+      });
+    };
+
+    return await this.requestPermissionsScopes({
+      options,
+      postRequest
+    });
+  };
+
+  /**
    * Request permissions to the wallet.
    *
    * @async
@@ -331,11 +358,33 @@ export class Wallet {
    * @see [ICRC25 Request Permissions](https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_request_permissions)
    */
   requestPermissions = async ({
-    options: {timeoutInMilliseconds, ...rest} = {},
+    options,
     scopes
   }: {
     options?: WalletRequestOptions;
   } & Partial<IcrcAnyRequestedScopes> = {}): Promise<IcrcScopes> => {
+    const postRequest = (id: RpcId): void => {
+      requestPermissions({
+        popup: this.#popup,
+        origin: this.#origin,
+        id,
+        scopes: scopes ?? WALLET_DEFAULT_SCOPES
+      });
+    };
+
+    return await this.requestPermissionsScopes({
+      options,
+      postRequest
+    });
+  };
+
+  private readonly requestPermissionsScopes = async ({
+    options: {timeoutInMilliseconds, ...rest} = {},
+    postRequest
+  }: {
+    options?: WalletRequestOptions;
+    postRequest: (id: RpcId) => void;
+  }): Promise<IcrcScopes> => {
     const handleMessage = async ({
       data,
       id
@@ -359,15 +408,6 @@ export class Wallet {
       }
 
       return {handled: false};
-    };
-
-    const postRequest = (id: RpcId): void => {
-      requestPermissions({
-        popup: this.#popup,
-        origin: this.#origin,
-        id,
-        scopes: scopes ?? WALLET_DEFAULT_SCOPES
-      });
     };
 
     return await this.request<IcrcScopes>({

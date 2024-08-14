@@ -206,12 +206,12 @@ export class Signer {
     if (isPermissionsRequestRequest) {
       const {id} = permissionsRequestData;
 
-      const scopes = readPermissions({owner: this.#owner, origin});
+      const permissions = readPermissions({owner: this.#owner, origin});
 
       notifyPermissionScopes({
         id,
         origin,
-        scopes
+        scopes: permissions?.scopes ?? []
       });
       return {handled: true};
     }
