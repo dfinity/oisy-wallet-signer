@@ -9,7 +9,19 @@ export enum SignerErrorCode {
   /**
    * The request sent by the relying party is not supported by the signer.
    */
-  REQUEST_NOT_SUPPORTED = 501
+  REQUEST_NOT_SUPPORTED = 501,
+
+  /**
+   * A generic error.
+   * @see https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#errors
+   */
+  GENERIC_ERROR = 1000,
+
+  /**
+   * An error is thrown when the permission to perform a feature is denied.
+   * @see https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#errors
+   */
+  PERMISSION_NOT_GRANTED = 3000
 }
 
 export const SIGNER_SUPPORTED_STANDARDS: IcrcSupportedStandards = [

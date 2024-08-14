@@ -4,6 +4,7 @@ import {
   RpcErrorCode,
   RpcNotificationSchema,
   RpcRequestSchema,
+  RpcResponseWithErrorSchema,
   RpcResponseWithResultOrErrorSchema,
   inferRpcRequestWithParamsSchema,
   inferRpcRequestWithoutParamsSchema
@@ -240,7 +241,7 @@ describe('rpc', () => {
     });
   });
 
-  describe('RpcResponse', () => {
+  describe('RpcResponse with result or error', () => {
     it('should validate a correct RpcResponse with result', () => {
       const validRpcResponse = {
         jsonrpc: JSON_RPC_VERSION_2,
@@ -330,6 +331,89 @@ describe('rpc', () => {
         hello: 'world'
       };
       expect(() => RpcResponseWithResultOrErrorSchema.parse(invalidRpcResponse)).toThrow();
+    });
+  });
+
+  describe('RpcResponse with error', () => {
+    it('should validate a correct RpcResponse with standard error', () => {
+      const validRpcResponseWithError = {
+        jsonrpc: JSON_RPC_VERSION_2,
+        id: 1,
+        error: {
+          code: RpcErrorCode.INTERNAL_ERROR,
+          message: 'An internal error occurred'
+        }
+      };
+      expect(() => RpcResponseWithErrorSchema.parse(validRpcResponseWithError)).not.toThrow();
+    });
+
+    it('should validate a correct RpcResponse with custom error code', () => {
+      const validRpcResponseWithError = {
+        jsonrpc: JSON_RPC_VERSION_2,
+        id: 1,
+        error: {
+          code: 9999,
+          message: 'A custom error occurred'
+        }
+      };
+      expect(() => RpcResponseWithErrorSchema.parse(validRpcResponseWithError)).not.toThrow();
+    });
+
+    it('should throw if RpcResponse with error has no error code', () => {
+      const invalidRpcResponseWithError = {
+        jsonrpc: JSON_RPC_VERSION_2,
+        id: 1,
+        error: {
+          message: 'An error occurred without a code'
+        }
+      };
+      expect(() => RpcResponseWithErrorSchema.parse(invalidRpcResponseWithError)).toThrow();
+    });
+
+    it('should throw if RpcResponse with error has no error message', () => {
+      const invalidRpcResponseWithError = {
+        jsonrpc: JSON_RPC_VERSION_2,
+        id: 1,
+        error: {
+          code: RpcErrorCode.INTERNAL_ERROR
+        }
+      };
+      expect(() => RpcResponseWithErrorSchema.parse(invalidRpcResponseWithError)).toThrow();
+    });
+
+    it('should throw if RpcResponse with error has no id', () => {
+      const invalidRpcResponseWithError = {
+        jsonrpc: JSON_RPC_VERSION_2,
+        error: {
+          code: RpcErrorCode.INTERNAL_ERROR,
+          message: 'An internal error occurred'
+        }
+      };
+      expect(() => RpcResponseWithErrorSchema.parse(invalidRpcResponseWithError)).toThrow();
+    });
+
+    it('should throw if RpcResponse with error has no jsonrpc field', () => {
+      const invalidRpcResponseWithError = {
+        id: 1,
+        error: {
+          code: RpcErrorCode.INTERNAL_ERROR,
+          message: 'An internal error occurred'
+        }
+      };
+      expect(() => RpcResponseWithErrorSchema.parse(invalidRpcResponseWithError)).toThrow();
+    });
+
+    it('should throw if RpcResponse with error has additional fields', () => {
+      const invalidRpcResponseWithError = {
+        jsonrpc: JSON_RPC_VERSION_2,
+        id: 1,
+        error: {
+          code: RpcErrorCode.INTERNAL_ERROR,
+          message: 'An internal error occurred'
+        },
+        additionalField: 'not allowed'
+      };
+      expect(() => RpcResponseWithErrorSchema.parse(invalidRpcResponseWithError)).toThrow();
     });
   });
 });

@@ -94,8 +94,12 @@ export enum RpcErrorCode {
   SERVER_ERROR = -32000
 }
 
+const RpcResponseErrorCodeSchema = z.union([z.number(), z.nativeEnum(RpcErrorCode)]);
+
+export type RpcResponseErrorCode = z.infer<typeof RpcResponseErrorCodeSchema>;
+
 const RpcResponseErrorSchema = z.object({
-  code: z.union([z.number(), z.nativeEnum(RpcErrorCode)]),
+  code: RpcResponseErrorCodeSchema,
   message: z.string(),
   data: z.optional(z.never())
 });
@@ -108,9 +112,9 @@ const RpcResponseSchema = RpcSchema.extend({
 
 export type RpcResponse = z.infer<typeof RpcResponseSchema>;
 
-const RpcResponseWithErrorSchema = RpcResponseSchema.extend({
+export const RpcResponseWithErrorSchema = RpcResponseSchema.extend({
   error: RpcResponseErrorSchema
-});
+}).strict();
 
 export type RpcResponseWithError = z.infer<typeof RpcResponseWithErrorSchema>;
 

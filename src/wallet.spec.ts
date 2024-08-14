@@ -5,6 +5,7 @@ import {
   ICRC29_STATUS,
   ICRC49_CALL_CANISTER
 } from './constants/icrc.constants';
+import {SignerErrorCode} from './constants/signer.constants';
 import {
   WALLET_CONNECT_TIMEOUT_REQUEST_PERMISSIONS,
   WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD,
@@ -17,6 +18,7 @@ import {
   IcrcSupportedStandardsResponseSchema
 } from './types/icrc-responses';
 import {JSON_RPC_VERSION_2, RpcResponseWithResultOrErrorSchema} from './types/rpc';
+import {WalletResponseError} from './types/wallet-errors';
 import type {WalletOptions} from './types/wallet-options';
 import {WALLET_WINDOW_CENTER, WALLET_WINDOW_TOP_RIGHT, windowFeatures} from './utils/window.utils';
 import {Wallet} from './wallet';
@@ -376,6 +378,35 @@ describe('Wallet', () => {
             `The response origin ${hackerOrigin} does not match the wallet origin ${mockParameters.url}.`
           );
         });
+
+        it('should throw a wallet response error if the wallet notify an error', async () => {
+          const testId = '12345';
+
+          const promise = wallet.supportedStandards({options: {requestId: testId}});
+
+          const errorMsg = 'This is a test error.';
+
+          const messageEvent = new MessageEvent('message', {
+            origin: mockParameters.url,
+            data: {
+              jsonrpc: JSON_RPC_VERSION_2,
+              id: testId,
+              error: {
+                code: SignerErrorCode.GENERIC_ERROR,
+                message: errorMsg
+              }
+            }
+          });
+
+          window.dispatchEvent(messageEvent);
+
+          const error = {
+            code: SignerErrorCode.GENERIC_ERROR,
+            message: errorMsg
+          };
+
+          await expect(promise).rejects.toThrowError(new WalletResponseError(error));
+        });
       });
 
       describe('Request success', () => {
@@ -546,6 +577,35 @@ describe('Wallet', () => {
           await expect(promise).rejects.toThrow(
             `The response origin ${hackerOrigin} does not match the wallet origin ${mockParameters.url}.`
           );
+        });
+
+        it('should throw a wallet response error if the wallet notify an error', async () => {
+          const testId = '12345';
+
+          const promise = wallet.requestPermissions({options: {requestId: testId}});
+
+          const errorMsg = 'This is a test error.';
+
+          const messageEvent = new MessageEvent('message', {
+            origin: mockParameters.url,
+            data: {
+              jsonrpc: JSON_RPC_VERSION_2,
+              id: testId,
+              error: {
+                code: SignerErrorCode.GENERIC_ERROR,
+                message: errorMsg
+              }
+            }
+          });
+
+          window.dispatchEvent(messageEvent);
+
+          const error = {
+            code: SignerErrorCode.GENERIC_ERROR,
+            message: errorMsg
+          };
+
+          await expect(promise).rejects.toThrowError(new WalletResponseError(error));
         });
       });
 
