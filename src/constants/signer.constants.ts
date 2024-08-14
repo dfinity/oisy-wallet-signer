@@ -1,3 +1,4 @@
+import {IcrcWalletStandardSchema} from '../types/icrc';
 import type {IcrcSupportedStandards} from '../types/icrc-responses';
 
 export enum SignerErrorCode {
@@ -24,13 +25,9 @@ export enum SignerErrorCode {
   PERMISSION_NOT_GRANTED = 3000
 }
 
-export const SIGNER_SUPPORTED_STANDARDS: IcrcSupportedStandards = [
-  {
-    name: 'ICRC-25',
-    url: 'https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-25/ICRC-25.md'
-  },
-  {
-    name: 'ICRC-27',
-    url: 'https://github.com/dfinity/ICRC/blob/main/ICRCs/ICRC-27/ICRC-27.md'
-  }
-];
+export const SIGNER_SUPPORTED_STANDARDS: IcrcSupportedStandards = Object.values(
+  IcrcWalletStandardSchema.Values
+).map((name) => ({
+  name,
+  url: `https://github.com/dfinity/ICRC/blob/main/ICRCs/${name}/${name}.md`
+}));
