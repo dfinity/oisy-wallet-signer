@@ -27,7 +27,11 @@ import {
 import type {WalletMessageEvent, WalletMessageEventData} from './types/wallet';
 import {WalletResponseError} from './types/wallet-errors';
 import {WalletOptionsSchema, type WalletOptions} from './types/wallet-options';
-import {WalletRequestOptionsSchema, type WalletRequestOptions} from './types/wallet-request';
+import {
+  WalletRequestOptionsSchema,
+  type WalletRequestOptions,
+  type WalletRequestOptionsWithTimeout
+} from './types/wallet-request';
 import type {ReadyOrError} from './utils/timeout.utils';
 import {WALLET_WINDOW_TOP_RIGHT, windowFeatures} from './utils/window.utils';
 
@@ -331,7 +335,7 @@ export class Wallet {
    * @see [ICRC25 Permissions](https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_permissions)
    */
   permissions = async ({
-    options
+    options: {timeoutInMilliseconds, ...rest} = {}
   }: {
     options?: WalletRequestOptions;
   } = {}): Promise<IcrcScopesArray> => {
@@ -344,7 +348,10 @@ export class Wallet {
     };
 
     return await this.requestPermissionsScopes({
-      options,
+      options: {
+        timeoutInMilliseconds: timeoutInMilliseconds ?? WALLET_CONNECT_TIMEOUT_REQUEST_PERMISSIONS,
+        ...rest
+      },
       postRequest
     });
   };
@@ -359,7 +366,7 @@ export class Wallet {
    * @see [ICRC25 Request Permissions](https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_request_permissions)
    */
   requestPermissions = async ({
-    options,
+    options: {timeoutInMilliseconds, ...rest} = {},
     scopes
   }: {
     options?: WalletRequestOptions;
@@ -374,16 +381,19 @@ export class Wallet {
     };
 
     return await this.requestPermissionsScopes({
-      options,
+      options: {
+        timeoutInMilliseconds: timeoutInMilliseconds ?? WALLET_CONNECT_TIMEOUT_REQUEST_PERMISSIONS,
+        ...rest
+      },
       postRequest
     });
   };
 
   private readonly requestPermissionsScopes = async ({
-    options: {timeoutInMilliseconds, ...rest} = {},
+    options,
     postRequest
   }: {
-    options?: WalletRequestOptions;
+    options: WalletRequestOptionsWithTimeout;
     postRequest: (id: RpcId) => void;
   }): Promise<IcrcScopesArray> => {
     const handleMessage = async ({
@@ -412,10 +422,7 @@ export class Wallet {
     };
 
     return await this.request<IcrcScopesArray>({
-      options: {
-        timeoutInMilliseconds: timeoutInMilliseconds ?? WALLET_CONNECT_TIMEOUT_REQUEST_PERMISSIONS,
-        ...rest
-      },
+      options,
       postRequest,
       handleMessage
     });
