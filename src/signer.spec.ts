@@ -1,5 +1,5 @@
 import {Ed25519KeyIdentity} from '@dfinity/identity';
-import type {MockInstance} from 'vitest';
+import {beforeEach, type MockInstance} from 'vitest';
 import {
   ICRC25_REQUEST_PERMISSIONS,
   ICRC25_SUPPORTED_STANDARDS,
@@ -16,14 +16,15 @@ import type {IcrcScope} from './types/icrc-responses';
 import {JSON_RPC_VERSION_2} from './types/rpc';
 import type {SignerMessageEventData} from './types/signer';
 import type {SignerOptions} from './types/signer-options';
+import {get} from './utils/storage.utils';
 
 describe('Signer', () => {
-  const mockParameters: SignerOptions = {
+  const signerOptions: SignerOptions = {
     owner: Ed25519KeyIdentity.generate().getPrincipal()
   };
 
   it('should init a signer', () => {
-    const signer = Signer.init(mockParameters);
+    const signer = Signer.init(signerOptions);
     expect(signer).toBeInstanceOf(Signer);
     signer.disconnect();
   });
@@ -31,7 +32,7 @@ describe('Signer', () => {
   it('should add event listener for message on connect', () => {
     const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
 
-    const signer = Signer.init(mockParameters);
+    const signer = Signer.init(signerOptions);
     expect(addEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
     signer.disconnect();
   });
@@ -39,7 +40,7 @@ describe('Signer', () => {
   it('should remove event listener for message on connect', () => {
     const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
 
-    const signer = Signer.init(mockParameters);
+    const signer = Signer.init(signerOptions);
     signer.disconnect();
 
     expect(removeEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
@@ -56,7 +57,7 @@ describe('Signer', () => {
     let signer: Signer;
 
     beforeEach(() => {
-      signer = Signer.init(mockParameters);
+      signer = Signer.init(signerOptions);
       onMessageListenerSpy = vi.spyOn(signer as unknown as {onMessage: () => void}, 'onMessage');
     });
 
@@ -106,7 +107,7 @@ describe('Signer', () => {
     let postMessageMock: MockInstance;
 
     beforeEach(() => {
-      signer = Signer.init(mockParameters);
+      signer = Signer.init(signerOptions);
       notifyReadySpy = vi.spyOn(signerHandlers, 'notifyReady');
       postMessageMock = vi.fn();
       vi.stubGlobal('opener', {postMessage: postMessageMock});
@@ -224,7 +225,7 @@ describe('Signer', () => {
     let postMessageMock: MockInstance;
 
     beforeEach(() => {
-      signer = Signer.init(mockParameters);
+      signer = Signer.init(signerOptions);
 
       postMessageMock = vi.fn();
 
@@ -470,12 +471,6 @@ describe('Signer', () => {
     });
 
     describe('approve permission', () => {
-      let notifyReadySpy: MockInstance;
-
-      beforeEach(() => {
-        notifyReadySpy = vi.spyOn(signerHandlers, 'notifyReady');
-      });
-
       const scopes: IcrcScope[] = [
         {
           scope: {
@@ -511,38 +506,63 @@ describe('Signer', () => {
         }).toThrowError("The relying party's origin is unknown.");
       });
 
-      it('should notify scopes for selected permission', () => {
-        const messageEvent = new MessageEvent('message', {
-          data: {
+      describe('Wallet ready', () => {
+        let notifyReadySpy: MockInstance;
+
+        beforeEach(() => {
+          notifyReadySpy = vi.spyOn(signerHandlers, 'notifyReady');
+
+          const messageEvent = new MessageEvent('message', {
+            data: {
+              id: testId,
+              jsonrpc: JSON_RPC_VERSION_2,
+              method: ICRC29_STATUS
+            },
+            origin: testOrigin
+          });
+
+          window.dispatchEvent(messageEvent);
+
+          expect(notifyReadySpy).toHaveBeenCalledWith({
             id: testId,
-            jsonrpc: JSON_RPC_VERSION_2,
-            method: ICRC29_STATUS
-          },
-          origin: testOrigin
+            origin: testOrigin
+          });
         });
 
-        window.dispatchEvent(messageEvent);
+        it('should notify scopes for selected permission', () => {
+          signer.approvePermissions({
+            requestId: msg.data.id,
+            scopes
+          });
 
-        expect(notifyReadySpy).toHaveBeenCalledWith({
-          id: testId,
-          origin: testOrigin
+          expect(postMessageMock).toHaveBeenCalledWith(
+            {
+              jsonrpc: JSON_RPC_VERSION_2,
+              id: msg.data.id,
+              result: {
+                scopes
+              }
+            },
+            testOrigin
+          );
         });
 
-        signer.approvePermissions({
-          requestId: msg.data.id,
-          scopes
-        });
+        it('should save permissions in storage', () => {
+          signer.approvePermissions({
+            requestId: msg.data.id,
+            scopes
+          });
 
-        expect(postMessageMock).toHaveBeenCalledWith(
-          {
-            jsonrpc: JSON_RPC_VERSION_2,
-            id: msg.data.id,
-            result: {
-              scopes
-            }
-          },
-          testOrigin
-        );
+          const expectedKey = `oisy_signer_${testOrigin}_${signerOptions.owner.toText()}`;
+          const expectedData = {
+            scopes,
+            created_at: expect.any(Number)
+          };
+
+          const storedData = get({key: expectedKey});
+
+          expect(storedData).toStrictEqual(expectedData);
+        });
       });
     });
   });
