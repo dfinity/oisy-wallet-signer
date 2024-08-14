@@ -20,7 +20,7 @@ import {
 import type {IcrcScope} from './types/icrc-responses';
 import {RpcRequestSchema} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
-import {SignerOptions} from './types/signer-options';
+import type {SignerOptions} from './types/signer-options';
 import type {RequestPermissionPayload} from './types/signer-subscribers';
 import {Observable} from './utils/observable';
 

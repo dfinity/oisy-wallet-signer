@@ -15,7 +15,7 @@ import type {IcrcRequestAnyPermissionsRequest} from './types/icrc-requests';
 import type {IcrcScope} from './types/icrc-responses';
 import {JSON_RPC_VERSION_2} from './types/rpc';
 import type {SignerMessageEventData} from './types/signer';
-import {SignerOptions} from './types/signer-options';
+import type {SignerOptions} from './types/signer-options';
 
 describe('Signer', () => {
   const mockParameters: SignerOptions = {

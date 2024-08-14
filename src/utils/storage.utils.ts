@@ -1,6 +1,6 @@
 import {nonNullish} from '@dfinity/utils';
 
-export const set = <T>({key, value}: {key: string; value: T}) => {
+export const set = <T>({key, value}: {key: string; value: T}): void => {
   try {
     localStorage.setItem(key, JSON.stringify(value));
   } catch (err: unknown) {
@@ -10,7 +10,7 @@ export const set = <T>({key, value}: {key: string; value: T}) => {
   }
 };
 
-export const del = ({key}: {key: string}) => {
+export const del = ({key}: {key: string}): void => {
   try {
     localStorage.removeItem(key);
   } catch (err: unknown) {
@@ -21,7 +21,7 @@ export const del = ({key}: {key: string}) => {
 
 export const get = <T>({key}: {key: string}): T | undefined => {
   try {
-    const {[key]: value} = localStorage;
+    const value = localStorage.getItem(key);
     return nonNullish(value) ? JSON.parse(value) : undefined;
   } catch (err: unknown) {
     // See comment in set.error
