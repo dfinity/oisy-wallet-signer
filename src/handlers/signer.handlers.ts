@@ -1,7 +1,7 @@
 import {SIGNER_SUPPORTED_STANDARDS} from '../constants/signer.constants';
 import type {
   IcrcReadyResponse,
-  IcrcScope,
+  IcrcScopesArray,
   IcrcScopesResponse,
   IcrcSupportedStandardsResponse
 } from '../types/icrc-responses';
@@ -44,7 +44,7 @@ export const notifyPermissionScopes = ({
   id,
   origin,
   scopes
-}: Notify & {scopes: IcrcScope[]}): void => {
+}: Notify & {scopes: IcrcScopesArray}): void => {
   const msg: IcrcScopesResponse = {
     jsonrpc: JSON_RPC_VERSION_2,
     id,
