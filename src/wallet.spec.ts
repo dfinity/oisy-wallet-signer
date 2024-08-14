@@ -7,9 +7,9 @@ import {
 } from './constants/icrc.constants';
 import {SignerErrorCode} from './constants/signer.constants';
 import {
-  WALLET_CONNECT_TIMEOUT_REQUEST_PERMISSIONS,
-  WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD,
-  WALLET_DEFAULT_SCOPES
+  WALLET_DEFAULT_SCOPES,
+  WALLET_TIMEOUT_REQUEST_PERMISSIONS,
+  WALLET_TIMEOUT_REQUEST_SUPPORTED_STANDARD
 } from './constants/wallet.constants';
 import * as walletHandlers from './handlers/wallet.handlers';
 import type {IcrcAnyRequestedScopes} from './types/icrc-requests';
@@ -303,7 +303,7 @@ describe('Wallet', () => {
               vi.useFakeTimers();
 
               const timeout =
-                options?.timeoutInMilliseconds ?? WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD;
+                options?.timeoutInMilliseconds ?? WALLET_TIMEOUT_REQUEST_SUPPORTED_STANDARD;
 
               wallet.supportedStandards({options}).catch((err: Error) => {
                 expect(err.message).toBe(
@@ -329,7 +329,7 @@ describe('Wallet', () => {
 
             wallet.supportedStandards().catch((err: Error) => {
               expect(err.message).toBe(
-                `Request to wallet timed out after ${WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD} milliseconds.`
+                `Request to wallet timed out after ${WALLET_TIMEOUT_REQUEST_SUPPORTED_STANDARD} milliseconds.`
               );
 
               expect(spy).toHaveBeenCalledTimes(1);
@@ -352,7 +352,7 @@ describe('Wallet', () => {
 
             window.dispatchEvent(messageEventSupportedStandards);
 
-            await vi.advanceTimersByTimeAsync(WALLET_CONNECT_TIMEOUT_REQUEST_SUPPORTED_STANDARD);
+            await vi.advanceTimersByTimeAsync(WALLET_TIMEOUT_REQUEST_SUPPORTED_STANDARD);
           });
         });
 
@@ -502,8 +502,7 @@ describe('Wallet', () => {
             return new Promise<void>(async (resolve) => {
               vi.useFakeTimers();
 
-              const timeout =
-                options?.timeoutInMilliseconds ?? WALLET_CONNECT_TIMEOUT_REQUEST_PERMISSIONS;
+              const timeout = options?.timeoutInMilliseconds ?? WALLET_TIMEOUT_REQUEST_PERMISSIONS;
 
               wallet.requestPermissions({options}).catch((err: Error) => {
                 expect(err.message).toBe(
@@ -529,7 +528,7 @@ describe('Wallet', () => {
 
             wallet.requestPermissions().catch((err: Error) => {
               expect(err.message).toBe(
-                `Request to wallet timed out after ${WALLET_CONNECT_TIMEOUT_REQUEST_PERMISSIONS} milliseconds.`
+                `Request to wallet timed out after ${WALLET_TIMEOUT_REQUEST_PERMISSIONS} milliseconds.`
               );
 
               expect(spy).toHaveBeenCalledTimes(1);
@@ -552,7 +551,7 @@ describe('Wallet', () => {
 
             window.dispatchEvent(messageEventScopes);
 
-            await vi.advanceTimersByTimeAsync(WALLET_CONNECT_TIMEOUT_REQUEST_PERMISSIONS);
+            await vi.advanceTimersByTimeAsync(WALLET_TIMEOUT_REQUEST_PERMISSIONS);
           });
         });
 
