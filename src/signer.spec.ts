@@ -1,14 +1,21 @@
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import type {MockInstance} from 'vitest';
 import {
+  ICRC25_PERMISSION_GRANTED,
+  ICRC25_PERMISSIONS,
   ICRC25_REQUEST_PERMISSIONS,
   ICRC25_SUPPORTED_STANDARDS,
   ICRC27_ACCOUNTS,
   ICRC29_STATUS,
   ICRC49_CALL_CANISTER
 } from './constants/icrc.constants';
-import {SIGNER_SUPPORTED_STANDARDS, SignerErrorCode} from './constants/signer.constants';
+import {
+  SIGNER_DEFAULT_SCOPES,
+  SIGNER_SUPPORTED_STANDARDS,
+  SignerErrorCode
+} from './constants/signer.constants';
 import * as signerHandlers from './handlers/signer.handlers';
+import {savePermissions} from './sessions/signer.sessions';
 import {Signer} from './signer';
 import {IcrcWalletPermissionStateSchema} from './types/icrc';
 import type {IcrcRequestAnyPermissionsRequest} from './types/icrc-requests';
@@ -16,7 +23,7 @@ import type {IcrcScopesArray} from './types/icrc-responses';
 import {JSON_RPC_VERSION_2} from './types/rpc';
 import type {SignerMessageEventData} from './types/signer';
 import type {SignerOptions} from './types/signer-options';
-import {get} from './utils/storage.utils';
+import {del, get} from './utils/storage.utils';
 
 describe('Signer', () => {
   const signerOptions: SignerOptions = {
@@ -252,10 +259,12 @@ describe('Signer', () => {
       };
 
       let notifySupportedStandardsSpy: MockInstance;
+      let notifyPermissionsSpy: MockInstance;
       let notifyErrorSpy: MockInstance;
 
       beforeEach(() => {
         notifySupportedStandardsSpy = vi.spyOn(signerHandlers, 'notifySupportedStandards');
+        notifyPermissionsSpy = vi.spyOn(signerHandlers, 'notifyPermissionScopes');
         notifyErrorSpy = vi.spyOn(signerHandlers, 'notifyError');
       });
 
@@ -273,16 +282,17 @@ describe('Signer', () => {
         );
       });
 
-      it('should not notify any other messages than ready icrc29_status', () => {
+      it('should not notify any other messages than ready', () => {
         const messageEvent = new MessageEvent('message', msg);
         window.dispatchEvent(messageEvent);
 
         expect(notifySupportedStandardsSpy).not.toHaveBeenCalled();
+        expect(notifyPermissionsSpy).not.toHaveBeenCalled();
         expect(notifyErrorSpy).not.toHaveBeenCalled();
       });
     });
 
-    describe('supported standards', () => {
+    describe('Supported standards', () => {
       const msg = {
         data: {
           id: testId,
@@ -293,10 +303,12 @@ describe('Signer', () => {
       };
 
       let notifyReadySpy: MockInstance;
+      let notifyPermissionsSpy: MockInstance;
       let notifyErrorSpy: MockInstance;
 
       beforeEach(() => {
         notifyReadySpy = vi.spyOn(signerHandlers, 'notifyReady');
+        notifyPermissionsSpy = vi.spyOn(signerHandlers, 'notifyPermissionScopes');
         notifyErrorSpy = vi.spyOn(signerHandlers, 'notifyError');
       });
 
@@ -321,11 +333,93 @@ describe('Signer', () => {
         window.dispatchEvent(messageEvent);
 
         expect(notifyReadySpy).not.toHaveBeenCalled();
+        expect(notifyPermissionsSpy).not.toHaveBeenCalled();
         expect(notifyErrorSpy).not.toHaveBeenCalled();
       });
     });
 
-    describe('request permissions', () => {
+    describe('Permissions', () => {
+      const msg = {
+        data: {
+          id: testId,
+          jsonrpc: JSON_RPC_VERSION_2,
+          method: ICRC25_PERMISSIONS
+        },
+        origin: testOrigin
+      };
+
+      let notifyReadySpy: MockInstance;
+      let notifySupportedStandardsSpy: MockInstance;
+      let notifyErrorSpy: MockInstance;
+
+      beforeEach(() => {
+        notifyReadySpy = vi.spyOn(signerHandlers, 'notifyReady');
+        notifySupportedStandardsSpy = vi.spyOn(signerHandlers, 'notifySupportedStandards');
+        notifyErrorSpy = vi.spyOn(signerHandlers, 'notifyError');
+      });
+
+      it('should notify default permissions for icrc25_permissions', () => {
+        const messageEvent = new MessageEvent('message', msg);
+        window.dispatchEvent(messageEvent);
+
+        expect(postMessageMock).toHaveBeenCalledWith(
+          {
+            jsonrpc: JSON_RPC_VERSION_2,
+            id: testId,
+            result: {
+              scopes: SIGNER_DEFAULT_SCOPES
+            }
+          },
+          testOrigin
+        );
+      });
+
+      it('should notify permissions already confirmed and saved in local storage for icrc25_permissions', () => {
+        const owner = Ed25519KeyIdentity.generate().getPrincipal();
+
+        const scopes: IcrcScopesArray = [
+          {
+            scope: {
+              method: ICRC27_ACCOUNTS
+            },
+            state: ICRC25_PERMISSION_GRANTED
+          }
+        ];
+
+        savePermissions({
+          owner,
+          origin: testOrigin,
+          scopes
+        });
+
+        const messageEvent = new MessageEvent('message', msg);
+        window.dispatchEvent(messageEvent);
+
+        expect(postMessageMock).toHaveBeenCalledWith(
+          {
+            jsonrpc: JSON_RPC_VERSION_2,
+            id: testId,
+            result: {
+              scopes: SIGNER_DEFAULT_SCOPES
+            }
+          },
+          testOrigin
+        );
+
+        del({key: `oisy_signer_${testOrigin}_${owner.toText()}`});
+      });
+
+      it('should not notify any other messages than icrc25_permissions', () => {
+        const messageEvent = new MessageEvent('message', msg);
+        window.dispatchEvent(messageEvent);
+
+        expect(notifyReadySpy).not.toHaveBeenCalled();
+        expect(notifySupportedStandardsSpy).not.toHaveBeenCalled();
+        expect(notifyErrorSpy).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('Request permissions', () => {
       it('should notify REQUEST_NOT_SUPPORTED for invalid request permissions', () => {
         const testOrigin = 'https://hello.com';
 
