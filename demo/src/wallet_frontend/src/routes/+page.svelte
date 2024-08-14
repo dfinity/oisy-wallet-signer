@@ -2,7 +2,7 @@
 	import { notSignedIn } from '$core/derived/auth.derived';
 	import { Signer } from '@dfinity/oisy-wallet-signer/signer';
 	import UserId from '$core/components/UserId.svelte';
-	import ApprovePermissions from '$lib/ApprovePermissions.svelte';
+	import ConfirmPermissions from '$lib/ConfirmPermissions.svelte';
 
 	let signer: Signer | undefined = $state(undefined);
 
@@ -22,4 +22,4 @@
 
 <UserId />
 
-<ApprovePermissions {signer} />
+<ConfirmPermissions {signer} />
