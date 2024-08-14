@@ -2,10 +2,12 @@ import {assertNonNullish, nonNullish, notEmptyString} from '@dfinity/utils';
 import {
   WALLET_CONNECT_TIMEOUT_IN_MILLISECONDS,
   WALLET_DEFAULT_SCOPES,
+  WALLET_TIMEOUT_PERMISSIONS,
   WALLET_TIMEOUT_REQUEST_PERMISSIONS,
   WALLET_TIMEOUT_REQUEST_SUPPORTED_STANDARD
 } from './constants/wallet.constants';
 import {
+  permissions,
   requestPermissions,
   requestSupportedStandards,
   retryRequestStatus
@@ -320,6 +322,36 @@ export class Wallet {
       },
       postRequest,
       handleMessage
+    });
+  };
+
+  /**
+   * Query the state of all permissions of the wallet.
+   *
+   * @async
+   * @param {WalletRequestOptions} options - The options for the wallet request, which may include parameters such as timeout settings and other request-specific configurations.
+   * @returns {Promise<IcrcScopes>} A promise that resolves to all permissions the wallet knows about. The result might be empty if no permissions were ever requested or if the permissions are outdated.
+   * @see [ICRC25 Permissions](https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_permissions)
+   */
+  permissions = async ({
+    options: {timeoutInMilliseconds, ...rest} = {}
+  }: {
+    options?: WalletRequestOptions;
+  } = {}): Promise<IcrcScopesArray> => {
+    const postRequest = (id: RpcId): void => {
+      permissions({
+        popup: this.#popup,
+        origin: this.#origin,
+        id
+      });
+    };
+
+    return await this.requestPermissionsScopes({
+      options: {
+        timeoutInMilliseconds: timeoutInMilliseconds ?? WALLET_TIMEOUT_PERMISSIONS,
+        ...rest
+      },
+      postRequest
     });
   };
 
