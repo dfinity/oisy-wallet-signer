@@ -1,11 +1,13 @@
 import {DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS} from '../constants/core.constants';
 import {
+  ICRC25_PERMISSIONS,
   ICRC25_REQUEST_PERMISSIONS,
   ICRC25_SUPPORTED_STANDARDS,
   ICRC29_STATUS
 } from '../constants/icrc.constants';
 import type {
   IcrcAnyRequestedScopes,
+  IcrcPermissionsRequest,
   IcrcRequestAnyPermissionsRequest,
   IcrcStatusRequest,
   IcrcSupportedStandardsRequest
@@ -60,6 +62,17 @@ export const requestSupportedStandards = ({id, ...rest}: Request): void => {
   };
 
   // Requesting supported standards does not require user interaction therefore it can be queried without focusing the popup.
+  postMsg({msg, ...rest});
+};
+
+export const permissions = ({id, ...rest}: Request): void => {
+  const msg: IcrcPermissionsRequest = {
+    jsonrpc: JSON_RPC_VERSION_2,
+    id,
+    method: ICRC25_PERMISSIONS
+  };
+
+  // Requesting the state of all permissions does not require user interaction therefore it can be queried without focusing the popup.
   postMsg({msg, ...rest});
 };
 
