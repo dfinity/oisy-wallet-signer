@@ -1,3 +1,4 @@
+import {Ed25519KeyIdentity} from '@dfinity/identity';
 import type {MockInstance} from 'vitest';
 import {
   ICRC25_REQUEST_PERMISSIONS,
@@ -8,18 +9,21 @@ import {
 } from './constants/icrc.constants';
 import {SIGNER_SUPPORTED_STANDARDS, SignerErrorCode} from './constants/signer.constants';
 import * as signerHandlers from './handlers/signer.handlers';
-import {Signer, type SignerParameters} from './signer';
+import {Signer} from './signer';
 import {IcrcWalletPermissionStateSchema} from './types/icrc';
 import type {IcrcRequestAnyPermissionsRequest} from './types/icrc-requests';
 import type {IcrcScope} from './types/icrc-responses';
 import {JSON_RPC_VERSION_2} from './types/rpc';
 import type {SignerMessageEventData} from './types/signer';
+import type {SignerOptions} from './types/signer-options';
 
 describe('Signer', () => {
-  const mockParameters: SignerParameters = {};
+  const signerOptions: SignerOptions = {
+    owner: Ed25519KeyIdentity.generate().getPrincipal()
+  };
 
   it('should init a signer', () => {
-    const signer = Signer.init(mockParameters);
+    const signer = Signer.init(signerOptions);
     expect(signer).toBeInstanceOf(Signer);
     signer.disconnect();
   });
@@ -27,7 +31,7 @@ describe('Signer', () => {
   it('should add event listener for message on connect', () => {
     const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
 
-    const signer = Signer.init(mockParameters);
+    const signer = Signer.init(signerOptions);
     expect(addEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
     signer.disconnect();
   });
@@ -35,7 +39,7 @@ describe('Signer', () => {
   it('should remove event listener for message on connect', () => {
     const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
 
-    const signer = Signer.init(mockParameters);
+    const signer = Signer.init(signerOptions);
     signer.disconnect();
 
     expect(removeEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
@@ -52,7 +56,7 @@ describe('Signer', () => {
     let signer: Signer;
 
     beforeEach(() => {
-      signer = Signer.init(mockParameters);
+      signer = Signer.init(signerOptions);
       onMessageListenerSpy = vi.spyOn(signer as unknown as {onMessage: () => void}, 'onMessage');
     });
 
@@ -102,7 +106,7 @@ describe('Signer', () => {
     let postMessageMock: MockInstance;
 
     beforeEach(() => {
-      signer = Signer.init(mockParameters);
+      signer = Signer.init(signerOptions);
       notifyReadySpy = vi.spyOn(signerHandlers, 'notifyReady');
       postMessageMock = vi.fn();
       vi.stubGlobal('opener', {postMessage: postMessageMock});
@@ -220,7 +224,7 @@ describe('Signer', () => {
     let postMessageMock: MockInstance;
 
     beforeEach(() => {
-      signer = Signer.init(mockParameters);
+      signer = Signer.init(signerOptions);
 
       postMessageMock = vi.fn();
 
