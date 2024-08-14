@@ -1,5 +1,6 @@
 import {DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS} from '../constants/core.constants';
 import {
+  ICRC25_PERMISSIONS,
   ICRC25_REQUEST_PERMISSIONS,
   ICRC25_SUPPORTED_STANDARDS,
   ICRC27_ACCOUNTS
@@ -7,7 +8,12 @@ import {
 import type {IcrcAnyRequestedScopes} from '../types/icrc-requests';
 import {JSON_RPC_VERSION_2} from '../types/rpc';
 import type {ReadyOrError} from '../utils/timeout.utils';
-import {requestPermissions, requestSupportedStandards, retryRequestStatus} from './wallet.handlers';
+import {
+  permissions,
+  requestPermissions,
+  requestSupportedStandards,
+  retryRequestStatus
+} from './wallet.handlers';
 
 describe('Wallet handlers', () => {
   const testId = '1234_test';
@@ -125,7 +131,7 @@ describe('Wallet handlers', () => {
       }));
   });
 
-  describe('requestSupportedStandards', () => {
+  describe('Supported standards', () => {
     it('should send the correct message to the popup', () => {
       requestSupportedStandards({id: testId, popup, origin: testOrigin});
 
@@ -146,7 +152,28 @@ describe('Wallet handlers', () => {
     });
   });
 
-  describe('requestPermissions', () => {
+  describe('Query permissions', () => {
+    it('should send the correct message to the popup', () => {
+      permissions({id: testId, popup, origin: testOrigin});
+
+      expect(postMessageMock).toHaveBeenCalledWith(
+        {
+          jsonrpc: JSON_RPC_VERSION_2,
+          id: testId,
+          method: ICRC25_PERMISSIONS
+        },
+        testOrigin
+      );
+    });
+
+    it('should not bring the popup in front with focus', () => {
+      permissions({id: testId, popup, origin: testOrigin});
+
+      expect(focusMock).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Request permissions', () => {
     const scopes: IcrcAnyRequestedScopes = {
       scopes: [
         {
