@@ -14,7 +14,7 @@ import {
   WALLET_TIMEOUT_REQUEST_SUPPORTED_STANDARD
 } from './constants/wallet.constants';
 import * as walletHandlers from './handlers/wallet.handlers';
-import {IcrcAnyRequestedScopes, IcrcPermissionsRequestSchema} from './types/icrc-requests';
+import {IcrcAnyRequestedScopes} from './types/icrc-requests';
 import {
   IcrcScopesResponseSchema,
   IcrcSupportedStandardsResponseSchema
@@ -479,7 +479,7 @@ describe('Wallet', () => {
         await wallet.disconnect();
       });
 
-      describe.skip('Query', () => {
+      describe('Query', () => {
         describe('Request errors', () => {
           it('should throw error if the wallet request options are not well formatted', async () => {
             await expect(
@@ -527,7 +527,7 @@ describe('Wallet', () => {
             return new Promise<void>(async (resolve) => {
               vi.useFakeTimers();
 
-              const spy = vi.spyOn(IcrcPermissionsRequestSchema, 'safeParse');
+              const spy = vi.spyOn(IcrcScopesResponseSchema, 'safeParse');
 
               wallet.permissions().catch((err: Error) => {
                 expect(err.message).toBe(
