@@ -3,6 +3,8 @@
 	import { Signer } from '@dfinity/oisy-wallet-signer/signer';
 	import UserId from '$core/components/UserId.svelte';
 	import ApprovePermissions from '$lib/ApprovePermissions.svelte';
+	import { authStore } from '$core/stores/auth.store';
+	import { isNullish } from '@dfinity/utils';
 
 	let signer: Signer | undefined = $state(undefined);
 
@@ -12,7 +14,14 @@
 			return;
 		}
 
-		signer = Signer.init({});
+		if (isNullish($authStore.identity)) {
+			signer?.disconnect();
+			return;
+		}
+
+		signer = Signer.init({
+			owner: $authStore.identity.getPrincipal()
+		});
 
 		return () => {
 			signer?.disconnect();
