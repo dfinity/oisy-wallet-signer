@@ -72,6 +72,7 @@ export const permissions = ({id, ...rest}: Request): void => {
     method: ICRC25_PERMISSIONS
   };
 
+  // Requesting the state of all permissions does not require user interaction therefore it can be queried without focusing the popup.
   postMsg({msg, ...rest});
 };
 
