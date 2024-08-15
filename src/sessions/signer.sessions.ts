@@ -1,4 +1,6 @@
 import type {Principal} from '@dfinity/principal';
+import {isNullish} from '@dfinity/utils';
+import {SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS} from '../constants/signer.constants';
 import type {IcrcScopesArray} from '../types/icrc-responses';
 import type {SessionPermissions} from '../types/signer-sessions';
 import {get, set} from '../utils/storage.utils';
@@ -26,8 +28,16 @@ export const savePermissions = ({
   set({key: key(rest), value});
 };
 
-export const readPermissions = (params: SessionParams): SessionPermissions | undefined => {
-  // TODO: cleanup expired permissions
+export const readValidPermissions = (params: SessionParams): SessionPermissions | undefined => {
+  const permissions = get<SessionPermissions>({key: key(params)});
 
-  return get<SessionPermissions>({key: key(params)});
+  if (isNullish(permissions)) {
+    return undefined;
+  }
+
+  if (permissions.createdAt < Date.now() - SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS) {
+    return undefined;
+  }
+
+  return permissions;
 };
