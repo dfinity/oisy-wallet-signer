@@ -35,6 +35,10 @@ export const readValidPermissions = (params: SessionParams): SessionPermissions 
     return undefined;
   }
 
+  // TODO: We can improve the UX by "tracking" when the user is using a feature of the signer.
+  // For example:
+  // 1. Checking if the signer was last used within the past seven days.
+  // 2. Comparing the creation date was granted within the last 30 days.
   if (permissions.createdAt < Date.now() - SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS) {
     return undefined;
   }
