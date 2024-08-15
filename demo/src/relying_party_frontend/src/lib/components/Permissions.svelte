@@ -1,12 +1,10 @@
 <script lang="ts">
 	import type { Wallet } from '@dfinity/oisy-wallet-signer/wallet';
-	import { nonNullish } from '@dfinity/utils';
-	import { fade } from 'svelte/transition';
-	import Button from '$core/components/Button.svelte';
-	import Value from '$core/components/Value.svelte';
+	import { isNullish, nonNullish } from '@dfinity/utils';
 	import type { IcrcScopesArray } from '@dfinity/oisy-wallet-signer';
+	import { fade } from 'svelte/transition';
+	import Value from '$core/components/Value.svelte';
 	import PermissionsScopes from '$lib/components/PermissionsScopes.svelte';
-	import { emit } from '$core/utils/events.utils';
 
 	type Props = {
 		wallet: Wallet | undefined;
@@ -16,22 +14,33 @@
 
 	let scopes: IcrcScopesArray | undefined = $state(undefined);
 
-	const onclick = async () => {
-		scopes = await wallet?.requestPermissions();
+	const loadPermissions = async () => {
+		if (isNullish(wallet)) {
+			scopes = undefined;
+			return;
+		}
 
-		emit({
-			message: 'oisyDemoReloadPermissions'
-		});
+		scopes = await wallet.permissions();
+	};
+
+	$effect(() => {
+		(async () => await loadPermissions())();
+	});
+
+	const onoisyDemoReloadPermissions = async () => {
+		await loadPermissions();
 	};
 </script>
 
+<svelte:window {onoisyDemoReloadPermissions} />
+
 {#if nonNullish(wallet)}
 	<div in:fade>
-		<Value id="request-permissions" testId="request-permissions" title="Permissions requests">
+		<Value id="permissions" testId="permissions" title="Permissions state">
 			{#if nonNullish(scopes)}
 				<PermissionsScopes {scopes} />
 			{:else}
-				<Button {onclick} testId="request-permissions-button">Request permissions</Button>
+				<p>None defined.</p>
 			{/if}
 		</Value>
 	</div>

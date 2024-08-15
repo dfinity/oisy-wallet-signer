@@ -10,4 +10,14 @@ declare global {
 	}
 }
 
+/* eslint-disable */
+
+declare module 'svelte/elements' {
+	interface HTMLAttributes<T> {
+		onoisyDemoReloadPermissions?: (event: CustomEvent<any>) => void;
+	}
+}
+
+/* eslint-enable */
+
 export {};
