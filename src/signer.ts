@@ -8,7 +8,7 @@ import {
   notifyReady,
   notifySupportedStandards
 } from './handlers/signer.handlers';
-import {readPermissions, savePermissions} from './sessions/signer.sessions';
+import {readValidPermissions, savePermissions} from './sessions/signer.sessions';
 import {
   IcrcWalletPermissionStateSchema,
   IcrcWalletScopedMethodSchema,
@@ -206,7 +206,7 @@ export class Signer {
     if (isPermissionsRequestRequest) {
       const {id} = permissionsRequestData;
 
-      const permissions = readPermissions({owner: this.#owner, origin});
+      const permissions = readValidPermissions({owner: this.#owner, origin});
 
       notifyPermissionScopes({
         id,
