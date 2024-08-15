@@ -1,10 +1,11 @@
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {afterEach, beforeEach, type MockInstance} from 'vitest';
 import {ICRC25_PERMISSION_GRANTED, ICRC27_ACCOUNTS} from '../constants/icrc.constants';
+import {SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS} from '../constants/signer.constants';
 import type {IcrcScopesArray} from '../types/icrc-responses';
 import * as storageUtils from '../utils/storage.utils';
 import {del} from '../utils/storage.utils';
-import {readPermissions, savePermissions} from './signer.sessions';
+import {readValidPermissions, savePermissions} from './signer.sessions';
 
 describe('Signer sessions', () => {
   const owner = Ed25519KeyIdentity.generate().getPrincipal();
@@ -26,12 +27,14 @@ describe('Signer sessions', () => {
 
   beforeEach(() => {
     setSpy = vi.spyOn(storageUtils, 'set');
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
     del({key: expectedKey});
 
     vi.clearAllMocks();
+    vi.useRealTimers();
   });
 
   it('should save the permissions to local storage', () => {
@@ -56,7 +59,7 @@ describe('Signer sessions', () => {
       scopes
     });
 
-    const permissions = readPermissions({owner, origin});
+    const permissions = readValidPermissions({owner, origin});
 
     const expectedValue = {
       scopes,
@@ -64,5 +67,44 @@ describe('Signer sessions', () => {
     };
 
     expect(permissions).toEqual(expect.objectContaining(expectedValue));
+  });
+
+  it('should return undefined for permissions older than the validity period', () => {
+    savePermissions({
+      owner,
+      origin,
+      scopes
+    });
+
+    vi.advanceTimersByTime(SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS + 1);
+
+    const permissions = readValidPermissions({owner, origin});
+
+    expect(permissions).toBeUndefined();
+  });
+
+  it('should return the permissions if exactly equals the validity period', () => {
+    savePermissions({
+      owner,
+      origin,
+      scopes
+    });
+
+    vi.advanceTimersByTime(SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS);
+
+    const permissions = readValidPermissions({owner, origin});
+
+    expect(permissions).toEqual(
+      expect.objectContaining({
+        scopes,
+        createdAt: expect.any(Number)
+      })
+    );
+  });
+
+  it('should return undefined if permissions are nullish', () => {
+    const permissions = readValidPermissions({owner, origin});
+
+    expect(permissions).toBeUndefined();
   });
 });
