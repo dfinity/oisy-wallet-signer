@@ -14,6 +14,7 @@ interface SessionParams {
 
 const key = ({owner, origin}: SessionParams): string => `${KEY_PREFIX}_${origin}_${owner.toText()}`;
 
+// TODO: partial
 export const savePermissions = ({
   scopes,
   ...rest
