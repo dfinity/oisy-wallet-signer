@@ -1,6 +1,6 @@
 import type {Principal} from '@dfinity/principal';
 import {assertNonNullish, nonNullish} from '@dfinity/utils';
-import {ICRC25_REQUEST_PERMISSIONS} from './constants/icrc.constants';
+import {ICRC25_REQUEST_PERMISSIONS, ICRC27_ACCOUNTS} from './constants/icrc.constants';
 import {SIGNER_DEFAULT_SCOPES, SignerErrorCode} from './constants/signer.constants';
 import {
   notifyError,
@@ -8,7 +8,7 @@ import {
   notifyReady,
   notifySupportedStandards
 } from './handlers/signer.handlers';
-import {readValidPermissions, savePermissions} from './sessions/signer.sessions';
+import {permissionState, readValidPermissions, savePermissions} from './sessions/signer.sessions';
 import {
   IcrcWalletPermissionStateSchema,
   IcrcWalletScopedMethodSchema,
@@ -298,9 +298,20 @@ export class Signer {
       const {id} = accountsData;
 
       // TODO:
-      // Is permission denied => notify error
-      // Is permission granted => callback => notify accounts
-      // Is permission ask_on_use => ask permission => save permission => same as above
+      switch (permissionState({owner: this.#owner, origin, method: ICRC27_ACCOUNTS})) {
+        case 'denied': {
+          // Is permission denied => notify error
+          break;
+        }
+        case 'granted': {
+          // Is permission granted => callback => notify accounts
+          break;
+        }
+        case 'ask_on_use': {
+          // Is permission ask_on_use => ask permission => save permission => same as above
+          break;
+        }
+      }
 
       return {handled: true};
     }
