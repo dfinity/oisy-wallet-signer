@@ -1,4 +1,9 @@
-import {ICRC25_PERMISSION_GRANTED, ICRC27_ACCOUNTS} from '../constants/icrc.constants';
+import {
+  ICRC25_PERMISSION_GRANTED,
+  ICRC25_PERMISSIONS,
+  ICRC25_REQUEST_PERMISSIONS,
+  ICRC27_ACCOUNTS
+} from '../constants/icrc.constants';
 import {
   IcrcReadyResponseSchema,
   IcrcScopeSchema,
@@ -13,8 +18,8 @@ import {JSON_RPC_VERSION_2} from './rpc';
 
 describe('icrc-responses', () => {
   const responseSchemas = [
-    {icrc: 'icrc25_request_permissions', schema: IcrcScopesResponseSchema},
-    {icrc: 'icrc25_permissions', schema: IcrcScopesResponseSchema}
+    {icrc: ICRC25_REQUEST_PERMISSIONS, schema: IcrcScopesResponseSchema},
+    {icrc: ICRC25_PERMISSIONS, schema: IcrcScopesResponseSchema}
   ];
 
   describe.each(responseSchemas)('$icrc', ({schema}) => {
