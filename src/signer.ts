@@ -15,6 +15,7 @@ import {
   type IcrcWalletApproveMethod
 } from './types/icrc';
 import {
+  IcrcAccountsRequestSchema,
   IcrcPermissionsRequestSchema,
   IcrcRequestAnyPermissionsRequestSchema,
   IcrcStatusRequestSchema,
@@ -93,6 +94,11 @@ export class Signer {
 
     const {handled: requestsPermissionsHandled} = this.handleRequestPermissionsRequest(message);
     if (requestsPermissionsHandled) {
+      return;
+    }
+
+    const {handled: accountsHandled} = this.handleAccounts(message);
+    if (accountsHandled) {
       return;
     }
 
@@ -275,4 +281,30 @@ export class Signer {
 
     savePermissions({owner: this.#owner, origin: this.#walletOrigin, scopes});
   };
+
+  /**
+   * Handles incoming messages to list the accounts.
+   *
+   * Parses the message data to determine if it conforms to a accounts request and responds with the accounts if the permissions are granted.
+   *
+   * @param {SignerMessageEvent} message - The incoming message event containing the data and origin.
+   * @returns {Object} An object with a boolean property `handled` indicating whether the request was handled.
+   */
+  private handleAccounts({data, origin}: SignerMessageEvent): {handled: boolean} {
+    const {success: isAccountsRequest, data: accountsData} =
+      IcrcAccountsRequestSchema.safeParse(data);
+
+    if (isAccountsRequest) {
+      const {id} = accountsData;
+
+      // TODO:
+      // Is permission denied => notify error
+      // Is permission granted => callback => notify accounts
+      // Is permission ask_on_use => ask permission => save permission => same as above
+
+      return {handled: true};
+    }
+
+    return {handled: false};
+  }
 }
