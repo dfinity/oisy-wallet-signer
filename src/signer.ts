@@ -308,7 +308,7 @@ export class Signer {
           break;
         }
         case 'ask_on_use': {
-          // Is permission ask_on_use => ask permission => save permission => same as above
+          // Is permission not yet set => notify error
           break;
         }
       }
