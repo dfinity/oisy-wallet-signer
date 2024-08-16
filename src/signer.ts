@@ -1,6 +1,5 @@
 import type {Principal} from '@dfinity/principal';
 import {assertNonNullish, nonNullish} from '@dfinity/utils';
-import {ICRC25_REQUEST_PERMISSIONS} from './constants/icrc.constants';
 import {SIGNER_DEFAULT_SCOPES, SignerErrorCode} from './constants/signer.constants';
 import {
   notifyError,
@@ -9,33 +8,28 @@ import {
   notifySupportedStandards
 } from './handlers/signer.handlers';
 import {readValidPermissions, savePermissions} from './sessions/signer.sessions';
-import {
-  IcrcWalletPermissionStateSchema,
-  IcrcWalletScopedMethodSchema,
-  type IcrcWalletApproveMethod
-} from './types/icrc';
+import {IcrcWalletPermissionStateSchema, IcrcWalletScopedMethodSchema} from './types/icrc';
 import {
   IcrcPermissionsRequestSchema,
   IcrcRequestAnyPermissionsRequestSchema,
   IcrcStatusRequestSchema,
   IcrcSupportedStandardsRequestSchema
 } from './types/icrc-requests';
-import type {IcrcScope} from './types/icrc-responses';
+import {IcrcScope, IcrcScopesArray} from './types/icrc-responses';
 import {RpcRequestSchema} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
-import type {SignerOptions} from './types/signer-options';
+import {RequestsPermissions, SignerOptions} from './types/signer-options';
 import type {RequestPermissionPayload} from './types/signer-subscribers';
-import {Observable} from './utils/observable';
 
 export class Signer {
   readonly #owner: Principal;
+  readonly #requestsPermissions: RequestsPermissions | undefined;
+
   #walletOrigin: string | undefined | null;
 
-  readonly #requestsPermissionsSubscribers: Observable<RequestPermissionPayload> =
-    new Observable<RequestPermissionPayload>();
-
-  private constructor({owner}: SignerOptions) {
+  private constructor({owner, requestsPermissions}: SignerOptions) {
     this.#owner = owner;
+    this.#requestsPermissions = requestsPermissions;
 
     window.addEventListener('message', this.onMessageListener);
   }
@@ -91,7 +85,8 @@ export class Signer {
       return;
     }
 
-    const {handled: requestsPermissionsHandled} = this.handleRequestPermissionsRequest(message);
+    const {handled: requestsPermissionsHandled} =
+      await this.handleRequestPermissionsRequest(message);
     if (requestsPermissionsHandled) {
       return;
     }
@@ -129,26 +124,6 @@ export class Signer {
 
     this.#walletOrigin = origin;
   }
-
-  /**
-   * TODO: to be documented when fully implemented.
-   */
-  on = ({
-    method,
-    callback
-  }: {
-    method: IcrcWalletApproveMethod;
-    callback: (data: RequestPermissionPayload) => void;
-  }): (() => void) => {
-    switch (method) {
-      case ICRC25_REQUEST_PERMISSIONS:
-        return this.#requestsPermissionsSubscribers.subscribe({callback});
-    }
-
-    throw new Error(
-      'The specified method is not supported. Please ensure you are using a supported standard.'
-    );
-  };
 
   /**
    * Handles incoming status requests.
@@ -229,7 +204,9 @@ export class Signer {
    * @param {SignerMessageEvent} message - The incoming message event containing the data and origin.
    * @returns {Object} An object with a boolean property `handled` indicating whether the request was processed as a permissions request.
    */
-  private handleRequestPermissionsRequest({data}: SignerMessageEvent): {handled: boolean} {
+  private async handleRequestPermissionsRequest({
+    data
+  }: SignerMessageEvent): Promise<{handled: boolean}> {
     const {success: isRequestPermissionsRequest, data: requestPermissionsData} =
       IcrcRequestAnyPermissionsRequestSchema.safeParse(data);
 
@@ -240,7 +217,7 @@ export class Signer {
       } = requestPermissionsData;
 
       // TODO: Can the newer version of TypeScript infer "as IcrcScope"?
-      const scopes = requestedScopes
+      const supportedRequestedScopes = requestedScopes
         .filter(
           ({method: requestedMethod}) =>
             IcrcWalletScopedMethodSchema.safeParse(requestedMethod).success
@@ -257,14 +234,16 @@ export class Signer {
       // Additionally, it may be beneficial to define a type that ensures at least one scope is present when responding to permission queries ([IcrcScope, ...IcrcScop[]] in Zod).
       // Overall, it would be handy to enforce a minimum of one permission through types and behavior?
 
-      this.#requestsPermissionsSubscribers.next({requestId, scopes});
+      const confirmedScopes = await this.#requestsPermissions(supportedRequestedScopes);
+      this.confirmPermissions({scopes: confirmedScopes, requestId});
+
       return {handled: true};
     }
 
     return {handled: false};
   }
 
-  confirmPermissions = ({scopes, requestId}: RequestPermissionPayload): void => {
+  private confirmPermissions({scopes, requestId}: RequestPermissionPayload): void {
     assertNonNullish(this.#walletOrigin, "The relying party's origin is unknown.");
 
     notifyPermissionScopes({
@@ -274,5 +253,5 @@ export class Signer {
     });
 
     savePermissions({owner: this.#owner, origin: this.#walletOrigin, scopes});
-  };
+  }
 }
