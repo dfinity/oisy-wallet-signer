@@ -2,7 +2,7 @@ import type {Principal} from '@dfinity/principal';
 import {isNullish} from '@dfinity/utils';
 import {SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS} from '../constants/signer.constants';
 import type {IcrcScopesArray} from '../types/icrc-responses';
-import type {SessionPermissions} from '../types/signer-sessions';
+import type {SessionIcrcScope, SessionPermissions} from '../types/signer-sessions';
 import {get, set} from '../utils/storage.utils';
 
 const KEY_PREFIX = 'oisy_signer';
@@ -14,19 +14,52 @@ interface SessionParams {
 
 const key = ({owner, origin}: SessionParams): string => `${KEY_PREFIX}_${origin}_${owner.toText()}`;
 
-// TODO: partial
 export const savePermissions = ({
   scopes,
   ...rest
 }: SessionParams & {
   scopes: IcrcScopesArray;
 }): void => {
-  const value: SessionPermissions = {
-    scopes,
-    createdAt: Date.now()
+  const permissionKey = key(rest);
+
+  const permissions = get<SessionPermissions>({key: permissionKey});
+
+  const retainScopes = (permissions?.scopes ?? []).filter(
+    ({scope: {method: existingMethod}}) =>
+      scopes.find(({scope: {method}}) => existingMethod === method) === undefined
+  );
+
+  const now = Date.now();
+
+  const updateScopes = scopes.reduce<SessionIcrcScope[]>(
+    (acc, {scope: {method, ...scopeRest}, ...rest}) => {
+      const existingScope: SessionIcrcScope | undefined = (permissions?.scopes ?? []).find(
+        ({scope: {method: existingMethod}}) => existingMethod === method
+      );
+
+      return [
+        ...acc,
+        {
+          ...rest,
+          scope: {
+            ...scopeRest,
+            method
+          },
+          createdAt: existingScope?.createdAt ?? now,
+          updatedAt: now
+        }
+      ];
+    },
+    []
+  );
+
+  const updatedPermissions: SessionPermissions = {
+    scopes: [...retainScopes, ...updateScopes],
+    createdAt: permissions?.createdAt ?? now,
+    updatedAt: now
   };
 
-  set({key: key(rest), value});
+  set({key: permissionKey, value: updatedPermissions});
 };
 
 export const readValidPermissions = (params: SessionParams): SessionPermissions | undefined => {
