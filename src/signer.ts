@@ -186,7 +186,7 @@ export class Signer {
       notifyPermissionScopes({
         id,
         origin,
-        scopes: permissions?.scopes ?? SIGNER_DEFAULT_SCOPES
+        scopes: permissions ?? SIGNER_DEFAULT_SCOPES
       });
       return {handled: true};
     }
