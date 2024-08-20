@@ -4,7 +4,8 @@ import type {MockInstance} from 'vitest';
 import {
   ICRC25_PERMISSION_DENIED,
   ICRC25_PERMISSION_GRANTED,
-  ICRC27_ACCOUNTS
+  ICRC27_ACCOUNTS,
+  ICRC49_CALL_CANISTER
 } from '../constants/icrc.constants';
 import {SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS} from '../constants/signer.constants';
 import type {IcrcScope, IcrcScopesArray} from '../types/icrc-responses';
@@ -16,14 +17,21 @@ import {readValidPermissions, savePermissions} from './signer.sessions';
 describe('Signer sessions', () => {
   const owner = Ed25519KeyIdentity.generate().getPrincipal();
 
-  const scope: IcrcScope = {
+  const scopeToTest: IcrcScope = {
     scope: {
       method: ICRC27_ACCOUNTS
     },
     state: ICRC25_PERMISSION_GRANTED
   };
 
-  const scopes: IcrcScopesArray = [scope];
+  const scopeToRetain: IcrcScope = {
+    scope: {
+      method: ICRC49_CALL_CANISTER
+    },
+    state: ICRC25_PERMISSION_GRANTED
+  };
+
+  const scopes: IcrcScopesArray = [scopeToTest, scopeToRetain];
 
   const origin = 'https://example.com';
 
@@ -32,7 +40,7 @@ describe('Signer sessions', () => {
   const expectedScopes = {
     scopes: expect.arrayContaining([
       expect.objectContaining({
-        ...scope,
+        ...scopeToTest,
         createdAt: expect.any(Number),
         updatedAt: expect.any(Number)
       })
@@ -81,7 +89,7 @@ describe('Signer sessions', () => {
 
         updateScopes = [
           {
-            ...scope,
+            ...scopeToTest,
             state: ICRC25_PERMISSION_DENIED
           }
         ];
@@ -102,7 +110,12 @@ describe('Signer sessions', () => {
               ...updateScopes[0],
               createdAt: savedPermissions.scopes[0].createdAt,
               updatedAt: expect.any(Number)
-            })
+            }),
+            {
+              ...scopeToRetain,
+              createdAt: expect.any(Number),
+              updatedAt: expect.any(Number)
+            }
           ]),
           createdAt: savedPermissions.createdAt,
           updatedAt: expect.any(Number)
@@ -127,9 +140,12 @@ describe('Signer sessions', () => {
         const updatedPermissions = readValidPermissions({owner, origin});
 
         expect(updatedPermissions?.updatedAt).toBeGreaterThan(savedPermissions.updatedAt);
-        expect(updatedPermissions?.scopes[0].updatedAt).toBeGreaterThan(
-          savedPermissions.scopes[0].updatedAt
+
+        const expectedScope = updatedPermissions?.scopes.find(
+          (scope) => scope.scope.method === scopeToTest.scope.method
         );
+
+        expect(expectedScope?.updatedAt).toBeGreaterThan(savedPermissions.scopes[0].updatedAt);
       });
     });
   });
