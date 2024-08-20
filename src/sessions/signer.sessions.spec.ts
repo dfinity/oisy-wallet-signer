@@ -11,7 +11,7 @@ import {SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS} from '../constants/si
 import type {IcrcScope, IcrcScopesArray} from '../types/icrc-responses';
 import type {SessionPermissions} from '../types/signer-sessions';
 import * as storageUtils from '../utils/storage.utils';
-import {del} from '../utils/storage.utils';
+import {del, get} from '../utils/storage.utils';
 import {readValidPermissions, savePermissions} from './signer.sessions';
 
 describe('Signer sessions', () => {
@@ -85,7 +85,7 @@ describe('Signer sessions', () => {
           scopes
         });
 
-        savedPermissions = readValidPermissions({owner, origin});
+        savedPermissions = get<SessionPermissions>({key: expectedKey});
 
         updateScopes = [
           {
@@ -104,11 +104,18 @@ describe('Signer sessions', () => {
           scopes: updateScopes
         });
 
+        const updatedPermissions = get<SessionPermissions>({key: expectedKey});
+
+        const savedScopeToTest = updatedPermissions?.scopes.find(
+          (scope) => scope.scope.method === scopeToTest.scope.method
+        );
+
+        assertNonNullish(savedScopeToTest);
+
         const expectedScopes = {
           scopes: expect.arrayContaining([
             expect.objectContaining({
-              ...updateScopes[0],
-              createdAt: savedPermissions.scopes[0].createdAt,
+              ...savedScopeToTest,
               updatedAt: expect.any(Number)
             }),
             {
@@ -120,8 +127,6 @@ describe('Signer sessions', () => {
           createdAt: savedPermissions.createdAt,
           updatedAt: expect.any(Number)
         };
-
-        const updatedPermissions = readValidPermissions({owner, origin});
 
         expect(updatedPermissions).toEqual(expect.objectContaining(expectedScopes));
       });
@@ -137,7 +142,7 @@ describe('Signer sessions', () => {
           scopes: updateScopes
         });
 
-        const updatedPermissions = readValidPermissions({owner, origin});
+        const updatedPermissions = get<SessionPermissions>({key: expectedKey});
 
         expect(updatedPermissions?.updatedAt).toBeGreaterThan(savedPermissions.updatedAt);
 
@@ -158,12 +163,22 @@ describe('Signer sessions', () => {
         scopes
       });
 
-      const permissions = readValidPermissions({owner, origin});
+      const permissions = get<SessionPermissions>({key: expectedKey});
 
       expect(permissions).toEqual(expect.objectContaining(expectedScopes));
+
+      const validPermissions = readValidPermissions({owner, origin});
+
+      expect(validPermissions).toEqual(expect.objectContaining([scopeToTest, scopeToRetain]));
     });
 
-    it('should return undefined for permissions older than the validity period', () => {
+    it('should return undefined if no permissions were ever saved', () => {
+      const permissions = readValidPermissions({owner, origin});
+
+      expect(permissions).toBeUndefined();
+    });
+
+    it('should return empty array for permissions older than the validity period', () => {
       savePermissions({
         owner,
         origin,
@@ -174,7 +189,7 @@ describe('Signer sessions', () => {
 
       const permissions = readValidPermissions({owner, origin});
 
-      expect(permissions).toBeUndefined();
+      expect(permissions).toHaveLength(0);
     });
 
     it('should return the permissions if exactly equals the validity period', () => {
@@ -186,9 +201,13 @@ describe('Signer sessions', () => {
 
       vi.advanceTimersByTime(SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS);
 
-      const permissions = readValidPermissions({owner, origin});
+      const permissions = get<SessionPermissions>({key: expectedKey});
 
-      expect(permissions).toEqual(expectedScopes);
+      expect(permissions).toEqual(expect.objectContaining(expectedScopes));
+
+      const validPermissions = readValidPermissions({owner, origin});
+
+      expect(validPermissions).toEqual(expect.objectContaining([scopeToTest, scopeToRetain]));
     });
 
     it('should return undefined if permissions are nullish', () => {

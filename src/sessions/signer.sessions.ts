@@ -62,22 +62,20 @@ export const savePermissions = ({
   set({key: permissionKey, value: updatedPermissions});
 };
 
-export const readValidPermissions = (params: SessionParams): SessionPermissions | undefined => {
+export const readValidPermissions = (params: SessionParams): IcrcScopesArray | undefined => {
   const permissions = get<SessionPermissions>({key: key(params)});
 
   if (isNullish(permissions)) {
     return undefined;
   }
 
-  // TODO: the permissions should be filtered with their respective updatedAt timestamp not the overall timestamp.
-
   // TODO: We can improve the UX by "tracking" when the user is using a feature of the signer.
   // For example:
   // 1. Checking if the signer was last used within the past seven days.
   // 2. Comparing the creation date was granted within the last 30 days.
-  if (permissions.createdAt < Date.now() - SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS) {
-    return undefined;
-  }
-
-  return permissions;
+  return permissions.scopes
+    .filter(
+      ({updatedAt}) => updatedAt >= Date.now() - SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS
+    )
+    .map(({updatedAt: _, createdAt: __, ...rest}) => ({...rest}));
 };
