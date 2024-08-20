@@ -211,7 +211,10 @@ export class Signer {
       notifyPermissionScopes({
         id,
         origin,
-        scopes: permissions?.scopes ?? SIGNER_DEFAULT_SCOPES
+        scopes:
+          // TODO: move map to service
+          permissions?.scopes.map(({updatedAt: _, createdAt: __, ...rest}) => ({...rest})) ??
+          SIGNER_DEFAULT_SCOPES
       });
       return {handled: true};
     }
