@@ -69,6 +69,8 @@ export const readValidPermissions = (params: SessionParams): SessionPermissions 
     return undefined;
   }
 
+  // TODO: the permissions should be filtered with their respective updatedAt timestamp not the overall timestamp.
+
   // TODO: We can improve the UX by "tracking" when the user is using a feature of the signer.
   // For example:
   // 1. Checking if the signer was last used within the past seven days.
