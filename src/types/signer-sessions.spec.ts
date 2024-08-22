@@ -1,21 +1,28 @@
 import {ICRC25_PERMISSION_GRANTED, ICRC27_ACCOUNTS} from '../constants/icrc.constants';
-import type {IcrcScopesArray} from './icrc-responses';
+import type {IcrcScope} from './icrc-responses';
 import {SessionPermissionsSchema} from './signer-sessions';
 
 describe('Signer-sessions', () => {
-  const scopes: IcrcScopesArray = [
-    {
-      scope: {
-        method: ICRC27_ACCOUNTS
-      },
-      state: ICRC25_PERMISSION_GRANTED
-    }
-  ];
+  const scope: IcrcScope = {
+    scope: {
+      method: ICRC27_ACCOUNTS
+    },
+    state: ICRC25_PERMISSION_GRANTED
+  };
 
-  it('should validate a correct SessionPermissions object', () => {
+  const scopeWithTimestamps = {
+    ...scope,
+    createdAt: Date.now(),
+    updatedAt: Date.now()
+  };
+
+  const scopes = [scopeWithTimestamps];
+
+  it('should validate a correct SessionPermissions', () => {
     const validData = {
       scopes,
-      createdAt: Date.now()
+      createdAt: Date.now(),
+      updatedAt: Date.now()
     };
 
     const parsedData = SessionPermissionsSchema.parse(validData);
@@ -25,7 +32,8 @@ describe('Signer-sessions', () => {
   it('should fail validation if createdAt is not a number', () => {
     const invalidData = {
       scopes,
-      createdAt: 'not-a-number'
+      createdAt: 'not-a-number',
+      updatedAt: Date.now()
     };
 
     expect(() => SessionPermissionsSchema.parse(invalidData)).toThrow();
@@ -33,7 +41,27 @@ describe('Signer-sessions', () => {
 
   it('should fail validation if createdAt is missing', () => {
     const invalidData = {
-      scopes
+      scopes,
+      updatedAt: Date.now()
+    };
+
+    expect(() => SessionPermissionsSchema.parse(invalidData)).toThrow();
+  });
+
+  it('should fail validation if updatedAt is not a number', () => {
+    const invalidData = {
+      scopes,
+      createdAt: Date.now(),
+      updatedAt: 'not-a-number'
+    };
+
+    expect(() => SessionPermissionsSchema.parse(invalidData)).toThrow();
+  });
+
+  it('should fail validation if updatedAt is missing', () => {
+    const invalidData = {
+      scopes,
+      created: Date.now()
     };
 
     expect(() => SessionPermissionsSchema.parse(invalidData)).toThrow();
@@ -41,9 +69,100 @@ describe('Signer-sessions', () => {
 
   it('should fail validation if scopes is missing', () => {
     const invalidData = {
-      createdAt: Date.now()
+      createdAt: Date.now(),
+      updatedAt: Date.now()
     };
 
     expect(() => SessionPermissionsSchema.parse(invalidData)).toThrow();
+  });
+
+  it('should fail validation if createdAt is not a number in a scope', () => {
+    const invalidData = {
+      scopes: [
+        {
+          ...scope,
+          createdAt: 'not-a-number',
+          updatedAt: Date.now()
+        }
+      ],
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    };
+
+    expect(() => SessionPermissionsSchema.parse(invalidData)).toThrow();
+  });
+
+  it('should fail validation if createdAt is missing in a scope', () => {
+    const invalidData = {
+      scopes: [
+        {
+          ...scope,
+          updatedAt: Date.now()
+        }
+      ],
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    };
+
+    expect(() => SessionPermissionsSchema.parse(invalidData)).toThrow();
+  });
+
+  it('should fail validation if updatedAt is not a number in a scope', () => {
+    const invalidData = {
+      scopes: [
+        {
+          ...scope,
+          createdAt: Date.now(),
+          updatedAt: 'not-a-number'
+        }
+      ],
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    };
+
+    expect(() => SessionPermissionsSchema.parse(invalidData)).toThrow();
+  });
+
+  it('should fail validation if updatedAt is missing in a scope', () => {
+    const invalidData = {
+      scopes: [
+        {
+          ...scope,
+          createdAt: Date.now()
+        }
+      ],
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    };
+
+    expect(() => SessionPermissionsSchema.parse(invalidData)).toThrow();
+  });
+
+  it('should pass validate if scopes array is empty', () => {
+    const invalidData = {
+      scopes: [],
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    };
+
+    expect(() => SessionPermissionsSchema.parse(invalidData)).not.toThrow();
+  });
+
+  it('should validate a correct SessionPermissions object with multiple scopes', () => {
+    const validData = {
+      scopes: [
+        scopeWithTimestamps,
+        {
+          ...scope,
+          createdAt: Date.now(),
+          updatedAt: Date.now()
+        }
+      ],
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    };
+
+    const parsedData = SessionPermissionsSchema.parse(validData);
+    expect(parsedData).toEqual(validData);
   });
 });

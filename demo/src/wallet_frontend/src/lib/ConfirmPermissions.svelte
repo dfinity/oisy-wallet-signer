@@ -2,13 +2,9 @@
 	import { fade } from 'svelte/transition';
 	import type { Signer } from '@dfinity/oisy-wallet-signer/signer';
 	import { isNullish, nonNullish } from '@dfinity/utils';
-	import {
-		ICRC25_REQUEST_PERMISSIONS,
-		type IcrcScope,
-		type RequestPermissionPayload,
-		type RpcId
-	} from '@dfinity/oisy-wallet-signer';
+	import { ICRC25_REQUEST_PERMISSIONS, type IcrcScope } from '@dfinity/oisy-wallet-signer';
 	import Button from '$core/components/Button.svelte';
+	import type { PermissionsConfirmation } from '@dfinity/oisy-wallet-signer/types/signer-prompts';
 
 	type Props = {
 		signer: Signer | undefined;
@@ -17,39 +13,41 @@
 	let { signer }: Props = $props();
 
 	let scopes: IcrcScope[] | undefined = $state(undefined);
-	let id: RpcId | undefined = $state(undefined);
+	let confirm: PermissionsConfirmation | undefined = $state(undefined);
 
 	const sortScope = (
 		{ scope: { method: methodA } }: IcrcScope,
 		{ scope: { method: methodB } }: IcrcScope
 	): number => methodA.localeCompare(methodB);
 
+	const resetPrompt = () => {
+		confirm = undefined;
+		scopes = undefined;
+	};
+
 	$effect(() => {
 		if (isNullish(signer)) {
+			resetPrompt();
 			return;
 		}
 
-		signer.on({
+		signer.register({
 			method: ICRC25_REQUEST_PERMISSIONS,
-			callback: ({ scopes: scopesToApprove, requestId }: RequestPermissionPayload) => {
-				scopes = scopesToApprove.sort(sortScope);
-				id = requestId;
+			prompt: ({ confirmScopes, requestedScopes }) => {
+				confirm = confirmScopes;
+				scopes = requestedScopes;
 			}
 		});
 	});
 
-	const onsubmit = ($event: SubmitEvent) => {
+	const onsubmit = async ($event: SubmitEvent) => {
 		$event.preventDefault();
 
 		// TODO: alert errors
 
-		signer?.confirmPermissions({
-			requestId: $state.snapshot(id)!,
-			scopes: $state.snapshot(scopes)!
-		});
+		confirm?.($state.snapshot(scopes)!);
 
-		scopes = undefined;
-		id = undefined;
+		resetPrompt();
 	};
 
 	const onToggle = (scope: IcrcScope) => {

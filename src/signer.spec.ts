@@ -23,6 +23,7 @@ import type {IcrcScopesArray} from './types/icrc-responses';
 import {JSON_RPC_VERSION_2} from './types/rpc';
 import type {SignerMessageEventData} from './types/signer';
 import type {SignerOptions} from './types/signer-options';
+import type {PermissionsPromptPayload} from './types/signer-prompts';
 import {del, get} from './utils/storage.utils';
 
 describe('Signer', () => {
@@ -420,7 +421,7 @@ describe('Signer', () => {
     });
 
     describe('Request permissions', () => {
-      it('should notify REQUEST_NOT_SUPPORTED for invalid request permissions', () => {
+      it('should notify REQUEST_NOT_SUPPORTED for invalid request permissions', async () => {
         const testOrigin = 'https://hello.com';
 
         const {params: _, ...rest} = requestPermissionsData;
@@ -435,54 +436,77 @@ describe('Signer', () => {
         const messageEvent = new MessageEvent('message', msg);
         window.dispatchEvent(messageEvent);
 
-        expect(postMessageMock).toHaveBeenCalledWith(
-          {
-            jsonrpc: JSON_RPC_VERSION_2,
-            id: testId,
-            error: {
-              code: SignerErrorCode.REQUEST_NOT_SUPPORTED,
-              message: 'The request sent by the relying party is not supported by the signer.'
-            }
-          },
-          testOrigin
-        );
+        await vi.waitFor(() => {
+          expect(postMessageMock).toHaveBeenCalledWith(
+            {
+              jsonrpc: JSON_RPC_VERSION_2,
+              id: testId,
+              error: {
+                code: SignerErrorCode.REQUEST_NOT_SUPPORTED,
+                message: 'The request sent by the relying party is not supported by the signer.'
+              }
+            },
+            testOrigin
+          );
+        });
+      });
+
+      it('should notify missing prompt for icrc25_request_permissions', () => {
+        const messageEvent = new MessageEvent('message', requestPermissionsMsg);
+        window.dispatchEvent(messageEvent);
+
+        expect(postMessageMock).not.toHaveBeenNthCalledWith(1, {
+          error: {
+            code: SignerErrorCode.PERMISSIONS_PROMPT_NOT_REGISTERED,
+            message: 'The signer has not registered a prompt to respond to permission requests.'
+          }
+        });
       });
 
       it('should not post message for icrc25_request_permissions', () => {
+        const promptSpy = vi.fn();
+
+        signer.register({
+          method: ICRC25_REQUEST_PERMISSIONS,
+          prompt: promptSpy
+        });
+
         const messageEvent = new MessageEvent('message', requestPermissionsMsg);
         window.dispatchEvent(messageEvent);
 
         expect(postMessageMock).not.toHaveBeenCalled();
+
+        promptSpy.mockClear();
       });
 
-      it('should trigger client subscriber for icrc25_request_permissions', () => {
-        const spy = vi.fn();
+      it('should trigger the registered prompt for icrc25_request_permissions', () => {
+        const promptSpy = vi.fn();
 
-        signer.on({
+        signer.register({
           method: ICRC25_REQUEST_PERMISSIONS,
-          callback: spy
+          prompt: promptSpy
         });
 
         const messageEvent = new MessageEvent('message', requestPermissionsMsg);
         window.dispatchEvent(messageEvent);
 
-        expect(spy).toHaveBeenNthCalledWith(1, {
-          requestId: requestPermissionsData.id,
-          scopes: requestPermissionsData.params.scopes.map((scope) => ({
+        expect(promptSpy).toHaveBeenNthCalledWith(1, {
+          requestedScopes: requestPermissionsData.params.scopes.map((scope) => ({
             scope: {...scope},
             state: IcrcWalletPermissionStateSchema.enum.denied
-          }))
+          })),
+          confirmScopes: expect.any(Function)
         });
 
-        spy.mockClear();
+        promptSpy.mockClear();
       });
 
       it('should filter the supported scopes on request permissions', () => {
-        const spy = vi.fn();
+        const promptSpy = vi.fn();
 
-        signer.on({
+        signer.register({
           method: ICRC25_REQUEST_PERMISSIONS,
-          callback: spy
+          prompt: promptSpy
         });
 
         const requestPermissionsMsg = {
@@ -502,19 +526,19 @@ describe('Signer', () => {
         const messageEvent = new MessageEvent('message', requestPermissionsMsg);
         window.dispatchEvent(messageEvent);
 
-        expect(spy).toHaveBeenNthCalledWith(1, {
-          requestId: requestPermissionsData.id,
-          scopes: requestPermissionsData.params.scopes.map((scope) => ({
+        expect(promptSpy).toHaveBeenNthCalledWith(1, {
+          requestedScopes: requestPermissionsData.params.scopes.map((scope) => ({
             scope: {...scope},
             state: IcrcWalletPermissionStateSchema.enum.denied
-          }))
+          })),
+          confirmScopes: expect.any(Function)
         });
 
-        spy.mockClear();
+        promptSpy.mockClear();
       });
     });
 
-    it('should notify REQUEST_NOT_SUPPORTED for unknown standard', () => {
+    it('should notify REQUEST_NOT_SUPPORTED for unknown standard', async () => {
       const testOrigin = 'https://hello.com';
 
       const msg = {
@@ -529,39 +553,19 @@ describe('Signer', () => {
       const messageEvent = new MessageEvent('message', msg);
       window.dispatchEvent(messageEvent);
 
-      expect(postMessageMock).toHaveBeenCalledWith(
-        {
-          jsonrpc: JSON_RPC_VERSION_2,
-          id: testId,
-          error: {
-            code: SignerErrorCode.REQUEST_NOT_SUPPORTED,
-            message: 'The request sent by the relying party is not supported by the signer.'
-          }
-        },
-        testOrigin
-      );
-    });
-
-    it('should not trigger client subscriber if unsubscribed', () => {
-      const spy = vi.fn();
-
-      const off = signer.on({
-        method: ICRC25_REQUEST_PERMISSIONS,
-        callback: spy
+      await vi.waitFor(() => {
+        expect(postMessageMock).toHaveBeenCalledWith(
+          {
+            jsonrpc: JSON_RPC_VERSION_2,
+            id: testId,
+            error: {
+              code: SignerErrorCode.REQUEST_NOT_SUPPORTED,
+              message: 'The request sent by the relying party is not supported by the signer.'
+            }
+          },
+          testOrigin
+        );
       });
-
-      const messageEvent = new MessageEvent('message', requestPermissionsMsg);
-      window.dispatchEvent(messageEvent);
-
-      expect(spy).toHaveBeenCalledTimes(1);
-
-      off();
-
-      window.dispatchEvent(messageEvent);
-
-      expect(spy).toHaveBeenCalledTimes(1);
-
-      spy.mockClear();
     });
 
     describe('Confirm permissions', () => {
@@ -582,7 +586,7 @@ describe('Signer', () => {
 
       const msg = {
         data: {
-          id: 'test-987',
+          id: requestPermissionsData.id,
           jsonrpc: JSON_RPC_VERSION_2,
           method: {
             scopes
@@ -591,44 +595,42 @@ describe('Signer', () => {
         origin: testOrigin
       };
 
-      it('should throw error if origin of the relying party is not set', () => {
-        expect(() => {
-          signer.confirmPermissions({
-            requestId: msg.data.id,
-            scopes
-          });
-        }).toThrowError("The relying party's origin is unknown.");
-      });
+      let notifyReadySpy: MockInstance;
 
-      describe('Wallet ready', () => {
-        let notifyReadySpy: MockInstance;
+      let payload: PermissionsPromptPayload;
 
-        beforeEach(() => {
-          notifyReadySpy = vi.spyOn(signerHandlers, 'notifyReady');
+      beforeEach(() => {
+        notifyReadySpy = vi.spyOn(signerHandlers, 'notifyReady');
 
-          const messageEvent = new MessageEvent('message', {
-            data: {
-              id: testId,
-              jsonrpc: JSON_RPC_VERSION_2,
-              method: ICRC29_STATUS
-            },
-            origin: testOrigin
-          });
-
-          window.dispatchEvent(messageEvent);
-
-          expect(notifyReadySpy).toHaveBeenCalledWith({
+        const messageEvent = new MessageEvent('message', {
+          data: {
             id: testId,
-            origin: testOrigin
-          });
+            jsonrpc: JSON_RPC_VERSION_2,
+            method: ICRC29_STATUS
+          },
+          origin: testOrigin
         });
 
-        it('should notify scopes for selected permissions', () => {
-          signer.confirmPermissions({
-            requestId: msg.data.id,
-            scopes
-          });
+        window.dispatchEvent(messageEvent);
 
+        expect(notifyReadySpy).toHaveBeenCalledWith({
+          id: testId,
+          origin: testOrigin
+        });
+
+        signer.register({
+          method: ICRC25_REQUEST_PERMISSIONS,
+          prompt: (p) => (payload = p)
+        });
+
+        const messageEventPermissionsRequests = new MessageEvent('message', requestPermissionsMsg);
+        window.dispatchEvent(messageEventPermissionsRequests);
+      });
+
+      it('should notify scopes for selected permissions', async () => {
+        payload.confirmScopes(scopes);
+
+        await vi.waitFor(() => {
           expect(postMessageMock).toHaveBeenCalledWith(
             {
               jsonrpc: JSON_RPC_VERSION_2,
@@ -640,19 +642,23 @@ describe('Signer', () => {
             testOrigin
           );
         });
+      });
 
-        it('should save permissions in storage', () => {
-          signer.confirmPermissions({
-            requestId: msg.data.id,
-            scopes
-          });
+      it('should save permissions in storage', async () => {
+        payload.confirmScopes(scopes);
 
-          const expectedKey = `oisy_signer_${testOrigin}_${signerOptions.owner.toText()}`;
-          const expectedData = {
-            scopes,
-            createdAt: expect.any(Number)
-          };
+        const expectedKey = `oisy_signer_${testOrigin}_${signerOptions.owner.toText()}`;
+        const expectedData = {
+          scopes: scopes.map((scope) => ({
+            ...scope,
+            createdAt: expect.any(Number),
+            updatedAt: expect.any(Number)
+          })),
+          createdAt: expect.any(Number),
+          updatedAt: expect.any(Number)
+        };
 
+        await vi.waitFor(() => {
           const storedData = get({key: expectedKey});
 
           expect(storedData).toStrictEqual(expectedData);
