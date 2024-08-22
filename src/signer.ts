@@ -9,7 +9,7 @@ import {
   notifySupportedStandards
 } from './handlers/signer.handlers';
 import {
-  permissionState,
+  sessionScopeState,
   readSessionValidScopes,
   saveSessionScopes
 } from './sessions/signer.sessions';
@@ -359,7 +359,7 @@ export class Signer {
       const {id} = accountsData;
 
       // TODO:
-      switch (permissionState({owner: this.#owner, origin, method: ICRC27_ACCOUNTS})) {
+      switch (sessionScopeState({owner: this.#owner, origin, method: ICRC27_ACCOUNTS})) {
         case 'denied': {
           // Is permission denied => notify error
           break;

@@ -83,11 +83,11 @@ export const readSessionValidScopes = (params: SessionIdentifier): IcrcScopesArr
     .map(({updatedAt: _, createdAt: __, ...rest}) => ({...rest}));
 };
 
-export const permissionState = ({
+export const sessionScopeState = ({
   method,
   ...rest
-}: SessionParams & {method: IcrcWalletScopedMethod}): IcrcWalletPermissionState => {
-  const scopes = readValidPermissions(rest);
+}: SessionIdentifier & {method: IcrcWalletScopedMethod}): IcrcWalletPermissionState => {
+  const scopes = readSessionValidScopes(rest);
 
   return (
     scopes?.find(({scope: {method: m}}) => m === method)?.state ?? ICRC25_PERMISSION_ASK_ON_USE
