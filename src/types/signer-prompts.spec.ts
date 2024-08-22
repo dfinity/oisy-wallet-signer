@@ -1,6 +1,6 @@
 import {ICRC27_ACCOUNTS} from '../constants/icrc.constants';
 import type {IcrcScopesArray} from './icrc-responses';
-import {PermissionsPromptPayload, PermissionsPromptSchema} from './signer-prompts';
+import {PermissionsPromptSchema, type PermissionsPromptPayload} from './signer-prompts';
 
 describe('SignerPrompts', () => {
   describe('Permissions', () => {
@@ -14,7 +14,7 @@ describe('SignerPrompts', () => {
     ];
 
     it('should validate a prompt', () => {
-      const prompt = (payload: PermissionsPromptPayload) => {
+      const prompt = (payload: PermissionsPromptPayload): void => {
         payload.confirmScopes(scopes);
       };
 

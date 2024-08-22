@@ -449,7 +449,26 @@ describe('Signer', () => {
         });
       });
 
+      it('should notify missing prompt for icrc25_request_permissions', () => {
+        const messageEvent = new MessageEvent('message', requestPermissionsMsg);
+        window.dispatchEvent(messageEvent);
+
+        expect(postMessageMock).not.toHaveBeenNthCalledWith(1, {
+          error: {
+            code: SignerErrorCode.PERMISSIONS_PROMPT_NOT_REGISTERED,
+            message: 'The signer has not registered a prompt to respond to permission requests.'
+          }
+        });
+      });
+
       it('should not post message for icrc25_request_permissions', () => {
+        const promptSpy = vi.fn();
+
+        signer.register({
+          method: ICRC25_REQUEST_PERMISSIONS,
+          prompt: promptSpy
+        });
+
         const messageEvent = new MessageEvent('message', requestPermissionsMsg);
         window.dispatchEvent(messageEvent);
 

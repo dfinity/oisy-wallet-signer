@@ -25,9 +25,9 @@ import {RpcRequestSchema} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
 import type {SignerOptions} from './types/signer-options';
 import {
-  PermissionsConfirmation,
-  PermissionsPrompt,
-  PermissionsPromptSchema
+  PermissionsPromptSchema,
+  type PermissionsConfirmation,
+  type PermissionsPrompt
 } from './types/signer-prompts';
 import type {RequestPermissionPayload} from './types/signer-subscribers';
 
