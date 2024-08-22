@@ -146,11 +146,12 @@ export class Signer {
   }: {
     method: IcrcWalletApproveMethod;
     prompt: PermissionsPrompt;
-  }): (() => void) => {
+  }): void => {
     switch (method) {
       case ICRC25_REQUEST_PERMISSIONS: {
         PermissionsPromptSchema.parse(prompt);
         this.#permissionsPrompt = prompt;
+        return;
       }
     }
 
