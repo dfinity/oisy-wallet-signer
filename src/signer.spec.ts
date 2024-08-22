@@ -23,7 +23,7 @@ import type {IcrcScopesArray} from './types/icrc-responses';
 import {JSON_RPC_VERSION_2} from './types/rpc';
 import type {SignerMessageEventData} from './types/signer';
 import type {SignerOptions} from './types/signer-options';
-import {PermissionsPromptPayload} from './types/signer-prompts';
+import type {PermissionsPromptPayload} from './types/signer-prompts';
 import {del, get} from './utils/storage.utils';
 
 describe('Signer', () => {
@@ -553,7 +553,7 @@ describe('Signer', () => {
       const messageEvent = new MessageEvent('message', msg);
       window.dispatchEvent(messageEvent);
 
-      await vi.waitFor(() =>
+      await vi.waitFor(() => {
         expect(postMessageMock).toHaveBeenCalledWith(
           {
             jsonrpc: JSON_RPC_VERSION_2,
@@ -564,8 +564,8 @@ describe('Signer', () => {
             }
           },
           testOrigin
-        )
-      );
+        );
+      });
     });
 
     describe('Confirm permissions', () => {
