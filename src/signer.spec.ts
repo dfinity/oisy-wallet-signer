@@ -6,7 +6,8 @@ import {
   ICRC25_REQUEST_PERMISSIONS,
   ICRC25_SUPPORTED_STANDARDS,
   ICRC27_ACCOUNTS,
-  ICRC29_STATUS
+  ICRC29_STATUS,
+  ICRC49_CALL_CANISTER
 } from './constants/icrc.constants';
 import {
   SIGNER_DEFAULT_SCOPES,
@@ -22,7 +23,8 @@ import type {IcrcScopesArray} from './types/icrc-responses';
 import {JSON_RPC_VERSION_2} from './types/rpc';
 import type {SignerMessageEventData} from './types/signer';
 import type {SignerOptions} from './types/signer-options';
-import {del} from './utils/storage.utils';
+import {PermissionsPromptPayload} from './types/signer-prompts';
+import {del, get} from './utils/storage.utils';
 
 describe('Signer', () => {
   const signerOptions: SignerOptions = {
@@ -566,29 +568,7 @@ describe('Signer', () => {
       );
     });
 
-    /* it('should not trigger client subscriber if unsubscribed', () => {
-      const spy = vi.fn();
-
-      const off = signer.on({
-        method: ICRC25_REQUEST_PERMISSIONS,
-        callback: spy
-      });
-
-      const messageEvent = new MessageEvent('message', requestPermissionsMsg);
-      window.dispatchEvent(messageEvent);
-
-      expect(spy).toHaveBeenCalledTimes(1);
-
-      off();
-
-      window.dispatchEvent(messageEvent);
-
-      expect(spy).toHaveBeenCalledTimes(1);
-
-      spy.mockClear();
-    }); */
-
-    /* describe('Confirm permissions', () => {
+    describe('Confirm permissions', () => {
       const scopes: IcrcScopesArray = [
         {
           scope: {
@@ -606,7 +586,7 @@ describe('Signer', () => {
 
       const msg = {
         data: {
-          id: 'test-987',
+          id: requestPermissionsData.id,
           jsonrpc: JSON_RPC_VERSION_2,
           method: {
             scopes
@@ -615,44 +595,42 @@ describe('Signer', () => {
         origin: testOrigin
       };
 
-      it('should throw error if origin of the relying party is not set', () => {
-        expect(() => {
-          signer.confirmPermissions({
-            requestId: msg.data.id,
-            scopes
-          });
-        }).toThrowError("The relying party's origin is unknown.");
-      });
+      let notifyReadySpy: MockInstance;
 
-      describe('Wallet ready', () => {
-        let notifyReadySpy: MockInstance;
+      let payload: PermissionsPromptPayload;
 
-        beforeEach(() => {
-          notifyReadySpy = vi.spyOn(signerHandlers, 'notifyReady');
+      beforeEach(() => {
+        notifyReadySpy = vi.spyOn(signerHandlers, 'notifyReady');
 
-          const messageEvent = new MessageEvent('message', {
-            data: {
-              id: testId,
-              jsonrpc: JSON_RPC_VERSION_2,
-              method: ICRC29_STATUS
-            },
-            origin: testOrigin
-          });
-
-          window.dispatchEvent(messageEvent);
-
-          expect(notifyReadySpy).toHaveBeenCalledWith({
+        const messageEvent = new MessageEvent('message', {
+          data: {
             id: testId,
-            origin: testOrigin
-          });
+            jsonrpc: JSON_RPC_VERSION_2,
+            method: ICRC29_STATUS
+          },
+          origin: testOrigin
         });
 
-        it('should notify scopes for selected permissions', () => {
-          signer.confirmPermissions({
-            requestId: msg.data.id,
-            scopes
-          });
+        window.dispatchEvent(messageEvent);
 
+        expect(notifyReadySpy).toHaveBeenCalledWith({
+          id: testId,
+          origin: testOrigin
+        });
+
+        signer.register({
+          method: ICRC25_REQUEST_PERMISSIONS,
+          prompt: (p) => (payload = p)
+        });
+
+        const messageEventPermissionsRequests = new MessageEvent('message', requestPermissionsMsg);
+        window.dispatchEvent(messageEventPermissionsRequests);
+      });
+
+      it('should notify scopes for selected permissions', async () => {
+        payload.confirmScopes(scopes);
+
+        await vi.waitFor(() => {
           expect(postMessageMock).toHaveBeenCalledWith(
             {
               jsonrpc: JSON_RPC_VERSION_2,
@@ -664,29 +642,28 @@ describe('Signer', () => {
             testOrigin
           );
         });
+      });
 
-        it('should save permissions in storage', () => {
-          signer.confirmPermissions({
-            requestId: msg.data.id,
-            scopes
-          });
+      it('should save permissions in storage', async () => {
+        payload.confirmScopes(scopes);
 
-          const expectedKey = `oisy_signer_${testOrigin}_${signerOptions.owner.toText()}`;
-          const expectedData = {
-            scopes: scopes.map((scope) => ({
-              ...scope,
-              createdAt: expect.any(Number),
-              updatedAt: expect.any(Number)
-            })),
+        const expectedKey = `oisy_signer_${testOrigin}_${signerOptions.owner.toText()}`;
+        const expectedData = {
+          scopes: scopes.map((scope) => ({
+            ...scope,
             createdAt: expect.any(Number),
             updatedAt: expect.any(Number)
-          };
+          })),
+          createdAt: expect.any(Number),
+          updatedAt: expect.any(Number)
+        };
 
+        await vi.waitFor(() => {
           const storedData = get({key: expectedKey});
 
           expect(storedData).toStrictEqual(expectedData);
         });
       });
-    }); */
+    });
   });
 });
