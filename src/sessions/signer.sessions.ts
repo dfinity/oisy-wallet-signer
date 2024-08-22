@@ -9,17 +9,18 @@ import {get, set} from '../utils/storage.utils';
 
 const KEY_PREFIX = 'oisy_signer';
 
-interface SessionParams {
+interface SessionIdentifier {
   owner: Principal;
   origin: string;
 }
 
-const key = ({owner, origin}: SessionParams): string => `${KEY_PREFIX}_${origin}_${owner.toText()}`;
+const key = ({owner, origin}: SessionIdentifier): string =>
+  `${KEY_PREFIX}_${origin}_${owner.toText()}`;
 
-export const savePermissions = ({
+export const saveSessionScopes = ({
   scopes,
   ...rest
-}: SessionParams & {
+}: SessionIdentifier & {
   scopes: IcrcScopesArray;
 }): void => {
   const permissionKey = key(rest);
@@ -64,7 +65,7 @@ export const savePermissions = ({
   set({key: permissionKey, value: updatedPermissions});
 };
 
-export const readValidPermissions = (params: SessionParams): IcrcScopesArray | undefined => {
+export const readSessionValidScopes = (params: SessionIdentifier): IcrcScopesArray | undefined => {
   const permissions = get<SessionPermissions>({key: key(params)});
 
   if (isNullish(permissions)) {

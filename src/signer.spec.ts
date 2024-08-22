@@ -15,7 +15,7 @@ import {
   SignerErrorCode
 } from './constants/signer.constants';
 import * as signerHandlers from './handlers/signer.handlers';
-import {savePermissions} from './sessions/signer.sessions';
+import {saveSessionScopes} from './sessions/signer.sessions';
 import {Signer} from './signer';
 import {IcrcWalletPermissionStateSchema} from './types/icrc';
 import type {IcrcRequestAnyPermissionsRequest} from './types/icrc-requests';
@@ -387,7 +387,7 @@ describe('Signer', () => {
           }
         ];
 
-        savePermissions({
+        saveSessionScopes({
           owner,
           origin: testOrigin,
           scopes

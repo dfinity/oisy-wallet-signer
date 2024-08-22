@@ -8,7 +8,11 @@ import {
   notifyReady,
   notifySupportedStandards
 } from './handlers/signer.handlers';
-import {permissionState, readValidPermissions, savePermissions} from './sessions/signer.sessions';
+import {
+  permissionState,
+  readSessionValidScopes,
+  saveSessionScopes
+} from './sessions/signer.sessions';
 import {
   IcrcWalletPermissionStateSchema,
   IcrcWalletScopedMethodSchema,
@@ -222,12 +226,12 @@ export class Signer {
     if (isPermissionsRequestRequest) {
       const {id} = permissionsRequestData;
 
-      const permissions = readValidPermissions({owner: this.#owner, origin});
+      const scopes = readSessionValidScopes({owner: this.#owner, origin});
 
       notifyPermissionScopes({
         id,
         origin,
-        scopes: permissions ?? SIGNER_DEFAULT_SCOPES
+        scopes: scopes ?? SIGNER_DEFAULT_SCOPES
       });
       return {handled: true};
     }
@@ -336,7 +340,7 @@ export class Signer {
       scopes
     });
 
-    savePermissions({owner: this.#owner, origin: this.#walletOrigin, scopes});
+    saveSessionScopes({owner: this.#owner, origin: this.#walletOrigin, scopes});
   }
 
   /**

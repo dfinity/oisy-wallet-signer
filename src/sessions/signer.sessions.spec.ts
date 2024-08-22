@@ -12,7 +12,7 @@ import type {IcrcScope, IcrcScopesArray} from '../types/icrc-responses';
 import type {SessionPermissions} from '../types/signer-sessions';
 import * as storageUtils from '../utils/storage.utils';
 import {del, get} from '../utils/storage.utils';
-import {readValidPermissions, savePermissions} from './signer.sessions';
+import {readSessionValidScopes, saveSessionScopes} from './signer.sessions';
 
 describe('Signer sessions', () => {
   const owner = Ed25519KeyIdentity.generate().getPrincipal();
@@ -65,7 +65,7 @@ describe('Signer sessions', () => {
 
   describe('Save', () => {
     it('should save the permissions to local storage', () => {
-      savePermissions({
+      saveSessionScopes({
         owner,
         origin,
         scopes
@@ -79,7 +79,7 @@ describe('Signer sessions', () => {
       let updateScopes: IcrcScopesArray;
 
       beforeEach(() => {
-        savePermissions({
+        saveSessionScopes({
           owner,
           origin,
           scopes
@@ -98,7 +98,7 @@ describe('Signer sessions', () => {
       it('should retain existing scopes and update new ones', () => {
         assertNonNullish(savedPermissions);
 
-        savePermissions({
+        saveSessionScopes({
           owner,
           origin,
           scopes: updateScopes
@@ -136,7 +136,7 @@ describe('Signer sessions', () => {
 
         vi.advanceTimersByTime(SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS);
 
-        savePermissions({
+        saveSessionScopes({
           owner,
           origin,
           scopes: updateScopes
@@ -157,7 +157,7 @@ describe('Signer sessions', () => {
 
   describe('Read', () => {
     it('should read the permissions from local storage', () => {
-      savePermissions({
+      saveSessionScopes({
         owner,
         origin,
         scopes
@@ -167,19 +167,19 @@ describe('Signer sessions', () => {
 
       expect(permissions).toEqual(expect.objectContaining(expectedScopes));
 
-      const validPermissions = readValidPermissions({owner, origin});
+      const validScopes = readSessionValidScopes({owner, origin});
 
-      expect(validPermissions).toEqual(expect.objectContaining([scopeToTest, scopeToRetain]));
+      expect(validScopes).toEqual(expect.objectContaining([scopeToTest, scopeToRetain]));
     });
 
     it('should return undefined if no permissions were ever saved', () => {
-      const permissions = readValidPermissions({owner, origin});
+      const scopes = readSessionValidScopes({owner, origin});
 
-      expect(permissions).toBeUndefined();
+      expect(scopes).toBeUndefined();
     });
 
     it('should return empty array for permissions older than the validity period', () => {
-      savePermissions({
+      saveSessionScopes({
         owner,
         origin,
         scopes
@@ -187,13 +187,13 @@ describe('Signer sessions', () => {
 
       vi.advanceTimersByTime(SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS + 1);
 
-      const permissions = readValidPermissions({owner, origin});
+      const sessionScopes = readSessionValidScopes({owner, origin});
 
-      expect(permissions).toHaveLength(0);
+      expect(sessionScopes).toHaveLength(0);
     });
 
     it('should return the permissions if exactly equals the validity period', () => {
-      savePermissions({
+      saveSessionScopes({
         owner,
         origin,
         scopes
@@ -205,15 +205,15 @@ describe('Signer sessions', () => {
 
       expect(permissions).toEqual(expect.objectContaining(expectedScopes));
 
-      const validPermissions = readValidPermissions({owner, origin});
+      const validScopes = readSessionValidScopes({owner, origin});
 
-      expect(validPermissions).toEqual(expect.objectContaining([scopeToTest, scopeToRetain]));
+      expect(validScopes).toEqual(expect.objectContaining([scopeToTest, scopeToRetain]));
     });
 
     it('should return undefined if permissions are nullish', () => {
-      const permissions = readValidPermissions({owner, origin});
+      const scopes = readSessionValidScopes({owner, origin});
 
-      expect(permissions).toBeUndefined();
+      expect(scopes).toBeUndefined();
     });
   });
 });
