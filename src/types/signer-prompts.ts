@@ -23,6 +23,6 @@ export type PermissionsPromptPayload = z.infer<typeof PermissionsPromptPayloadSc
  * @param {IcrcScopes[]} params.requestedScopes - An array of IcrcScopes representing the permissions being requested.
  * @param {PermissionsConfirmation} params.confirmScopes - A function to be called by the consumer to confirm (grant or deny) the requested permissions.
  */
-const PermissionsPromptSchema = z.function().args(PermissionsPromptPayloadSchema).returns(z.void());
+export const PermissionsPromptSchema = z.function().args(PermissionsPromptPayloadSchema).returns(z.void());
 
 export type PermissionsPrompt = z.infer<typeof PermissionsPromptSchema>;

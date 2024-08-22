@@ -24,7 +24,11 @@ import type {IcrcScope, IcrcScopesArray} from './types/icrc-responses';
 import {RpcRequestSchema} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
 import type {SignerOptions} from './types/signer-options';
-import type {PermissionsConfirmation, PermissionsPrompt} from './types/signer-prompts';
+import {
+  PermissionsConfirmation,
+  PermissionsPrompt,
+  PermissionsPromptSchema
+} from './types/signer-prompts';
 import type {RequestPermissionPayload} from './types/signer-subscribers';
 
 export class Signer {
@@ -144,8 +148,10 @@ export class Signer {
     prompt: PermissionsPrompt;
   }): (() => void) => {
     switch (method) {
-      case ICRC25_REQUEST_PERMISSIONS:
+      case ICRC25_REQUEST_PERMISSIONS: {
+        PermissionsPromptSchema.parse(prompt);
         this.#permissionsPrompt = prompt;
+      }
     }
 
     throw new Error(
