@@ -3,9 +3,11 @@ import {
   ICRC25_PERMISSIONS,
   ICRC25_REQUEST_PERMISSIONS,
   ICRC25_SUPPORTED_STANDARDS,
+  ICRC27_ACCOUNTS,
   ICRC29_STATUS
 } from '../constants/icrc.constants';
 import type {
+  IcrcAccountsRequest,
   IcrcAnyRequestedScopes,
   IcrcPermissionsRequest,
   IcrcRequestAnyPermissionsRequest,
@@ -86,6 +88,16 @@ export const requestPermissions = ({
     id,
     method: ICRC25_REQUEST_PERMISSIONS,
     params: {scopes}
+  };
+
+  focusAndPostMsg({msg, ...rest});
+};
+
+export const requestAccounts = ({id, ...rest}: Request): void => {
+  const msg: IcrcAccountsRequest = {
+    jsonrpc: JSON_RPC_VERSION_2,
+    id,
+    method: ICRC27_ACCOUNTS
   };
 
   focusAndPostMsg({msg, ...rest});

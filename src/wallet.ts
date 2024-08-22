@@ -2,21 +2,25 @@ import {assertNonNullish, nonNullish, notEmptyString} from '@dfinity/utils';
 import {
   WALLET_CONNECT_TIMEOUT_IN_MILLISECONDS,
   WALLET_DEFAULT_SCOPES,
+  WALLET_TIMEOUT_ACCOUNTS,
   WALLET_TIMEOUT_PERMISSIONS,
   WALLET_TIMEOUT_REQUEST_PERMISSIONS,
   WALLET_TIMEOUT_REQUEST_SUPPORTED_STANDARD
 } from './constants/wallet.constants';
 import {
   permissions,
+  requestAccounts,
   requestPermissions,
   requestSupportedStandards,
   retryRequestStatus
 } from './handlers/wallet.handlers';
 import type {IcrcAnyRequestedScopes} from './types/icrc-requests';
 import {
+  IcrcAccountsResponseSchema,
   IcrcReadyResponseSchema,
   IcrcScopesResponseSchema,
   IcrcSupportedStandardsResponseSchema,
+  type IcrcAccounts,
   type IcrcScopesArray,
   type IcrcSupportedStandards
 } from './types/icrc-responses';
@@ -422,6 +426,54 @@ export class Wallet {
 
     return await this.request<IcrcScopesArray>({
       options,
+      postRequest,
+      handleMessage
+    });
+  };
+
+  /**
+   * List the accounts supported by the wallet.
+   *
+   * @async
+   * @param {WalletRequestOptions} options - The options for the wallet request, which may include parameters such as timeout settings and other request-specific configurations.
+   * @returns {Promise<IcrcAccounts>} A promise that resolves to an object containing the supported ICRC accounts by the wallet.
+   * @see [ICRC27 Get Accounts](https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_27_accounts.md)
+   */
+  accounts = async ({
+    options: {timeoutInMilliseconds, ...rest} = {}
+  }: {options?: WalletRequestOptions} = {}): Promise<IcrcAccounts> => {
+    const handleMessage = async ({
+      data,
+      id
+    }: {
+      data: WalletMessageEventData;
+      id: RpcId;
+    }): Promise<{handled: boolean; result?: IcrcAccounts}> => {
+      const {success: isAccounts, data: accountsData} = IcrcAccountsResponseSchema.safeParse(data);
+
+      if (isAccounts && id === accountsData?.id && nonNullish(accountsData?.result)) {
+        const {
+          result: {accounts: result}
+        } = accountsData;
+        return {handled: true, result};
+      }
+
+      return {handled: false};
+    };
+
+    const postRequest = (id: RpcId): void => {
+      requestAccounts({
+        popup: this.#popup,
+        origin: this.#origin,
+        id
+      });
+    };
+
+    return await this.request<IcrcAccounts>({
+      options: {
+        timeoutInMilliseconds: timeoutInMilliseconds ?? WALLET_TIMEOUT_ACCOUNTS,
+        ...rest
+      },
       postRequest,
       handleMessage
     });
