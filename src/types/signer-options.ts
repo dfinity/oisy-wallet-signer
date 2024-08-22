@@ -35,12 +35,20 @@ const PrincipalNotAnonymousSchema = PrincipalSchema.refine(
   }
 );
 
-export const RequestsPermissionsSchema = z
-  .function()
-  .args(IcrcScopesArraySchema)
-  .returns(z.promise(IcrcScopesArraySchema));
+const PermissionsResponseSchema = z.function().args(IcrcScopesArraySchema).returns(z.void());
 
-export type RequestsPermissions = z.infer<typeof RequestsPermissionsSchema>;
+export type PermissionsResponse = z.infer<typeof PermissionsResponseSchema>;
+
+const PermissionsRequestsParamsSchema = z.object({
+  requestedScopes: IcrcScopesArraySchema,
+  confirmScopes: PermissionsResponseSchema
+});
+
+export type PermissionsRequestsParams = z.infer<typeof PermissionsRequestsParamsSchema>;
+
+const PermissionsRequestsSchema = z.function().args(PermissionsRequestsParamsSchema).returns(z.void());
+
+export type PermissionsRequests = z.infer<typeof PermissionsRequestsSchema>;
 
 export const SignerOptionsSchema = z.object({
   /**
@@ -58,12 +66,9 @@ export const SignerOptionsSchema = z.object({
    * 1. When the relying party explicitly requests permissions.
    * 2. When the relying party attempts to access a feature that requires permissions that have not yet been granted by the user.
    *
-   * The function receives an array of requested IcrcScopes and returns a Promise that resolves to an array of IcrcScopes that the user has confirmed.
-   *
-   * @param requestedScopes - An array of IcrcScopes representing the permissions being requested.
-   * @returns A Promise that resolves to an array of IcrcScopes representing the permissions confirmed by the user.
+   * @param requestedScopes - An object containing the `requestedScopes` array of IcrcScopes representing the permissions being requested and the `confirmScopes` function to confirm these permissions.
    */
-  requestsPermissions: RequestsPermissionsSchema
+  permissionsRequests: PermissionsRequestsSchema
 });
 
 export type SignerOptions = z.infer<typeof SignerOptionsSchema>;

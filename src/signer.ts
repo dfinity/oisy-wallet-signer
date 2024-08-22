@@ -18,18 +18,18 @@ import {
 import {IcrcScope, IcrcScopesArray} from './types/icrc-responses';
 import {RpcRequestSchema} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
-import {RequestsPermissions, SignerOptions} from './types/signer-options';
+import {PermissionsRequests, PermissionsResponse, SignerOptions} from './types/signer-options';
 import type {RequestPermissionPayload} from './types/signer-subscribers';
 
 export class Signer {
   readonly #owner: Principal;
-  readonly #requestsPermissions: RequestsPermissions | undefined;
+  readonly #permissionsRequests: PermissionsRequests;
 
   #walletOrigin: string | undefined | null;
 
-  private constructor({owner, requestsPermissions}: SignerOptions) {
+  private constructor({owner, permissionsRequests}: SignerOptions) {
     this.#owner = owner;
-    this.#requestsPermissions = requestsPermissions;
+    this.#permissionsRequests = permissionsRequests;
 
     window.addEventListener('message', this.onMessageListener);
   }
@@ -234,7 +234,16 @@ export class Signer {
       // Additionally, it may be beneficial to define a type that ensures at least one scope is present when responding to permission queries ([IcrcScope, ...IcrcScop[]] in Zod).
       // Overall, it would be handy to enforce a minimum of one permission through types and behavior?
 
-      const confirmedScopes = await this.#requestsPermissions(supportedRequestedScopes);
+      const promise = new Promise<IcrcScopesArray>((resolve) => {
+        const confirmScopes: PermissionsResponse = (scopes) => {
+          resolve(scopes);
+        };
+
+        this.#permissionsRequests({requestedScopes: supportedRequestedScopes, confirmScopes});
+      });
+
+      const confirmedScopes = await promise;
+
       this.confirmPermissions({scopes: confirmedScopes, requestId});
 
       return {handled: true};

@@ -1,23 +1,23 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
 	import type { Signer } from '@dfinity/oisy-wallet-signer/signer';
-	import { isNullish, nonNullish } from '@dfinity/utils';
-	import {
-		ICRC25_REQUEST_PERMISSIONS,
-		type IcrcScope,
-		type RequestPermissionPayload,
-		type RpcId
+	import { nonNullish } from '@dfinity/utils';
+	import type {
+		IcrcScope,
+		PermissionsRequestsParams,
+		PermissionsResponse
 	} from '@dfinity/oisy-wallet-signer';
 	import Button from '$core/components/Button.svelte';
 
 	type Props = {
 		signer: Signer | undefined;
+		permissionsRequests: PermissionsRequestsParams | undefined;
 	};
 
-	let { signer }: Props = $props();
+	let { signer, permissionsRequests }: Props = $props();
 
 	let scopes: IcrcScope[] | undefined = $state(undefined);
-	let id: RpcId | undefined = $state(undefined);
+	let confirmScopes: PermissionsResponse | undefined = $derived(permissionsRequests?.confirmScopes);
 
 	const sortScope = (
 		{ scope: { method: methodA } }: IcrcScope,
@@ -25,31 +25,26 @@
 	): number => methodA.localeCompare(methodB);
 
 	$effect(() => {
-		if (isNullish(signer)) {
-			return;
-		}
+		scopes = permissionsRequests?.requestedScopes;
 
-		signer.on({
-			method: ICRC25_REQUEST_PERMISSIONS,
-			callback: ({ scopes: scopesToApprove, requestId }: RequestPermissionPayload) => {
-				scopes = scopesToApprove.sort(sortScope);
-				id = requestId;
-			}
-		});
+		// TODO: register here?
+		// signer.on({
+		// 	method: ICRC25_REQUEST_PERMISSIONS,
+		// 	callback: ({ scopes: scopesToApprove, requestId }: RequestPermissionPayload) => {
+		// 		scopes = scopesToApprove.sort(sortScope);
+		// 		id = requestId;
+		// 	}
+		// });
 	});
 
-	const onsubmit = ($event: SubmitEvent) => {
+	const onsubmit = async ($event: SubmitEvent) => {
 		$event.preventDefault();
 
 		// TODO: alert errors
 
-		signer?.confirmPermissions({
-			requestId: $state.snapshot(id)!,
-			scopes: $state.snapshot(scopes)!
-		});
+		confirmScopes?.($state.snapshot(scopes)!);
 
-		scopes = undefined;
-		id = undefined;
+		permissionsRequests = undefined;
 	};
 
 	const onToggle = (scope: IcrcScope) => {
