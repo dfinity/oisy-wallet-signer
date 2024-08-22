@@ -1,6 +1,5 @@
 import {Principal} from '@dfinity/principal';
 import {z} from 'zod';
-import {IcrcScopesArraySchema} from './icrc-responses';
 
 const PrincipalSchema = z.custom<Principal>((value: unknown) => {
   if (typeof value !== 'object') {
@@ -35,21 +34,6 @@ const PrincipalNotAnonymousSchema = PrincipalSchema.refine(
   }
 );
 
-const PermissionsResponseSchema = z.function().args(IcrcScopesArraySchema).returns(z.void());
-
-export type PermissionsResponse = z.infer<typeof PermissionsResponseSchema>;
-
-const PermissionsRequestsParamsSchema = z.object({
-  requestedScopes: IcrcScopesArraySchema,
-  confirmScopes: PermissionsResponseSchema
-});
-
-export type PermissionsRequestsParams = z.infer<typeof PermissionsRequestsParamsSchema>;
-
-const PermissionsRequestsSchema = z.function().args(PermissionsRequestsParamsSchema).returns(z.void());
-
-export type PermissionsRequests = z.infer<typeof PermissionsRequestsSchema>;
-
 export const SignerOptionsSchema = z.object({
   /**
    * The owner who interacts with the signer.
@@ -57,18 +41,7 @@ export const SignerOptionsSchema = z.object({
    * When the signer is initialized, the owner should be signed in to the consumer dApp.
    * Upon signing out, it is up to the consumer to disconnect the signer.
    */
-  owner: PrincipalNotAnonymousSchema,
-
-  /**
-   * A function invoked when the signer requires the user to confirm (grant or deny) requested permissions.
-   *
-   * This function can be triggered in two scenarios:
-   * 1. When the relying party explicitly requests permissions.
-   * 2. When the relying party attempts to access a feature that requires permissions that have not yet been granted by the user.
-   *
-   * @param requestedScopes - An object containing the `requestedScopes` array of IcrcScopes representing the permissions being requested and the `confirmScopes` function to confirm these permissions.
-   */
-  permissionsRequests: PermissionsRequestsSchema
+  owner: PrincipalNotAnonymousSchema
 });
 
 export type SignerOptions = z.infer<typeof SignerOptionsSchema>;

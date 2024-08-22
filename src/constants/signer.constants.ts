@@ -14,6 +14,11 @@ export enum SignerErrorCode {
   REQUEST_NOT_SUPPORTED = 501,
 
   /**
+   * The signer has not registered a prompt to respond to permission requests.
+   */
+  PERMISSIONS_PROMPT_NOT_REGISTERED = 502,
+
+  /**
    * A generic error.
    * @see https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#errors
    */

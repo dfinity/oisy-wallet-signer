@@ -5,11 +5,8 @@
 	import ConfirmPermissions from '$lib/ConfirmPermissions.svelte';
 	import { authStore } from '$core/stores/auth.store';
 	import { isNullish } from '@dfinity/utils';
-	import { type PermissionsRequestsParams } from '@dfinity/oisy-wallet-signer';
 
 	let signer: Signer | undefined = $state(undefined);
-
-	let permissionsRequests: PermissionsRequestsParams | undefined = $state(undefined);
 
 	$effect(() => {
 		if ($notSignedIn) {
@@ -23,8 +20,7 @@
 		}
 
 		signer = Signer.init({
-			owner: $authStore.identity.getPrincipal(),
-			permissionsRequests: (requests) => (permissionsRequests = requests)
+			owner: $authStore.identity.getPrincipal()
 		});
 
 		return () => {
@@ -35,4 +31,4 @@
 
 <UserId />
 
-<ConfirmPermissions {signer} {permissionsRequests} />
+<ConfirmPermissions {signer} />

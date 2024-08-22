@@ -1,40 +1,43 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
 	import type { Signer } from '@dfinity/oisy-wallet-signer/signer';
-	import { nonNullish } from '@dfinity/utils';
-	import type {
-		IcrcScope,
-		PermissionsRequestsParams,
-		PermissionsResponse
-	} from '@dfinity/oisy-wallet-signer';
+	import { isNullish, nonNullish } from '@dfinity/utils';
+	import { ICRC25_REQUEST_PERMISSIONS, type IcrcScope } from '@dfinity/oisy-wallet-signer';
 	import Button from '$core/components/Button.svelte';
+	import type { PermissionsConfirmation } from '@dfinity/oisy-wallet-signer/types/signer-prompts';
 
 	type Props = {
 		signer: Signer | undefined;
-		permissionsRequests: PermissionsRequestsParams | undefined;
 	};
 
-	let { signer, permissionsRequests }: Props = $props();
+	let { signer }: Props = $props();
 
 	let scopes: IcrcScope[] | undefined = $state(undefined);
-	let confirmScopes: PermissionsResponse | undefined = $derived(permissionsRequests?.confirmScopes);
+	let confirm: PermissionsConfirmation | undefined = $state(undefined);
 
 	const sortScope = (
 		{ scope: { method: methodA } }: IcrcScope,
 		{ scope: { method: methodB } }: IcrcScope
 	): number => methodA.localeCompare(methodB);
 
-	$effect(() => {
-		scopes = permissionsRequests?.requestedScopes;
+	const resetPrompt = () => {
+		confirm = undefined;
+		scopes = undefined;
+	};
 
-		// TODO: register here?
-		// signer.on({
-		// 	method: ICRC25_REQUEST_PERMISSIONS,
-		// 	callback: ({ scopes: scopesToApprove, requestId }: RequestPermissionPayload) => {
-		// 		scopes = scopesToApprove.sort(sortScope);
-		// 		id = requestId;
-		// 	}
-		// });
+	$effect(() => {
+		if (isNullish(signer)) {
+			resetPrompt();
+			return;
+		}
+
+		signer.register({
+			method: ICRC25_REQUEST_PERMISSIONS,
+			prompt: ({ confirmScopes, requestedScopes }) => {
+				confirm = confirmScopes;
+				scopes = requestedScopes;
+			}
+		});
 	});
 
 	const onsubmit = async ($event: SubmitEvent) => {
@@ -42,9 +45,9 @@
 
 		// TODO: alert errors
 
-		confirmScopes?.($state.snapshot(scopes)!);
+		confirm?.($state.snapshot(scopes)!);
 
-		permissionsRequests = undefined;
+		resetPrompt();
 	};
 
 	const onToggle = (scope: IcrcScope) => {
