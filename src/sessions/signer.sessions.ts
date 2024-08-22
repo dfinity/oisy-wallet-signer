@@ -86,10 +86,9 @@ export const permissionState = ({
   method,
   ...rest
 }: SessionParams & {method: IcrcWalletScopedMethod}): IcrcWalletPermissionState => {
-  const permissions = readValidPermissions(rest);
+  const scopes = readValidPermissions(rest);
 
   return (
-    permissions?.scopes.find(({scope: {method: m}}) => m === method)?.state ??
-    ICRC25_PERMISSION_ASK_ON_USE
+    scopes?.find(({scope: {method: m}}) => m === method)?.state ?? ICRC25_PERMISSION_ASK_ON_USE
   );
 };
