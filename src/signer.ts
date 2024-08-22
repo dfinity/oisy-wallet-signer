@@ -1,5 +1,5 @@
 import type {Principal} from '@dfinity/principal';
-import {assertNonNullish, nonNullish} from '@dfinity/utils';
+import {assertNonNullish, isNullish, nonNullish} from '@dfinity/utils';
 import {ICRC25_REQUEST_PERMISSIONS} from './constants/icrc.constants';
 import {SIGNER_DEFAULT_SCOPES, SignerErrorCode} from './constants/signer.constants';
 import {
@@ -20,19 +20,23 @@ import {
   IcrcStatusRequestSchema,
   IcrcSupportedStandardsRequestSchema
 } from './types/icrc-requests';
-import type {IcrcScope} from './types/icrc-responses';
+import type {IcrcScope, IcrcScopesArray} from './types/icrc-responses';
 import {RpcRequestSchema} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
 import type {SignerOptions} from './types/signer-options';
+import {
+  PermissionsPromptSchema,
+  type PermissionsConfirmation,
+  type PermissionsPrompt
+} from './types/signer-prompts';
 import type {RequestPermissionPayload} from './types/signer-subscribers';
-import {Observable} from './utils/observable';
 
 export class Signer {
   readonly #owner: Principal;
+
   #walletOrigin: string | undefined | null;
 
-  readonly #requestsPermissionsSubscribers: Observable<RequestPermissionPayload> =
-    new Observable<RequestPermissionPayload>();
+  #permissionsPrompt: PermissionsPrompt | undefined;
 
   private constructor({owner}: SignerOptions) {
     this.#owner = owner;
@@ -76,6 +80,8 @@ export class Signer {
 
     this.assertAndSetOrigin(message);
 
+    // TODO: wrap a try catch around all handler and notify "Unexpected exception" in case if issues
+
     const {handled: statusRequestHandled} = this.handleStatusRequest(message);
     if (statusRequestHandled) {
       return;
@@ -91,7 +97,8 @@ export class Signer {
       return;
     }
 
-    const {handled: requestsPermissionsHandled} = this.handleRequestPermissionsRequest(message);
+    const {handled: requestsPermissionsHandled} =
+      await this.handleRequestPermissionsRequest(message);
     if (requestsPermissionsHandled) {
       return;
     }
@@ -133,16 +140,19 @@ export class Signer {
   /**
    * TODO: to be documented when fully implemented.
    */
-  on = ({
+  register = ({
     method,
-    callback
+    prompt
   }: {
     method: IcrcWalletApproveMethod;
-    callback: (data: RequestPermissionPayload) => void;
-  }): (() => void) => {
+    prompt: PermissionsPrompt;
+  }): void => {
     switch (method) {
-      case ICRC25_REQUEST_PERMISSIONS:
-        return this.#requestsPermissionsSubscribers.subscribe({callback});
+      case ICRC25_REQUEST_PERMISSIONS: {
+        PermissionsPromptSchema.parse(prompt);
+        this.#permissionsPrompt = prompt;
+        return;
+      }
     }
 
     throw new Error(
@@ -229,7 +239,9 @@ export class Signer {
    * @param {SignerMessageEvent} message - The incoming message event containing the data and origin.
    * @returns {Object} An object with a boolean property `handled` indicating whether the request was processed as a permissions request.
    */
-  private handleRequestPermissionsRequest({data}: SignerMessageEvent): {handled: boolean} {
+  private async handleRequestPermissionsRequest({
+    data
+  }: SignerMessageEvent): Promise<{handled: boolean}> {
     const {success: isRequestPermissionsRequest, data: requestPermissionsData} =
       IcrcRequestAnyPermissionsRequestSchema.safeParse(data);
 
@@ -239,8 +251,25 @@ export class Signer {
         params: {scopes: requestedScopes}
       } = requestPermissionsData;
 
+      const notifyMissingPromptError = (): void => {
+        notifyError({
+          id: requestId ?? null,
+          origin,
+          error: {
+            code: SignerErrorCode.PERMISSIONS_PROMPT_NOT_REGISTERED,
+            message: 'The signer has not registered a prompt to respond to permission requests.'
+          }
+        });
+      };
+
+      if (isNullish(this.#permissionsPrompt)) {
+        notifyMissingPromptError();
+
+        return {handled: true};
+      }
+
       // TODO: Can the newer version of TypeScript infer "as IcrcScope"?
-      const scopes = requestedScopes
+      const supportedRequestedScopes = requestedScopes
         .filter(
           ({method: requestedMethod}) =>
             IcrcWalletScopedMethodSchema.safeParse(requestedMethod).success
@@ -257,14 +286,42 @@ export class Signer {
       // Additionally, it may be beneficial to define a type that ensures at least one scope is present when responding to permission queries ([IcrcScope, ...IcrcScop[]] in Zod).
       // Overall, it would be handy to enforce a minimum of one permission through types and behavior?
 
-      this.#requestsPermissionsSubscribers.next({requestId, scopes});
-      return {handled: true};
+      class MissingPromptError extends Error {}
+
+      const promise = new Promise<IcrcScopesArray>((resolve, reject) => {
+        const confirmScopes: PermissionsConfirmation = (scopes) => {
+          resolve(scopes);
+        };
+
+        // The consumer currently has no way to unregister the prompt, so we know that it is defined. However, to be future-proof, it's better to ensure it is defined.
+        if (isNullish(this.#permissionsPrompt)) {
+          reject(new MissingPromptError());
+          return;
+        }
+
+        this.#permissionsPrompt({requestedScopes: supportedRequestedScopes, confirmScopes});
+      });
+
+      try {
+        const confirmedScopes = await promise;
+
+        this.confirmPermissions({scopes: confirmedScopes, requestId});
+
+        return {handled: true};
+      } catch (err: unknown) {
+        if (err instanceof MissingPromptError) {
+          notifyMissingPromptError();
+          return {handled: true};
+        }
+
+        throw err;
+      }
     }
 
     return {handled: false};
   }
 
-  confirmPermissions = ({scopes, requestId}: RequestPermissionPayload): void => {
+  private confirmPermissions({scopes, requestId}: RequestPermissionPayload): void {
     assertNonNullish(this.#walletOrigin, "The relying party's origin is unknown.");
 
     notifyPermissionScopes({
@@ -274,5 +331,5 @@ export class Signer {
     });
 
     savePermissions({owner: this.#owner, origin: this.#walletOrigin, scopes});
-  };
+  }
 }
