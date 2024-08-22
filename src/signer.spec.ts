@@ -473,6 +473,8 @@ describe('Signer', () => {
         window.dispatchEvent(messageEvent);
 
         expect(postMessageMock).not.toHaveBeenCalled();
+
+        promptSpy.mockClear();
       });
 
       it('should trigger the registered prompt for icrc25_request_permissions', () => {
@@ -534,7 +536,7 @@ describe('Signer', () => {
       });
     });
 
-    it('should notify REQUEST_NOT_SUPPORTED for unknown standard', () => {
+    it('should notify REQUEST_NOT_SUPPORTED for unknown standard', async () => {
       const testOrigin = 'https://hello.com';
 
       const msg = {
@@ -549,16 +551,18 @@ describe('Signer', () => {
       const messageEvent = new MessageEvent('message', msg);
       window.dispatchEvent(messageEvent);
 
-      expect(postMessageMock).toHaveBeenCalledWith(
-        {
-          jsonrpc: JSON_RPC_VERSION_2,
-          id: testId,
-          error: {
-            code: SignerErrorCode.REQUEST_NOT_SUPPORTED,
-            message: 'The request sent by the relying party is not supported by the signer.'
-          }
-        },
-        testOrigin
+      await vi.waitFor(() =>
+        expect(postMessageMock).toHaveBeenCalledWith(
+          {
+            jsonrpc: JSON_RPC_VERSION_2,
+            id: testId,
+            error: {
+              code: SignerErrorCode.REQUEST_NOT_SUPPORTED,
+              message: 'The request sent by the relying party is not supported by the signer.'
+            }
+          },
+          testOrigin
+        )
       );
     });
 
