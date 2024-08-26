@@ -1,4 +1,5 @@
 import {z} from 'zod';
+import {IcrcAccountsSchema} from './icrc-accounts';
 import {
   IcrcWalletPermissionStateSchema,
   IcrcWalletScopedMethodSchema,
@@ -91,3 +92,14 @@ export type IcrcSupportedStandardsResponse = z.infer<typeof IcrcSupportedStandar
 export const IcrcReadyResponseSchema = inferRpcResponseSchema(z.literal('ready'));
 
 export type IcrcReadyResponse = z.infer<typeof IcrcReadyResponseSchema>;
+
+// icrc27_accounts
+// https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_27_accounts.md#icrc-27-get-accounts
+
+export const IcrcAccountsResponseSchema = inferRpcResponseSchema(
+  z.object({
+    accounts: IcrcAccountsSchema
+  })
+);
+
+export type IcrcAccountsResponse = z.infer<typeof IcrcAccountsResponseSchema>;
