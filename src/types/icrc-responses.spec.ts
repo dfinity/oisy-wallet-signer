@@ -5,6 +5,7 @@ import {
   ICRC27_ACCOUNTS
 } from '../constants/icrc.constants';
 import {
+  IcrcAccountsResponseSchema,
   IcrcReadyResponseSchema,
   IcrcScopeSchema,
   IcrcScopesResponseSchema,
@@ -536,6 +537,120 @@ describe('icrc-responses', () => {
       const response: Partial<IcrcReadyResponse> = rest;
 
       expect(() => IcrcReadyResponseSchema.parse(response)).toThrow();
+    });
+  });
+
+  describe('icrc27_accounts', () => {
+    const owner = 'xlmdg-vkosz-ceopx-7wtgu-g3xmd-koiyc-awqaq-7modz-zf6r6-364rh-oqe';
+
+    const validResponse = {
+      jsonrpc: JSON_RPC_VERSION_2,
+      id: 1,
+      result: {
+        accounts: [
+          {
+            owner
+          },
+          {
+            owner: '2vxsx-fae',
+            subaccount: new Uint8Array(32)
+          }
+        ]
+      }
+    };
+
+    it('should validate a correct response', () => {
+      expect(() => IcrcAccountsResponseSchema.parse(validResponse)).not.toThrow();
+    });
+
+    it('should throw if response has an invalid Principal', () => {
+      const invalidResponse = {
+        ...validResponse,
+        result: {
+          accounts: [
+            {
+              owner: 'invalid-principal'
+            }
+          ]
+        }
+      };
+      expect(() => IcrcAccountsResponseSchema.parse(invalidResponse)).toThrow();
+    });
+
+    it('should throw if response has a subaccount that is not 32 bytes long', () => {
+      const invalidResponse = {
+        ...validResponse,
+        result: {
+          accounts: [
+            {
+              owner,
+              subaccount: new Uint8Array(11)
+            }
+          ]
+        }
+      };
+      expect(() => IcrcAccountsResponseSchema.parse(invalidResponse)).toThrow();
+    });
+
+    it('should throw if response has an account with extra fields', () => {
+      const invalidResponse = {
+        ...validResponse,
+        result: {
+          accounts: [
+            {
+              owner,
+              someRandomField: 'unexpected'
+            }
+          ]
+        }
+      };
+      expect(() => IcrcAccountsResponseSchema.parse(invalidResponse)).toThrow();
+    });
+
+    it('should throw if response has no accounts field', () => {
+      const {result: _, ...rest} = validResponse;
+
+      const response = {
+        ...rest,
+        result: {}
+      };
+
+      expect(() => IcrcAccountsResponseSchema.parse(response)).toThrow();
+    });
+
+    it('should throw if response has no result field', () => {
+      const {result: _, ...rest} = validResponse;
+
+      const response = rest;
+
+      expect(() => IcrcAccountsResponseSchema.parse(response)).toThrow();
+    });
+
+    it('should throw if response has no id', () => {
+      const {id: _, ...rest} = validResponse;
+
+      const response = rest;
+
+      expect(() => IcrcAccountsResponseSchema.parse(response)).toThrow();
+    });
+
+    it('should throw if response has no jsonrpc', () => {
+      const {jsonrpc: _, ...rest} = validResponse;
+
+      const response = rest;
+
+      expect(() => IcrcAccountsResponseSchema.parse(response)).toThrow();
+    });
+
+    it('should throw if response has an empty accounts array', () => {
+      const invalidResponse = {
+        ...validResponse,
+        result: {
+          accounts: []
+        }
+      };
+
+      expect(() => IcrcAccountsResponseSchema.parse(invalidResponse)).toThrow();
     });
   });
 });
