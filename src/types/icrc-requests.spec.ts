@@ -1,9 +1,11 @@
 import {ICRC27_ACCOUNTS} from '../constants/icrc.constants';
 import {
+  IcrcAccountsRequestSchema,
   IcrcPermissionsRequestSchema,
   IcrcRequestAnyPermissionsRequestSchema,
   IcrcStatusRequestSchema,
   IcrcSupportedStandardsRequestSchema,
+  type IcrcAccountsRequest,
   type IcrcPermissionsRequest,
   type IcrcRequestAnyPermissionsRequest
 } from './icrc-requests';
@@ -181,6 +183,50 @@ describe('icrc-requests', () => {
 
       const invalidRequest = rest;
       expect(() => schema.parse(invalidRequest)).toThrow();
+    });
+  });
+
+  describe('icrc27_accounts', () => {
+    const validRequest: IcrcAccountsRequest = {
+      jsonrpc: JSON_RPC_VERSION_2,
+      id: 1,
+      method: 'icrc27_accounts'
+    };
+
+    it('should validate a correct request', () => {
+      expect(() => IcrcAccountsRequestSchema.parse(validRequest)).not.toThrow();
+    });
+
+    it('should throw if request has params', () => {
+      const invalidRequest: IcrcAccountsRequest = {
+        ...validRequest,
+        // @ts-expect-error: we are testing this on purpose
+        params: {}
+      };
+      expect(() => IcrcAccountsRequestSchema.parse(invalidRequest)).toThrow();
+    });
+
+    it('should throw if request has invalid method', () => {
+      const invalidRequest: IcrcAccountsRequest = {
+        ...validRequest,
+        // @ts-expect-error: we are testing this on purpose
+        method: 'test'
+      };
+      expect(() => IcrcAccountsRequestSchema.parse(invalidRequest)).toThrow();
+    });
+
+    it('should throw if request has no id', () => {
+      const {id: _, ...rest} = validRequest;
+
+      const invalidRequest = rest;
+      expect(() => IcrcAccountsRequestSchema.parse(invalidRequest)).toThrow();
+    });
+
+    it('should throw if request has no jsonrpc', () => {
+      const {jsonrpc: _, ...rest} = validRequest;
+
+      const invalidRequest = rest;
+      expect(() => IcrcAccountsRequestSchema.parse(invalidRequest)).toThrow();
     });
   });
 });
