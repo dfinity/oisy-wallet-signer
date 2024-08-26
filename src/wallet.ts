@@ -14,6 +14,7 @@ import {
   requestSupportedStandards,
   retryRequestStatus
 } from './handlers/wallet.handlers';
+import type {IcrcAccounts} from './types/icrc-accounts';
 import type {IcrcAnyRequestedScopes} from './types/icrc-requests';
 import {
   IcrcAccountsResponseSchema,
