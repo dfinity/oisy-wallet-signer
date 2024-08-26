@@ -1,6 +1,6 @@
 import type {Principal} from '@dfinity/principal';
 import {assertNonNullish, isNullish, nonNullish} from '@dfinity/utils';
-import {ICRC25_REQUEST_PERMISSIONS} from './constants/icrc.constants';
+import {ICRC25_REQUEST_PERMISSIONS, ICRC27_ACCOUNTS} from './constants/icrc.constants';
 import {SIGNER_DEFAULT_SCOPES, SignerErrorCode} from './constants/signer.constants';
 import {
   notifyError,
@@ -8,8 +8,13 @@ import {
   notifyReady,
   notifySupportedStandards
 } from './handlers/signer.handlers';
-import {readSessionValidScopes, saveSessionScopes} from './sessions/signer.sessions';
 import {
+  readSessionValidScopes,
+  saveSessionScopes,
+  sessionScopeState
+} from './sessions/signer.sessions';
+import {
+  IcrcAccountsRequestSchema,
   IcrcPermissionsRequestSchema,
   IcrcRequestAnyPermissionsRequestSchema,
   IcrcStatusRequestSchema,
@@ -21,7 +26,7 @@ import {
   IcrcWalletScopedMethodSchema,
   type IcrcWalletApproveMethod
 } from './types/icrc-standards';
-import {RpcRequestSchema} from './types/rpc';
+import {RpcRequestSchema, type RpcId} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
 import type {SignerOptions} from './types/signer-options';
 import {
@@ -30,6 +35,8 @@ import {
   type PermissionsPrompt
 } from './types/signer-prompts';
 import type {RequestPermissionPayload} from './types/signer-subscribers';
+
+class MissingPromptError extends Error {}
 
 export class Signer {
   readonly #owner: Principal;
@@ -100,6 +107,11 @@ export class Signer {
     const {handled: requestsPermissionsHandled} =
       await this.handleRequestPermissionsRequest(message);
     if (requestsPermissionsHandled) {
+      return;
+    }
+
+    const {handled: accountsHandled} = await this.handleAccounts(message);
+    if (accountsHandled) {
       return;
     }
 
@@ -251,19 +263,8 @@ export class Signer {
         params: {scopes: requestedScopes}
       } = requestPermissionsData;
 
-      const notifyMissingPromptError = (): void => {
-        notifyError({
-          id: requestId ?? null,
-          origin,
-          error: {
-            code: SignerErrorCode.PERMISSIONS_PROMPT_NOT_REGISTERED,
-            message: 'The signer has not registered a prompt to respond to permission requests.'
-          }
-        });
-      };
-
       if (isNullish(this.#permissionsPrompt)) {
-        notifyMissingPromptError();
+        this.notifyMissingPromptError(requestId);
 
         return {handled: true};
       }
@@ -286,31 +287,16 @@ export class Signer {
       // Additionally, it may be beneficial to define a type that ensures at least one scope is present when responding to permission queries ([IcrcScope, ...IcrcScop[]] in Zod).
       // Overall, it would be handy to enforce a minimum of one permission through types and behavior?
 
-      class MissingPromptError extends Error {}
-
-      const promise = new Promise<IcrcScopesArray>((resolve, reject) => {
-        const confirmScopes: PermissionsConfirmation = (scopes) => {
-          resolve(scopes);
-        };
-
-        // The consumer currently has no way to unregister the prompt, so we know that it is defined. However, to be future-proof, it's better to ensure it is defined.
-        if (isNullish(this.#permissionsPrompt)) {
-          reject(new MissingPromptError());
-          return;
-        }
-
-        this.#permissionsPrompt({requestedScopes: supportedRequestedScopes, confirmScopes});
-      });
-
       try {
-        const confirmedScopes = await promise;
+        const confirmedScopes = await this.promptPermissions(supportedRequestedScopes);
 
-        this.confirmPermissions({scopes: confirmedScopes, requestId});
+        this.emitPermissions({scopes: confirmedScopes, requestId});
+        this.savePermissions({scopes: confirmedScopes});
 
         return {handled: true};
       } catch (err: unknown) {
         if (err instanceof MissingPromptError) {
-          notifyMissingPromptError();
+          this.notifyMissingPromptError(requestId);
           return {handled: true};
         }
 
@@ -321,7 +307,25 @@ export class Signer {
     return {handled: false};
   }
 
-  private confirmPermissions({scopes, requestId}: RequestPermissionPayload): void {
+  private async promptPermissions(requestedScopes: IcrcScopesArray): Promise<IcrcScopesArray> {
+    const promise = new Promise<IcrcScopesArray>((resolve, reject) => {
+      const confirmScopes: PermissionsConfirmation = (scopes) => {
+        resolve(scopes);
+      };
+
+      // The consumer currently has no way to unregister the prompt, so we know that it is defined. However, to be future-proof, it's better to ensure it is defined.
+      if (isNullish(this.#permissionsPrompt)) {
+        reject(new MissingPromptError());
+        return;
+      }
+
+      this.#permissionsPrompt({requestedScopes, confirmScopes});
+    });
+
+    return await promise;
+  }
+
+  private emitPermissions({scopes, requestId}: RequestPermissionPayload): void {
     assertNonNullish(this.#walletOrigin, "The relying party's origin is unknown.");
 
     notifyPermissionScopes({
@@ -329,7 +333,79 @@ export class Signer {
       origin: this.#walletOrigin,
       scopes
     });
+  }
+
+  private notifyMissingPromptError(id: RpcId | undefined): void {
+    notifyError({
+      id: id ?? null,
+      origin,
+      error: {
+        code: SignerErrorCode.PERMISSIONS_PROMPT_NOT_REGISTERED,
+        message: 'The signer has not registered a prompt to respond to permission requests.'
+      }
+    });
+  }
+
+  private savePermissions({scopes}: Omit<RequestPermissionPayload, 'requestId'>): void {
+    assertNonNullish(this.#walletOrigin, "The relying party's origin is unknown.");
 
     saveSessionScopes({owner: this.#owner, origin: this.#walletOrigin, scopes});
+  }
+
+  /**
+   * Handles incoming messages to list the accounts.
+   *
+   * Parses the message data to determine if it conforms to a accounts request and responds with the accounts if the permissions are granted.
+   *
+   * @param {SignerMessageEvent} message - The incoming message event containing the data and origin.
+   * @returns {Object} An object with a boolean property `handled` indicating whether the request was handled.
+   */
+  private async handleAccounts({data, origin}: SignerMessageEvent): Promise<{handled: boolean}> {
+    const {success: isAccountsRequest, data: accountsData} =
+      IcrcAccountsRequestSchema.safeParse(data);
+
+    if (isAccountsRequest) {
+      const {id: requestId} = accountsData;
+
+      // TODO: this will be refactored as other requests will require the same checks and execution flow.
+      switch (sessionScopeState({owner: this.#owner, origin, method: ICRC27_ACCOUNTS})) {
+        case 'denied': {
+          // TODO: Is permission denied => notify error
+          break;
+        }
+        case 'granted': {
+          // TODO: Is permission granted => callback => notify accounts
+          break;
+        }
+        case 'ask_on_use': {
+          try {
+            const confirmedScopes = await this.promptPermissions([
+              {
+                scope: {
+                  method: ICRC27_ACCOUNTS
+                },
+                state: 'denied'
+              }
+            ]);
+
+            this.savePermissions({scopes: confirmedScopes});
+
+            // TODO: Is permission granted => callback => notify accounts
+          } catch (err: unknown) {
+            if (err instanceof MissingPromptError) {
+              this.notifyMissingPromptError(requestId);
+              return {handled: true};
+            }
+
+            throw err;
+          }
+          break;
+        }
+      }
+
+      return {handled: true};
+    }
+
+    return {handled: false};
   }
 }
