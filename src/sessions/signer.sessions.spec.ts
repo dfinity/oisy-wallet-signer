@@ -2,6 +2,7 @@ import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {assertNonNullish} from '@dfinity/utils';
 import type {MockInstance} from 'vitest';
 import {
+  ICRC25_PERMISSION_ASK_ON_USE,
   ICRC25_PERMISSION_DENIED,
   ICRC25_PERMISSION_GRANTED,
   ICRC27_ACCOUNTS,
@@ -9,10 +10,11 @@ import {
 } from '../constants/icrc.constants';
 import {SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS} from '../constants/signer.constants';
 import type {IcrcScope, IcrcScopesArray} from '../types/icrc-responses';
+import type {IcrcWalletScopedMethod} from '../types/icrc-standards';
 import type {SessionPermissions} from '../types/signer-sessions';
 import * as storageUtils from '../utils/storage.utils';
 import {del, get} from '../utils/storage.utils';
-import {readSessionValidScopes, saveSessionScopes} from './signer.sessions';
+import {readSessionValidScopes, saveSessionScopes, sessionScopeState} from './signer.sessions';
 
 describe('Signer sessions', () => {
   const owner = Ed25519KeyIdentity.generate().getPrincipal();
@@ -214,6 +216,76 @@ describe('Signer sessions', () => {
       const scopes = readSessionValidScopes({owner, origin});
 
       expect(scopes).toBeUndefined();
+    });
+  });
+
+  describe('Session', () => {
+    it('should return the state of the session if the scope already exists', () => {
+      saveSessionScopes({
+        owner,
+        origin,
+        scopes
+      });
+
+      const state = sessionScopeState({
+        owner,
+        origin,
+        method: ICRC27_ACCOUNTS
+      });
+
+      expect(state).toBe(ICRC25_PERMISSION_GRANTED);
+    });
+
+    it('should return ask on use if the requested method does not exist', () => {
+      const state = sessionScopeState({
+        owner,
+        origin,
+        method: 'this_does_not_exist' as IcrcWalletScopedMethod
+      });
+
+      expect(state).toBe(ICRC25_PERMISSION_ASK_ON_USE);
+    });
+
+    it('should return ask on use if the requested method does not exist', () => {
+      const state = sessionScopeState({
+        owner,
+        origin,
+        method: ICRC27_ACCOUNTS
+      });
+
+      expect(state).toBe(ICRC25_PERMISSION_ASK_ON_USE);
+    });
+
+    it('should return ICRC25_PERMISSION_ASK_ON_USE if there are no valid scopes', () => {
+      saveSessionScopes({
+        owner,
+        origin,
+        scopes
+      });
+
+      vi.advanceTimersByTime(SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS + 1);
+
+      const state = sessionScopeState({
+        owner,
+        origin,
+        method: ICRC27_ACCOUNTS
+      });
+
+      expect(state).toBe(ICRC25_PERMISSION_ASK_ON_USE);
+    });
+
+    it('should call readSessionValidScopes with the correct parameters', () => {
+      const readSpy = vi.spyOn(storageUtils, 'get');
+
+      sessionScopeState({
+        owner,
+        origin,
+        method: ICRC27_ACCOUNTS
+      });
+
+      expect(readSpy).toHaveBeenCalledWith({
+        key: expect.stringContaining(`oisy_signer_${origin}_${owner.toText()}`)
+      });
     });
   });
 });
