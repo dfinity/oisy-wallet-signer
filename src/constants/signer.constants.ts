@@ -1,5 +1,5 @@
-import {IcrcWalletScopedMethodSchema, IcrcWalletStandardSchema} from '../types/icrc';
 import type {IcrcScopesArray, IcrcSupportedStandards} from '../types/icrc-responses';
+import {IcrcWalletScopedMethodSchema, IcrcWalletStandardSchema} from '../types/icrc-standards';
 import {ICRC25_PERMISSION_ASK_ON_USE} from './icrc.constants';
 
 export enum SignerErrorCode {

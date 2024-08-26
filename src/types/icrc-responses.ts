@@ -5,7 +5,7 @@ import {
   IcrcWalletPermissionStateSchema,
   IcrcWalletScopedMethodSchema,
   IcrcWalletStandardSchema
-} from './icrc';
+} from './icrc-standards';
 import {inferRpcResponseSchema} from './rpc';
 
 const IcrcScopeMethodSchema = z.object({

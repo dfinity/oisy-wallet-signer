@@ -17,9 +17,9 @@ import {
 import * as signerHandlers from './handlers/signer.handlers';
 import {saveSessionScopes} from './sessions/signer.sessions';
 import {Signer} from './signer';
-import {IcrcWalletPermissionStateSchema} from './types/icrc';
 import type {IcrcRequestAnyPermissionsRequest} from './types/icrc-requests';
 import type {IcrcScopesArray} from './types/icrc-responses';
+import {IcrcWalletPermissionStateSchema} from './types/icrc-standards';
 import {JSON_RPC_VERSION_2} from './types/rpc';
 import type {SignerMessageEventData} from './types/signer';
 import type {SignerOptions} from './types/signer-options';

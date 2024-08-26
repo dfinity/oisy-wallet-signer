@@ -1,5 +1,5 @@
-import {IcrcWalletScopedMethodSchema} from '../types/icrc';
 import type {IcrcRequestedScopes} from '../types/icrc-requests';
+import {IcrcWalletScopedMethodSchema} from '../types/icrc-standards';
 
 const WALLET_TIMEOUT_IN_MILLISECONDS_WITH_USER_INTERACTION = 60 * 2 * 1000;
 const WALLET_TIMEOUT_IN_MILLISECONDS_WITHOUT_USER_INTERACTION = 5000;

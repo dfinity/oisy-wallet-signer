@@ -14,11 +14,6 @@ import {
   sessionScopeState
 } from './sessions/signer.sessions';
 import {
-  IcrcWalletPermissionStateSchema,
-  IcrcWalletScopedMethodSchema,
-  type IcrcWalletApproveMethod
-} from './types/icrc';
-import {
   IcrcAccountsRequestSchema,
   IcrcPermissionsRequestSchema,
   IcrcRequestAnyPermissionsRequestSchema,
@@ -26,6 +21,11 @@ import {
   IcrcSupportedStandardsRequestSchema
 } from './types/icrc-requests';
 import type {IcrcScope, IcrcScopesArray} from './types/icrc-responses';
+import {
+  IcrcWalletPermissionStateSchema,
+  IcrcWalletScopedMethodSchema,
+  type IcrcWalletApproveMethod
+} from './types/icrc-standards';
 import {RpcRequestSchema, type RpcId} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
 import type {SignerOptions} from './types/signer-options';
