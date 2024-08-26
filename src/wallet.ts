@@ -21,7 +21,6 @@ import {
   IcrcReadyResponseSchema,
   IcrcScopesResponseSchema,
   IcrcSupportedStandardsResponseSchema,
-  type IcrcAccounts,
   type IcrcScopesArray,
   type IcrcSupportedStandards
 } from './types/icrc-responses';
