@@ -10,17 +10,17 @@ import {
 } from './handlers/signer.handlers';
 import {readSessionValidScopes, saveSessionScopes} from './sessions/signer.sessions';
 import {
-  IcrcWalletPermissionStateSchema,
-  IcrcWalletScopedMethodSchema,
-  type IcrcWalletApproveMethod
-} from './types/icrc';
-import {
   IcrcPermissionsRequestSchema,
   IcrcRequestAnyPermissionsRequestSchema,
   IcrcStatusRequestSchema,
   IcrcSupportedStandardsRequestSchema
 } from './types/icrc-requests';
 import type {IcrcScope, IcrcScopesArray} from './types/icrc-responses';
+import {
+  IcrcWalletPermissionStateSchema,
+  IcrcWalletScopedMethodSchema,
+  type IcrcWalletApproveMethod
+} from './types/icrc-standards';
 import {RpcRequestSchema} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
 import type {SignerOptions} from './types/signer-options';

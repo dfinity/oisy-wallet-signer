@@ -10,9 +10,9 @@ export {
   ICRC29,
   ICRC29_STATUS
 } from './constants/icrc.constants';
-export type * from './types/icrc';
 export type * from './types/icrc-requests';
 export type * from './types/icrc-responses';
+export type * from './types/icrc-standards';
 export type * from './types/rpc';
 export type * from './types/signer-options';
 export type * from './types/signer-subscribers';

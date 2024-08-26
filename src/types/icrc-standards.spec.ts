@@ -13,9 +13,9 @@ import {
   IcrcWalletMethodSchema,
   IcrcWalletScopedMethodSchema,
   IcrcWalletStandardSchema
-} from './icrc';
+} from './icrc-standards';
 
-describe('icrc', () => {
+describe('ICRC standards', () => {
   const methodEnums = [
     {
       title: 'ICRC25_REQUEST_PERMISSIONS',
