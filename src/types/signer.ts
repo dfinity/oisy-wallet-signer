@@ -1,5 +1,6 @@
 import {z} from 'zod';
 import {
+  IcrcAccountsRequestSchema,
   IcrcPermissionsRequestSchema,
   IcrcRequestAnyPermissionsRequestSchema,
   IcrcStatusRequestSchema,
@@ -11,7 +12,8 @@ const SignerMessageEventDataSchema = z
     IcrcStatusRequestSchema,
     IcrcRequestAnyPermissionsRequestSchema,
     IcrcPermissionsRequestSchema,
-    IcrcSupportedStandardsRequestSchema
+    IcrcSupportedStandardsRequestSchema,
+    IcrcAccountsRequestSchema
   ])
   .optional();
 

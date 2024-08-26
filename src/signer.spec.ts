@@ -17,13 +17,14 @@ import {
 import * as signerHandlers from './handlers/signer.handlers';
 import {saveSessionScopes} from './sessions/signer.sessions';
 import {Signer} from './signer';
-import type {IcrcRequestAnyPermissionsRequest} from './types/icrc-requests';
+import type {IcrcAccountsRequest, IcrcRequestAnyPermissionsRequest} from './types/icrc-requests';
 import type {IcrcScopesArray} from './types/icrc-responses';
 import {IcrcWalletPermissionStateSchema} from './types/icrc-standards';
 import {JSON_RPC_VERSION_2} from './types/rpc';
 import type {SignerMessageEventData} from './types/signer';
 import type {SignerOptions} from './types/signer-options';
-import type {PermissionsPromptPayload} from './types/signer-prompts';
+import type {PermissionsConfirmation, PermissionsPromptPayload} from './types/signer-prompts';
+import type {SessionPermissions} from './types/signer-sessions';
 import {del, get} from './utils/storage.utils';
 
 describe('Signer', () => {
@@ -535,6 +536,99 @@ describe('Signer', () => {
         });
 
         promptSpy.mockClear();
+      });
+    });
+
+    describe('Accounts', () => {
+      const requestAccountsData: IcrcAccountsRequest = {
+        id: testId,
+        jsonrpc: JSON_RPC_VERSION_2,
+        method: ICRC27_ACCOUNTS
+      };
+
+      const requestAccountsMsg = {
+        data: requestAccountsData,
+        origin: testOrigin
+      };
+
+      it('should notify missing prompt for icrc27_accounts', () => {
+        const messageEvent = new MessageEvent('message', requestAccountsMsg);
+        window.dispatchEvent(messageEvent);
+
+        expect(postMessageMock).not.toHaveBeenNthCalledWith(1, {
+          error: {
+            code: SignerErrorCode.PERMISSIONS_PROMPT_NOT_REGISTERED,
+            message: 'The signer has not registered a prompt to respond to permission requests.'
+          }
+        });
+      });
+
+      it('should prompt for permissions if icrc27_accounts currently matches ask_on_use - has not yet permissions set', async () => {
+        const promptSpy = vi.fn();
+
+        signer.register({
+          method: ICRC25_REQUEST_PERMISSIONS,
+          prompt: promptSpy
+        });
+
+        const messageEvent = new MessageEvent('message', requestAccountsMsg);
+        window.dispatchEvent(messageEvent);
+
+        await vi.waitFor(() => {
+          expect(promptSpy).toHaveBeenCalledWith({
+            requestedScopes: [
+              {
+                scope: {method: ICRC27_ACCOUNTS},
+                state: IcrcWalletPermissionStateSchema.enum.denied
+              }
+            ],
+            confirmScopes: expect.any(Function)
+          });
+        });
+
+        promptSpy.mockClear();
+      });
+
+      it('should save granted permission after prompt for icrc27_accounts', async () => {
+        let confirmScopes: PermissionsConfirmation | undefined;
+
+        signer.register({
+          method: ICRC25_REQUEST_PERMISSIONS,
+          prompt: ({confirmScopes: confirm, requestedScopes: _}) => {
+            confirmScopes = confirm;
+          }
+        });
+
+        const messageEvent = new MessageEvent('message', requestAccountsMsg);
+        window.dispatchEvent(messageEvent);
+
+        await vi.waitFor(() => {
+          expect(confirmScopes).not.toBeUndefined();
+        });
+
+        confirmScopes?.([
+          {
+            scope: {method: ICRC27_ACCOUNTS},
+            state: IcrcWalletPermissionStateSchema.enum.granted
+          }
+        ]);
+
+        await vi.waitFor(() => {
+          const storedScopes: SessionPermissions | undefined = get({
+            key: `oisy_signer_${testOrigin}_${signerOptions.owner.toText()}`
+          });
+
+          expect(storedScopes).not.toBeUndefined();
+
+          expect(storedScopes?.scopes).toEqual([
+            {
+              scope: {method: ICRC27_ACCOUNTS},
+              state: IcrcWalletPermissionStateSchema.enum.granted,
+              createdAt: expect.any(Number),
+              updatedAt: expect.any(Number)
+            }
+          ]);
+        });
       });
     });
 
