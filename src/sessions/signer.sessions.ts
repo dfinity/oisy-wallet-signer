@@ -1,7 +1,9 @@
 import type {Principal} from '@dfinity/principal';
 import {isNullish} from '@dfinity/utils';
+import {ICRC25_PERMISSION_ASK_ON_USE} from '../constants/icrc.constants';
 import {SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS} from '../constants/signer.constants';
 import type {IcrcScopesArray} from '../types/icrc-responses';
+import type {IcrcWalletPermissionState, IcrcWalletScopedMethod} from '../types/icrc-standards';
 import type {SessionIcrcScope, SessionPermissions} from '../types/signer-sessions';
 import {get, set} from '../utils/storage.utils';
 
@@ -79,4 +81,15 @@ export const readSessionValidScopes = (params: SessionIdentifier): IcrcScopesArr
       ({updatedAt}) => updatedAt >= Date.now() - SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS
     )
     .map(({updatedAt: _, createdAt: __, ...rest}) => ({...rest}));
+};
+
+export const sessionScopeState = ({
+  method,
+  ...rest
+}: SessionIdentifier & {method: IcrcWalletScopedMethod}): IcrcWalletPermissionState => {
+  const scopes = readSessionValidScopes(rest);
+
+  return (
+    scopes?.find(({scope: {method: m}}) => m === method)?.state ?? ICRC25_PERMISSION_ASK_ON_USE
+  );
 };
