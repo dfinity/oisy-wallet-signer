@@ -26,10 +26,12 @@ const PrincipalTextSchema = z.string().refine(
   }
 );
 
-export const IcrcAccountSchema = z.object({
-  owner: PrincipalTextSchema,
-  subaccount: IcrcSubaccountSchema.optional()
-});
+export const IcrcAccountSchema = z
+  .object({
+    owner: PrincipalTextSchema,
+    subaccount: IcrcSubaccountSchema.optional()
+  })
+  .strict();
 
 export type IcrcAccount = z.infer<typeof IcrcAccountSchema>;
 

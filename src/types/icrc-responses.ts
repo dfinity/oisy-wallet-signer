@@ -1,6 +1,5 @@
-import {Principal} from '@dfinity/principal';
-import {arrayOfNumberToUint8Array} from '@dfinity/utils';
 import {z} from 'zod';
+import {IcrcAccountsSchema} from './icrc-accounts';
 import {
   IcrcWalletPermissionStateSchema,
   IcrcWalletScopedMethodSchema,
@@ -96,39 +95,6 @@ export type IcrcReadyResponse = z.infer<typeof IcrcReadyResponseSchema>;
 
 // icrc27_accounts
 // https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_27_accounts.md#icrc-27-get-accounts
-
-const IcrcSubaccountSchema = z
-  .union([z.instanceof(Uint8Array), z.array(z.number())])
-  .refine(
-    (value) =>
-      (value instanceof Uint8Array ? value : arrayOfNumberToUint8Array(value)).length === 32,
-    {
-      message: 'Subaccount must be exactly 32 bytes long.'
-    }
-  );
-
-const PrincipalTextSchema = z.string().refine(
-  (principal) => {
-    try {
-      Principal.fromText(principal);
-      return true;
-    } catch (err: unknown) {
-      return false;
-    }
-  },
-  {
-    message: 'Invalid textual representation of a Principal.'
-  }
-);
-
-const IcrcAccountSchema = z.object({
-  owner: PrincipalTextSchema,
-  subaccount: IcrcSubaccountSchema.optional()
-});
-
-export const IcrcAccountsSchema = z.array(IcrcAccountSchema).min(1);
-
-export type IcrcAccounts = z.infer<typeof IcrcAccountsSchema>;
 
 export const IcrcAccountsResponseSchema = inferRpcResponseSchema(
   z.object({
