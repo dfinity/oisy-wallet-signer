@@ -367,6 +367,7 @@ export class Signer {
     if (isAccountsRequest) {
       const {id: requestId} = accountsData;
 
+      // TODO: this will be refactored as other requests will require the same checks and execution flow.
       switch (sessionScopeState({owner: this.#owner, origin, method: ICRC27_ACCOUNTS})) {
         case 'denied': {
           // TODO: Is permission denied => notify error
