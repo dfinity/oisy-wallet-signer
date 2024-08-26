@@ -10,6 +10,7 @@ import {JSON_RPC_VERSION_2} from '../types/rpc';
 import type {ReadyOrError} from '../utils/timeout.utils';
 import {
   permissions,
+  requestAccounts,
   requestPermissions,
   requestSupportedStandards,
   retryRequestStatus
@@ -198,6 +199,27 @@ describe('Wallet handlers', () => {
 
     it('should bring the popup in front with focus', () => {
       requestPermissions({id: testId, popup, origin: testOrigin, scopes: scopes.scopes});
+
+      expect(focusMock).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('Request accounts', () => {
+    it('should send the correct message to the popup', () => {
+      requestAccounts({id: testId, popup, origin: testOrigin});
+
+      expect(postMessageMock).toHaveBeenCalledWith(
+        {
+          jsonrpc: JSON_RPC_VERSION_2,
+          id: testId,
+          method: ICRC27_ACCOUNTS
+        },
+        testOrigin
+      );
+    });
+
+    it('should bring the popup in front with focus', () => {
+      requestAccounts({id: testId, popup, origin: testOrigin});
 
       expect(focusMock).toHaveBeenCalledTimes(1);
     });
