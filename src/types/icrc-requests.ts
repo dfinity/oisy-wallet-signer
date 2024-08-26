@@ -3,6 +3,7 @@ import {
   ICRC25_PERMISSIONS,
   ICRC25_REQUEST_PERMISSIONS,
   ICRC25_SUPPORTED_STANDARDS,
+  ICRC27_ACCOUNTS,
   ICRC29_STATUS
 } from '../constants/icrc.constants';
 import {IcrcWalletScopedMethodSchema} from './icrc';
@@ -67,3 +68,11 @@ export const IcrcStatusRequestSchema = inferRpcRequestWithoutParamsSchema({
 });
 
 export type IcrcStatusRequest = z.infer<typeof IcrcStatusRequestSchema>;
+
+// icrc27_accounts
+// https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_27_accounts.md
+export const IcrcAccountsRequestSchema = inferRpcRequestWithoutParamsSchema({
+  method: ICRC27_ACCOUNTS
+});
+
+export type IcrcAccountsRequest = z.infer<typeof IcrcAccountsRequestSchema>;
