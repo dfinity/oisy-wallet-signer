@@ -25,7 +25,7 @@
 			{#if nonNullish(accounts)}
 				TODO
 			{:else}
-				<Button {onclick} testId="request-permissions-button">Accounts</Button>
+				<Button {onclick} testId="accounts-button">Accounts</Button>
 			{/if}
 		</Value>
 	</div>
