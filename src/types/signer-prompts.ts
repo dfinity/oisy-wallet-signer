@@ -49,7 +49,7 @@ export type AccountsPromptPayload = z.infer<typeof AccountsPromptPayloadSchema>;
  */
 export const AccountsPromptSchema = z
   .function()
-  .args(PermissionsPromptPayloadSchema)
+  .args(AccountsPromptPayloadSchema)
   .returns(z.void());
 
 export type AccountsPrompt = z.infer<typeof AccountsPromptSchema>;

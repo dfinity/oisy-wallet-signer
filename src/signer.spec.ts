@@ -656,7 +656,7 @@ describe('Signer', () => {
 
         signer.register({
           method: ICRC25_REQUEST_PERMISSIONS,
-          prompt: ({confirmScopes: confirm, requestedScopes: _}) => {
+          prompt: ({confirmScopes: confirm, requestedScopes: _}: PermissionsPromptPayload) => {
             confirmScopes = confirm;
           }
         });
@@ -776,7 +776,7 @@ describe('Signer', () => {
 
         signer.register({
           method: ICRC25_REQUEST_PERMISSIONS,
-          prompt: (p) => (payload = p)
+          prompt: (p: PermissionsPromptPayload) => (payload = p)
         });
 
         const messageEventPermissionsRequests = new MessageEvent('message', requestPermissionsMsg);
