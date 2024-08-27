@@ -30,7 +30,9 @@ import {RpcRequestSchema, type RpcId} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
 import type {SignerOptions} from './types/signer-options';
 import {
+  AccountsPromptSchema,
   PermissionsPromptSchema,
+  type AccountsPrompt,
   type PermissionsConfirmation,
   type PermissionsPrompt
 } from './types/signer-prompts';
@@ -44,6 +46,7 @@ export class Signer {
   #walletOrigin: string | undefined | null;
 
   #permissionsPrompt: PermissionsPrompt | undefined;
+  #accountsPrompt: AccountsPrompt | undefined;
 
   private constructor({owner}: SignerOptions) {
     this.#owner = owner;
@@ -157,13 +160,17 @@ export class Signer {
     prompt
   }: {
     method: IcrcWalletApproveMethod;
-    prompt: PermissionsPrompt;
+    prompt: PermissionsPrompt | AccountsPrompt;
   }): void => {
     switch (method) {
       case ICRC25_REQUEST_PERMISSIONS: {
         PermissionsPromptSchema.parse(prompt);
         this.#permissionsPrompt = prompt;
         return;
+      }
+      case ICRC27_ACCOUNTS: {
+        AccountsPromptSchema.parse(prompt);
+        this.#accountsPrompt = prompt;
       }
     }
 
