@@ -6,7 +6,8 @@ import {
   notifyError,
   notifyPermissionScopes,
   notifyReady,
-  notifySupportedStandards
+  notifySupportedStandards,
+  type NotifyPermissions
 } from './handlers/signer.handlers';
 import {
   readSessionValidScopes,
@@ -36,7 +37,6 @@ import {
   type PermissionsConfirmation,
   type PermissionsPrompt
 } from './types/signer-prompts';
-import type {RequestPermissionPayload} from './types/signer-subscribers';
 
 class MissingPromptError extends Error {}
 
@@ -299,7 +299,7 @@ export class Signer {
       const promptFn = async (): Promise<void> => {
         const confirmedScopes = await this.promptPermissions(supportedRequestedScopes);
 
-        this.emitPermissions({scopes: confirmedScopes, requestId});
+        this.emitPermissions({scopes: confirmedScopes, id: requestId});
         this.savePermissions({scopes: confirmedScopes});
       };
 
@@ -332,13 +332,12 @@ export class Signer {
     return await promise;
   }
 
-  private emitPermissions({scopes, requestId}: RequestPermissionPayload): void {
+  private emitPermissions(params: Omit<NotifyPermissions, 'origin'>): void {
     assertNonNullish(this.#walletOrigin, "The relying party's origin is unknown.");
 
     notifyPermissionScopes({
-      id: requestId,
-      origin: this.#walletOrigin,
-      scopes
+      ...params,
+      origin: this.#walletOrigin
     });
   }
 
@@ -355,7 +354,7 @@ export class Signer {
     });
   }
 
-  private savePermissions({scopes}: Omit<RequestPermissionPayload, 'requestId'>): void {
+  private savePermissions({scopes}: {scopes: IcrcScopesArray}): void {
     assertNonNullish(this.#walletOrigin, "The relying party's origin is unknown.");
 
     saveSessionScopes({owner: this.#owner, origin: this.#walletOrigin, scopes});

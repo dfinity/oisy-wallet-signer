@@ -40,11 +40,9 @@ export const notifySupportedStandards = ({id, origin}: Notify): void => {
   notify({msg, origin});
 };
 
-export const notifyPermissionScopes = ({
-  id,
-  origin,
-  scopes
-}: Notify & {scopes: IcrcScopesArray}): void => {
+export type NotifyPermissions = Notify & {scopes: IcrcScopesArray};
+
+export const notifyPermissionScopes = ({id, origin, scopes}: NotifyPermissions): void => {
   const msg: IcrcScopesResponse = {
     jsonrpc: JSON_RPC_VERSION_2,
     id,
