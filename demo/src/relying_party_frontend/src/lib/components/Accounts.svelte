@@ -17,13 +17,23 @@
 	const onclick = async () => {
 		accounts = await wallet?.accounts();
 	};
+
+	const onreset = async () => {
+		accounts = undefined;
+	};
 </script>
 
 {#if nonNullish(wallet)}
 	<div in:fade>
 		<Value id="accounts" testId="accounts" title="Accounts">
 			{#if nonNullish(accounts)}
-				TODO
+				<ul in:fade data-tid="accounts-list">
+					{#each accounts as account}
+						<li>{account.owner}</li>
+					{/each}
+				</ul>
+
+				<Button onclick={onreset} testId="reset-accounts-button">Reset accounts</Button>
 			{:else}
 				<Button {onclick} testId="accounts-button">Accounts</Button>
 			{/if}
