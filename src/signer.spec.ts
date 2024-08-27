@@ -748,6 +748,8 @@ describe('Signer', () => {
             }
           ]);
         });
+
+        del({key: `oisy_signer_${testOrigin}_${signerOptions.owner.toText()}`});
       });
 
       it('should notify accounts after prompt for icrc27_accounts permissions', async () => {
