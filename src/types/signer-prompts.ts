@@ -1,4 +1,5 @@
 import {z} from 'zod';
+import {IcrcAccountsSchema} from './icrc-accounts';
 import {IcrcScopesArraySchema} from './icrc-responses';
 
 const PermissionsConfirmationSchema = z.function().args(IcrcScopesArraySchema).returns(z.void());
@@ -29,3 +30,26 @@ export const PermissionsPromptSchema = z
   .returns(z.void());
 
 export type PermissionsPrompt = z.infer<typeof PermissionsPromptSchema>;
+
+const AccountsConfirmationSchema = z.function().args(IcrcAccountsSchema).returns(z.void());
+
+export type AccountsConfirmation = z.infer<typeof AccountsConfirmationSchema>;
+
+const AccountsPromptPayloadSchema = z.object({
+  confirmAccounts: AccountsConfirmationSchema
+});
+
+export type AccountsPromptPayload = z.infer<typeof AccountsPromptPayloadSchema>;
+
+/**
+ * A function that is invoked when the signer requires the user - or consumer of the library - to confirm (select or reject) accounts.
+ *
+ * @param {AccountsPromptPayload} params - An object containing a function to confirm the accounts.
+ * @param {IcrcAccounts[]} params.confirmAccounts - A function to be called by the consumer to confirm (select or reject) the provided accounts.
+ */
+export const AccountsPromptSchema = z
+  .function()
+  .args(PermissionsPromptPayloadSchema)
+  .returns(z.void());
+
+export type AccountsPrompt = z.infer<typeof AccountsPromptSchema>;

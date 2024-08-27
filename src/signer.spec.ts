@@ -23,7 +23,12 @@ import {IcrcWalletPermissionStateSchema} from './types/icrc-standards';
 import {JSON_RPC_VERSION_2} from './types/rpc';
 import type {SignerMessageEventData} from './types/signer';
 import type {SignerOptions} from './types/signer-options';
-import type {PermissionsConfirmation, PermissionsPromptPayload} from './types/signer-prompts';
+import {
+  AccountsPromptSchema,
+  PermissionsPromptSchema,
+  type PermissionsConfirmation,
+  type PermissionsPromptPayload
+} from './types/signer-prompts';
 import type {SessionPermissions} from './types/signer-sessions';
 import {del, get} from './utils/storage.utils';
 
@@ -815,6 +820,65 @@ describe('Signer', () => {
           expect(storedData).toStrictEqual(expectedData);
         });
       });
+    });
+  });
+
+  describe('Prompts', () => {
+    let signer: Signer;
+
+    beforeEach(() => {
+      signer = Signer.init(signerOptions);
+    });
+
+    afterEach(() => {
+      signer.disconnect();
+
+      vi.clearAllMocks();
+      vi.restoreAllMocks();
+    });
+
+    it('should validate a permissions prompt on register', () => {
+      const mockPermissionsPrompt = vi.fn();
+
+      const spy = vi.spyOn(PermissionsPromptSchema, 'parse');
+
+      expect(() => {
+        signer.register({
+          method: ICRC25_REQUEST_PERMISSIONS,
+          prompt: mockPermissionsPrompt
+        });
+      }).not.toThrow();
+
+      expect(spy).toHaveBeenCalledWith(mockPermissionsPrompt);
+    });
+
+    it('should validate an accounts prompt on register', () => {
+      const mockAccountsPrompt = vi.fn();
+
+      const spy = vi.spyOn(AccountsPromptSchema, 'parse');
+
+      expect(() => {
+        signer.register({
+          method: ICRC27_ACCOUNTS,
+          prompt: mockAccountsPrompt
+        });
+      }).not.toThrow();
+
+      expect(spy).toHaveBeenCalledWith(mockAccountsPrompt);
+    });
+
+    it('should throw on register if prompt not supported', () => {
+      const mockPrompt = vi.fn();
+
+      expect(() => {
+        signer.register({
+          // @ts-expect-error: we are testing this on purpose
+          method: 'something',
+          prompt: mockPrompt
+        });
+      }).toThrowError(
+        'The specified method is not supported. Please ensure you are using a supported standard.'
+      );
     });
   });
 });
