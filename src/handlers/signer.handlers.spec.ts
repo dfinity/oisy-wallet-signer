@@ -1,3 +1,4 @@
+import {Principal} from '@dfinity/principal';
 import type {Mock} from 'vitest';
 import {ICRC27_ACCOUNTS} from '../constants/icrc.constants';
 import {SIGNER_SUPPORTED_STANDARDS, SignerErrorCode} from '../constants/signer.constants';
@@ -9,6 +10,7 @@ import type {
 } from '../types/icrc-responses';
 import {JSON_RPC_VERSION_2, type RpcId, type RpcResponseWithError} from '../types/rpc';
 import {
+  notifyAccounts,
   notifyError,
   notifyPermissionScopes,
   notifyReady,
@@ -105,6 +107,28 @@ describe('Signer handlers', () => {
         result: {
           scopes
         }
+      };
+
+      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
+    });
+  });
+
+  describe('notifyAccounts', () => {
+    it('should post a message with the accounts', () => {
+      // TODO: create mocks for accounts, principal etc.
+      const principalText = 'xlmdg-vkosz-ceopx-7wtgu-g3xmd-koiyc-awqaq-7modz-zf6r6-364rh-oqe';
+
+      const accounts = [
+        {owner: principalText},
+        {owner: Principal.anonymous().toText(), subaccount: new Uint8Array(32)}
+      ];
+
+      notifyAccounts({id, origin, accounts});
+
+      const expectedMessage = {
+        jsonrpc: JSON_RPC_VERSION_2,
+        id,
+        result: {accounts}
       };
 
       expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
