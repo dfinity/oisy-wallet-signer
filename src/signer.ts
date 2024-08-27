@@ -336,9 +336,11 @@ export class Signer {
   }
 
   private notifyMissingPromptError(id: RpcId | undefined): void {
+    assertNonNullish(this.#walletOrigin, "The relying party's origin is unknown.");
+
     notifyError({
       id: id ?? null,
-      origin,
+      origin: this.#walletOrigin,
       error: {
         code: SignerErrorCode.PERMISSIONS_PROMPT_NOT_REGISTERED,
         message: 'The signer has not registered a prompt to respond to permission requests.'
