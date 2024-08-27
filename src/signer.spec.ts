@@ -577,6 +577,49 @@ describe('Signer', () => {
         });
       });
 
+      it('should reject request for icrc27_accounts if permissions were already denied', async () => {
+        const promptSpy = vi.fn();
+
+        signer.register({
+          method: ICRC25_REQUEST_PERMISSIONS,
+          prompt: promptSpy
+        });
+
+        saveSessionScopes({
+          owner: signerOptions.owner,
+          origin: testOrigin,
+          scopes: [
+            {
+              scope: {method: ICRC27_ACCOUNTS},
+              state: IcrcWalletPermissionStateSchema.enum.denied
+            }
+          ]
+        });
+
+        const messageEvent = new MessageEvent('message', requestAccountsMsg);
+        window.dispatchEvent(messageEvent);
+
+        await vi.waitFor(() => {
+          expect(postMessageMock).toHaveBeenNthCalledWith(
+            1,
+            {
+              jsonrpc: JSON_RPC_VERSION_2,
+              id: testId,
+              error: {
+                code: SignerErrorCode.PERMISSION_NOT_GRANTED,
+                message:
+                  'The signer has not granted the necessary permissions to process the request from the relying party.'
+              }
+            },
+            testOrigin
+          );
+        });
+
+        promptSpy.mockClear();
+
+        del({key: `oisy_signer_${testOrigin}_${signerOptions.owner.toText()}`});
+      });
+
       it('should prompt for permissions if icrc27_accounts currently matches ask_on_use - has not yet permissions set', async () => {
         const promptSpy = vi.fn();
 

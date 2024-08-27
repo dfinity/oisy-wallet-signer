@@ -372,7 +372,15 @@ export class Signer {
       // TODO: this will be refactored as other requests will require the same checks and execution flow.
       switch (sessionScopeState({owner: this.#owner, origin, method: ICRC27_ACCOUNTS})) {
         case 'denied': {
-          // TODO: Is permission denied => notify error
+          notifyError({
+            id: requestId ?? null,
+            origin,
+            error: {
+              code: SignerErrorCode.PERMISSION_NOT_GRANTED,
+              message:
+                'The signer has not granted the necessary permissions to process the request from the relying party.'
+            }
+          });
           break;
         }
         case 'granted': {
