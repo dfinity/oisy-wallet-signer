@@ -557,11 +557,12 @@ describe('Signer', () => {
         origin: testOrigin
       };
 
-      it.only('should notify missing prompt for icrc27_accounts', () => {
+      it('should notify missing prompt for icrc27_accounts', async () => {
         const messageEvent = new MessageEvent('message', requestAccountsMsg);
         window.dispatchEvent(messageEvent);
 
-        expect(postMessageMock).toHaveBeenNthCalledWith(
+        await vi.waitFor(() => {
+          expect(postMessageMock).toHaveBeenNthCalledWith(
             1,
             {
               jsonrpc: JSON_RPC_VERSION_2,
@@ -572,7 +573,8 @@ describe('Signer', () => {
               }
             },
             testOrigin
-        );
+          );
+        });
       });
 
       it('should prompt for permissions if icrc27_accounts currently matches ask_on_use - has not yet permissions set', async () => {
