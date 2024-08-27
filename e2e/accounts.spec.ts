@@ -7,15 +7,12 @@ testWithII('should requests permissions and list accounts', async () => {
   const partyPage = getPartyPage();
 
   await partyPage.approvePermissionsAccounts();
-
-  // TODO list accounts
 });
 
 testWithII('should not requests permissions and list accounts', async () => {
   const partyPage = getPartyPage();
 
-  // TODO: uncomment when list accounts on first test
-  // await partyPage.resetAccounts();
+  await partyPage.resetAccounts();
 
   await partyPage.accounts();
 });
