@@ -3,20 +3,20 @@ import {assertNonNullish, isNullish, nonNullish} from '@dfinity/utils';
 import {ICRC25_REQUEST_PERMISSIONS, ICRC27_ACCOUNTS} from './constants/icrc.constants';
 import {SIGNER_DEFAULT_SCOPES, SignerErrorCode} from './constants/signer.constants';
 import {
-  NotifyAccounts,
-  NotifyPermissions,
   notifyAccounts,
   notifyError,
   notifyPermissionScopes,
   notifyReady,
-  notifySupportedStandards
+  notifySupportedStandards,
+  type NotifyAccounts,
+  type NotifyPermissions
 } from './handlers/signer.handlers';
 import {
   readSessionValidScopes,
   saveSessionScopes,
   sessionScopeState
 } from './sessions/signer.sessions';
-import {IcrcAccounts} from './types/icrc-accounts';
+import type {IcrcAccounts} from './types/icrc-accounts';
 import {
   IcrcAccountsRequestSchema,
   IcrcPermissionsRequestSchema,
@@ -34,9 +34,9 @@ import {RpcRequestSchema, type RpcId} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
 import type {SignerOptions} from './types/signer-options';
 import {
-  AccountsConfirmation,
   AccountsPromptSchema,
   PermissionsPromptSchema,
+  type AccountsConfirmation,
   type AccountsPrompt,
   type PermissionsConfirmation,
   type PermissionsPrompt
