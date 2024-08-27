@@ -554,6 +554,13 @@ describe('Signer', () => {
     });
 
     describe('Accounts', () => {
+      const principalText = 'xlmdg-vkosz-ceopx-7wtgu-g3xmd-koiyc-awqaq-7modz-zf6r6-364rh-oqe';
+
+      const accounts = [
+        {owner: principalText},
+        {owner: Principal.anonymous().toText(), subaccount: new Uint8Array(32)}
+      ];
+
       const requestAccountsData: IcrcAccountsRequest = {
         id: testId,
         jsonrpc: JSON_RPC_VERSION_2,
@@ -629,8 +636,6 @@ describe('Signer', () => {
       });
 
       it('should notify account for icrc27_accounts if permissions were already granted', async () => {
-        const promptSpy = vi.fn();
-
         let confirmAccounts: AccountsConfirmation | undefined;
 
         signer.register({
@@ -658,13 +663,6 @@ describe('Signer', () => {
           expect(confirmAccounts).not.toBeUndefined();
         });
 
-        const principalText = 'xlmdg-vkosz-ceopx-7wtgu-g3xmd-koiyc-awqaq-7modz-zf6r6-364rh-oqe';
-
-        const accounts = [
-          {owner: principalText},
-          {owner: Principal.anonymous().toText(), subaccount: new Uint8Array(32)}
-        ];
-
         confirmAccounts?.(accounts);
 
         await vi.waitFor(() => {
@@ -680,8 +678,6 @@ describe('Signer', () => {
             testOrigin
           );
         });
-
-        promptSpy.mockClear();
 
         del({key: `oisy_signer_${testOrigin}_${signerOptions.owner.toText()}`});
       });
@@ -712,7 +708,7 @@ describe('Signer', () => {
         promptSpy.mockClear();
       });
 
-      it('should save granted permission after prompt for icrc27_accounts', async () => {
+      it('should save granted permission after prompt for icrc27_accounts permissions', async () => {
         let confirmScopes: PermissionsConfirmation | undefined;
 
         signer.register({
@@ -751,6 +747,59 @@ describe('Signer', () => {
               updatedAt: expect.any(Number)
             }
           ]);
+        });
+      });
+
+      it('should notify accounts after prompt for icrc27_accounts permissions', async () => {
+        let confirmScopes: PermissionsConfirmation | undefined;
+        let confirmAccounts: AccountsConfirmation | undefined;
+
+        signer.register({
+          method: ICRC25_REQUEST_PERMISSIONS,
+          prompt: ({confirmScopes: confirm, requestedScopes: _}: PermissionsPromptPayload) => {
+            confirmScopes = confirm;
+          }
+        });
+
+        signer.register({
+          method: ICRC27_ACCOUNTS,
+          prompt: ({confirmAccounts: confirm}: AccountsPromptPayload) => {
+            confirmAccounts = confirm;
+          }
+        });
+
+        const messageEvent = new MessageEvent('message', requestAccountsMsg);
+        window.dispatchEvent(messageEvent);
+
+        await vi.waitFor(() => {
+          expect(confirmScopes).not.toBeUndefined();
+        });
+
+        confirmScopes?.([
+          {
+            scope: {method: ICRC27_ACCOUNTS},
+            state: IcrcWalletPermissionStateSchema.enum.granted
+          }
+        ]);
+
+        await vi.waitFor(() => {
+          expect(confirmAccounts).not.toBeUndefined();
+        });
+
+        confirmAccounts?.(accounts);
+
+        await vi.waitFor(() => {
+          expect(postMessageMock).toHaveBeenNthCalledWith(
+            1,
+            {
+              jsonrpc: JSON_RPC_VERSION_2,
+              id: testId,
+              result: {
+                accounts
+              }
+            },
+            testOrigin
+          );
         });
       });
     });
