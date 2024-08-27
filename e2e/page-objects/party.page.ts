@@ -107,7 +107,7 @@ export class PartyPage extends IdentityPage {
     await expect(permissions.getByText('icrc49_call_canister: denied')).toBeVisible();
   }
 
-  async accounts(): Promise<void> {
+  async approvePermissionsAccounts(): Promise<void> {
     await expect(this.page.getByTestId('accounts-button')).toBeVisible();
 
     await this.page.getByTestId('accounts-button').click();
@@ -115,5 +115,29 @@ export class PartyPage extends IdentityPage {
     await this.#walletPage?.approveAccountsPermissions();
 
     // TODO: response not yet implemented
+  }
+
+  async resetAccounts(): Promise<void> {
+    await expect(this.page.getByTestId('reset-accounts-button')).toBeVisible();
+
+    await this.page.getByTestId('reset-accounts-button').click();
+
+    await expect(this.page.getByTestId('accounts-button')).toBeVisible();
+  }
+
+  async accounts(): Promise<void> {
+    await expect(this.page.getByTestId('accounts-button')).toBeVisible();
+
+    await this.page.getByTestId('accounts-button').click();
+
+    await expect(this.page.getByTestId('accounts')).toBeVisible();
+
+    const ul = this.page.getByTestId('accounts-list');
+
+    const accounts = ul.locator('li');
+
+    expect(await accounts.count()).toBe(1);
+
+    // TODO: check principal
   }
 }
