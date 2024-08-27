@@ -9,20 +9,22 @@ export enum SignerErrorCode {
   ORIGIN_ERROR = 500,
 
   /**
-   * The request sent by the relying party is not supported by the signer.
-   */
-  REQUEST_NOT_SUPPORTED = 501,
-
-  /**
    * The signer has not registered a prompt to respond to permission requests.
    */
-  PERMISSIONS_PROMPT_NOT_REGISTERED = 502,
+  PERMISSIONS_PROMPT_NOT_REGISTERED = 501,
 
   /**
    * A generic error.
    * @see https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#errors
    */
   GENERIC_ERROR = 1000,
+
+  /**
+   * The request sent by the relying party is not supported by the signer.
+   *
+   * @see https://github.com/dfinity/wg-identity-authentication/blob/docs/fix-get-accounts/topics/icrc_25_signer_interaction_standard.md#errors-3
+   */
+  REQUEST_NOT_SUPPORTED = 2000,
 
   /**
    * An error is thrown when the permission to perform a feature is denied.
