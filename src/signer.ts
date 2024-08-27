@@ -3,17 +3,20 @@ import {assertNonNullish, isNullish, nonNullish} from '@dfinity/utils';
 import {ICRC25_REQUEST_PERMISSIONS, ICRC27_ACCOUNTS} from './constants/icrc.constants';
 import {SIGNER_DEFAULT_SCOPES, SignerErrorCode} from './constants/signer.constants';
 import {
+  NotifyAccounts,
+  NotifyPermissions,
+  notifyAccounts,
   notifyError,
   notifyPermissionScopes,
   notifyReady,
-  notifySupportedStandards,
-  type NotifyPermissions
+  notifySupportedStandards
 } from './handlers/signer.handlers';
 import {
   readSessionValidScopes,
   saveSessionScopes,
   sessionScopeState
 } from './sessions/signer.sessions';
+import {IcrcAccounts} from './types/icrc-accounts';
 import {
   IcrcAccountsRequestSchema,
   IcrcPermissionsRequestSchema,
@@ -31,6 +34,7 @@ import {RpcRequestSchema, type RpcId} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
 import type {SignerOptions} from './types/signer-options';
 import {
+  AccountsConfirmation,
   AccountsPromptSchema,
   PermissionsPromptSchema,
   type AccountsPrompt,
@@ -390,7 +394,16 @@ export class Signer {
           break;
         }
         case 'granted': {
-          // TODO: Is permission granted => callback => notify accounts
+          const promptFn = async (): Promise<void> => {
+            const accounts = await this.promptAccounts();
+
+            this.emitAccounts({accounts, id: requestId});
+          };
+
+          await this.prompt({
+            requestId,
+            promptFn
+          });
           break;
         }
         case 'ask_on_use': {
@@ -441,5 +454,33 @@ export class Signer {
 
       throw err;
     }
+  }
+
+  // TODO: this can maybe be made generic. It's really similar to promptPermissions.
+  private async promptAccounts(): Promise<IcrcAccounts> {
+    const promise = new Promise<IcrcAccounts>((resolve, reject) => {
+      const confirmAccounts: AccountsConfirmation = (accounts) => {
+        resolve(accounts);
+      };
+
+      // The consumer currently has no way to unregister the prompt, so we know that it is defined. However, to be future-proof, it's better to ensure it is defined.
+      if (isNullish(this.#accountsPrompt)) {
+        reject(new MissingPromptError());
+        return;
+      }
+
+      this.#accountsPrompt({confirmAccounts});
+    });
+
+    return await promise;
+  }
+
+  private emitAccounts(params: Omit<NotifyAccounts, 'origin'>): void {
+    assertNonNullish(this.#walletOrigin, "The relying party's origin is unknown.");
+
+    notifyAccounts({
+      origin: this.#walletOrigin,
+      ...params
+    });
   }
 }

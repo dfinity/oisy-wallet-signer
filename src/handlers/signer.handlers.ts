@@ -54,9 +54,9 @@ export const notifyPermissionScopes = ({id, origin, scopes}: NotifyPermissions):
   notify({msg, origin});
 };
 
-export type NotifyAccount = Notify & {accounts: IcrcAccounts};
+export type NotifyAccounts = Notify & {accounts: IcrcAccounts};
 
-export const notifyAccounts = ({id, origin, accounts}: NotifyAccount): void => {
+export const notifyAccounts = ({id, origin, accounts}: NotifyAccounts): void => {
   const msg: IcrcAccountsResponse = {
     jsonrpc: JSON_RPC_VERSION_2,
     id,
