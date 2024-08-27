@@ -296,21 +296,19 @@ export class Signer {
       // Additionally, it may be beneficial to define a type that ensures at least one scope is present when responding to permission queries ([IcrcScope, ...IcrcScop[]] in Zod).
       // Overall, it would be handy to enforce a minimum of one permission through types and behavior?
 
-      try {
+      const promptFn = async (): Promise<void> => {
         const confirmedScopes = await this.promptPermissions(supportedRequestedScopes);
 
         this.emitPermissions({scopes: confirmedScopes, requestId});
         this.savePermissions({scopes: confirmedScopes});
+      };
 
-        return {handled: true};
-      } catch (err: unknown) {
-        if (err instanceof MissingPromptError) {
-          this.notifyMissingPromptError(requestId);
-          return {handled: true};
-        }
+      await this.prompt({
+        requestId,
+        promptFn
+      });
 
-        throw err;
-      }
+      return {handled: true};
     }
 
     return {handled: false};
@@ -397,7 +395,7 @@ export class Signer {
           break;
         }
         case 'ask_on_use': {
-          try {
+          const promptFn = async (): Promise<void> => {
             const confirmedScopes = await this.promptPermissions([
               {
                 scope: {
@@ -410,14 +408,13 @@ export class Signer {
             this.savePermissions({scopes: confirmedScopes});
 
             // TODO: Is permission granted => callback => notify accounts
-          } catch (err: unknown) {
-            if (err instanceof MissingPromptError) {
-              this.notifyMissingPromptError(requestId);
-              return {handled: true};
-            }
+          };
 
-            throw err;
-          }
+          await this.prompt({
+            requestId,
+            promptFn
+          });
+
           break;
         }
       }
@@ -426,5 +423,24 @@ export class Signer {
     }
 
     return {handled: false};
+  }
+
+  private async prompt({
+    requestId,
+    promptFn
+  }: {
+    promptFn: () => Promise<void>;
+    requestId: RpcId;
+  }): Promise<void> {
+    try {
+      await promptFn();
+    } catch (err: unknown) {
+      if (err instanceof MissingPromptError) {
+        this.notifyMissingPromptError(requestId);
+        return;
+      }
+
+      throw err;
+    }
   }
 }
