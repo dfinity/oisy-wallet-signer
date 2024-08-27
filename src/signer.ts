@@ -171,6 +171,7 @@ export class Signer {
       case ICRC27_ACCOUNTS: {
         AccountsPromptSchema.parse(prompt);
         this.#accountsPrompt = prompt;
+        return;
       }
     }
 
