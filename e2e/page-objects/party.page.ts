@@ -114,7 +114,7 @@ export class PartyPage extends IdentityPage {
 
     await this.#walletPage?.approveAccountsPermissions();
 
-    // TODO: response not yet implemented
+    await this.assertAccounts();
   }
 
   async resetAccounts(): Promise<void> {
@@ -130,6 +130,10 @@ export class PartyPage extends IdentityPage {
 
     await this.page.getByTestId('accounts-button').click();
 
+    await this.assertAccounts();
+  }
+
+  private async assertAccounts(): Promise<void> {
     await expect(this.page.getByTestId('accounts')).toBeVisible();
 
     const ul = this.page.getByTestId('accounts-list');
