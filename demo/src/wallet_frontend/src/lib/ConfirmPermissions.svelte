@@ -4,7 +4,10 @@
 	import { isNullish, nonNullish } from '@dfinity/utils';
 	import { ICRC25_REQUEST_PERMISSIONS, type IcrcScope } from '@dfinity/oisy-wallet-signer';
 	import Button from '$core/components/Button.svelte';
-	import type { PermissionsConfirmation } from '@dfinity/oisy-wallet-signer/types/signer-prompts';
+	import type {
+		PermissionsConfirmation,
+		PermissionsPromptPayload
+	} from '@dfinity/oisy-wallet-signer/types/signer-prompts';
 
 	type Props = {
 		signer: Signer | undefined;
@@ -33,7 +36,7 @@
 
 		signer.register({
 			method: ICRC25_REQUEST_PERMISSIONS,
-			prompt: ({ confirmScopes, requestedScopes }) => {
+			prompt: ({ confirmScopes, requestedScopes }: PermissionsPromptPayload) => {
 				confirm = confirmScopes;
 				scopes = requestedScopes;
 			}
