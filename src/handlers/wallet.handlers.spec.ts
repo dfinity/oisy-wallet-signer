@@ -17,7 +17,7 @@ import {
 } from './wallet.handlers';
 
 describe('Wallet handlers', () => {
-  const testId = '1234_test';
+  const testId = crypto.randomUUID();
   const testOrigin = 'https://hello.com';
 
   let popup: Window;

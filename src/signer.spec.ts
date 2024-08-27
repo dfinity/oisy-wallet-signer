@@ -106,7 +106,7 @@ describe('Signer', () => {
   });
 
   describe('Origin', () => {
-    const testId = 'test-123';
+    const testId = crypto.randomUUID();
 
     let originalOpener: typeof window.opener;
 
@@ -210,7 +210,7 @@ describe('Signer', () => {
   });
 
   describe('Exchange postMessage', () => {
-    const testId = 'test-123';
+    const testId = crypto.randomUUID();
     const testOrigin = 'https://hello.com';
 
     const requestPermissionsData: IcrcRequestAnyPermissionsRequest = {

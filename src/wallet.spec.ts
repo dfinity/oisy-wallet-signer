@@ -384,7 +384,7 @@ describe('Wallet', () => {
         });
 
         it('should throw a wallet response error if the wallet notify an error', async () => {
-          const testId = '12345';
+          const testId = crypto.randomUUID();
 
           const promise = wallet.supportedStandards({options: {requestId: testId}});
 
@@ -584,7 +584,7 @@ describe('Wallet', () => {
           });
 
           it('should throw a wallet response error if the wallet notify an error', async () => {
-            const testId = '12345';
+            const testId = crypto.randomUUID();
 
             const promise = wallet.requestPermissions({options: {requestId: testId}});
 
@@ -765,7 +765,7 @@ describe('Wallet', () => {
           });
 
           it('should throw a wallet response error if the wallet notify an error', async () => {
-            const testId = '12345';
+            const testId = crypto.randomUUID();
 
             const promise = wallet.requestPermissions({options: {requestId: testId}});
 
@@ -1000,7 +1000,7 @@ describe('Wallet', () => {
         });
 
         it('should throw a wallet response error if the wallet notify an error', async () => {
-          const testId = '12345';
+          const testId = crypto.randomUUID();
 
           const promise = wallet.accounts({options: {requestId: testId}});
 
