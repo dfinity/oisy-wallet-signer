@@ -1,4 +1,5 @@
 import {Ed25519KeyIdentity} from '@dfinity/identity';
+import {Principal} from '@dfinity/principal';
 import type {MockInstance} from 'vitest';
 import {
   ICRC25_PERMISSION_GRANTED,
@@ -26,6 +27,8 @@ import type {SignerOptions} from './types/signer-options';
 import {
   AccountsPromptSchema,
   PermissionsPromptSchema,
+  type AccountsConfirmation,
+  type AccountsPromptPayload,
   type PermissionsConfirmation,
   type PermissionsPromptPayload
 } from './types/signer-prompts';
@@ -614,6 +617,64 @@ describe('Signer', () => {
                 code: SignerErrorCode.PERMISSION_NOT_GRANTED,
                 message:
                   'The signer has not granted the necessary permissions to process the request from the relying party.'
+              }
+            },
+            testOrigin
+          );
+        });
+
+        promptSpy.mockClear();
+
+        del({key: `oisy_signer_${testOrigin}_${signerOptions.owner.toText()}`});
+      });
+
+      it('should notify account for icrc27_accounts if permissions were already granted', async () => {
+        const promptSpy = vi.fn();
+
+        let confirmAccounts: AccountsConfirmation | undefined;
+
+        signer.register({
+          method: ICRC27_ACCOUNTS,
+          prompt: ({confirmAccounts: confirm}: AccountsPromptPayload) => {
+            confirmAccounts = confirm;
+          }
+        });
+
+        saveSessionScopes({
+          owner: signerOptions.owner,
+          origin: testOrigin,
+          scopes: [
+            {
+              scope: {method: ICRC27_ACCOUNTS},
+              state: IcrcWalletPermissionStateSchema.enum.granted
+            }
+          ]
+        });
+
+        const messageEvent = new MessageEvent('message', requestAccountsMsg);
+        window.dispatchEvent(messageEvent);
+
+        await vi.waitFor(() => {
+          expect(confirmAccounts).not.toBeUndefined();
+        });
+
+        const principalText = 'xlmdg-vkosz-ceopx-7wtgu-g3xmd-koiyc-awqaq-7modz-zf6r6-364rh-oqe';
+
+        const accounts = [
+          {owner: principalText},
+          {owner: Principal.anonymous().toText(), subaccount: new Uint8Array(32)}
+        ];
+
+        confirmAccounts?.(accounts);
+
+        await vi.waitFor(() => {
+          expect(postMessageMock).toHaveBeenNthCalledWith(
+            1,
+            {
+              jsonrpc: JSON_RPC_VERSION_2,
+              id: testId,
+              result: {
+                accounts
               }
             },
             testOrigin
