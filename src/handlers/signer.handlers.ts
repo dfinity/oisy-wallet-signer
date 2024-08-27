@@ -1,5 +1,5 @@
 import {SIGNER_SUPPORTED_STANDARDS} from '../constants/signer.constants';
-import {IcrcAccounts} from '../types/icrc-accounts';
+import type {IcrcAccounts} from '../types/icrc-accounts';
 import type {
   IcrcAccountsResponse,
   IcrcReadyResponse,
