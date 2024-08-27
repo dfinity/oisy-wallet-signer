@@ -1,5 +1,7 @@
 import {SIGNER_SUPPORTED_STANDARDS} from '../constants/signer.constants';
+import {IcrcAccounts} from '../types/icrc-accounts';
 import type {
+  IcrcAccountsResponse,
   IcrcReadyResponse,
   IcrcScopesArray,
   IcrcScopesResponse,
@@ -47,6 +49,18 @@ export const notifyPermissionScopes = ({id, origin, scopes}: NotifyPermissions):
     jsonrpc: JSON_RPC_VERSION_2,
     id,
     result: {scopes}
+  };
+
+  notify({msg, origin});
+};
+
+export type NotifyAccount = Notify & {accounts: IcrcAccounts};
+
+export const notifyAccounts = ({id, origin, accounts}: NotifyAccount): void => {
+  const msg: IcrcAccountsResponse = {
+    jsonrpc: JSON_RPC_VERSION_2,
+    id,
+    result: {accounts}
   };
 
   notify({msg, origin});
