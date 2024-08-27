@@ -162,15 +162,16 @@ export class Signer {
     method: IcrcWalletApproveMethod;
     prompt: PermissionsPrompt | AccountsPrompt;
   }): void => {
+    // TODO: is there a way to avoid casting?
     switch (method) {
       case ICRC25_REQUEST_PERMISSIONS: {
         PermissionsPromptSchema.parse(prompt);
-        this.#permissionsPrompt = prompt;
+        this.#permissionsPrompt = prompt as PermissionsPrompt;
         return;
       }
       case ICRC27_ACCOUNTS: {
         AccountsPromptSchema.parse(prompt);
-        this.#accountsPrompt = prompt;
+        this.#accountsPrompt = prompt as AccountsPrompt;
         return;
       }
     }
