@@ -456,12 +456,18 @@ describe('Signer', () => {
         const messageEvent = new MessageEvent('message', requestPermissionsMsg);
         window.dispatchEvent(messageEvent);
 
-        expect(postMessageMock).not.toHaveBeenNthCalledWith(1, {
-          error: {
-            code: SignerErrorCode.PERMISSIONS_PROMPT_NOT_REGISTERED,
-            message: 'The signer has not registered a prompt to respond to permission requests.'
-          }
-        });
+        expect(postMessageMock).toHaveBeenNthCalledWith(
+          1,
+          {
+            jsonrpc: JSON_RPC_VERSION_2,
+            id: testId,
+            error: {
+              code: SignerErrorCode.PERMISSIONS_PROMPT_NOT_REGISTERED,
+              message: 'The signer has not registered a prompt to respond to permission requests.'
+            }
+          },
+          testOrigin
+        );
       });
 
       it('should not post message for icrc25_request_permissions', () => {
@@ -551,16 +557,22 @@ describe('Signer', () => {
         origin: testOrigin
       };
 
-      it('should notify missing prompt for icrc27_accounts', () => {
+      it.only('should notify missing prompt for icrc27_accounts', () => {
         const messageEvent = new MessageEvent('message', requestAccountsMsg);
         window.dispatchEvent(messageEvent);
 
-        expect(postMessageMock).not.toHaveBeenNthCalledWith(1, {
-          error: {
-            code: SignerErrorCode.PERMISSIONS_PROMPT_NOT_REGISTERED,
-            message: 'The signer has not registered a prompt to respond to permission requests.'
-          }
-        });
+        expect(postMessageMock).toHaveBeenNthCalledWith(
+            1,
+            {
+              jsonrpc: JSON_RPC_VERSION_2,
+              id: testId,
+              error: {
+                code: SignerErrorCode.PERMISSIONS_PROMPT_NOT_REGISTERED,
+                message: 'The signer has not registered a prompt to respond to permission requests.'
+              }
+            },
+            testOrigin
+        );
       });
 
       it('should prompt for permissions if icrc27_accounts currently matches ask_on_use - has not yet permissions set', async () => {
