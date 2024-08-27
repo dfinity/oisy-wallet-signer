@@ -8,6 +8,7 @@
 	import SupportedStandards from '$lib/components/SupportedStandards.svelte';
 	import RequestPermissions from '$lib/components/RequestPermissions.svelte';
 	import Permissions from '$lib/components/Permissions.svelte';
+	import Accounts from '$lib/components/Accounts.svelte';
 
 	let wallet: Wallet | undefined = $state(undefined);
 
@@ -42,3 +43,5 @@
 <Permissions {wallet} />
 
 <RequestPermissions {wallet} />
+
+<Accounts {wallet} />

@@ -97,7 +97,7 @@ export class PartyPage extends IdentityPage {
 
     await this.page.getByTestId('request-permissions-button').click();
 
-    await this.#walletPage?.approvePermissions();
+    await this.#walletPage?.approveRequestedPermissions();
 
     await expect(this.page.getByTestId('request-permissions')).toBeVisible();
 
@@ -105,5 +105,15 @@ export class PartyPage extends IdentityPage {
 
     await expect(permissions.getByText('icrc27_accounts: granted')).toBeVisible();
     await expect(permissions.getByText('icrc49_call_canister: denied')).toBeVisible();
+  }
+
+  async accounts(): Promise<void> {
+    await expect(this.page.getByTestId('accounts-button')).toBeVisible();
+
+    await this.page.getByTestId('accounts-button').click();
+
+    await this.#walletPage?.approveAccountsPermissions();
+
+    // TODO: response not yet implemented
   }
 }

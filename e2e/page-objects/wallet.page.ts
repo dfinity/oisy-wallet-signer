@@ -27,14 +27,22 @@ export class WalletPage extends IdentityPage {
     await walletIIPage.signInWithIdentity({identity: this.identity});
   }
 
-  async approvePermissions(): Promise<void> {
+  async approveRequestedPermissions(): Promise<void> {
+    await this.approvePermissions({countPermissions: 2});
+  }
+
+  async approveAccountsPermissions(): Promise<void> {
+    await this.approvePermissions({countPermissions: 1});
+  }
+
+  private async approvePermissions({countPermissions}: {countPermissions: number}): Promise<void> {
     await expect(this.page.getByTestId('requested-permissions')).toBeVisible();
 
     const ul = this.page.getByTestId('requested-permissions-list');
 
     const checkboxes = ul.locator('input');
 
-    expect(await checkboxes.count()).toBe(2);
+    expect(await checkboxes.count()).toBe(countPermissions);
 
     await checkboxes.nth(0).click();
 
