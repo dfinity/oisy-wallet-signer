@@ -320,6 +320,7 @@ export class Signer {
 
   private async promptPermissions(requestedScopes: IcrcScopesArray): Promise<IcrcScopesArray> {
     const promise = new Promise<IcrcScopesArray>((resolve, reject) => {
+      // TODO: the answer cannot actually contains ask_on_use. That would be cleaner type wise.
       const confirmScopes: PermissionsConfirmation = (scopes) => {
         resolve(scopes);
       };
@@ -379,31 +380,39 @@ export class Signer {
     if (isAccountsRequest) {
       const {id: requestId} = accountsData;
 
+      const notifyAccounts = async (): Promise<void> => {
+        const promptFn = async (): Promise<void> => {
+          const accounts = await this.promptAccounts();
+
+          this.emitAccounts({accounts, id: requestId});
+        };
+
+        await this.prompt({
+          requestId,
+          promptFn
+        });
+      };
+
+      const notifyDeniedAccounts = (): void => {
+        notifyError({
+          id: requestId ?? null,
+          origin,
+          error: {
+            code: SignerErrorCode.PERMISSION_NOT_GRANTED,
+            message:
+              'The signer has not granted the necessary permissions to process the request from the relying party.'
+          }
+        });
+      };
+
       // TODO: this will be refactored as other requests will require the same checks and execution flow.
       switch (sessionScopeState({owner: this.#owner, origin, method: ICRC27_ACCOUNTS})) {
         case 'denied': {
-          notifyError({
-            id: requestId ?? null,
-            origin,
-            error: {
-              code: SignerErrorCode.PERMISSION_NOT_GRANTED,
-              message:
-                'The signer has not granted the necessary permissions to process the request from the relying party.'
-            }
-          });
+          notifyDeniedAccounts();
           break;
         }
         case 'granted': {
-          const promptFn = async (): Promise<void> => {
-            const accounts = await this.promptAccounts();
-
-            this.emitAccounts({accounts, id: requestId});
-          };
-
-          await this.prompt({
-            requestId,
-            promptFn
-          });
+          await notifyAccounts();
           break;
         }
         case 'ask_on_use': {
@@ -419,7 +428,17 @@ export class Signer {
 
             this.savePermissions({scopes: confirmedScopes});
 
-            // TODO: Is permission granted => callback => notify accounts
+            const approved =
+              confirmedScopes.find(
+                ({scope: {method}, state}) => method === ICRC27_ACCOUNTS && state === 'granted'
+              ) !== undefined;
+
+            if (approved) {
+              await notifyAccounts();
+              return;
+            }
+
+            notifyDeniedAccounts();
           };
 
           await this.prompt({
