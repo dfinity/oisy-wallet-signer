@@ -25,9 +25,9 @@ import type {SignerMessageEventData} from './types/signer';
 import type {SignerOptions} from './types/signer-options';
 import {
   AccountsPromptSchema,
-  PermissionsConfirmation,
-  PermissionsPromptPayload,
-  PermissionsPromptSchema
+  PermissionsPromptSchema,
+  type PermissionsConfirmation,
+  type PermissionsPromptPayload
 } from './types/signer-prompts';
 import type {SessionPermissions} from './types/signer-sessions';
 import {del, get} from './utils/storage.utils';
