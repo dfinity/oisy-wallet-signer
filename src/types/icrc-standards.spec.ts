@@ -9,10 +9,10 @@ import {
   ICRC29_STATUS
 } from '../constants/icrc.constants';
 import {
-  IcrcWalletApproveMethodSchema,
-  IcrcWalletMethodSchema,
-  IcrcWalletScopedMethodSchema,
-  IcrcWalletStandardSchema
+  IcrcApproveMethodSchema,
+  IcrcMethodSchema,
+  IcrcScopedMethodSchema,
+  IcrcStandardSchema
 } from './icrc-standards';
 
 describe('ICRC standards', () => {
@@ -39,15 +39,12 @@ describe('ICRC standards', () => {
     }
   ];
 
-  it.each(methodEnums)(
-    'should validate $title with IcrcWalletMethodSchema',
-    async ({validEnum}) => {
-      expect(IcrcWalletMethodSchema.safeParse(validEnum).success).toBe(true);
-    }
-  );
+  it.each(methodEnums)('should validate $title with IcrcMethodSchema', async ({validEnum}) => {
+    expect(IcrcMethodSchema.safeParse(validEnum).success).toBe(true);
+  });
 
-  it('should not validate IcrcWalletMethodSchema unkown value', () => {
-    expect(IcrcWalletMethodSchema.safeParse('INVALID_METHOD').success).toBe(false);
+  it('should not validate IcrcMethodSchema unkown value', () => {
+    expect(IcrcMethodSchema.safeParse('INVALID_METHOD').success).toBe(false);
   });
 
   const approveEnums = [
@@ -77,16 +74,16 @@ describe('ICRC standards', () => {
   ];
 
   it.each(approveEnums)(
-    'should validate $title with IcrcWalletApproveMethodSchema',
+    'should validate $title with IcrcApproveMethodSchema',
     async ({validEnum}) => {
-      expect(IcrcWalletApproveMethodSchema.safeParse(validEnum).success).toBe(true);
+      expect(IcrcApproveMethodSchema.safeParse(validEnum).success).toBe(true);
     }
   );
 
   it.each(invalidApproveEnums)(
-    'should not validate $title with IcrcWalletApproveMethodSchema',
+    'should not validate $title with IcrcApproveMethodSchema',
     async ({validEnum}) => {
-      expect(IcrcWalletApproveMethodSchema.safeParse(validEnum).success).toBe(false);
+      expect(IcrcApproveMethodSchema.safeParse(validEnum).success).toBe(false);
     }
   );
 
@@ -116,17 +113,14 @@ describe('ICRC standards', () => {
     }
   ];
 
-  it.each(scopeEnums)(
-    'should validate $title with IcrcWalletScopedMethodSchema',
-    async ({validEnum}) => {
-      expect(IcrcWalletScopedMethodSchema.safeParse(validEnum).success).toBe(true);
-    }
-  );
+  it.each(scopeEnums)('should validate $title with IcrcScopedMethodSchema', async ({validEnum}) => {
+    expect(IcrcScopedMethodSchema.safeParse(validEnum).success).toBe(true);
+  });
 
   it.each(invalidScopeEnums)(
-    'should not validate $title with IcrcWalletScopedMethodSchema',
+    'should not validate $title with IcrcScopedMethodSchema',
     async ({validEnum}) => {
-      expect(IcrcWalletScopedMethodSchema.safeParse(validEnum).success).toBe(false);
+      expect(IcrcScopedMethodSchema.safeParse(validEnum).success).toBe(false);
     }
   );
 
@@ -145,14 +139,11 @@ describe('ICRC standards', () => {
     }
   ];
 
-  it.each(standardEnums)(
-    'should validate $title with IcrcWalletStandardSchema',
-    async ({validEnum}) => {
-      expect(IcrcWalletStandardSchema.safeParse(validEnum).success).toBe(true);
-    }
-  );
+  it.each(standardEnums)('should validate $title with IcrcStandardSchema', async ({validEnum}) => {
+    expect(IcrcStandardSchema.safeParse(validEnum).success).toBe(true);
+  });
 
-  it('should not validate IcrcWalletStandardSchema unknown enum values', () => {
-    expect(IcrcWalletStandardSchema.safeParse('INVALID_STANDARD').success).toBe(false);
+  it('should not validate IcrcStandardSchema unknown enum values', () => {
+    expect(IcrcStandardSchema.safeParse('INVALID_STANDARD').success).toBe(false);
   });
 });

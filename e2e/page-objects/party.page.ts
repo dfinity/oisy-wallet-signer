@@ -1,6 +1,6 @@
 import {InternetIdentityPage} from '@dfinity/internet-identity-playwright';
 import {expect} from '@playwright/test';
-import {IcrcWalletPermissionState, IcrcWalletScopedMethod} from '../../src';
+import {IcrcPermissionState, IcrcScopedMethod} from '../../src';
 import {waitForFadeAnimation} from '../utils/test.utils';
 import {IdentityPage, IdentityPageParams} from './identity.page';
 import {WalletPage} from './wallet.page';
@@ -81,7 +81,7 @@ export class PartyPage extends IdentityPage {
   }
 
   async assertPermissions(
-    expectedPermissions: Record<IcrcWalletScopedMethod, IcrcWalletPermissionState>
+    expectedPermissions: Record<IcrcScopedMethod, IcrcPermissionState>
   ): Promise<void> {
     await expect(this.page.getByTestId('permissions')).toBeVisible();
 

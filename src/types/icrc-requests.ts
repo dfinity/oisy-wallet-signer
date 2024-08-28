@@ -6,7 +6,7 @@ import {
   ICRC27_ACCOUNTS,
   ICRC29_STATUS
 } from '../constants/icrc.constants';
-import {IcrcWalletScopedMethodSchema} from './icrc-standards';
+import {IcrcScopedMethodSchema} from './icrc-standards';
 import {inferRpcRequestWithParamsSchema, inferRpcRequestWithoutParamsSchema} from './rpc';
 
 // icrc25_request_permissions
@@ -15,7 +15,7 @@ const IcrcRequestedScopesSchema = z.object({
   scopes: z
     .array(
       z.object({
-        method: IcrcWalletScopedMethodSchema
+        method: IcrcScopedMethodSchema
       })
     )
     .min(1)
