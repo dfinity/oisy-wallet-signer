@@ -1,13 +1,13 @@
+import {IDL} from '@dfinity/candid';
+import {mockPrincipalText} from '../constants/icrc-accounts.mocks';
 import {
+  WalletRequestOptionsSchema,
   extendIcrcCallCanisterRequestParamsSchema,
-  WalletCallParams,
-  WalletRequestOptionsSchema
+  type WalletCallParams
 } from './wallet-request';
-import {mockPrincipalText} from "../constants/icrc-accounts.mocks";
-import {IDL} from "@dfinity/candid";
 
 describe('WalletRequest', () => {
-  describe("Options", () => {
+  describe('Options', () => {
     it('should validate with a specified timeoutInMilliseconds', () => {
       const validData = {
         timeoutInMilliseconds: 3000
@@ -32,25 +32,25 @@ describe('WalletRequest', () => {
       const result = WalletRequestOptionsSchema.safeParse(invalidData);
       expect(result.success).toBe(false);
     });
-  })
+  });
 
-  describe("Call", () => {
-    type MyTest = {
+  describe('Call', () => {
+    interface MyTest {
       hello: string;
-    };
+    }
 
     const argType = IDL.Record({
       hello: IDL.Text
-    })
+    });
 
     const schema = extendIcrcCallCanisterRequestParamsSchema<MyTest>();
 
     it('should validate correct parameters', () => {
-      const validParams: WalletCallParams<{ hello: string }> = {
+      const validParams: WalletCallParams<{hello: string}> = {
         canisterId: mockPrincipalText,
         sender: mockPrincipalText,
         method: 'some_method',
-        arg: { hello: 'world' },
+        arg: {hello: 'world'},
         argType
       };
 
@@ -77,7 +77,7 @@ describe('WalletRequest', () => {
         canisterId: mockPrincipalText,
         sender: mockPrincipalText,
         method: 'some_method',
-        arg: { hello: 'world' }
+        arg: {hello: 'world'}
       };
 
       const result = schema.safeParse(invalidParams);
@@ -100,7 +100,7 @@ describe('WalletRequest', () => {
       const invalidParams = {
         sender: mockPrincipalText,
         method: 'some_method',
-        arg: { hello: 'world' },
+        arg: {hello: 'world'},
         argType
       };
 
@@ -112,7 +112,7 @@ describe('WalletRequest', () => {
       const invalidParams = {
         canisterId: mockPrincipalText,
         method: 'some_method',
-        arg: { hello: 'world' },
+        arg: {hello: 'world'},
         argType
       };
 
@@ -124,14 +124,12 @@ describe('WalletRequest', () => {
       const invalidParams = {
         canisterId: mockPrincipalText,
         sender: mockPrincipalText,
-        arg: { hello: 'world' },
+        arg: {hello: 'world'},
         argType
       };
 
       const result = schema.safeParse(invalidParams);
       expect(result.success).toBe(false);
     });
-
-
-  })
+  });
 });
