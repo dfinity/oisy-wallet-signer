@@ -433,25 +433,25 @@ describe('icrc-requests', () => {
     });
 
     it('should fail validation when "canisterId" is missing', () => {
-      const {canisterId, ...rest} = validParams;
+      const {canisterId: _, ...rest} = validParams;
 
       expect(() => IcrcCallCanisterRequestParamsSchema.parse(rest)).toThrow();
     });
 
     it('should fail validation when "sender" is missing', () => {
-      const {sender, ...rest} = validParams;
+      const {sender: _, ...rest} = validParams;
 
       expect(() => IcrcCallCanisterRequestParamsSchema.parse(rest)).toThrow();
     });
 
     it('should fail validation when "method" is missing', () => {
-      const {method, ...rest} = validParams;
+      const {method: _, ...rest} = validParams;
 
       expect(() => IcrcCallCanisterRequestParamsSchema.parse(rest)).toThrow();
     });
 
     it('should fail validation when "arg" is missing', () => {
-      const {arg, ...rest} = validParams;
+      const {arg: _, ...rest} = validParams;
 
       expect(() => IcrcCallCanisterRequestParamsSchema.parse(rest)).toThrow();
     });
