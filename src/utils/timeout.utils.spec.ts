@@ -28,7 +28,9 @@ describe('retryUntilReady', () => {
   });
 
   it('should return "ready" if isReady returns "ready" initially', async () => {
-    const isReady: () => ReadyOrError | 'pending' = vi.fn(() => 'ready');
+    const isReady: () => ReadyOrError | 'pending' = vi.fn(
+      () => 'ready' as ReadyOrError | 'pending'
+    );
     const fn = vi.fn();
 
     const result = await retryUntilReady({retries: 3, isReady, fn});
@@ -39,7 +41,9 @@ describe('retryUntilReady', () => {
   });
 
   it('should return "error" if isReady returns "error" initially', async () => {
-    const isReady: () => ReadyOrError | 'pending' = vi.fn(() => 'error');
+    const isReady: () => ReadyOrError | 'pending' = vi.fn(
+      () => 'error' as ReadyOrError | 'pending'
+    );
     const fn = vi.fn();
 
     const result = await retryUntilReady({retries: 3, isReady, fn});
