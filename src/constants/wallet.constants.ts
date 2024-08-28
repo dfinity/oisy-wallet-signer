@@ -14,6 +14,6 @@ export const WALLET_TIMEOUT_PERMISSIONS = WALLET_TIMEOUT_IN_MILLISECONDS_WITHOUT
 export const WALLET_TIMEOUT_ACCOUNTS = WALLET_TIMEOUT_IN_MILLISECONDS_WITH_USER_INTERACTION;
 export const WALLET_TIMEOUT_CALL_CANISTER = WALLET_TIMEOUT_IN_MILLISECONDS_WITH_USER_INTERACTION;
 
-export const {scopes: WALLET_DEFAULT_SCOPES}: IcrcRequestedScopes = {
+export const WALLET_DEFAULT_SCOPES: IcrcRequestedScopes = {
   scopes: Object.values(IcrcScopedMethodSchema.Values).map((method) => ({method}))
 };
