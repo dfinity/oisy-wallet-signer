@@ -1,12 +1,15 @@
+import {isNullish} from '@dfinity/utils';
 import {z} from 'zod';
 import {
   ICRC25_PERMISSIONS,
   ICRC25_REQUEST_PERMISSIONS,
   ICRC25_SUPPORTED_STANDARDS,
   ICRC27_ACCOUNTS,
-  ICRC29_STATUS
+  ICRC29_STATUS,
+  ICRC49_CALL_CANISTER
 } from '../constants/icrc.constants';
 import {IcrcScopedMethodSchema} from './icrc-standards';
+import {PrincipalTextSchema} from './principal';
 import {inferRpcRequestWithParamsSchema, inferRpcRequestWithoutParamsSchema} from './rpc';
 
 // icrc25_request_permissions
@@ -76,3 +79,25 @@ export const IcrcAccountsRequestSchema = inferRpcRequestWithoutParamsSchema({
 });
 
 export type IcrcAccountsRequest = z.infer<typeof IcrcAccountsRequestSchema>;
+
+// icrc49_call_canister
+// https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_49_call_canister.md
+
+const IcrcBlob = z.instanceof(Uint8Array);
+
+const IcrcCallCanisterRequestParamsSchema = z.object({
+  canisterId: PrincipalTextSchema,
+  sender: PrincipalTextSchema,
+  method: z.string().trim().min(1),
+  arg: IcrcBlob,
+  memo: IcrcBlob.optional().refine((blob) => isNullish(blob) || blob.length <= 32, {
+    message: 'Memo must be a Uint8Array with a maximum length of 32 bytes'
+  })
+});
+
+export const IcrcCallCanisterRequestSchema = inferRpcRequestWithParamsSchema({
+  method: ICRC49_CALL_CANISTER,
+  params: IcrcCallCanisterRequestParamsSchema
+});
+
+export type IcrcCallCanisterRequest = z.infer<typeof IcrcCallCanisterRequestSchema>;
