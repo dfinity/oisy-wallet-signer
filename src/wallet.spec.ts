@@ -1,3 +1,4 @@
+import {IDL} from '@dfinity/candid';
 import {mockAccounts, mockPrincipalText} from './constants/icrc-accounts.mocks';
 import {
   ICRC25_PERMISSIONS,
@@ -17,20 +18,20 @@ import {
   WALLET_TIMEOUT_REQUEST_SUPPORTED_STANDARD
 } from './constants/wallet.constants';
 import * as walletHandlers from './handlers/wallet.handlers';
-import type {IcrcAnyRequestedScopes, IcrcCallCanisterRequestParams} from './types/icrc-requests';
+import type {IcrcAnyRequestedScopes} from './types/icrc-requests';
 import {
   IcrcAccountsResponseSchema,
   IcrcCallCanisterResult,
+  IcrcCallCanisterResultResponseSchema,
   IcrcScopesResponseSchema,
   IcrcSupportedStandardsResponseSchema
 } from './types/icrc-responses';
 import {JSON_RPC_VERSION_2, RpcResponseWithResultOrErrorSchema} from './types/rpc';
 import {WalletResponseError} from './types/wallet-errors';
 import type {WalletOptions} from './types/wallet-options';
+import {WalletCallParams} from './types/wallet-request';
 import {WALLET_WINDOW_CENTER, WALLET_WINDOW_TOP_RIGHT, windowFeatures} from './utils/window.utils';
 import {Wallet} from './wallet';
-import {WalletCallParams} from "./types/wallet-request";
-import {IDL} from "@dfinity/candid";
 
 describe('Wallet', () => {
   const mockParameters: WalletOptions = {url: 'https://test.com'};
@@ -1076,13 +1077,13 @@ describe('Wallet', () => {
 
       type MyTest = {
         hello: string;
-      }
+      };
 
       const params: WalletCallParams<MyTest> = {
         canisterId: mockPrincipalText,
         sender: mockPrincipalText,
         method: 'some_method',
-        arg: {hello: "world"},
+        arg: {hello: 'world'},
         argType: IDL.Record({
           hello: IDL.Text
         })
@@ -1147,12 +1148,12 @@ describe('Wallet', () => {
           }
         );
 
-        it.only('should timeout if response ID is not the same as request ID', async () => {
+        it('should timeout if response ID is not the same as request ID', async () => {
           // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
           return new Promise<void>(async (resolve) => {
             vi.useFakeTimers();
 
-            const spy = vi.spyOn(IcrcScopesResponseSchema, 'safeParse');
+            const spy = vi.spyOn(IcrcCallCanisterResultResponseSchema, 'safeParse');
 
             wallet.call({params}).catch((err: Error) => {
               expect(err.message).toBe(
@@ -1262,7 +1263,7 @@ describe('Wallet', () => {
           expect(spyPostMessage).toHaveBeenCalledWith(
             expect.objectContaining({
               jsonrpc: JSON_RPC_VERSION_2,
-              method: ICRC25_REQUEST_PERMISSIONS,
+              method: ICRC49_CALL_CANISTER,
               params: {
                 ...rest,
                 arg: new Uint8Array(IDL.encode([argType], [arg]))
