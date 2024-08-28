@@ -80,14 +80,14 @@ export const permissions = ({id, ...rest}: Request): void => {
 
 export const requestPermissions = ({
   id,
-  scopes,
+  params,
   ...rest
-}: Request & IcrcAnyRequestedScopes): void => {
+}: Request & {params: IcrcAnyRequestedScopes}): void => {
   const msg: IcrcRequestAnyPermissionsRequest = {
     jsonrpc: JSON_RPC_VERSION_2,
     id,
     method: ICRC25_REQUEST_PERMISSIONS,
-    params: {scopes}
+    params
   };
 
   focusAndPostMsg({msg, ...rest});

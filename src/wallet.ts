@@ -1,7 +1,7 @@
 import {assertNonNullish, nonNullish, notEmptyString} from '@dfinity/utils';
 import {
   WALLET_CONNECT_TIMEOUT_IN_MILLISECONDS,
-  WALLET_DEFAULT_SCOPES,
+  WALLET_DEFAULT_SCOPES_PARAMS,
   WALLET_TIMEOUT_ACCOUNTS,
   WALLET_TIMEOUT_PERMISSIONS,
   WALLET_TIMEOUT_REQUEST_PERMISSIONS,
@@ -360,26 +360,28 @@ export class Wallet {
   };
 
   /**
-   * Request permissions to the wallet.
+   * Request permissions from the wallet.
    *
    * @async
-   * @param {WalletRequestOptions} options - The options for the wallet request, which may include parameters such as timeout settings and other request-specific configurations.
-   * @param {Partial<IcrcAnyRequestedScopes>} scopes - The specific scopes being requested from the wallet. These define the permissions that the wallet may grant.
+   * @param {Object} args - The arguments object.
+   * @param {WalletRequestOptions} [args.options] - The options for the wallet request, which may include parameters such as timeout settings and other request-specific configurations.
+   * @param {Partial<IcrcAnyRequestedScopes>} [args.params] - The specific scopes being requested from the wallet. These define the permissions that the wallet may grant.
    * @returns {Promise<IcrcScopesArray>} A promise that resolves to the permissions that were confirmed by the user of the wallet.
    * @see [ICRC25 Request Permissions](https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_request_permissions)
    */
   requestPermissions = async ({
     options: {timeoutInMilliseconds, ...rest} = {},
-    scopes
+    params
   }: {
     options?: WalletRequestOptions;
-  } & Partial<IcrcAnyRequestedScopes> = {}): Promise<IcrcScopesArray> => {
+    params?: IcrcAnyRequestedScopes;
+  } = {}): Promise<IcrcScopesArray> => {
     const postRequest = (id: RpcId): void => {
       requestPermissions({
         popup: this.#popup,
         origin: this.#origin,
         id,
-        scopes: scopes ?? WALLET_DEFAULT_SCOPES
+        params: params ?? WALLET_DEFAULT_SCOPES_PARAMS
       });
     };
 

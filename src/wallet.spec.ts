@@ -9,7 +9,7 @@ import {
 } from './constants/icrc.constants';
 import {SignerErrorCode} from './constants/signer.constants';
 import {
-  WALLET_DEFAULT_SCOPES,
+  WALLET_DEFAULT_SCOPES_PARAMS,
   WALLET_TIMEOUT_ACCOUNTS,
   WALLET_TIMEOUT_PERMISSIONS,
   WALLET_TIMEOUT_REQUEST_PERMISSIONS,
@@ -826,9 +826,7 @@ describe('Wallet', () => {
               expect.objectContaining({
                 jsonrpc: JSON_RPC_VERSION_2,
                 method: ICRC25_REQUEST_PERMISSIONS,
-                params: {
-                  scopes: WALLET_DEFAULT_SCOPES
-                }
+                params: WALLET_DEFAULT_SCOPES_PARAMS
               }),
               mockParameters.url
             );
@@ -840,7 +838,10 @@ describe('Wallet', () => {
 
             const selectedScopes: IcrcAnyRequestedScopes = {scopes: [{method: ICRC27_ACCOUNTS}]};
 
-            const promise = wallet.requestPermissions({options: {requestId}, ...selectedScopes});
+            const promise = wallet.requestPermissions({
+              options: {requestId},
+              params: selectedScopes
+            });
 
             window.dispatchEvent(messageEventScopes);
 
@@ -853,9 +854,7 @@ describe('Wallet', () => {
               expect.objectContaining({
                 jsonrpc: JSON_RPC_VERSION_2,
                 method: ICRC25_REQUEST_PERMISSIONS,
-                params: {
-                  scopes: selectedScopes.scopes
-                }
+                params: selectedScopes
               }),
               mockParameters.url
             );
