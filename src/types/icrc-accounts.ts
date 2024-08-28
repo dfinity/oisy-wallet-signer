@@ -1,6 +1,6 @@
-import {Principal} from '@dfinity/principal';
 import {arrayOfNumberToUint8Array} from '@dfinity/utils';
 import {z} from 'zod';
+import {PrincipalTextSchema} from './principal';
 
 const IcrcSubaccountSchema = z
   .union([z.instanceof(Uint8Array), z.array(z.number())])
@@ -11,20 +11,6 @@ const IcrcSubaccountSchema = z
       message: 'Subaccount must be exactly 32 bytes long.'
     }
   );
-
-export const PrincipalTextSchema = z.string().refine(
-  (principal) => {
-    try {
-      Principal.fromText(principal);
-      return true;
-    } catch (err: unknown) {
-      return false;
-    }
-  },
-  {
-    message: 'Invalid textual representation of a Principal.'
-  }
-);
 
 export const IcrcAccountSchema = z
   .object({
