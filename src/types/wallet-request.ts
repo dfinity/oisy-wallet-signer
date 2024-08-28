@@ -1,4 +1,5 @@
 import {Type} from '@dfinity/candid/lib/cjs/idl';
+import {nonNullish} from '@dfinity/utils';
 import {z} from 'zod';
 import {IcrcCallCanisterRequestParamsSchema} from './icrc-requests';
 import {RpcIdSchema} from './rpc';
@@ -43,9 +44,11 @@ export type WalletRequestOptionsWithTimeout = z.infer<typeof WalletRequestOption
  * @returns {z.ZodObject} - A Zod schema object that includes the base fields and the custom `arg` and `argType`.
  */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-const extendIcrcCallCanisterRequestParamsSchema = <T>() => {
+export const extendIcrcCallCanisterRequestParamsSchema = <T>() => {
   return IcrcCallCanisterRequestParamsSchema.omit({arg: true}).extend({
-    arg: z.custom<T>(),
+    arg: z.custom<T>().refine(nonNullish, {
+      message: 'arg is required'
+    }),
     argType: z.instanceof(Type) as z.ZodType<Type>
   });
 };
