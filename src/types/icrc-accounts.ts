@@ -1,9 +1,10 @@
 import {arrayOfNumberToUint8Array} from '@dfinity/utils';
 import {z} from 'zod';
+import {IcrcBlob} from './blob';
 import {PrincipalTextSchema} from './principal';
 
 const IcrcSubaccountSchema = z
-  .union([z.instanceof(Uint8Array), z.array(z.number())])
+  .union([IcrcBlob, z.array(z.number())])
   .refine(
     (value) =>
       (value instanceof Uint8Array ? value : arrayOfNumberToUint8Array(value)).length === 32,
