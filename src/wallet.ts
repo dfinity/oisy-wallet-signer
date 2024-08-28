@@ -3,6 +3,7 @@ import {
   WALLET_CONNECT_TIMEOUT_IN_MILLISECONDS,
   WALLET_DEFAULT_SCOPES,
   WALLET_TIMEOUT_ACCOUNTS,
+  WALLET_TIMEOUT_CALL_CANISTER,
   WALLET_TIMEOUT_PERMISSIONS,
   WALLET_TIMEOUT_REQUEST_PERMISSIONS,
   WALLET_TIMEOUT_REQUEST_SUPPORTED_STANDARD
@@ -10,17 +11,20 @@ import {
 import {
   permissions,
   requestAccounts,
+  requestCallCanister,
   requestPermissions,
   requestSupportedStandards,
   retryRequestStatus
 } from './handlers/wallet.handlers';
 import type {IcrcAccounts} from './types/icrc-accounts';
-import type {IcrcAnyRequestedScopes} from './types/icrc-requests';
+import type {IcrcAnyRequestedScopes, IcrcCallCanisterRequestParams} from './types/icrc-requests';
 import {
   IcrcAccountsResponseSchema,
+  IcrcCallCanisterResultResponseSchema,
   IcrcReadyResponseSchema,
   IcrcScopesResponseSchema,
   IcrcSupportedStandardsResponseSchema,
+  type IcrcCallCanisterResult,
   type IcrcScopesArray,
   type IcrcSupportedStandards
 } from './types/icrc-responses';
@@ -472,6 +476,60 @@ export class Wallet {
     return await this.request<IcrcAccounts>({
       options: {
         timeoutInMilliseconds: timeoutInMilliseconds ?? WALLET_TIMEOUT_ACCOUNTS,
+        ...rest
+      },
+      postRequest,
+      handleMessage
+    });
+  };
+
+  /**
+   * Call a canister method via the wallet.
+   *
+   * @async
+   * @param {Object} args - The arguments for the call.
+   * @param {IcrcCallCanisterRequestParams} args.params - The parameters required to call the canister, including the canister ID, method name, and any arguments.
+   * @param {WalletRequestOptions} [args.options] - The options for the wallet request, which may include parameters such as timeout settings and other request-specific configurations.
+   * @returns {Promise<IcrcCallCanisterResult>} A promise that resolves to the result of the canister call.
+   * @see [ICRC49 Call Canister](https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_49_call_canister.md)
+   */
+  call = async ({
+    options: {timeoutInMilliseconds, ...rest} = {},
+    params
+  }: {
+    options?: WalletRequestOptions;
+    params: IcrcCallCanisterRequestParams;
+  }): Promise<IcrcCallCanisterResult> => {
+    const handleMessage = async ({
+      data,
+      id
+    }: {
+      data: WalletMessageEventData;
+      id: RpcId;
+    }): Promise<{handled: boolean; result?: IcrcCallCanisterResult}> => {
+      const {success: isAccounts, data: resultData} =
+        IcrcCallCanisterResultResponseSchema.safeParse(data);
+
+      if (isAccounts && id === resultData?.id && nonNullish(resultData?.result)) {
+        const {result} = resultData;
+        return {handled: true, result};
+      }
+
+      return {handled: false};
+    };
+
+    const postRequest = (id: RpcId): void => {
+      requestCallCanister({
+        popup: this.#popup,
+        origin: this.#origin,
+        id,
+        params
+      });
+    };
+
+    return await this.request<IcrcCallCanisterResult>({
+      options: {
+        timeoutInMilliseconds: timeoutInMilliseconds ?? WALLET_TIMEOUT_CALL_CANISTER,
         ...rest
       },
       postRequest,

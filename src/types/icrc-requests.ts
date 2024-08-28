@@ -94,6 +94,8 @@ const IcrcCallCanisterRequestParamsSchema = z.object({
   })
 });
 
+export type IcrcCallCanisterRequestParams = z.infer<typeof IcrcCallCanisterRequestParamsSchema>;
+
 export const IcrcCallCanisterRequestSchema = inferRpcRequestWithParamsSchema({
   method: ICRC49_CALL_CANISTER,
   params: IcrcCallCanisterRequestParamsSchema
