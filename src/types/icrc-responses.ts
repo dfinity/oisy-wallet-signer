@@ -1,4 +1,5 @@
 import {z} from 'zod';
+import {IcrcBlob} from './blob';
 import {IcrcAccountsSchema} from './icrc-accounts';
 import {
   IcrcPermissionStateSchema,
@@ -103,3 +104,19 @@ export const IcrcAccountsResponseSchema = inferRpcResponseSchema(
 );
 
 export type IcrcAccountsResponse = z.infer<typeof IcrcAccountsResponseSchema>;
+
+// icrc49_call_canister
+// https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_49_call_canister.md
+
+const IcrcCallCanisterResultSchema = z.object({
+  contentMap: IcrcBlob,
+  certificate: IcrcBlob
+});
+
+export type IcrcCallCanisterResult = z.infer<typeof IcrcCallCanisterResultSchema>;
+
+export const IcrcCallCanisterResultResponseSchema = inferRpcResponseSchema(
+  IcrcCallCanisterResultSchema.strict()
+);
+
+export type IcrcCallCanisterResultResponse = z.infer<typeof IcrcCallCanisterResultResponseSchema>;
