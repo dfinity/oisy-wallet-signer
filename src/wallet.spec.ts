@@ -21,15 +21,15 @@ import * as walletHandlers from './handlers/wallet.handlers';
 import type {IcrcAnyRequestedScopes} from './types/icrc-requests';
 import {
   IcrcAccountsResponseSchema,
-  IcrcCallCanisterResult,
   IcrcCallCanisterResultResponseSchema,
   IcrcScopesResponseSchema,
-  IcrcSupportedStandardsResponseSchema
+  IcrcSupportedStandardsResponseSchema,
+  type IcrcCallCanisterResult
 } from './types/icrc-responses';
 import {JSON_RPC_VERSION_2, RpcResponseWithResultOrErrorSchema} from './types/rpc';
 import {WalletResponseError} from './types/wallet-errors';
 import type {WalletOptions} from './types/wallet-options';
-import {WalletCallParams} from './types/wallet-request';
+import type {WalletCallParams} from './types/wallet-request';
 import {WALLET_WINDOW_CENTER, WALLET_WINDOW_TOP_RIGHT, windowFeatures} from './utils/window.utils';
 import {Wallet} from './wallet';
 
@@ -1075,9 +1075,9 @@ describe('Wallet', () => {
     describe('Call', () => {
       let wallet: Wallet;
 
-      type MyTest = {
+      interface MyTest {
         hello: string;
-      };
+      }
 
       const params: WalletCallParams<MyTest> = {
         canisterId: mockPrincipalText,
