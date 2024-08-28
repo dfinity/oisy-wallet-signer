@@ -13,6 +13,6 @@ export const WALLET_TIMEOUT_REQUEST_PERMISSIONS =
 export const WALLET_TIMEOUT_PERMISSIONS = WALLET_TIMEOUT_IN_MILLISECONDS_WITHOUT_USER_INTERACTION;
 export const WALLET_TIMEOUT_ACCOUNTS = WALLET_TIMEOUT_IN_MILLISECONDS_WITH_USER_INTERACTION;
 
-export const WALLET_DEFAULT_SCOPES_PARAMS: IcrcRequestedScopes = {
+export const WALLET_DEFAULT_SCOPES: IcrcRequestedScopes = {
   scopes: Object.values(IcrcScopedMethodSchema.Values).map((method) => ({method}))
 };

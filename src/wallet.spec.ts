@@ -9,7 +9,7 @@ import {
 } from './constants/icrc.constants';
 import {SignerErrorCode} from './constants/signer.constants';
 import {
-  WALLET_DEFAULT_SCOPES_PARAMS,
+  WALLET_DEFAULT_SCOPES,
   WALLET_TIMEOUT_ACCOUNTS,
   WALLET_TIMEOUT_PERMISSIONS,
   WALLET_TIMEOUT_REQUEST_PERMISSIONS,
@@ -826,7 +826,7 @@ describe('Wallet', () => {
               expect.objectContaining({
                 jsonrpc: JSON_RPC_VERSION_2,
                 method: ICRC25_REQUEST_PERMISSIONS,
-                params: WALLET_DEFAULT_SCOPES_PARAMS
+                params: WALLET_DEFAULT_SCOPES
               }),
               mockParameters.url
             );

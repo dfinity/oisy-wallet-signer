@@ -1,7 +1,7 @@
 import {assertNonNullish, nonNullish, notEmptyString} from '@dfinity/utils';
 import {
   WALLET_CONNECT_TIMEOUT_IN_MILLISECONDS,
-  WALLET_DEFAULT_SCOPES_PARAMS,
+  WALLET_DEFAULT_SCOPES,
   WALLET_TIMEOUT_ACCOUNTS,
   WALLET_TIMEOUT_PERMISSIONS,
   WALLET_TIMEOUT_REQUEST_PERMISSIONS,
@@ -381,7 +381,7 @@ export class Wallet {
         popup: this.#popup,
         origin: this.#origin,
         id,
-        params: params ?? WALLET_DEFAULT_SCOPES_PARAMS
+        params: params ?? WALLET_DEFAULT_SCOPES
       });
     };
 
