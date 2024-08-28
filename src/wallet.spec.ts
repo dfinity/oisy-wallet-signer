@@ -35,7 +35,7 @@ describe('Wallet', () => {
     origin: mockParameters.url,
     data: {
       jsonrpc: JSON_RPC_VERSION_2,
-      id: '123',
+      id: crypto.randomUUID(),
       result: 'ready'
     }
   });
@@ -87,7 +87,7 @@ describe('Wallet', () => {
             origin: hackerOrigin,
             data: {
               jsonrpc: JSON_RPC_VERSION_2,
-              id: '123',
+              id: crypto.randomUUID(),
               result: 'ready'
             }
           });
@@ -348,7 +348,7 @@ describe('Wallet', () => {
               origin: mockParameters.url,
               data: {
                 jsonrpc: JSON_RPC_VERSION_2,
-                id: '123',
+                id: crypto.randomUUID(),
                 result: {
                   supportedStandards
                 }
@@ -370,7 +370,7 @@ describe('Wallet', () => {
             origin: hackerOrigin,
             data: {
               jsonrpc: JSON_RPC_VERSION_2,
-              id: '123',
+              id: crypto.randomUUID(),
               result: {
                 supportedStandards
               }
@@ -548,7 +548,7 @@ describe('Wallet', () => {
                 origin: mockParameters.url,
                 data: {
                   jsonrpc: JSON_RPC_VERSION_2,
-                  id: '123',
+                  id: crypto.randomUUID(),
                   result: {
                     scopes
                   }
@@ -570,7 +570,7 @@ describe('Wallet', () => {
               origin: hackerOrigin,
               data: {
                 jsonrpc: JSON_RPC_VERSION_2,
-                id: '123',
+                id: crypto.randomUUID(),
                 result: {
                   scopes
                 }
@@ -729,7 +729,7 @@ describe('Wallet', () => {
                 origin: mockParameters.url,
                 data: {
                   jsonrpc: JSON_RPC_VERSION_2,
-                  id: '123',
+                  id: crypto.randomUUID(),
                   result: {
                     scopes
                   }
@@ -751,7 +751,7 @@ describe('Wallet', () => {
               origin: hackerOrigin,
               data: {
                 jsonrpc: JSON_RPC_VERSION_2,
-                id: '123',
+                id: crypto.randomUUID(),
                 result: {
                   scopes
                 }
@@ -953,7 +953,7 @@ describe('Wallet', () => {
               origin: mockParameters.url,
               data: {
                 jsonrpc: JSON_RPC_VERSION_2,
-                id: '123',
+                id: crypto.randomUUID(),
                 result: {
                   accounts: mockAccounts
                 }
@@ -975,7 +975,7 @@ describe('Wallet', () => {
             origin: hackerOrigin,
             data: {
               jsonrpc: JSON_RPC_VERSION_2,
-              id: '123',
+              id: crypto.randomUUID(),
               result: {
                 accounts: mockAccounts
               }
