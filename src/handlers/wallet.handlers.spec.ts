@@ -1,16 +1,19 @@
 import {DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS} from '../constants/core.constants';
+import {mockPrincipalText} from '../constants/icrc-accounts.mocks';
 import {
   ICRC25_PERMISSIONS,
   ICRC25_REQUEST_PERMISSIONS,
   ICRC25_SUPPORTED_STANDARDS,
-  ICRC27_ACCOUNTS
+  ICRC27_ACCOUNTS,
+  ICRC49_CALL_CANISTER
 } from '../constants/icrc.constants';
-import type {IcrcAnyRequestedScopes} from '../types/icrc-requests';
+import type {IcrcAnyRequestedScopes, IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import {JSON_RPC_VERSION_2} from '../types/rpc';
 import type {ReadyOrError} from '../utils/timeout.utils';
 import {
   permissions,
   requestAccounts,
+  requestCallCanister,
   requestPermissions,
   requestSupportedStandards,
   retryRequestStatus
@@ -220,6 +223,35 @@ describe('Wallet handlers', () => {
 
     it('should bring the popup in front with focus', () => {
       requestAccounts({id: testId, popup, origin: testOrigin});
+
+      expect(focusMock).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('Request accounts', () => {
+    const params: IcrcCallCanisterRequestParams = {
+      canisterId: mockPrincipalText,
+      sender: mockPrincipalText,
+      method: 'some_method',
+      arg: new Uint8Array([1, 2, 3, 4])
+    };
+
+    it('should send the correct message to the popup', () => {
+      requestCallCanister({id: testId, popup, origin: testOrigin, params});
+
+      expect(postMessageMock).toHaveBeenCalledWith(
+        {
+          jsonrpc: JSON_RPC_VERSION_2,
+          id: testId,
+          method: ICRC49_CALL_CANISTER,
+          params
+        },
+        testOrigin
+      );
+    });
+
+    it('should bring the popup in front with focus', () => {
+      requestCallCanister({id: testId, popup, origin: testOrigin, params});
 
       expect(focusMock).toHaveBeenCalledTimes(1);
     });
