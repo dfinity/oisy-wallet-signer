@@ -12,7 +12,7 @@ describe('IcrcBlob', () => {
     const result = IcrcBlob.safeParse(invalidBlob);
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.errors[0].message).toBe('Expected Uint8Array, received array');
+      expect(result.error.errors[0].message).toBe('Input not instance of Uint8Array');
     }
   });
 
@@ -21,7 +21,7 @@ describe('IcrcBlob', () => {
     const result = IcrcBlob.safeParse(invalidBlob);
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.errors[0].message).toBe('Expected Uint8Array, received string');
+      expect(result.error.errors[0].message).toBe('Input not instance of Uint8Array');
     }
   });
 
@@ -30,7 +30,7 @@ describe('IcrcBlob', () => {
     const result = IcrcBlob.safeParse(invalidBlob);
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.errors[0].message).toBe('Expected Uint8Array, received number');
+      expect(result.error.errors[0].message).toBe('Input not instance of Uint8Array');
     }
   });
 
@@ -39,7 +39,7 @@ describe('IcrcBlob', () => {
     const result = IcrcBlob.safeParse(invalidBlob);
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.errors[0].message).toBe('Expected Uint8Array, received object');
+      expect(result.error.errors[0].message).toBe('Input not instance of Uint8Array');
     }
   });
 });
