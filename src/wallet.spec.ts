@@ -415,7 +415,7 @@ describe('Wallet', () => {
       });
 
       describe('Request success', () => {
-        const requestId = '12345';
+        const requestId = crypto.randomUUID();
 
         const messageEventSupportedStandards = new MessageEvent('message', {
           origin: mockParameters.url,
@@ -615,7 +615,7 @@ describe('Wallet', () => {
         });
 
         describe('Request success', () => {
-          const requestId = '12345';
+          const requestId = crypto.randomUUID();
 
           const messageEventScopes = new MessageEvent('message', {
             origin: mockParameters.url,
@@ -796,7 +796,7 @@ describe('Wallet', () => {
         });
 
         describe('Request success', () => {
-          const requestId = '12345';
+          const requestId = crypto.randomUUID();
 
           const messageEventScopes = new MessageEvent('message', {
             origin: mockParameters.url,
@@ -1021,7 +1021,7 @@ describe('Wallet', () => {
       });
 
       describe('Request success', () => {
-        const requestId = '12345';
+        const requestId = crypto.randomUUID();
 
         const messageEventSupportedStandards = new MessageEvent('message', {
           origin: mockParameters.url,
