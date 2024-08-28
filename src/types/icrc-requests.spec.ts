@@ -1,11 +1,14 @@
+import {mockPrincipalText} from '../constants/icrc-accounts.mocks';
 import {ICRC27_ACCOUNTS} from '../constants/icrc.constants';
 import {
   IcrcAccountsRequestSchema,
+  IcrcCallCanisterRequestSchema,
   IcrcPermissionsRequestSchema,
   IcrcRequestAnyPermissionsRequestSchema,
   IcrcStatusRequestSchema,
   IcrcSupportedStandardsRequestSchema,
   type IcrcAccountsRequest,
+  type IcrcCallCanisterRequest,
   type IcrcPermissionsRequest,
   type IcrcRequestAnyPermissionsRequest
 } from './icrc-requests';
@@ -227,6 +230,136 @@ describe('icrc-requests', () => {
 
       const invalidRequest = rest;
       expect(() => IcrcAccountsRequestSchema.parse(invalidRequest)).toThrow();
+    });
+  });
+
+  describe('icrc49_call_canister', () => {
+    const validRequest: IcrcCallCanisterRequest = {
+      jsonrpc: JSON_RPC_VERSION_2,
+      id: 1,
+      method: 'icrc49_call_canister',
+      params: {
+        canisterId: mockPrincipalText,
+        sender: mockPrincipalText,
+        method: 'some_method',
+        arg: new Uint8Array([1, 2, 3, 4])
+      }
+    };
+
+    it('should validate a correct request', () => {
+      expect(() => IcrcCallCanisterRequestSchema.parse(validRequest)).not.toThrow();
+    });
+
+    it('should fail validation when "canisterId" is invalid', () => {
+      const invalidRequest = {
+        ...validRequest,
+        params: {
+          ...validRequest.params,
+          canisterId: 'invalid-principal'
+        }
+      };
+      expect(() => IcrcCallCanisterRequestSchema.parse(invalidRequest)).toThrow();
+    });
+
+    it('should fail validation when "sender" is invalid', () => {
+      const invalidRequest = {
+        ...validRequest,
+        params: {
+          ...validRequest.params,
+          sender: 'invalid-principal'
+        }
+      };
+      expect(() => IcrcCallCanisterRequestSchema.parse(invalidRequest)).toThrow();
+    });
+
+    it('should fail validation when "method" is an empty string', () => {
+      const invalidRequest = {
+        ...validRequest,
+        params: {
+          ...validRequest.params,
+          method: ''
+        }
+      };
+      expect(() => IcrcCallCanisterRequestSchema.parse(invalidRequest)).toThrow();
+    });
+
+    it('should fail validation when "arg" is not a Uint8Array', () => {
+      const invalidRequest = {
+        ...validRequest,
+        params: {
+          ...validRequest.params,
+          arg: 'not-a-Uint8Array'
+        }
+      };
+      expect(() => IcrcCallCanisterRequestSchema.parse(invalidRequest)).toThrow();
+    });
+
+    it('should pass validation when "memo" is a valid Uint8Array of length <= 32', () => {
+      const validMemoRequest = {
+        ...validRequest,
+        params: {
+          ...validRequest.params,
+          memo: new Uint8Array(20)
+        }
+      };
+      expect(() => IcrcCallCanisterRequestSchema.parse(validMemoRequest)).not.toThrow();
+    });
+
+    it('should pass validation when "memo" is a valid Uint8Array of length = 32', () => {
+      const validMemoRequest = {
+        ...validRequest,
+        params: {
+          ...validRequest.params,
+          memo: new Uint8Array(32)
+        }
+      };
+      expect(() => IcrcCallCanisterRequestSchema.parse(validMemoRequest)).not.toThrow();
+    });
+
+    it('should fail validation when "memo" exceeds 32 bytes', () => {
+      const invalidMemoRequest = {
+        ...validRequest,
+        params: {
+          ...validRequest.params,
+          memo: new Uint8Array(33)
+        }
+      };
+      expect(() => IcrcCallCanisterRequestSchema.parse(invalidMemoRequest)).toThrow();
+    });
+
+    it('should fail validation when "params" is missing', () => {
+      const {params: _, ...rest} = validRequest;
+
+      const invalidRequest = rest;
+      expect(() => IcrcCallCanisterRequestSchema.parse(invalidRequest)).toThrow();
+    });
+
+    it('should fail validation when "id" is missing', () => {
+      const {id: _, ...rest} = validRequest;
+
+      const invalidRequest = {
+        ...rest,
+        params: validRequest.params
+      };
+      expect(() => IcrcCallCanisterRequestSchema.parse(invalidRequest)).toThrow();
+    });
+
+    it('should fail validation when "jsonrpc" is missing', () => {
+      const {jsonrpc: _, ...rest} = validRequest;
+
+      const invalidRequest = {
+        ...rest,
+        params: validRequest.params
+      };
+      expect(() => IcrcCallCanisterRequestSchema.parse(invalidRequest)).toThrow();
+    });
+
+    it('should fail validation when "method" is invalid', () => {
+      const invalidRequest = {
+        ...validRequest,
+        method: 'invalid_method'
+      };
+      expect(() => IcrcCallCanisterRequestSchema.parse(invalidRequest)).toThrow();
     });
   });
 });
