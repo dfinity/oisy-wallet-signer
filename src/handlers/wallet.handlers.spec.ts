@@ -175,7 +175,7 @@ describe('Wallet handlers', () => {
   });
 
   describe('Request permissions', () => {
-    const scopes: IcrcAnyRequestedScopes = {
+    const params: IcrcAnyRequestedScopes = {
       scopes: [
         {
           method: ICRC27_ACCOUNTS
@@ -184,21 +184,21 @@ describe('Wallet handlers', () => {
     };
 
     it('should send the correct message to the popup', () => {
-      requestPermissions({id: testId, popup, origin: testOrigin, scopes: scopes.scopes});
+      requestPermissions({id: testId, popup, origin: testOrigin, params});
 
       expect(postMessageMock).toHaveBeenCalledWith(
         {
           jsonrpc: JSON_RPC_VERSION_2,
           id: testId,
           method: ICRC25_REQUEST_PERMISSIONS,
-          params: scopes
+          params
         },
         testOrigin
       );
     });
 
     it('should bring the popup in front with focus', () => {
-      requestPermissions({id: testId, popup, origin: testOrigin, scopes: scopes.scopes});
+      requestPermissions({id: testId, popup, origin: testOrigin, params});
 
       expect(focusMock).toHaveBeenCalledTimes(1);
     });
