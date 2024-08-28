@@ -29,6 +29,8 @@ import {WalletResponseError} from './types/wallet-errors';
 import type {WalletOptions} from './types/wallet-options';
 import {WALLET_WINDOW_CENTER, WALLET_WINDOW_TOP_RIGHT, windowFeatures} from './utils/window.utils';
 import {Wallet} from './wallet';
+import {WalletCallParams} from "./types/wallet-request";
+import {IDL} from "@dfinity/candid";
 
 describe('Wallet', () => {
   const mockParameters: WalletOptions = {url: 'https://test.com'};
@@ -1072,11 +1074,18 @@ describe('Wallet', () => {
     describe('Call', () => {
       let wallet: Wallet;
 
-      const params: IcrcCallCanisterRequestParams = {
+      type MyTest = {
+        hello: string;
+      }
+
+      const params: WalletCallParams<MyTest> = {
         canisterId: mockPrincipalText,
         sender: mockPrincipalText,
         method: 'some_method',
-        arg: new Uint8Array([1, 2, 3, 4])
+        arg: {hello: "world"},
+        argType: IDL.Record({
+          hello: IDL.Text
+        })
       };
 
       const result: IcrcCallCanisterResult = {
@@ -1138,7 +1147,7 @@ describe('Wallet', () => {
           }
         );
 
-        it('should timeout if response ID is not the same as request ID', async () => {
+        it.only('should timeout if response ID is not the same as request ID', async () => {
           // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
           return new Promise<void>(async (resolve) => {
             vi.useFakeTimers();
@@ -1235,13 +1244,11 @@ describe('Wallet', () => {
           }
         });
 
-        // TODO: continue
-
-        it('should call the wallet with postMessage and default scopes', async () => {
-          const spy = vi.spyOn(walletHandlers, 'requestPermissions');
+        it('should call the wallet with postMessage and encoded arguments', async () => {
+          const spy = vi.spyOn(walletHandlers, 'requestCallCanister');
           const spyPostMessage = vi.spyOn(window, 'postMessage');
 
-          const promise = wallet.requestPermissions({options: {requestId}});
+          const promise = wallet.call({options: {requestId}, params});
 
           window.dispatchEvent(messageEventScopes);
 
@@ -1250,53 +1257,29 @@ describe('Wallet', () => {
           expect(spy).toHaveBeenCalledTimes(1);
           expect(spyPostMessage).toHaveBeenCalledTimes(1);
 
-          expect(spyPostMessage).toHaveBeenCalledWith(
-            expect.objectContaining({
-              jsonrpc: JSON_RPC_VERSION_2,
-              method: ICRC25_REQUEST_PERMISSIONS,
-              params: {
-                scopes: WALLET_DEFAULT_SCOPES
-              }
-            }),
-            mockParameters.url
-          );
-        });
-
-        it('should call the wallet with postMessage selected scopes', async () => {
-          const spy = vi.spyOn(walletHandlers, 'requestPermissions');
-          const spyPostMessage = vi.spyOn(window, 'postMessage');
-
-          const selectedScopes: IcrcAnyRequestedScopes = {scopes: [{method: ICRC27_ACCOUNTS}]};
-
-          const promise = wallet.requestPermissions({options: {requestId}, ...selectedScopes});
-
-          window.dispatchEvent(messageEventScopes);
-
-          await promise;
-
-          expect(spy).toHaveBeenCalledTimes(1);
-          expect(spyPostMessage).toHaveBeenCalledTimes(1);
+          const {arg, argType, ...rest} = params;
 
           expect(spyPostMessage).toHaveBeenCalledWith(
             expect.objectContaining({
               jsonrpc: JSON_RPC_VERSION_2,
               method: ICRC25_REQUEST_PERMISSIONS,
               params: {
-                scopes: selectedScopes.scopes
+                ...rest,
+                arg: new Uint8Array(IDL.encode([argType], [arg]))
               }
             }),
             mockParameters.url
           );
         });
 
-        it('should respond with the selected permissions', async () => {
-          const promise = wallet.requestPermissions({options: {requestId}});
+        it('should respond with the result', async () => {
+          const promise = wallet.call({options: {requestId}, params});
 
           window.dispatchEvent(messageEventScopes);
 
-          const result = await promise;
+          const callResult = await promise;
 
-          expect(result).toEqual(scopes);
+          expect(callResult).toEqual(result);
         });
       });
     });
