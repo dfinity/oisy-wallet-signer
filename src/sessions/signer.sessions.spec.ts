@@ -10,7 +10,7 @@ import {
 } from '../constants/icrc.constants';
 import {SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS} from '../constants/signer.constants';
 import type {IcrcScope, IcrcScopesArray} from '../types/icrc-responses';
-import type {IcrcWalletScopedMethod} from '../types/icrc-standards';
+import type {IcrcScopedMethod} from '../types/icrc-standards';
 import type {SessionPermissions} from '../types/signer-sessions';
 import * as storageUtils from '../utils/storage.utils';
 import {del, get} from '../utils/storage.utils';
@@ -240,7 +240,7 @@ describe('Signer sessions', () => {
       const state = sessionScopeState({
         owner,
         origin,
-        method: 'this_does_not_exist' as IcrcWalletScopedMethod
+        method: 'this_does_not_exist' as IcrcScopedMethod
       });
 
       expect(state).toBe(ICRC25_PERMISSION_ASK_ON_USE);

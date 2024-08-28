@@ -1,20 +1,20 @@
 import {z} from 'zod';
 import {IcrcAccountsSchema} from './icrc-accounts';
 import {
-  IcrcWalletPermissionStateSchema,
-  IcrcWalletScopedMethodSchema,
-  IcrcWalletStandardSchema
+  IcrcPermissionStateSchema,
+  IcrcScopedMethodSchema,
+  IcrcStandardSchema
 } from './icrc-standards';
 import {inferRpcResponseSchema} from './rpc';
 
 const IcrcScopeMethodSchema = z.object({
-  method: IcrcWalletScopedMethodSchema
+  method: IcrcScopedMethodSchema
 });
 
 export const IcrcScopeSchema = z
   .object({
     scope: IcrcScopeMethodSchema,
-    state: IcrcWalletPermissionStateSchema
+    state: IcrcPermissionStateSchema
   })
   .strict();
 
@@ -58,10 +58,10 @@ const UrlSchema = z
 
       const [_, icrc] = match;
 
-      return Object.keys(IcrcWalletStandardSchema.Values).includes(icrc);
+      return Object.keys(IcrcStandardSchema.Values).includes(icrc);
     },
     {
-      message: 'The URL does not match any of the IcrcWalletStandard values.'
+      message: 'The URL does not match any of the IcrcStandard values.'
     }
   );
 
@@ -69,7 +69,7 @@ export const IcrcSupportedStandardsSchema = z
   .array(
     z
       .object({
-        name: IcrcWalletStandardSchema,
+        name: IcrcStandardSchema,
         url: UrlSchema
       })
       .strict()

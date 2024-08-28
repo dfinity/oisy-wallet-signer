@@ -1,5 +1,5 @@
 import type {IcrcRequestedScopes} from '../types/icrc-requests';
-import {IcrcWalletScopedMethodSchema} from '../types/icrc-standards';
+import {IcrcScopedMethodSchema} from '../types/icrc-standards';
 
 const WALLET_TIMEOUT_IN_MILLISECONDS_WITH_USER_INTERACTION = 60 * 2 * 1000;
 const WALLET_TIMEOUT_IN_MILLISECONDS_WITHOUT_USER_INTERACTION = 5000;
@@ -14,5 +14,5 @@ export const WALLET_TIMEOUT_PERMISSIONS = WALLET_TIMEOUT_IN_MILLISECONDS_WITHOUT
 export const WALLET_TIMEOUT_ACCOUNTS = WALLET_TIMEOUT_IN_MILLISECONDS_WITH_USER_INTERACTION;
 
 export const {scopes: WALLET_DEFAULT_SCOPES}: IcrcRequestedScopes = {
-  scopes: Object.values(IcrcWalletScopedMethodSchema.Values).map((method) => ({method}))
+  scopes: Object.values(IcrcScopedMethodSchema.Values).map((method) => ({method}))
 };

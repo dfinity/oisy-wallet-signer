@@ -26,9 +26,9 @@ import {
 } from './types/icrc-requests';
 import type {IcrcScope, IcrcScopesArray} from './types/icrc-responses';
 import {
-  IcrcWalletPermissionStateSchema,
-  IcrcWalletScopedMethodSchema,
-  type IcrcWalletApproveMethod
+  IcrcPermissionStateSchema,
+  IcrcScopedMethodSchema,
+  type IcrcApproveMethod
 } from './types/icrc-standards';
 import {RpcRequestSchema, type RpcId} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
@@ -163,7 +163,7 @@ export class Signer {
     method,
     prompt
   }: {
-    method: IcrcWalletApproveMethod;
+    method: IcrcApproveMethod;
     prompt: PermissionsPrompt | AccountsPrompt;
   }): void => {
     // TODO: is there a way to avoid casting?
@@ -285,14 +285,13 @@ export class Signer {
       // TODO: Can the newer version of TypeScript infer "as IcrcScope"?
       const supportedRequestedScopes = requestedScopes
         .filter(
-          ({method: requestedMethod}) =>
-            IcrcWalletScopedMethodSchema.safeParse(requestedMethod).success
+          ({method: requestedMethod}) => IcrcScopedMethodSchema.safeParse(requestedMethod).success
         )
         .map(
           ({method}) =>
             ({
               scope: {method},
-              state: IcrcWalletPermissionStateSchema.enum.denied
+              state: IcrcPermissionStateSchema.enum.denied
             }) as const as IcrcScope
         );
 

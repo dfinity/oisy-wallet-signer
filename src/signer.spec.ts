@@ -20,7 +20,7 @@ import {saveSessionScopes} from './sessions/signer.sessions';
 import {Signer} from './signer';
 import type {IcrcAccountsRequest, IcrcRequestAnyPermissionsRequest} from './types/icrc-requests';
 import type {IcrcScopesArray} from './types/icrc-responses';
-import {IcrcWalletPermissionStateSchema} from './types/icrc-standards';
+import {IcrcPermissionStateSchema} from './types/icrc-standards';
 import {JSON_RPC_VERSION_2} from './types/rpc';
 import type {SignerMessageEventData} from './types/signer';
 import type {SignerOptions} from './types/signer-options';
@@ -508,7 +508,7 @@ describe('Signer', () => {
         expect(promptSpy).toHaveBeenNthCalledWith(1, {
           requestedScopes: requestPermissionsData.params.scopes.map((scope) => ({
             scope: {...scope},
-            state: IcrcWalletPermissionStateSchema.enum.denied
+            state: IcrcPermissionStateSchema.enum.denied
           })),
           confirmScopes: expect.any(Function)
         });
@@ -544,7 +544,7 @@ describe('Signer', () => {
         expect(promptSpy).toHaveBeenNthCalledWith(1, {
           requestedScopes: requestPermissionsData.params.scopes.map((scope) => ({
             scope: {...scope},
-            state: IcrcWalletPermissionStateSchema.enum.denied
+            state: IcrcPermissionStateSchema.enum.denied
           })),
           confirmScopes: expect.any(Function)
         });
@@ -603,7 +603,7 @@ describe('Signer', () => {
           scopes: [
             {
               scope: {method: ICRC27_ACCOUNTS},
-              state: IcrcWalletPermissionStateSchema.enum.denied
+              state: IcrcPermissionStateSchema.enum.denied
             }
           ]
         });
@@ -646,7 +646,7 @@ describe('Signer', () => {
           scopes: [
             {
               scope: {method: ICRC27_ACCOUNTS},
-              state: IcrcWalletPermissionStateSchema.enum.granted
+              state: IcrcPermissionStateSchema.enum.granted
             }
           ]
         });
@@ -691,7 +691,7 @@ describe('Signer', () => {
             requestedScopes: [
               {
                 scope: {method: ICRC27_ACCOUNTS},
-                state: IcrcWalletPermissionStateSchema.enum.denied
+                state: IcrcPermissionStateSchema.enum.denied
               }
             ],
             confirmScopes: expect.any(Function)
@@ -721,7 +721,7 @@ describe('Signer', () => {
         confirmScopes?.([
           {
             scope: {method: ICRC27_ACCOUNTS},
-            state: IcrcWalletPermissionStateSchema.enum.granted
+            state: IcrcPermissionStateSchema.enum.granted
           }
         ]);
 
@@ -735,7 +735,7 @@ describe('Signer', () => {
           expect(storedScopes?.scopes).toEqual([
             {
               scope: {method: ICRC27_ACCOUNTS},
-              state: IcrcWalletPermissionStateSchema.enum.granted,
+              state: IcrcPermissionStateSchema.enum.granted,
               createdAt: expect.any(Number),
               updatedAt: expect.any(Number)
             }
@@ -771,7 +771,7 @@ describe('Signer', () => {
         confirmScopes?.([
           {
             scope: {method: ICRC27_ACCOUNTS},
-            state: IcrcWalletPermissionStateSchema.enum.granted
+            state: IcrcPermissionStateSchema.enum.granted
           }
         ]);
 
@@ -816,7 +816,7 @@ describe('Signer', () => {
         confirmScopes?.([
           {
             scope: {method: ICRC27_ACCOUNTS},
-            state: IcrcWalletPermissionStateSchema.enum.denied
+            state: IcrcPermissionStateSchema.enum.denied
           }
         ]);
 
