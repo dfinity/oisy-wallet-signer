@@ -491,8 +491,9 @@ export class Wallet {
    * Call a canister method via the wallet.
    *
    * @async
+   * @template T - The type of the argument being passed to the canister call.
    * @param {Object} args - The arguments for the call.
-   * @param {IcrcCallCanisterRequestParams} args.params - The parameters required to call the canister, including the canister ID, method name, and any arguments.
+   * @param {WalletCallParams<T>} args.params - The parameters required to call the canister, including the canister ID, method name, and a generic argument of type `T`.
    * @param {WalletRequestOptions} [args.options] - The options for the wallet request, which may include parameters such as timeout settings and other request-specific configurations.
    * @returns {Promise<IcrcCallCanisterResult>} A promise that resolves to the result of the canister call.
    * @see [ICRC49 Call Canister](https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_49_call_canister.md)
