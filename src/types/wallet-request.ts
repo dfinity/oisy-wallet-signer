@@ -1,4 +1,6 @@
+import {Type} from '@dfinity/candid/lib/cjs/idl';
 import {z} from 'zod';
+import {IcrcCallCanisterRequestParamsSchema} from './icrc-requests';
 import {RpcIdSchema} from './rpc';
 
 export const WalletRequestOptionsTimeoutSchema = z.object({
@@ -29,3 +31,15 @@ export const WalletRequestOptionsWithTimeoutSchema = WalletRequestOptionsSchema.
 }).merge(WalletRequestOptionsTimeoutSchema);
 
 export type WalletRequestOptionsWithTimeout = z.infer<typeof WalletRequestOptionsWithTimeoutSchema>;
+
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+const extendIcrcCallCanisterRequestParamsSchema = <T>() => {
+  return IcrcCallCanisterRequestParamsSchema.omit({arg: true}).extend({
+    arg: z.custom<T>(),
+    argType: z.instanceof(Type) as z.ZodType<Type>
+  });
+};
+
+export type WalletCallParams<T> = z.infer<
+  ReturnType<typeof extendIcrcCallCanisterRequestParamsSchema<T>>
+>;

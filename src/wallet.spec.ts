@@ -19,7 +19,8 @@ import {
 import * as walletHandlers from './handlers/wallet.handlers';
 import type {IcrcAnyRequestedScopes, IcrcCallCanisterRequestParams} from './types/icrc-requests';
 import {
-  IcrcAccountsResponseSchema, IcrcCallCanisterResult,
+  IcrcAccountsResponseSchema,
+  IcrcCallCanisterResult,
   IcrcScopesResponseSchema,
   IcrcSupportedStandardsResponseSchema
 } from './types/icrc-responses';

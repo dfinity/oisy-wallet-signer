@@ -84,7 +84,7 @@ export type IcrcAccountsRequest = z.infer<typeof IcrcAccountsRequestSchema>;
 // icrc49_call_canister
 // https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_49_call_canister.md
 
-const IcrcCallCanisterRequestParamsSchema = z.object({
+export const IcrcCallCanisterRequestParamsSchema = z.object({
   canisterId: PrincipalTextSchema,
   sender: PrincipalTextSchema,
   method: z.string().trim().min(1),

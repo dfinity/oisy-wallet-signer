@@ -1,3 +1,4 @@
+import {IDL} from '@dfinity/candid';
 import {assertNonNullish, nonNullish, notEmptyString} from '@dfinity/utils';
 import {
   WALLET_CONNECT_TIMEOUT_IN_MILLISECONDS,
@@ -17,7 +18,7 @@ import {
   retryRequestStatus
 } from './handlers/wallet.handlers';
 import type {IcrcAccounts} from './types/icrc-accounts';
-import type {IcrcAnyRequestedScopes, IcrcCallCanisterRequestParams} from './types/icrc-requests';
+import type {IcrcAnyRequestedScopes} from './types/icrc-requests';
 import {
   IcrcAccountsResponseSchema,
   IcrcCallCanisterResultResponseSchema,
@@ -38,6 +39,7 @@ import {WalletResponseError} from './types/wallet-errors';
 import {WalletOptionsSchema, type WalletOptions} from './types/wallet-options';
 import {
   WalletRequestOptionsSchema,
+  type WalletCallParams,
   type WalletRequestOptions,
   type WalletRequestOptionsWithTimeout
 } from './types/wallet-request';
@@ -495,12 +497,12 @@ export class Wallet {
    * @returns {Promise<IcrcCallCanisterResult>} A promise that resolves to the result of the canister call.
    * @see [ICRC49 Call Canister](https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_49_call_canister.md)
    */
-  call = async ({
+  call = async <T>({
     options: {timeoutInMilliseconds, ...rest} = {},
     params
   }: {
     options?: WalletRequestOptions;
-    params: IcrcCallCanisterRequestParams;
+    params: WalletCallParams<T>;
   }): Promise<IcrcCallCanisterResult> => {
     const handleMessage = async ({
       data,
@@ -521,11 +523,18 @@ export class Wallet {
     };
 
     const postRequest = (id: RpcId): void => {
+      const {arg: userArg, argType, ...rest} = params;
+
+      const arg = new Uint8Array(IDL.encode([argType], [userArg]));
+
       requestCallCanister({
         popup: this.#popup,
         origin: this.#origin,
         id,
-        params
+        params: {
+          ...rest,
+          arg
+        }
       });
     };
 

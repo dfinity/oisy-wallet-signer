@@ -81,8 +81,9 @@
     "node": ">=20"
   },
   "peerDependencies": {
+    "@dfinity/candid": "^1.4.0",
     "@dfinity/principal": "^1.4.0",
-    "@dfinity/utils": "^2.3.1",
+    "@dfinity/utils": "^2.4.0-next-2024-08-28",
     "zod": "^3.23.8"
   }
 }
