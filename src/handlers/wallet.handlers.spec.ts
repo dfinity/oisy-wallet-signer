@@ -78,7 +78,7 @@ describe('Wallet handlers', () => {
 
     describe('Pending', () => {
       beforeEach(() => {
-        isReady = vi.fn(() => 'pending');
+        isReady = vi.fn(() => 'pending' as ReadyOrError | 'pending');
       });
 
       it('should timeout after 30 seconds', async () =>

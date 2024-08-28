@@ -4,7 +4,7 @@ const DEV = (process.env.NODE_ENV ?? 'production') === 'development';
 
 export default defineConfig({
   webServer: {
-    command: 'npm run dev:party',
+    command: 'npm run dev:party --prefix demo',
     reuseExistingServer: true,
     port: 5173
   },
