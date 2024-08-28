@@ -1,4 +1,4 @@
-import {Principal} from '@dfinity/principal';
+import {mockAccounts} from '../constants/icrc-accounts.mocks';
 import {ICRC27_ACCOUNTS} from '../constants/icrc.constants';
 import type {IcrcScopesArray} from './icrc-responses';
 import {
@@ -35,16 +35,9 @@ describe('SignerPrompts', () => {
   });
 
   describe('Accounts', () => {
-    const principalText = 'xlmdg-vkosz-ceopx-7wtgu-g3xmd-koiyc-awqaq-7modz-zf6r6-364rh-oqe';
-
-    const accounts = [
-      {owner: principalText},
-      {owner: Principal.anonymous().toText(), subaccount: new Uint8Array(32)}
-    ];
-
     it('should validate an AccountsPrompt', () => {
       const prompt = (payload: AccountsPromptPayload): void => {
-        payload.confirmAccounts(accounts);
+        payload.confirmAccounts(mockAccounts);
       };
 
       expect(() => AccountsPromptSchema.parse(prompt)).not.toThrow();
