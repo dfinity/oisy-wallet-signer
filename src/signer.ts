@@ -320,7 +320,6 @@ export class Signer {
 
   private async promptPermissions(requestedScopes: IcrcScopesArray): Promise<IcrcScopesArray> {
     const promise = new Promise<IcrcScopesArray>((resolve, reject) => {
-      // TODO: the answer cannot actually contains ask_on_use. That would be cleaner type wise.
       const confirmScopes: PermissionsConfirmation = (scopes) => {
         resolve(scopes);
       };
