@@ -12,7 +12,7 @@ const IcrcSubaccountSchema = z
     }
   );
 
-const PrincipalTextSchema = z.string().refine(
+export const PrincipalTextSchema = z.string().refine(
   (principal) => {
     try {
       Principal.fromText(principal);
