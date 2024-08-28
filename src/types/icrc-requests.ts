@@ -8,6 +8,7 @@ import {
   ICRC29_STATUS,
   ICRC49_CALL_CANISTER
 } from '../constants/icrc.constants';
+import {IcrcBlob} from './blob';
 import {IcrcScopedMethodSchema} from './icrc-standards';
 import {PrincipalTextSchema} from './principal';
 import {inferRpcRequestWithParamsSchema, inferRpcRequestWithoutParamsSchema} from './rpc';
@@ -82,8 +83,6 @@ export type IcrcAccountsRequest = z.infer<typeof IcrcAccountsRequestSchema>;
 
 // icrc49_call_canister
 // https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_49_call_canister.md
-
-const IcrcBlob = z.instanceof(Uint8Array);
 
 const IcrcCallCanisterRequestParamsSchema = z.object({
   canisterId: PrincipalTextSchema,
