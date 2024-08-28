@@ -84,7 +84,7 @@ export type IcrcAccountsRequest = z.infer<typeof IcrcAccountsRequestSchema>;
 // icrc49_call_canister
 // https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_49_call_canister.md
 
-const IcrcCallCanisterRequestParamsSchema = z.object({
+export const IcrcCallCanisterRequestParamsSchema = z.object({
   canisterId: PrincipalTextSchema,
   sender: PrincipalTextSchema,
   method: z.string().trim().min(1),
@@ -93,6 +93,8 @@ const IcrcCallCanisterRequestParamsSchema = z.object({
     message: 'Memo must be a Uint8Array with a maximum length of 32 bytes'
   })
 });
+
+export type IcrcCallCanisterRequestParams = z.infer<typeof IcrcCallCanisterRequestParamsSchema>;
 
 export const IcrcCallCanisterRequestSchema = inferRpcRequestWithParamsSchema({
   method: ICRC49_CALL_CANISTER,
