@@ -1,6 +1,6 @@
 import {Ed25519KeyIdentity} from '@dfinity/identity';
-import {Principal} from '@dfinity/principal';
 import type {MockInstance} from 'vitest';
+import {mockAccounts} from './constants/icrc-accounts.mocks';
 import {
   ICRC25_PERMISSION_GRANTED,
   ICRC25_PERMISSIONS,
@@ -554,13 +554,6 @@ describe('Signer', () => {
     });
 
     describe('Accounts', () => {
-      const principalText = 'xlmdg-vkosz-ceopx-7wtgu-g3xmd-koiyc-awqaq-7modz-zf6r6-364rh-oqe';
-
-      const accounts = [
-        {owner: principalText},
-        {owner: Principal.anonymous().toText(), subaccount: new Uint8Array(32)}
-      ];
-
       const requestAccountsData: IcrcAccountsRequest = {
         id: testId,
         jsonrpc: JSON_RPC_VERSION_2,
@@ -665,7 +658,7 @@ describe('Signer', () => {
           expect(confirmAccounts).not.toBeUndefined();
         });
 
-        confirmAccounts?.(accounts);
+        confirmAccounts?.(mockAccounts);
 
         await vi.waitFor(() => {
           expect(postMessageMock).toHaveBeenNthCalledWith(
@@ -674,7 +667,7 @@ describe('Signer', () => {
               jsonrpc: JSON_RPC_VERSION_2,
               id: testId,
               result: {
-                accounts
+                accounts: mockAccounts
               }
             },
             testOrigin
@@ -786,7 +779,7 @@ describe('Signer', () => {
           expect(confirmAccounts).not.toBeUndefined();
         });
 
-        confirmAccounts?.(accounts);
+        confirmAccounts?.(mockAccounts);
 
         await vi.waitFor(() => {
           expect(postMessageMock).toHaveBeenNthCalledWith(
@@ -795,7 +788,7 @@ describe('Signer', () => {
               jsonrpc: JSON_RPC_VERSION_2,
               id: testId,
               result: {
-                accounts
+                accounts: mockAccounts
               }
             },
             testOrigin

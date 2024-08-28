@@ -1,5 +1,5 @@
-import {Principal} from '@dfinity/principal';
 import type {Mock} from 'vitest';
+import {mockAccounts} from '../constants/icrc-accounts.mocks';
 import {ICRC27_ACCOUNTS} from '../constants/icrc.constants';
 import {SIGNER_SUPPORTED_STANDARDS, SignerErrorCode} from '../constants/signer.constants';
 import type {
@@ -115,20 +115,12 @@ describe('Signer handlers', () => {
 
   describe('notifyAccounts', () => {
     it('should post a message with the accounts', () => {
-      // TODO: create mocks for accounts, principal etc.
-      const principalText = 'xlmdg-vkosz-ceopx-7wtgu-g3xmd-koiyc-awqaq-7modz-zf6r6-364rh-oqe';
-
-      const accounts = [
-        {owner: principalText},
-        {owner: Principal.anonymous().toText(), subaccount: new Uint8Array(32)}
-      ];
-
-      notifyAccounts({id, origin, accounts});
+      notifyAccounts({id, origin, accounts: mockAccounts});
 
       const expectedMessage = {
         jsonrpc: JSON_RPC_VERSION_2,
         id,
-        result: {accounts}
+        result: {accounts: mockAccounts}
       };
 
       expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);

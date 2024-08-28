@@ -1,3 +1,4 @@
+import {mockAccounts} from './constants/icrc-accounts.mocks';
 import {
   ICRC25_PERMISSIONS,
   ICRC25_REQUEST_PERMISSIONS,
@@ -876,16 +877,6 @@ describe('Wallet', () => {
     describe('Accounts', () => {
       let wallet: Wallet;
 
-      const accounts = [
-        {
-          owner: 'xlmdg-vkosz-ceopx-7wtgu-g3xmd-koiyc-awqaq-7modz-zf6r6-364rh-oqe'
-        },
-        {
-          owner: 'n5wcd-faaaa-aaaar-qaaea-cai',
-          subaccount: new Uint8Array(32)
-        }
-      ];
-
       beforeEach(async () => {
         const promise = Wallet.connect(mockParameters);
 
@@ -965,7 +956,7 @@ describe('Wallet', () => {
                 jsonrpc: JSON_RPC_VERSION_2,
                 id: '123',
                 result: {
-                  accounts
+                  accounts: mockAccounts
                 }
               }
             });
@@ -987,7 +978,7 @@ describe('Wallet', () => {
               jsonrpc: JSON_RPC_VERSION_2,
               id: '123',
               result: {
-                accounts
+                accounts: mockAccounts
               }
             }
           });
@@ -1038,7 +1029,7 @@ describe('Wallet', () => {
             jsonrpc: JSON_RPC_VERSION_2,
             id: requestId,
             result: {
-              accounts
+              accounts: mockAccounts
             }
           }
         });
@@ -1072,7 +1063,7 @@ describe('Wallet', () => {
 
           const result = await promise;
 
-          expect(result).toEqual(accounts);
+          expect(result).toEqual(mockAccounts);
         });
       });
     });

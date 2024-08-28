@@ -1,6 +1,7 @@
+import {mockAccounts, mockPrincipalText} from '../constants/icrc-accounts.mocks';
 import {
-  ICRC25_PERMISSION_GRANTED,
   ICRC25_PERMISSIONS,
+  ICRC25_PERMISSION_GRANTED,
   ICRC25_REQUEST_PERMISSIONS,
   ICRC27_ACCOUNTS
 } from '../constants/icrc.constants';
@@ -541,21 +542,11 @@ describe('icrc-responses', () => {
   });
 
   describe('icrc27_accounts', () => {
-    const owner = 'xlmdg-vkosz-ceopx-7wtgu-g3xmd-koiyc-awqaq-7modz-zf6r6-364rh-oqe';
-
     const validResponse = {
       jsonrpc: JSON_RPC_VERSION_2,
       id: 1,
       result: {
-        accounts: [
-          {
-            owner
-          },
-          {
-            owner: '2vxsx-fae',
-            subaccount: new Uint8Array(32)
-          }
-        ]
+        accounts: mockAccounts
       }
     };
 
@@ -583,7 +574,7 @@ describe('icrc-responses', () => {
         result: {
           accounts: [
             {
-              owner,
+              owner: mockPrincipalText,
               subaccount: new Uint8Array(11)
             }
           ]
@@ -598,7 +589,7 @@ describe('icrc-responses', () => {
         result: {
           accounts: [
             {
-              owner,
+              owner: mockPrincipalText,
               someRandomField: 'unexpected'
             }
           ]
