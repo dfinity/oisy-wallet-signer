@@ -3,13 +3,13 @@ import {initTestSuite} from './utils/init.utils';
 
 const getPartyPage = initTestSuite();
 
-testWithII.skip('should requests permissions and list accounts', async () => {
+testWithII('should requests permissions and list accounts', async () => {
   const partyPage = getPartyPage();
 
   await partyPage.approvePermissionsAccounts();
 });
 
-testWithII.skip('should not requests permissions and list accounts', async () => {
+testWithII('should not requests permissions and list accounts', async () => {
   const partyPage = getPartyPage();
 
   await partyPage.resetAccounts();
