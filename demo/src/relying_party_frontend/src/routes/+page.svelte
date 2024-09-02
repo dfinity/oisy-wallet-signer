@@ -33,7 +33,7 @@
 	</div>
 {:else}
 	<div in:fade>
-		<Value id="wallet-connected" testId="wallet-connected" title="Wallet status">Connected 🤝</Value
+		<Value id="wallet-connected" testId="wallet-connected" title="Wallet status">Connected</Value
 		>
 	</div>
 {/if}
