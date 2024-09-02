@@ -30,19 +30,19 @@
   "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "require": "./dist/index.mjs",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.mjs"
     },
     "./wallet": {
+      "types": "./dist/wallet.d.ts",
       "import": "./dist/wallet.js",
-      "require": "./dist/wallet.mjs",
-      "types": "./dist/wallet.d.ts"
+      "require": "./dist/wallet.mjs"
     },
     "./signer": {
+      "types": "./dist/signer.d.ts",
       "import": "./dist/signer.js",
-      "require": "./dist/signer.mjs",
-      "types": "./dist/signer.d.ts"
+      "require": "./dist/signer.mjs"
     }
   },
   "scripts": {
