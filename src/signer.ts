@@ -28,7 +28,9 @@ import type {IcrcScope, IcrcScopesArray} from './types/icrc-responses';
 import {
   IcrcPermissionStateSchema,
   IcrcScopedMethodSchema,
-  type IcrcApproveMethod
+  type IcrcApproveMethod,
+  type IcrcPermissionState,
+  type IcrcScopedMethod
 } from './types/icrc-standards';
 import {RpcRequestSchema, type RpcId} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
@@ -403,47 +405,19 @@ export class Signer {
         });
       };
 
-      // TODO: this will be refactored as other requests will require the same checks and execution flow.
-      switch (sessionScopeState({owner: this.#owner, origin, method: ICRC27_ACCOUNTS})) {
+      const permission = await this.assertAndPromptPermissions({
+        method: ICRC27_ACCOUNTS,
+        requestId,
+        origin
+      });
+
+      switch (permission) {
         case 'denied': {
           notifyDeniedAccounts();
           break;
         }
         case 'granted': {
           await notifyAccounts();
-          break;
-        }
-        case 'ask_on_use': {
-          const promptFn = async (): Promise<void> => {
-            const confirmedScopes = await this.promptPermissions([
-              {
-                scope: {
-                  method: ICRC27_ACCOUNTS
-                },
-                state: 'denied'
-              }
-            ]);
-
-            this.savePermissions({scopes: confirmedScopes});
-
-            const approved =
-              confirmedScopes.find(
-                ({scope: {method}, state}) => method === ICRC27_ACCOUNTS && state === 'granted'
-              ) !== undefined;
-
-            if (approved) {
-              await notifyAccounts();
-              return;
-            }
-
-            notifyDeniedAccounts();
-          };
-
-          await this.prompt({
-            requestId,
-            promptFn
-          });
-
           break;
         }
       }
@@ -499,5 +473,80 @@ export class Signer {
       origin: this.#walletOrigin,
       ...params
     });
+  }
+
+  /**
+   * Asserts the current permission state for the given method and origin. If the permission
+   * is set to 'ask_on_use', prompts the user for permission and returns the updated state.
+   *
+   * @private
+   * @async
+   * @function
+   * @param {Object} params - The parameters for the function.
+   * @param {IcrcScopedMethod} params.method - The method for which permissions are being checked.
+   * @param {string} params.origin - The origin from where the request is made.
+   * @param {RpcId} params.requestId - The unique identifier for the RPC request.
+   *
+   * @returns {Promise<Omit<IcrcPermissionState, 'ask_on_use'>>} - A promise that resolves to the updated
+   * permission state ('granted' or 'denied'), or the current permission if no prompt is needed.
+   *
+   * @throws {Error} - Throws an error if the permission prompt fails.
+   */
+  private async assertAndPromptPermissions({
+    method,
+    origin,
+    requestId
+  }: {
+    method: IcrcScopedMethod;
+    origin: string;
+    requestId: RpcId;
+  }): Promise<Omit<IcrcPermissionState, 'ask_on_use'>> {
+    const currentPermission = sessionScopeState({
+      owner: this.#owner,
+      origin,
+      method
+    });
+
+    switch (currentPermission) {
+      case 'ask_on_use': {
+        const promise = new Promise<Omit<IcrcPermissionState, 'ask_on_use'>>((resolve, reject) => {
+          const promptFn = async (): Promise<void> => {
+            const confirmedScopes = await this.promptPermissions([
+              {
+                scope: {
+                  method
+                },
+                state: 'denied'
+              }
+            ]);
+
+            this.savePermissions({scopes: confirmedScopes});
+
+            const approved =
+              confirmedScopes.find(
+                ({scope: {method}, state}) => method === ICRC27_ACCOUNTS && state === 'granted'
+              ) !== undefined;
+
+            if (approved) {
+              resolve('granted');
+              return;
+            }
+
+            resolve('denied');
+          };
+
+          this.prompt({
+            requestId,
+            promptFn
+          }).catch((err) => {
+            reject(err);
+          });
+        });
+
+        return await promise;
+      }
+      default:
+        return currentPermission;
+    }
   }
 }
