@@ -1,10 +1,15 @@
 import type {Principal} from '@dfinity/principal';
 import {assertNonNullish, isNullish, nonNullish} from '@dfinity/utils';
-import {ICRC25_REQUEST_PERMISSIONS, ICRC27_ACCOUNTS} from './constants/icrc.constants';
+import {
+  ICRC25_REQUEST_PERMISSIONS,
+  ICRC27_ACCOUNTS,
+  ICRC49_CALL_CANISTER
+} from './constants/icrc.constants';
 import {SIGNER_DEFAULT_SCOPES, SignerErrorCode} from './constants/signer.constants';
 import {
   notifyAccounts,
   notifyError,
+  notifyErrorPermissionNotGranted,
   notifyPermissionScopes,
   notifyReady,
   notifySupportedStandards,
@@ -18,7 +23,8 @@ import {
 } from './sessions/signer.sessions';
 import type {IcrcAccounts} from './types/icrc-accounts';
 import {
-  IcrcAccountsRequestSchema, IcrcCallCanisterRequestSchema,
+  IcrcAccountsRequestSchema,
+  IcrcCallCanisterRequestSchema,
   IcrcPermissionsRequestSchema,
   IcrcRequestAnyPermissionsRequestSchema,
   IcrcStatusRequestSchema,
@@ -121,6 +127,11 @@ export class Signer {
 
     const {handled: accountsHandled} = await this.handleAccounts(message);
     if (accountsHandled) {
+      return;
+    }
+
+    const {handled: callCanisterHandled} = await this.handleCallCanister(message);
+    if (callCanisterHandled) {
       return;
     }
 
@@ -393,18 +404,6 @@ export class Signer {
         });
       };
 
-      const notifyDeniedAccounts = (): void => {
-        notifyError({
-          id: requestId ?? null,
-          origin,
-          error: {
-            code: SignerErrorCode.PERMISSION_NOT_GRANTED,
-            message:
-              'The signer has not granted the necessary permissions to process the request from the relying party.'
-          }
-        });
-      };
-
       const permission = await this.assertAndPromptPermissions({
         method: ICRC27_ACCOUNTS,
         requestId,
@@ -413,7 +412,10 @@ export class Signer {
 
       switch (permission) {
         case 'denied': {
-          notifyDeniedAccounts();
+          notifyErrorPermissionNotGranted({
+            id: requestId ?? null,
+            origin
+          });
           break;
         }
         case 'granted': {
@@ -485,13 +487,35 @@ export class Signer {
    */
   private async handleCallCanister({
     data,
-    origin: _
+    origin
   }: SignerMessageEvent): Promise<{handled: boolean}> {
     const {success: isCallCanisterRequest, data: callData} =
       IcrcCallCanisterRequestSchema.safeParse(data);
 
     if (isCallCanisterRequest) {
-      const {id: _requestId} = callData;
+      const {id: requestId} = callData;
+
+      const permission = await this.assertAndPromptPermissions({
+        method: ICRC49_CALL_CANISTER,
+        requestId,
+        origin
+      });
+
+      switch (permission) {
+        case 'denied': {
+          notifyErrorPermissionNotGranted({
+            id: requestId ?? null,
+            origin
+          });
+          break;
+        }
+        case 'granted': {
+          // TODO: process call canister
+          break;
+        }
+      }
+
+      return {handled: true};
     }
 
     return {handled: false};
