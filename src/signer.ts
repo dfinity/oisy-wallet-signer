@@ -18,7 +18,8 @@ import {
 } from './sessions/signer.sessions';
 import type {IcrcAccounts} from './types/icrc-accounts';
 import {
-  IcrcAccountsRequestSchema, IcrcCallCanisterRequestSchema,
+  IcrcAccountsRequestSchema,
+  IcrcCallCanisterRequestSchema,
   IcrcPermissionsRequestSchema,
   IcrcRequestAnyPermissionsRequestSchema,
   IcrcStatusRequestSchema,
@@ -28,7 +29,9 @@ import type {IcrcScope, IcrcScopesArray} from './types/icrc-responses';
 import {
   IcrcPermissionStateSchema,
   IcrcScopedMethodSchema,
-  type IcrcApproveMethod
+  type IcrcApproveMethod,
+  type IcrcPermissionState,
+  type IcrcScopedMethod
 } from './types/icrc-standards';
 import {RpcRequestSchema, type RpcId} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
@@ -403,47 +406,19 @@ export class Signer {
         });
       };
 
-      // TODO: this will be refactored as other requests will require the same checks and execution flow.
-      switch (sessionScopeState({owner: this.#owner, origin, method: ICRC27_ACCOUNTS})) {
+      const permission = await this.assertAndPromptPermissions({
+        method: ICRC27_ACCOUNTS,
+        requestId,
+        origin
+      });
+
+      switch (permission) {
         case 'denied': {
           notifyDeniedAccounts();
           break;
         }
         case 'granted': {
           await notifyAccounts();
-          break;
-        }
-        case 'ask_on_use': {
-          const promptFn = async (): Promise<void> => {
-            const confirmedScopes = await this.promptPermissions([
-              {
-                scope: {
-                  method: ICRC27_ACCOUNTS
-                },
-                state: 'denied'
-              }
-            ]);
-
-            this.savePermissions({scopes: confirmedScopes});
-
-            const approved =
-              confirmedScopes.find(
-                ({scope: {method}, state}) => method === ICRC27_ACCOUNTS && state === 'granted'
-              ) !== undefined;
-
-            if (approved) {
-              await notifyAccounts();
-              return;
-            }
-
-            notifyDeniedAccounts();
-          };
-
-          await this.prompt({
-            requestId,
-            promptFn
-          });
-
           break;
         }
       }
@@ -509,14 +484,75 @@ export class Signer {
    * @param {SignerMessageEvent} message - The incoming message event containing the data and origin.
    * @returns {Object} An object with a boolean property `handled` indicating whether the request was handled.
    */
-  private async handleCallCanister({data, origin}: SignerMessageEvent): Promise<{handled: boolean}> {
+  private async handleCallCanister({
+    data,
+    origin: _
+  }: SignerMessageEvent): Promise<{handled: boolean}> {
     const {success: isCallCanisterRequest, data: callData} =
-        IcrcCallCanisterRequestSchema.safeParse(data);
+      IcrcCallCanisterRequestSchema.safeParse(data);
 
     if (isCallCanisterRequest) {
-      const {id: requestId} = callData;
+      const {id: _requestId} = callData;
     }
 
     return {handled: false};
+  }
+
+  private async assertAndPromptPermissions({
+    method,
+    origin,
+    requestId
+  }: {
+    method: IcrcScopedMethod;
+    origin: string;
+    requestId: RpcId;
+  }): Promise<Omit<IcrcPermissionState, 'ask_on_use'>> {
+    const currentPermission = sessionScopeState({
+      owner: this.#owner,
+      origin,
+      method
+    });
+
+    switch (currentPermission) {
+      case 'ask_on_use': {
+        const promise = new Promise<Omit<IcrcPermissionState, 'ask_on_use'>>((resolve, reject) => {
+          const promptFn = async (): Promise<void> => {
+            const confirmedScopes = await this.promptPermissions([
+              {
+                scope: {
+                  method
+                },
+                state: 'denied'
+              }
+            ]);
+
+            this.savePermissions({scopes: confirmedScopes});
+
+            const approved =
+              confirmedScopes.find(
+                ({scope: {method}, state}) => method === ICRC27_ACCOUNTS && state === 'granted'
+              ) !== undefined;
+
+            if (approved) {
+              resolve('granted');
+              return;
+            }
+
+            resolve('denied');
+          };
+
+          this.prompt({
+            requestId,
+            promptFn
+          }).catch((err) => {
+            reject(err);
+          });
+        });
+
+        return await promise;
+      }
+      default:
+        return currentPermission;
+    }
   }
 }
