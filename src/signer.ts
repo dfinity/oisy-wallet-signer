@@ -523,9 +523,8 @@ export class Signer {
             this.savePermissions({scopes: confirmedScopes});
 
             const approved =
-              confirmedScopes.find(
-                ({scope: {method}, state}) => method === ICRC27_ACCOUNTS && state === 'granted'
-              ) !== undefined;
+              confirmedScopes.find(({scope: {method}, state}) => method && state === 'granted') !==
+              undefined;
 
             if (approved) {
               resolve('granted');
