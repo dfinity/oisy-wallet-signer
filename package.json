@@ -54,7 +54,8 @@
     "test": "tsc --noEmit -p ./tsconfig.spec.json && vitest",
     "e2e": "NODE_ENV=development playwright test",
     "e2e:snapshots": "NODE_ENV=development playwright test --update-snapshots --reporter=list",
-    "e2e:ci": "playwright test --reporter=html"
+    "e2e:ci": "playwright test --reporter=html",
+    "e2e:ci:snapshots": "playwright test --update-snapshots --reporter=html"
   },
   "devDependencies": {
     "@dfinity/identity": "^2.0.0",
