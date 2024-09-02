@@ -1,6 +1,10 @@
 import type {Principal} from '@dfinity/principal';
 import {assertNonNullish, isNullish, nonNullish} from '@dfinity/utils';
-import {ICRC25_REQUEST_PERMISSIONS, ICRC27_ACCOUNTS} from './constants/icrc.constants';
+import {
+  ICRC25_REQUEST_PERMISSIONS,
+  ICRC27_ACCOUNTS,
+  ICRC49_CALL_CANISTER
+} from './constants/icrc.constants';
 import {SIGNER_DEFAULT_SCOPES, SignerErrorCode} from './constants/signer.constants';
 import {
   notifyAccounts,
@@ -20,6 +24,7 @@ import {
 import type {IcrcAccounts} from './types/icrc-accounts';
 import {
   IcrcAccountsRequestSchema,
+  IcrcCallCanisterRequestSchema,
   IcrcPermissionsRequestSchema,
   IcrcRequestAnyPermissionsRequestSchema,
   IcrcStatusRequestSchema,
@@ -122,6 +127,11 @@ export class Signer {
 
     const {handled: accountsHandled} = await this.handleAccounts(message);
     if (accountsHandled) {
+      return;
+    }
+
+    const {handled: callCanisterHandled} = await this.handleCallCanister(message);
+    if (callCanisterHandled) {
       return;
     }
 
@@ -465,6 +475,50 @@ export class Signer {
       origin: this.#walletOrigin,
       ...params
     });
+  }
+
+  /**
+   * Handles incoming messages to call a canister.
+   *
+   * Parses the message data to determine if it conforms to a call canister request and responds with the result of the call if the permissions are granted and if the user accept the consent message.
+   *
+   * @param {SignerMessageEvent} message - The incoming message event containing the data and origin.
+   * @returns {Object} An object with a boolean property `handled` indicating whether the request was handled.
+   */
+  private async handleCallCanister({
+    data,
+    origin
+  }: SignerMessageEvent): Promise<{handled: boolean}> {
+    const {success: isCallCanisterRequest, data: callData} =
+      IcrcCallCanisterRequestSchema.safeParse(data);
+
+    if (isCallCanisterRequest) {
+      const {id: requestId} = callData;
+
+      const permission = await this.assertAndPromptPermissions({
+        method: ICRC49_CALL_CANISTER,
+        requestId,
+        origin
+      });
+
+      switch (permission) {
+        case 'denied': {
+          notifyErrorPermissionNotGranted({
+            id: requestId ?? null,
+            origin
+          });
+          break;
+        }
+        case 'granted': {
+          // TODO: process call canister
+          break;
+        }
+      }
+
+      return {handled: true};
+    }
+
+    return {handled: false};
   }
 
   /**
