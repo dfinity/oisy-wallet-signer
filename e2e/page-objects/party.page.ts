@@ -27,7 +27,7 @@ export class PartyPage extends IdentityPage {
   }
 
   async waitReady(): Promise<void> {
-    const REPLICA_URL = 'http://localhost:4943';
+    const REPLICA_URL = 'http://127.0.0.1:5987';
     const INTERNET_IDENTITY_ID = 'rdmx6-jaaaa-aaaaa-aaadq-cai';
 
     await this.#partyIIPage.waitReady({url: REPLICA_URL, canisterId: INTERNET_IDENTITY_ID});

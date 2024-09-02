@@ -58,7 +58,7 @@
   },
   "devDependencies": {
     "@dfinity/identity": "^2.0.0",
-    "@dfinity/internet-identity-playwright": "^0.0.2",
+    "@dfinity/internet-identity-playwright": "^0.0.2-next-2024-09-02",
     "@playwright/test": "^1.46.1",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.12.7",
