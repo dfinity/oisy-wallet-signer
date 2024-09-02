@@ -18,8 +18,7 @@ import {
 } from './sessions/signer.sessions';
 import type {IcrcAccounts} from './types/icrc-accounts';
 import {
-  IcrcAccountsRequestSchema,
-  IcrcCallCanisterRequestSchema,
+  IcrcAccountsRequestSchema, IcrcCallCanisterRequestSchema,
   IcrcPermissionsRequestSchema,
   IcrcRequestAnyPermissionsRequestSchema,
   IcrcStatusRequestSchema,
@@ -498,6 +497,23 @@ export class Signer {
     return {handled: false};
   }
 
+  /**
+   * Asserts the current permission state for the given method and origin. If the permission
+   * is set to 'ask_on_use', prompts the user for permission and returns the updated state.
+   *
+   * @private
+   * @async
+   * @function
+   * @param {Object} params - The parameters for the function.
+   * @param {IcrcScopedMethod} params.method - The method for which permissions are being checked.
+   * @param {string} params.origin - The origin from where the request is made.
+   * @param {RpcId} params.requestId - The unique identifier for the RPC request.
+   *
+   * @returns {Promise<Omit<IcrcPermissionState, 'ask_on_use'>>} - A promise that resolves to the updated
+   * permission state ('granted' or 'denied'), or the current permission if no prompt is needed.
+   *
+   * @throws {Error} - Throws an error if the permission prompt fails.
+   */
   private async assertAndPromptPermissions({
     method,
     origin,
