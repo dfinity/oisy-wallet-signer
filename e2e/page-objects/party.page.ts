@@ -64,6 +64,7 @@ export class PartyPage extends IdentityPage {
   }
 
   async assertConnected(): Promise<void> {
+    console.log("Lets try");
     await expect(this.page.getByTestId('wallet-connected')).toHaveScreenshot();
   }
 
