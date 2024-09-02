@@ -53,10 +53,14 @@ const initAuthStore = (): AuthStore => {
 			new Promise<void>(async (resolve, reject) => {
 				authClient = authClient ?? (await createAuthClient());
 
-				const identityProvider = nonNullish(INTERNET_IDENTITY_CANISTER_ID)
+				// Juno Docker Container
+				const container = import.meta.env.VITE_CONTAINER;
+				const iiId = import.meta.env.VITE_INTERNET_IDENTITY_ID;
+
+				const identityProvider = nonNullish(container) && nonNullish(iiId)
 					? /apple/i.test(navigator?.vendor)
-						? `http://localhost:4943?canisterId=${INTERNET_IDENTITY_CANISTER_ID}`
-						: `http://${INTERNET_IDENTITY_CANISTER_ID}.localhost:4943`
+						? `http://localhost:5987?canisterId=${iiId}`
+						: `http://${iiId}.localhost:5987`
 					: `https://identity.${domain ?? 'ic0.app'}`;
 
 				await authClient?.login({
