@@ -5,6 +5,7 @@ import {SIGNER_DEFAULT_SCOPES, SignerErrorCode} from './constants/signer.constan
 import {
   notifyAccounts,
   notifyError,
+  notifyErrorPermissionNotGranted,
   notifyPermissionScopes,
   notifyReady,
   notifySupportedStandards,
@@ -393,18 +394,6 @@ export class Signer {
         });
       };
 
-      const notifyDeniedAccounts = (): void => {
-        notifyError({
-          id: requestId ?? null,
-          origin,
-          error: {
-            code: SignerErrorCode.PERMISSION_NOT_GRANTED,
-            message:
-              'The signer has not granted the necessary permissions to process the request from the relying party.'
-          }
-        });
-      };
-
       const permission = await this.assertAndPromptPermissions({
         method: ICRC27_ACCOUNTS,
         requestId,
@@ -413,7 +402,10 @@ export class Signer {
 
       switch (permission) {
         case 'denied': {
-          notifyDeniedAccounts();
+          notifyErrorPermissionNotGranted({
+            id: requestId ?? null,
+            origin
+          });
           break;
         }
         case 'granted': {

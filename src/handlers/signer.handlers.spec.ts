@@ -12,6 +12,7 @@ import {JSON_RPC_VERSION_2, type RpcId, type RpcResponseWithError} from '../type
 import {
   notifyAccounts,
   notifyError,
+  notifyErrorPermissionNotGranted,
   notifyPermissionScopes,
   notifyReady,
   notifySupportedStandards
@@ -121,6 +122,26 @@ describe('Signer handlers', () => {
         jsonrpc: JSON_RPC_VERSION_2,
         id,
         result: {accounts: mockAccounts}
+      };
+
+      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
+    });
+  });
+
+  describe('notifyErrorPermissionNotGranted', () => {
+    it('should post an error message indicating permission not granted', () => {
+      const error = {
+        code: SignerErrorCode.PERMISSION_NOT_GRANTED,
+        message:
+          'The signer has not granted the necessary permissions to process the request from the relying party.'
+      };
+
+      notifyErrorPermissionNotGranted({id, origin});
+
+      const expectedMessage: RpcResponseWithError = {
+        jsonrpc: JSON_RPC_VERSION_2,
+        id,
+        error
       };
 
       expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
