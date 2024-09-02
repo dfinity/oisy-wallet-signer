@@ -1,9 +1,9 @@
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import type {MockInstance} from 'vitest';
-import {mockAccounts} from './constants/icrc-accounts.mocks';
+import {mockAccounts, mockPrincipalText} from './constants/icrc-accounts.mocks';
 import {
-  ICRC25_PERMISSION_GRANTED,
   ICRC25_PERMISSIONS,
+  ICRC25_PERMISSION_GRANTED,
   ICRC25_REQUEST_PERMISSIONS,
   ICRC25_SUPPORTED_STANDARDS,
   ICRC27_ACCOUNTS,
@@ -18,9 +18,13 @@ import {
 import * as signerHandlers from './handlers/signer.handlers';
 import {saveSessionScopes} from './sessions/signer.sessions';
 import {Signer} from './signer';
-import type {IcrcAccountsRequest, IcrcRequestAnyPermissionsRequest} from './types/icrc-requests';
+import type {
+  IcrcAccountsRequest,
+  IcrcCallCanisterRequest,
+  IcrcRequestAnyPermissionsRequest
+} from './types/icrc-requests';
 import type {IcrcScopesArray} from './types/icrc-responses';
-import {IcrcPermissionStateSchema} from './types/icrc-standards';
+import {IcrcPermissionStateSchema, type IcrcScopedMethod} from './types/icrc-standards';
 import {JSON_RPC_VERSION_2} from './types/rpc';
 import type {SignerMessageEventData} from './types/signer';
 import type {SignerOptions} from './types/signer-options';
@@ -553,287 +557,314 @@ describe('Signer', () => {
       });
     });
 
-    describe('Accounts', () => {
+    describe('With prompts', () => {
       const requestAccountsData: IcrcAccountsRequest = {
         id: testId,
         jsonrpc: JSON_RPC_VERSION_2,
         method: ICRC27_ACCOUNTS
       };
 
-      const requestAccountsMsg = {
-        data: requestAccountsData,
-        origin: testOrigin
+      const requestCallCanisterData: IcrcCallCanisterRequest = {
+        id: testId,
+        jsonrpc: JSON_RPC_VERSION_2,
+        method: ICRC49_CALL_CANISTER,
+        params: {
+          canisterId: mockPrincipalText,
+          sender: mockPrincipalText,
+          method: 'some_method',
+          arg: new Uint8Array([1, 2, 3, 4])
+        }
       };
+
+      const testParams = [
+        {method: 'icrc27_accounts' as IcrcScopedMethod, requestData: requestAccountsData},
+        {method: 'icrc49_call_canister' as IcrcScopedMethod, requestData: requestCallCanisterData}
+      ];
 
       afterEach(() => {
         del({key: `oisy_signer_${testOrigin}_${signerOptions.owner.toText()}`});
       });
 
-      it('should notify missing prompt for icrc27_accounts', async () => {
-        const messageEvent = new MessageEvent('message', requestAccountsMsg);
-        window.dispatchEvent(messageEvent);
+      describe.each(testParams)('$method', ({method, requestData}) => {
+        const requestMsg = {
+          data: requestData,
+          origin: testOrigin
+        };
 
-        await vi.waitFor(() => {
-          expect(postMessageMock).toHaveBeenNthCalledWith(
-            1,
-            {
-              jsonrpc: JSON_RPC_VERSION_2,
-              id: testId,
-              error: {
-                code: SignerErrorCode.PERMISSIONS_PROMPT_NOT_REGISTERED,
-                message: 'The signer has not registered a prompt to respond to permission requests.'
+        it('should notify missing prompt', async () => {
+          const messageEvent = new MessageEvent('message', requestMsg);
+          window.dispatchEvent(messageEvent);
+
+          await vi.waitFor(() => {
+            expect(postMessageMock).toHaveBeenNthCalledWith(
+              1,
+              {
+                jsonrpc: JSON_RPC_VERSION_2,
+                id: testId,
+                error: {
+                  code: SignerErrorCode.PERMISSIONS_PROMPT_NOT_REGISTERED,
+                  message:
+                    'The signer has not registered a prompt to respond to permission requests.'
+                }
+              },
+              testOrigin
+            );
+          });
+        });
+
+        it('should reject request if permissions were already denied', async () => {
+          const promptSpy = vi.fn();
+
+          signer.register({
+            method: ICRC25_REQUEST_PERMISSIONS,
+            prompt: promptSpy
+          });
+
+          saveSessionScopes({
+            owner: signerOptions.owner,
+            origin: testOrigin,
+            scopes: [
+              {
+                scope: {method},
+                state: IcrcPermissionStateSchema.enum.denied
               }
-            },
-            testOrigin
-          );
+            ]
+          });
+
+          const messageEvent = new MessageEvent('message', requestMsg);
+          window.dispatchEvent(messageEvent);
+
+          await vi.waitFor(() => {
+            expect(postMessageMock).toHaveBeenNthCalledWith(
+              1,
+              {
+                jsonrpc: JSON_RPC_VERSION_2,
+                id: testId,
+                error: {
+                  code: SignerErrorCode.PERMISSION_NOT_GRANTED,
+                  message:
+                    'The signer has not granted the necessary permissions to process the request from the relying party.'
+                }
+              },
+              testOrigin
+            );
+          });
+
+          promptSpy.mockClear();
         });
-      });
 
-      it('should reject request for icrc27_accounts if permissions were already denied', async () => {
-        const promptSpy = vi.fn();
+        it(`should prompt for permissions if ${method} currently matches ask_on_use - has not yet permissions set`, async () => {
+          const promptSpy = vi.fn();
 
-        signer.register({
-          method: ICRC25_REQUEST_PERMISSIONS,
-          prompt: promptSpy
+          signer.register({
+            method: ICRC25_REQUEST_PERMISSIONS,
+            prompt: promptSpy
+          });
+
+          const messageEvent = new MessageEvent('message', requestMsg);
+          window.dispatchEvent(messageEvent);
+
+          await vi.waitFor(() => {
+            expect(promptSpy).toHaveBeenCalledWith({
+              requestedScopes: [
+                {
+                  scope: {method},
+                  state: IcrcPermissionStateSchema.enum.denied
+                }
+              ],
+              confirmScopes: expect.any(Function)
+            });
+          });
+
+          promptSpy.mockClear();
         });
 
-        saveSessionScopes({
-          owner: signerOptions.owner,
-          origin: testOrigin,
-          scopes: [
+        it('should save granted permission after prompt for permissions', async () => {
+          let confirmScopes: PermissionsConfirmation | undefined;
+
+          signer.register({
+            method: ICRC25_REQUEST_PERMISSIONS,
+            prompt: ({confirmScopes: confirm, requestedScopes: _}: PermissionsPromptPayload) => {
+              confirmScopes = confirm;
+            }
+          });
+
+          const messageEvent = new MessageEvent('message', requestMsg);
+          window.dispatchEvent(messageEvent);
+
+          await vi.waitFor(() => {
+            expect(confirmScopes).not.toBeUndefined();
+          });
+
+          confirmScopes?.([
             {
-              scope: {method: ICRC27_ACCOUNTS},
+              scope: {method},
+              state: IcrcPermissionStateSchema.enum.granted
+            }
+          ]);
+
+          await vi.waitFor(() => {
+            const storedScopes: SessionPermissions | undefined = get({
+              key: `oisy_signer_${testOrigin}_${signerOptions.owner.toText()}`
+            });
+
+            expect(storedScopes).not.toBeUndefined();
+
+            expect(storedScopes?.scopes).toEqual([
+              {
+                scope: {method},
+                state: IcrcPermissionStateSchema.enum.granted,
+                createdAt: expect.any(Number),
+                updatedAt: expect.any(Number)
+              }
+            ]);
+          });
+        });
+
+        it('should notify error after prompt for permissions', async () => {
+          let confirmScopes: PermissionsConfirmation | undefined;
+
+          signer.register({
+            method: ICRC25_REQUEST_PERMISSIONS,
+            prompt: ({confirmScopes: confirm, requestedScopes: _}: PermissionsPromptPayload) => {
+              confirmScopes = confirm;
+            }
+          });
+
+          const messageEvent = new MessageEvent('message', requestMsg);
+          window.dispatchEvent(messageEvent);
+
+          await vi.waitFor(() => {
+            expect(confirmScopes).not.toBeUndefined();
+          });
+
+          confirmScopes?.([
+            {
+              scope: {method},
               state: IcrcPermissionStateSchema.enum.denied
             }
-          ]
+          ]);
+
+          await vi.waitFor(() => {
+            expect(postMessageMock).toHaveBeenNthCalledWith(
+              1,
+              {
+                jsonrpc: JSON_RPC_VERSION_2,
+                id: testId,
+                error: {
+                  code: SignerErrorCode.PERMISSION_NOT_GRANTED,
+                  message:
+                    'The signer has not granted the necessary permissions to process the request from the relying party.'
+                }
+              },
+              testOrigin
+            );
+          });
         });
-
-        const messageEvent = new MessageEvent('message', requestAccountsMsg);
-        window.dispatchEvent(messageEvent);
-
-        await vi.waitFor(() => {
-          expect(postMessageMock).toHaveBeenNthCalledWith(
-            1,
-            {
-              jsonrpc: JSON_RPC_VERSION_2,
-              id: testId,
-              error: {
-                code: SignerErrorCode.PERMISSION_NOT_GRANTED,
-                message:
-                  'The signer has not granted the necessary permissions to process the request from the relying party.'
-              }
-            },
-            testOrigin
-          );
-        });
-
-        promptSpy.mockClear();
       });
 
-      it('should notify account for icrc27_accounts if permissions were already granted', async () => {
-        let confirmAccounts: AccountsConfirmation | undefined;
+      describe('Accounts', () => {
+        const requestAccountsMsg = {
+          data: requestAccountsData,
+          origin: testOrigin
+        };
 
-        signer.register({
-          method: ICRC27_ACCOUNTS,
-          prompt: ({confirmAccounts: confirm}: AccountsPromptPayload) => {
-            confirmAccounts = confirm;
-          }
+        it('should notify account for icrc27_accounts if permissions were already granted', async () => {
+          let confirmAccounts: AccountsConfirmation | undefined;
+
+          signer.register({
+            method: ICRC27_ACCOUNTS,
+            prompt: ({confirmAccounts: confirm}: AccountsPromptPayload) => {
+              confirmAccounts = confirm;
+            }
+          });
+
+          saveSessionScopes({
+            owner: signerOptions.owner,
+            origin: testOrigin,
+            scopes: [
+              {
+                scope: {method: ICRC27_ACCOUNTS},
+                state: IcrcPermissionStateSchema.enum.granted
+              }
+            ]
+          });
+
+          const messageEvent = new MessageEvent('message', requestAccountsMsg);
+          window.dispatchEvent(messageEvent);
+
+          await vi.waitFor(() => {
+            expect(confirmAccounts).not.toBeUndefined();
+          });
+
+          confirmAccounts?.(mockAccounts);
+
+          await vi.waitFor(() => {
+            expect(postMessageMock).toHaveBeenNthCalledWith(
+              1,
+              {
+                jsonrpc: JSON_RPC_VERSION_2,
+                id: testId,
+                result: {
+                  accounts: mockAccounts
+                }
+              },
+              testOrigin
+            );
+          });
         });
 
-        saveSessionScopes({
-          owner: signerOptions.owner,
-          origin: testOrigin,
-          scopes: [
+        it('should notify accounts after prompt for icrc27_accounts permissions', async () => {
+          let confirmScopes: PermissionsConfirmation | undefined;
+          let confirmAccounts: AccountsConfirmation | undefined;
+
+          signer.register({
+            method: ICRC25_REQUEST_PERMISSIONS,
+            prompt: ({confirmScopes: confirm, requestedScopes: _}: PermissionsPromptPayload) => {
+              confirmScopes = confirm;
+            }
+          });
+
+          signer.register({
+            method: ICRC27_ACCOUNTS,
+            prompt: ({confirmAccounts: confirm}: AccountsPromptPayload) => {
+              confirmAccounts = confirm;
+            }
+          });
+
+          const messageEvent = new MessageEvent('message', requestAccountsMsg);
+          window.dispatchEvent(messageEvent);
+
+          await vi.waitFor(() => {
+            expect(confirmScopes).not.toBeUndefined();
+          });
+
+          confirmScopes?.([
             {
               scope: {method: ICRC27_ACCOUNTS},
               state: IcrcPermissionStateSchema.enum.granted
             }
-          ]
-        });
-
-        const messageEvent = new MessageEvent('message', requestAccountsMsg);
-        window.dispatchEvent(messageEvent);
-
-        await vi.waitFor(() => {
-          expect(confirmAccounts).not.toBeUndefined();
-        });
-
-        confirmAccounts?.(mockAccounts);
-
-        await vi.waitFor(() => {
-          expect(postMessageMock).toHaveBeenNthCalledWith(
-            1,
-            {
-              jsonrpc: JSON_RPC_VERSION_2,
-              id: testId,
-              result: {
-                accounts: mockAccounts
-              }
-            },
-            testOrigin
-          );
-        });
-      });
-
-      it('should prompt for permissions if icrc27_accounts currently matches ask_on_use - has not yet permissions set', async () => {
-        const promptSpy = vi.fn();
-
-        signer.register({
-          method: ICRC25_REQUEST_PERMISSIONS,
-          prompt: promptSpy
-        });
-
-        const messageEvent = new MessageEvent('message', requestAccountsMsg);
-        window.dispatchEvent(messageEvent);
-
-        await vi.waitFor(() => {
-          expect(promptSpy).toHaveBeenCalledWith({
-            requestedScopes: [
-              {
-                scope: {method: ICRC27_ACCOUNTS},
-                state: IcrcPermissionStateSchema.enum.denied
-              }
-            ],
-            confirmScopes: expect.any(Function)
-          });
-        });
-
-        promptSpy.mockClear();
-      });
-
-      it('should save granted permission after prompt for icrc27_accounts permissions', async () => {
-        let confirmScopes: PermissionsConfirmation | undefined;
-
-        signer.register({
-          method: ICRC25_REQUEST_PERMISSIONS,
-          prompt: ({confirmScopes: confirm, requestedScopes: _}: PermissionsPromptPayload) => {
-            confirmScopes = confirm;
-          }
-        });
-
-        const messageEvent = new MessageEvent('message', requestAccountsMsg);
-        window.dispatchEvent(messageEvent);
-
-        await vi.waitFor(() => {
-          expect(confirmScopes).not.toBeUndefined();
-        });
-
-        confirmScopes?.([
-          {
-            scope: {method: ICRC27_ACCOUNTS},
-            state: IcrcPermissionStateSchema.enum.granted
-          }
-        ]);
-
-        await vi.waitFor(() => {
-          const storedScopes: SessionPermissions | undefined = get({
-            key: `oisy_signer_${testOrigin}_${signerOptions.owner.toText()}`
-          });
-
-          expect(storedScopes).not.toBeUndefined();
-
-          expect(storedScopes?.scopes).toEqual([
-            {
-              scope: {method: ICRC27_ACCOUNTS},
-              state: IcrcPermissionStateSchema.enum.granted,
-              createdAt: expect.any(Number),
-              updatedAt: expect.any(Number)
-            }
           ]);
-        });
-      });
 
-      it('should notify accounts after prompt for icrc27_accounts permissions', async () => {
-        let confirmScopes: PermissionsConfirmation | undefined;
-        let confirmAccounts: AccountsConfirmation | undefined;
+          await vi.waitFor(() => {
+            expect(confirmAccounts).not.toBeUndefined();
+          });
 
-        signer.register({
-          method: ICRC25_REQUEST_PERMISSIONS,
-          prompt: ({confirmScopes: confirm, requestedScopes: _}: PermissionsPromptPayload) => {
-            confirmScopes = confirm;
-          }
-        });
+          confirmAccounts?.(mockAccounts);
 
-        signer.register({
-          method: ICRC27_ACCOUNTS,
-          prompt: ({confirmAccounts: confirm}: AccountsPromptPayload) => {
-            confirmAccounts = confirm;
-          }
-        });
-
-        const messageEvent = new MessageEvent('message', requestAccountsMsg);
-        window.dispatchEvent(messageEvent);
-
-        await vi.waitFor(() => {
-          expect(confirmScopes).not.toBeUndefined();
-        });
-
-        confirmScopes?.([
-          {
-            scope: {method: ICRC27_ACCOUNTS},
-            state: IcrcPermissionStateSchema.enum.granted
-          }
-        ]);
-
-        await vi.waitFor(() => {
-          expect(confirmAccounts).not.toBeUndefined();
-        });
-
-        confirmAccounts?.(mockAccounts);
-
-        await vi.waitFor(() => {
-          expect(postMessageMock).toHaveBeenNthCalledWith(
-            1,
-            {
-              jsonrpc: JSON_RPC_VERSION_2,
-              id: testId,
-              result: {
-                accounts: mockAccounts
-              }
-            },
-            testOrigin
-          );
-        });
-      });
-
-      it('should notify error after prompt for icrc27_accounts permissions', async () => {
-        let confirmScopes: PermissionsConfirmation | undefined;
-
-        signer.register({
-          method: ICRC25_REQUEST_PERMISSIONS,
-          prompt: ({confirmScopes: confirm, requestedScopes: _}: PermissionsPromptPayload) => {
-            confirmScopes = confirm;
-          }
-        });
-
-        const messageEvent = new MessageEvent('message', requestAccountsMsg);
-        window.dispatchEvent(messageEvent);
-
-        await vi.waitFor(() => {
-          expect(confirmScopes).not.toBeUndefined();
-        });
-
-        confirmScopes?.([
-          {
-            scope: {method: ICRC27_ACCOUNTS},
-            state: IcrcPermissionStateSchema.enum.denied
-          }
-        ]);
-
-        await vi.waitFor(() => {
-          expect(postMessageMock).toHaveBeenNthCalledWith(
-            1,
-            {
-              jsonrpc: JSON_RPC_VERSION_2,
-              id: testId,
-              error: {
-                code: SignerErrorCode.PERMISSION_NOT_GRANTED,
-                message:
-                  'The signer has not granted the necessary permissions to process the request from the relying party.'
-              }
-            },
-            testOrigin
-          );
+          await vi.waitFor(() => {
+            expect(postMessageMock).toHaveBeenNthCalledWith(
+              1,
+              {
+                jsonrpc: JSON_RPC_VERSION_2,
+                id: testId,
+                result: {
+                  accounts: mockAccounts
+                }
+              },
+              testOrigin
+            );
+          });
         });
       });
     });
