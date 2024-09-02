@@ -524,7 +524,7 @@ export class Signer {
 
             const approved =
               confirmedScopes.find(
-                ({scope: {method}, state}) => method === ICRC27_ACCOUNTS && state === 'granted'
+                ({scope: {method: m}, state}) => m === method && state === 'granted'
               ) !== undefined;
 
             if (approved) {
