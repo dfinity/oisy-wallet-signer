@@ -25,6 +25,7 @@
 		"deploy": "scripts/deploy.sh"
 	},
 	"devDependencies": {
+		"@junobuild/config": "^0.0.14",
 		"@playwright/test": "^1.45.3",
 		"@sveltejs/adapter-static": "^3.0.2",
 		"@sveltejs/kit": "^2.5.18",

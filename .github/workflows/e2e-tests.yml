@@ -1,0 +1,41 @@
+name: E2E Tests
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Prepare Lib
+        uses: ./.github/actions/prepare
+      - name: Prepare Demo
+        uses: ./.github/actions/prepare
+        with:
+          folder: 'demo'
+      - name: Install Juno CLI
+        run: npm i -g @junobuild/cli
+      - name: Cache Docker layers
+        uses: actions/cache@v3
+        with:
+          path: /home/runner/.docker
+          key: ${{ runner.os }}-docker-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-docker-
+      - name: Run tests
+        run: |
+          cd demo
+          juno dev start --headless &
+          cd ..
+          npm run e2e:ci
+
+  may-merge:
+    needs: ['e2e']
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cleared for merging
+        run: echo OK
