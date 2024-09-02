@@ -523,8 +523,9 @@ export class Signer {
             this.savePermissions({scopes: confirmedScopes});
 
             const approved =
-              confirmedScopes.find(({scope: {method}, state}) => method && state === 'granted') !==
-              undefined;
+              confirmedScopes.find(
+                ({scope: {method: m}, state}) => m === method && state === 'granted'
+              ) !== undefined;
 
             if (approved) {
               resolve('granted');
