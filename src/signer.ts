@@ -18,7 +18,7 @@ import {
 } from './sessions/signer.sessions';
 import type {IcrcAccounts} from './types/icrc-accounts';
 import {
-  IcrcAccountsRequestSchema,
+  IcrcAccountsRequestSchema, IcrcCallCanisterRequestSchema,
   IcrcPermissionsRequestSchema,
   IcrcRequestAnyPermissionsRequestSchema,
   IcrcStatusRequestSchema,
@@ -499,5 +499,24 @@ export class Signer {
       origin: this.#walletOrigin,
       ...params
     });
+  }
+
+  /**
+   * Handles incoming messages to call a canister.
+   *
+   * Parses the message data to determine if it conforms to a call canister request and responds with the result of the call if the permissions are granted and if the user accept the consent message.
+   *
+   * @param {SignerMessageEvent} message - The incoming message event containing the data and origin.
+   * @returns {Object} An object with a boolean property `handled` indicating whether the request was handled.
+   */
+  private async handleCallCanister({data, origin}: SignerMessageEvent): Promise<{handled: boolean}> {
+    const {success: isCallCanisterRequest, data: callData} =
+        IcrcCallCanisterRequestSchema.safeParse(data);
+
+    if (isCallCanisterRequest) {
+      const {id: requestId} = callData;
+    }
+
+    return {handled: false};
   }
 }
