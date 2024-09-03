@@ -1,3 +1,4 @@
+import type {Agent} from '@dfinity/agent';
 import type {Principal} from '@dfinity/principal';
 import {assertNonNullish, isNullish, nonNullish} from '@dfinity/utils';
 import {
@@ -54,14 +55,16 @@ class MissingPromptError extends Error {}
 
 export class Signer {
   readonly #owner: Principal;
+  readonly #agent: Agent;
 
   #walletOrigin: string | undefined | null;
 
   #permissionsPrompt: PermissionsPrompt | undefined;
   #accountsPrompt: AccountsPrompt | undefined;
 
-  private constructor({owner}: SignerOptions) {
+  private constructor({owner, agent}: SignerOptions) {
     this.#owner = owner;
+    this.#agent = agent;
 
     window.addEventListener('message', this.onMessageListener);
   }
