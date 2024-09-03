@@ -1,7 +1,7 @@
 import {HttpAgent} from '@dfinity/agent';
 import {mockCanisterId} from '../constants/icrc-accounts.mocks';
-import type {_SERVICE as Icrc21Actor} from '../declarations/icrc-21';
-import {
+import type {
+  _SERVICE as Icrc21Actor,
   icrc21_consent_message_request,
   icrc21_consent_message_response
 } from '../declarations/icrc-21';
@@ -56,13 +56,17 @@ describe('canister.api', () => {
       }
     };
 
-    it('should call the canisterCallConsentMessage with correct arguments and return the result', async () => {
+    const icrc21Actor: Omit<Icrc21Actor, 'icrc21_canister_call_consent_message'> = {
+      icrc10_supported_standards: vi
+        .fn()
+        .mockResolvedValue([
+          {url: 'http://example.com', name: 'Example'}
+        ]) as unknown as Icrc21Actor['icrc10_supported_standards']
+    };
+
+    it('should call the consentMessage with correct arguments and return the result', async () => {
       const mockIcrc21Actor: Icrc21Actor = {
-        icrc10_supported_standards: vi
-          .fn()
-          .mockResolvedValue([
-            {url: 'http://example.com', name: 'Example'}
-          ]) as unknown as Icrc21Actor['icrc10_supported_standards'],
+        ...icrc21Actor,
         icrc21_canister_call_consent_message: vi
           .fn()
           .mockImplementation(async (_request: icrc21_consent_message_request) => {
@@ -85,8 +89,36 @@ describe('canister.api', () => {
         agent,
         canisterId: mockCanisterId
       });
-      expect(mockIcrc21Actor.icrc21_canister_call_consent_message).toHaveBeenCalledWith(consentMessageRequest);
+      expect(mockIcrc21Actor.icrc21_canister_call_consent_message).toHaveBeenCalledWith(
+        consentMessageRequest
+      );
       expect(result).toBe(consentMessageResponse);
+    });
+
+    it('should throw an error if the consentMessage throws', async () => {
+      const mockError = new Error('Test error');
+
+      const mockIcrc21Actor: Icrc21Actor = {
+        ...icrc21Actor,
+        icrc21_canister_call_consent_message: vi
+          .fn()
+          .mockImplementation(async (_request: icrc21_consent_message_request) => {
+            throw mockError;
+          }) as unknown as Icrc21Actor['icrc21_canister_call_consent_message']
+      };
+
+      const spy = vi.spyOn(actor, 'getIcrc21Actor');
+      spy.mockImplementation(async () => {
+        return mockIcrc21Actor;
+      });
+
+      await expect(
+        consentMessage({
+          agent,
+          canisterId: mockCanisterId,
+          request: consentMessageRequest
+        })
+      ).rejects.toThrow(mockError);
     });
   });
 });
