@@ -44,6 +44,9 @@ export const SignerOptionsSchema = z.object({
    */
   owner: PrincipalNotAnonymousSchema,
 
+  // TODO: instead of an agent, should the consumer only pas a "DEV" mode?
+  // The library can take care of creating the Anonymous agent for consent message, at least for now.
+
   /**
    * An agent that the signer can use to fetch the consent message during a canister call.
    *
