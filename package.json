@@ -83,6 +83,7 @@
     "node": ">=20"
   },
   "peerDependencies": {
+    "@dfinity/agent": "^2.0.0",
     "@dfinity/candid": "^2.0.0",
     "@dfinity/principal": "^2.0.0",
     "@dfinity/utils": "^2.5.0",

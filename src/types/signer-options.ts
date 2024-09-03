@@ -1,3 +1,4 @@
+import {HttpAgent, ProxyAgent, type Agent} from '@dfinity/agent';
 import {Principal} from '@dfinity/principal';
 import {z} from 'zod';
 
@@ -41,7 +42,16 @@ export const SignerOptionsSchema = z.object({
    * When the signer is initialized, the owner should be signed in to the consumer dApp.
    * Upon signing out, it is up to the consumer to disconnect the signer.
    */
-  owner: PrincipalNotAnonymousSchema
+  owner: PrincipalNotAnonymousSchema,
+
+  /**
+   * An agent that the signer can use to fetch the consent message during a canister call.
+   *
+   * This should be an instance of either `HttpAgent` or `ProxyAgent`.
+   */
+  agent: z.custom<Agent>((agent) => agent instanceof ProxyAgent || agent instanceof HttpAgent, {
+    message: 'Invalid agent instance.'
+  })
 });
 
 export type SignerOptions = z.infer<typeof SignerOptionsSchema>;
