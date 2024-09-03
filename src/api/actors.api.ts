@@ -1,12 +1,12 @@
-import {Actor, ActorMethod, ActorSubclass, Agent} from '@dfinity/agent';
+import {Actor, type ActorMethod, type ActorSubclass, type Agent} from '@dfinity/agent';
 import type {IDL} from '@dfinity/candid';
 import {Principal} from '@dfinity/principal';
 import {isNullish} from '@dfinity/utils';
 import type {_SERVICE as Icrc21Actor} from '../declarations/icrc-21';
 import {idlFactory} from '../declarations/icrc-21.idl';
-import {PrincipalText} from '../types/principal';
+import type {PrincipalText} from '../types/principal';
 
-let actors: Record<PrincipalText, ActorSubclass<Icrc21Actor>> | undefined | null = undefined;
+let actors: Record<PrincipalText, ActorSubclass<Icrc21Actor>> | undefined | null;
 
 export const getIcrc21Actor = async ({
   agent,
@@ -46,7 +46,7 @@ const createActor = async <T = Record<string, ActorMethod>>({
   idlFactory: IDL.InterfaceFactory;
   agent: Agent;
 }): Promise<ActorSubclass<T>> => {
-  return Actor.createActor(idlFactory, {
+  return await Actor.createActor(idlFactory, {
     agent,
     canisterId
   });

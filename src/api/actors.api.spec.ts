@@ -25,6 +25,8 @@ describe('getIcrc21Actor', () => {
   it('should create a new actor when none exists', async () => {
     const result = await getIcrc21Actor({agent, canisterId: mockCanisterId});
 
+    // TODO: spyOn nor function does work with vitest and Actor.createActor. Not against a better idea than disabling eslint for next line.
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(Actor.createActor).toHaveBeenCalledWith(idlFactory, {
       agent,
       canisterId: mockCanisterId
