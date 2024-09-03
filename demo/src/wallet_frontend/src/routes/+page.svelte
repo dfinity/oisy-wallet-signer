@@ -4,7 +4,7 @@
 	import UserId from '$core/components/UserId.svelte';
 	import ConfirmPermissions from '$lib/ConfirmPermissions.svelte';
 	import { authStore } from '$core/stores/auth.store';
-	import { isNullish } from '@dfinity/utils';
+	import { defaultAgent, isNullish } from '@dfinity/utils';
 	import ConfirmAccounts from '$lib/ConfirmAccounts.svelte';
 
 	let signer: Signer | undefined = $state(undefined);
@@ -21,7 +21,8 @@
 		}
 
 		signer = Signer.init({
-			owner: $authStore.identity.getPrincipal()
+			owner: $authStore.identity.getPrincipal(),
+			agent: defaultAgent()
 		});
 
 		return () => {

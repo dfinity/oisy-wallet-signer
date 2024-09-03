@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+# Compiles candid .did files to .idl.js and .d.ts
+
+set -euo pipefail
+
+if [ "$(didc --version)" != "didc 0.3.7" ]; then
+  {
+    echo "didc version 0.3.7 is required. To install it on Mac:"
+    echo "curl -Lf https://github.com/dfinity/candid/releases/download/2024-02-27/didc-macos -o install_didc"
+    echo "install -m 755 install_didc /$HOME/.local/bin/didc"
+  } >&2
+  exit 1
+fi
+
+did_files_to_compile() {
+  local path=src/declarations
+
+  find ${path} -type f -name '*.did' |
+    grep -vE ${path}/+payloads.did
+}
+
+# Normal API access.
+compile_did() {
+  local didfile="$1"
+  local jsFactoryFile="$(echo "$didfile" | sed 's/did$/idl.js/g')"
+  local tsFactoryFile="$(echo "$didfile" | sed 's/did$/idl.d.ts/g')"
+  local tsfile="$(echo "$didfile" | sed 's/did$/d.ts/g')"
+
+  {
+    echo "/* Do not edit.  Compiled with ./scripts/compile-idl-js from ${didfile} */"
+    didc bind -t js "${didfile}"
+  } | sed -E "s/^export default/export const idlFactory =/g" >"${jsFactoryFile}"
+
+  generate_did_factory_ts
+
+  didc bind -t ts "${didfile}" >"${tsfile}"
+}
+
+generate_did_factory_ts() {
+  echo "import type { IDL } from \"@dfinity/candid\";export const idlFactory: IDL.InterfaceFactory;" >"${tsFactoryFile}"
+}
+
+did_files_to_compile | while read line; do
+  compile_did "$line"
+done
+
+# didc might generate definition file with invalid trailing comma which can be fixed by the code formatter
+# in addition, types we create with generate_did_factory_ts are not formatted
+npm run format

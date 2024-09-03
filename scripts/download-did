@@ -1,0 +1,9 @@
+#!/bin/bash
+
+DIR=src/declarations
+
+if [ ! -d "$DIR" ]; then
+  mkdir "$DIR"
+fi
+
+curl -sSL https://raw.githubusercontent.com/dfinity/wg-identity-authentication/main/topics/ICRC-21/ICRC-21.did -o "$DIR"/icrc-21.did
