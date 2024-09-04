@@ -1,5 +1,6 @@
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import type {MockInstance} from 'vitest';
+import * as actors from './api/actors.api';
 import {mockAccounts, mockPrincipalText} from './constants/icrc-accounts.mocks';
 import {
   ICRC25_PERMISSIONS,
@@ -62,13 +63,30 @@ describe('Signer', () => {
     signer.disconnect();
   });
 
-  it('should remove event listener for message on connect', () => {
+  it('should remove event listener for message on disconnect', () => {
     const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
 
     const signer = Signer.init(signerOptions);
     signer.disconnect();
 
     expect(removeEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
+  });
+
+  it('should clean actors on disconnect', () => {
+    const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
+
+    const signer = Signer.init(signerOptions);
+    signer.disconnect();
+
+    expect(removeEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
+  });
+
+  it('should clean actors on disconnect', () => {
+    const spy = vi.spyOn(actors, 'resetActors');
+
+    const signer = Signer.init(signerOptions);
+    signer.disconnect();
+    expect(spy).toHaveBeenNthCalledWith(1);
   });
 
   describe('onMessage', () => {

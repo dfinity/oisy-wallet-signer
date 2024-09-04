@@ -1,4 +1,5 @@
 import {assertNonNullish, isNullish, nonNullish} from '@dfinity/utils';
+import {resetActors} from './api/actors.api';
 import {
   ICRC25_REQUEST_PERMISSIONS,
   ICRC27_ACCOUNTS,
@@ -80,12 +81,13 @@ export class Signer {
   }
 
   /**
-   * Disconnects the signer, removing the message event listener.
+   * Disconnects the signer, removing the message event listener and cleanup.
    * @returns {void}
    */
   disconnect = (): void => {
     window.removeEventListener('message', this.onMessageListener);
     this.#walletOrigin = null;
+    resetActors();
   };
 
   private readonly onMessageListener = (message: SignerMessageEvent): void => {
