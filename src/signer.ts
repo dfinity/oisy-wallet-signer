@@ -50,6 +50,7 @@ import {
   type PermissionsConfirmation,
   type PermissionsPrompt
 } from './types/signer-prompts';
+import {resetActors} from "./api/actors.api";
 
 class MissingPromptError extends Error {}
 
@@ -80,12 +81,13 @@ export class Signer {
   }
 
   /**
-   * Disconnects the signer, removing the message event listener.
+   * Disconnects the signer, removing the message event listener and cleanup.
    * @returns {void}
    */
   disconnect = (): void => {
     window.removeEventListener('message', this.onMessageListener);
     this.#walletOrigin = null;
+    resetActors();
   };
 
   private readonly onMessageListener = (message: SignerMessageEvent): void => {
