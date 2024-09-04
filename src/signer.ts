@@ -1,4 +1,5 @@
 import {assertNonNullish, isNullish, nonNullish} from '@dfinity/utils';
+import {resetActors} from './api/actors.api';
 import {
   ICRC25_REQUEST_PERMISSIONS,
   ICRC27_ACCOUNTS,
@@ -50,7 +51,6 @@ import {
   type PermissionsConfirmation,
   type PermissionsPrompt
 } from './types/signer-prompts';
-import {resetActors} from "./api/actors.api";
 
 class MissingPromptError extends Error {}
 
