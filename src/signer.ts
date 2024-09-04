@@ -44,6 +44,8 @@ import type {SignerMessageEvent} from './types/signer';
 import type {SignerOptions} from './types/signer-options';
 import {
   AccountsPromptSchema,
+  ConsentMessagePrompt,
+  ConsentMessagePromptSchema,
   PermissionsPromptSchema,
   type AccountsConfirmation,
   type AccountsPrompt,
@@ -61,6 +63,7 @@ export class Signer {
 
   #permissionsPrompt: PermissionsPrompt | undefined;
   #accountsPrompt: AccountsPrompt | undefined;
+  #consentMessagePrompt: ConsentMessagePrompt | undefined;
 
   private constructor({owner, agent}: SignerOptions) {
     this.#owner = owner;
@@ -180,8 +183,9 @@ export class Signer {
     prompt
   }: {
     method: IcrcApproveMethod;
-    prompt: PermissionsPrompt | AccountsPrompt;
+    prompt: PermissionsPrompt | AccountsPrompt | ConsentMessagePrompt;
   }): void => {
+    // TODO: maybe we should replace method here with another custom enum or type, that would be maybe a bit more comprehensive?
     // TODO: is there a way to avoid casting?
     switch (method) {
       case ICRC25_REQUEST_PERMISSIONS: {
@@ -192,6 +196,11 @@ export class Signer {
       case ICRC27_ACCOUNTS: {
         AccountsPromptSchema.parse(prompt);
         this.#accountsPrompt = prompt as AccountsPrompt;
+        return;
+      }
+      case ICRC49_CALL_CANISTER: {
+        ConsentMessagePromptSchema.parse(prompt);
+        this.#consentMessagePrompt = prompt as ConsentMessagePrompt;
         return;
       }
     }
