@@ -1,6 +1,6 @@
-import {HttpAgent} from '@dfinity/agent';
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import type {MockInstance} from 'vitest';
+import * as actors from './api/actors.api';
 import {mockAccounts, mockPrincipalText} from './constants/icrc-accounts.mocks';
 import {
   ICRC25_PERMISSIONS,
@@ -41,18 +41,12 @@ import {
 import type {SessionPermissions} from './types/signer-sessions';
 import {del, get} from './utils/storage.utils';
 
-vi.mock('@dfinity/agent', async (importOriginal) => {
-  return {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-    ...(await importOriginal<typeof import('@dfinity/agent')>()),
-    createSync: vi.fn()
-  };
-});
-
 describe('Signer', () => {
+  const identity = Ed25519KeyIdentity.generate();
+
   const signerOptions: SignerOptions = {
-    owner: Ed25519KeyIdentity.generate().getPrincipal(),
-    agent: HttpAgent.createSync()
+    owner: identity,
+    host: 'http://localhost:5987'
   };
 
   it('should init a signer', () => {
@@ -69,13 +63,30 @@ describe('Signer', () => {
     signer.disconnect();
   });
 
-  it('should remove event listener for message on connect', () => {
+  it('should remove event listener for message on disconnect', () => {
     const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
 
     const signer = Signer.init(signerOptions);
     signer.disconnect();
 
     expect(removeEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
+  });
+
+  it('should clean actors on disconnect', () => {
+    const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
+
+    const signer = Signer.init(signerOptions);
+    signer.disconnect();
+
+    expect(removeEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
+  });
+
+  it('should clean actors on disconnect', () => {
+    const spy = vi.spyOn(actors, 'resetActors');
+
+    const signer = Signer.init(signerOptions);
+    signer.disconnect();
+    expect(spy).toHaveBeenNthCalledWith(1);
   });
 
   describe('onMessage', () => {
@@ -593,7 +604,7 @@ describe('Signer', () => {
       ];
 
       afterEach(() => {
-        del({key: `oisy_signer_${testOrigin}_${signerOptions.owner.toText()}`});
+        del({key: `oisy_signer_${testOrigin}_${signerOptions.owner.getPrincipal().toText()}`});
       });
 
       describe.each(testParams)('$method', ({method, requestData}) => {
@@ -632,7 +643,7 @@ describe('Signer', () => {
           });
 
           saveSessionScopes({
-            owner: signerOptions.owner,
+            owner: signerOptions.owner.getPrincipal(),
             origin: testOrigin,
             scopes: [
               {
@@ -716,7 +727,7 @@ describe('Signer', () => {
 
           await vi.waitFor(() => {
             const storedScopes: SessionPermissions | undefined = get({
-              key: `oisy_signer_${testOrigin}_${signerOptions.owner.toText()}`
+              key: `oisy_signer_${testOrigin}_${signerOptions.owner.getPrincipal().toText()}`
             });
 
             expect(storedScopes).not.toBeUndefined();
@@ -791,7 +802,7 @@ describe('Signer', () => {
           });
 
           saveSessionScopes({
-            owner: signerOptions.owner,
+            owner: signerOptions.owner.getPrincipal(),
             origin: testOrigin,
             scopes: [
               {
@@ -989,7 +1000,7 @@ describe('Signer', () => {
       it('should save permissions in storage', async () => {
         payload.confirmScopes(scopes);
 
-        const expectedKey = `oisy_signer_${testOrigin}_${signerOptions.owner.toText()}`;
+        const expectedKey = `oisy_signer_${testOrigin}_${signerOptions.owner.getPrincipal().toText()}`;
         const expectedData = {
           scopes: scopes.map((scope) => ({
             ...scope,
