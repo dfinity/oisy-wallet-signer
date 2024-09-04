@@ -1,10 +1,11 @@
-import {HttpAgent} from '@dfinity/agent';
+import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {mockCanisterId} from '../constants/icrc-accounts.mocks';
 import type {
   _SERVICE as Icrc21Actor,
   icrc21_consent_message_request,
   icrc21_consent_message_response
 } from '../declarations/icrc-21';
+import type {SignerOptions} from '../types/signer-options';
 import * as actor from './actors.api';
 import {consentMessage} from './canister.api';
 
@@ -24,8 +25,21 @@ vi.mock('@dfinity/agent', async (importOriginal) => {
   };
 });
 
+vi.mock('@dfinity/utils', async (importOriginal) => {
+  const mockAgent = {test: 456};
+
+  return {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+    ...(await importOriginal<typeof import('@dfinity/utils')>()),
+    createAgent: vi.fn().mockResolvedValue(mockAgent)
+  };
+});
+
 describe('canister.api', () => {
-  const agent = HttpAgent.createSync();
+  const signerOptions: SignerOptions = {
+    owner: Ed25519KeyIdentity.generate(),
+    host: 'http://localhost:5987'
+  };
 
   describe('consentMessage', () => {
     const consentMessageRequest: icrc21_consent_message_request = {
@@ -80,13 +94,13 @@ describe('canister.api', () => {
       });
 
       const result = await consentMessage({
-        agent,
+        ...signerOptions,
         canisterId: mockCanisterId,
         request: consentMessageRequest
       });
 
       expect(spy).toHaveBeenCalledWith({
-        agent,
+        ...signerOptions,
         canisterId: mockCanisterId
       });
       expect(mockIcrc21Actor.icrc21_canister_call_consent_message).toHaveBeenCalledWith(
@@ -114,7 +128,7 @@ describe('canister.api', () => {
 
       await expect(
         consentMessage({
-          agent,
+          ...signerOptions,
           canisterId: mockCanisterId,
           request: consentMessageRequest
         })

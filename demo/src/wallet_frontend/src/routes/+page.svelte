@@ -22,7 +22,7 @@
 		}
 
 		signer = Signer.init({
-			owner: $authStore.identity.getPrincipal(),
+			owner: $authStore.identity,
 			agent: defaultAgent()
 		});
 
