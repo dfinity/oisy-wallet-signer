@@ -44,11 +44,11 @@ import type {SignerMessageEvent} from './types/signer';
 import type {SignerOptions} from './types/signer-options';
 import {
   AccountsPromptSchema,
-  ConsentMessagePrompt,
   ConsentMessagePromptSchema,
   PermissionsPromptSchema,
   type AccountsConfirmation,
   type AccountsPrompt,
+  type ConsentMessagePrompt,
   type PermissionsConfirmation,
   type PermissionsPrompt
 } from './types/signer-prompts';
