@@ -31,6 +31,7 @@ import type {SignerMessageEventData} from './types/signer';
 import type {SignerOptions} from './types/signer-options';
 import {
   AccountsPromptSchema,
+  ConsentMessagePromptSchema,
   PermissionsPromptSchema,
   type AccountsConfirmation,
   type AccountsPromptPayload,
@@ -1050,6 +1051,21 @@ describe('Signer', () => {
       }).not.toThrow();
 
       expect(spy).toHaveBeenCalledWith(mockAccountsPrompt);
+    });
+
+    it('should validate a consent message prompt on register', () => {
+      const mockConsentMessagePrompt = vi.fn();
+
+      const spy = vi.spyOn(ConsentMessagePromptSchema, 'parse');
+
+      expect(() => {
+        signer.register({
+          method: ICRC49_CALL_CANISTER,
+          prompt: mockConsentMessagePrompt
+        });
+      }).not.toThrow();
+
+      expect(spy).toHaveBeenCalledWith(mockConsentMessagePrompt);
     });
 
     it('should throw on register if prompt not supported', () => {

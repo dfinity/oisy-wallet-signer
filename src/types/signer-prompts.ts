@@ -1,4 +1,5 @@
 import {z} from 'zod';
+import type {icrc21_consent_info} from '../declarations/icrc-21';
 import {IcrcAccountsSchema} from './icrc-accounts';
 import {IcrcScopesArraySchema} from './icrc-responses';
 
@@ -53,3 +54,28 @@ export const AccountsPromptSchema = z
   .returns(z.void());
 
 export type AccountsPrompt = z.infer<typeof AccountsPromptSchema>;
+
+const ConsentMessageAnswerSchema = z.function().returns(z.void());
+
+const ConsentMessagePromptPayloadSchema = z.object({
+  consentInfo: z.custom<icrc21_consent_info>(),
+  approve: ConsentMessageAnswerSchema,
+  reject: ConsentMessageAnswerSchema
+});
+
+export type ConsentMessagePromptPayload = z.infer<typeof ConsentMessagePromptPayloadSchema>;
+
+/**
+ * A function that is invoked when the signer requires the user - or consumer of the library - to approve or reject a consent message.
+ *
+ * @param {ConsentMessagePromptPayload} params - An object containing the consent information and functions to handle approval or rejection.
+ * @param {icrc21_consent_info} params.consentInfo - An object containing the consent information that needs to be approved or rejected.
+ * @param {() => void} params.approve - A function to be called by the consumer to approve the consent message.
+ * @param {() => void} params.reject - A function to be called by the consumer to reject the consent message.
+ */
+export const ConsentMessagePromptSchema = z
+  .function()
+  .args(ConsentMessagePromptPayloadSchema)
+  .returns(z.void());
+
+export type ConsentMessagePrompt = z.infer<typeof ConsentMessagePromptSchema>;
