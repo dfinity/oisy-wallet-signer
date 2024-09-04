@@ -1,5 +1,3 @@
-import type {Agent} from '@dfinity/agent';
-import type {Principal} from '@dfinity/principal';
 import {assertNonNullish, isNullish, nonNullish} from '@dfinity/utils';
 import {
   ICRC25_REQUEST_PERMISSIONS,
@@ -41,7 +39,7 @@ import {
 } from './types/icrc-standards';
 import {RpcRequestSchema, type RpcId} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
-import type {SignerOptions} from './types/signer-options';
+import type {IdentityNotAnonymous, SignerOptions} from './types/signer-options';
 import {
   AccountsPromptSchema,
   ConsentMessagePromptSchema,
@@ -56,8 +54,7 @@ import {
 class MissingPromptError extends Error {}
 
 export class Signer {
-  readonly #owner: Principal;
-  readonly #agent: Agent;
+  readonly #owner: IdentityNotAnonymous;
 
   #walletOrigin: string | undefined | null;
 
@@ -65,9 +62,8 @@ export class Signer {
   #accountsPrompt: AccountsPrompt | undefined;
   #consentMessagePrompt: ConsentMessagePrompt | undefined;
 
-  private constructor({owner, agent}: SignerOptions) {
+  private constructor({owner}: SignerOptions) {
     this.#owner = owner;
-    this.#agent = agent;
 
     window.addEventListener('message', this.onMessageListener);
   }
@@ -266,7 +262,7 @@ export class Signer {
     if (isPermissionsRequestRequest) {
       const {id} = permissionsRequestData;
 
-      const scopes = readSessionValidScopes({owner: this.#owner, origin});
+      const scopes = readSessionValidScopes({owner: this.#owner.getPrincipal(), origin});
 
       notifyPermissionScopes({
         id,
@@ -385,7 +381,7 @@ export class Signer {
   private savePermissions({scopes}: {scopes: IcrcScopesArray}): void {
     assertNonNullish(this.#walletOrigin, "The relying party's origin is unknown.");
 
-    saveSessionScopes({owner: this.#owner, origin: this.#walletOrigin, scopes});
+    saveSessionScopes({owner: this.#owner.getPrincipal(), origin: this.#walletOrigin, scopes});
   }
 
   /**
@@ -560,7 +556,7 @@ export class Signer {
     requestId: RpcId;
   }): Promise<Omit<IcrcPermissionState, 'ask_on_use'>> {
     const currentPermission = sessionScopeState({
-      owner: this.#owner,
+      owner: this.#owner.getPrincipal(),
       origin,
       method
     });

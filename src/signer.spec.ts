@@ -50,8 +50,10 @@ vi.mock('@dfinity/agent', async (importOriginal) => {
 });
 
 describe('Signer', () => {
+  const identity = Ed25519KeyIdentity.generate();
+
   const signerOptions: SignerOptions = {
-    owner: Ed25519KeyIdentity.generate().getPrincipal(),
+    owner: identity,
     agent: HttpAgent.createSync()
   };
 
@@ -593,7 +595,7 @@ describe('Signer', () => {
       ];
 
       afterEach(() => {
-        del({key: `oisy_signer_${testOrigin}_${signerOptions.owner.toText()}`});
+        del({key: `oisy_signer_${testOrigin}_${signerOptions.owner.getPrincipal().toText()}`});
       });
 
       describe.each(testParams)('$method', ({method, requestData}) => {
@@ -632,7 +634,7 @@ describe('Signer', () => {
           });
 
           saveSessionScopes({
-            owner: signerOptions.owner,
+            owner: signerOptions.owner.getPrincipal(),
             origin: testOrigin,
             scopes: [
               {
@@ -716,7 +718,7 @@ describe('Signer', () => {
 
           await vi.waitFor(() => {
             const storedScopes: SessionPermissions | undefined = get({
-              key: `oisy_signer_${testOrigin}_${signerOptions.owner.toText()}`
+              key: `oisy_signer_${testOrigin}_${signerOptions.owner.getPrincipal().toText()}`
             });
 
             expect(storedScopes).not.toBeUndefined();
@@ -791,7 +793,7 @@ describe('Signer', () => {
           });
 
           saveSessionScopes({
-            owner: signerOptions.owner,
+            owner: signerOptions.owner.getPrincipal(),
             origin: testOrigin,
             scopes: [
               {
@@ -989,7 +991,7 @@ describe('Signer', () => {
       it('should save permissions in storage', async () => {
         payload.confirmScopes(scopes);
 
-        const expectedKey = `oisy_signer_${testOrigin}_${signerOptions.owner.toText()}`;
+        const expectedKey = `oisy_signer_${testOrigin}_${signerOptions.owner.getPrincipal().toText()}`;
         const expectedData = {
           scopes: scopes.map((scope) => ({
             ...scope,

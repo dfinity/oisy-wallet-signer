@@ -19,29 +19,42 @@ describe('SignerOptions', () => {
       const identity = Ed25519KeyIdentity.generate();
 
       const validSignerOptions = {
-        owner: identity.getPrincipal(),
+        owner: identity,
         agent
       };
 
       expect(() => SignerOptionsSchema.parse(validSignerOptions)).not.toThrow();
     });
 
-    it('should throw an error for invalid principal', () => {
-      const invalidPrincipal = {id: 'not-a-principal'};
+    it('should throw an error for invalid identity', () => {
+      const invalidIdentity = {id: 'not-an-identity'};
 
       const invalidSignerOptions = {
-        owner: invalidPrincipal,
+        owner: invalidIdentity,
         agent
       };
 
       expect(() => SignerOptionsSchema.parse(invalidSignerOptions)).toThrow(
-        'The value provided is not a valid Principal.'
+        'The value provided is not a valid Identity.'
+      );
+    });
+
+    it('should throw an error for invalid principal', () => {
+      const invalidIdentity = {_principal: {id: 'not-a-principal'}};
+
+      const invalidSignerOptions = {
+        owner: invalidIdentity,
+        agent
+      };
+
+      expect(() => SignerOptionsSchema.parse(invalidSignerOptions)).toThrow(
+        'The value provided is not a valid Identity.'
       );
     });
 
     it('should throw an error for an anonymous Principal', () => {
       const invalidSignerOptions = {
-        owner: new AnonymousIdentity().getPrincipal(),
+        owner: new AnonymousIdentity(),
         agent
       };
 
@@ -52,7 +65,7 @@ describe('SignerOptions', () => {
   });
 
   describe('Agent', () => {
-    const owner = Ed25519KeyIdentity.generate().getPrincipal();
+    const owner = Ed25519KeyIdentity.generate();
 
     it('should validate a valid HttpAgent', () => {
       const agent = HttpAgent.createSync();
