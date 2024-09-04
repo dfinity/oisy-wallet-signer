@@ -22,7 +22,7 @@
 
 		signer = Signer.init({
 			owner: $authStore.identity,
-            agent: defaultAgent()
+			agent: defaultAgent()
 		});
 
 		return () => {
