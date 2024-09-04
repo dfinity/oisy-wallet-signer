@@ -1,16 +1,11 @@
 <script lang="ts">
-	import { fade } from 'svelte/transition';
 	import type { Signer } from '@dfinity/oisy-wallet-signer/signer';
 	import { isNullish, nonNullish } from '@dfinity/utils';
-	import { ICRC27_ACCOUNTS, ICRC49_CALL_CANISTER } from '@dfinity/oisy-wallet-signer';
+	import { ICRC49_CALL_CANISTER } from '@dfinity/oisy-wallet-signer';
 	import {
-		type AccountsConfirmation,
-		type AccountsPromptPayload,
-		ConsentMessageAnswer,
-		type ConsentMessagePrompt,
+		type ConsentMessageAnswer,
 		type ConsentMessagePromptPayload
 	} from '@dfinity/oisy-wallet-signer/types/signer-prompts';
-	import { authStore } from '$core/stores/auth.store';
 	import type { icrc21_consent_info } from '@dfinity/oisy-wallet-signer/declarations/icrc-21';
     import Button from "$core/components/Button.svelte";
 
