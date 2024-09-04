@@ -4,7 +4,7 @@
 	import UserId from '$core/components/UserId.svelte';
 	import ConfirmPermissions from '$lib/ConfirmPermissions.svelte';
 	import { authStore } from '$core/stores/auth.store';
-	import { defaultAgent, isNullish } from '@dfinity/utils';
+	import { isNullish } from '@dfinity/utils';
 	import ConfirmAccounts from '$lib/ConfirmAccounts.svelte';
 	import ConfirmConsentMessage from '$lib/ConfirmConsentMessage.svelte';
 
@@ -23,7 +23,7 @@
 
 		signer = Signer.init({
 			owner: $authStore.identity,
-			agent: defaultAgent()
+			host: 'http://localhost:5987'
 		});
 
 		return () => {
