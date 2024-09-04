@@ -43,7 +43,7 @@ import {
 } from './types/icrc-standards';
 import {RpcRequestSchema, type RpcId} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
-import type {IdentityNotAnonymous, SignerOptions} from './types/signer-options';
+import {IdentityNotAnonymous, SignerHost, SignerOptions} from './types/signer-options';
 import {
   AccountsPromptSchema,
   ConsentMessageAnswer,
@@ -60,6 +60,7 @@ class MissingPromptError extends Error {}
 
 export class Signer {
   readonly #owner: IdentityNotAnonymous;
+  readonly #host: SignerHost;
 
   #walletOrigin: string | undefined | null;
 
