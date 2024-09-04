@@ -68,8 +68,9 @@ export class Signer {
   #accountsPrompt: AccountsPrompt | undefined;
   #consentMessagePrompt: ConsentMessagePrompt | undefined;
 
-  private constructor({owner}: SignerOptions) {
+  private constructor({owner, host}: SignerOptions) {
     this.#owner = owner;
+    this.#host = host;
 
     window.addEventListener('message', this.onMessageListener);
   }

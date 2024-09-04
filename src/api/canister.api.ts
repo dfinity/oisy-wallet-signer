@@ -13,6 +13,9 @@ export const consentMessage = async ({
   canisterId: string | Principal;
   request: icrc21_consent_message_request;
 } & SignerOptions): Promise<icrc21_consent_message_response> => {
+
+  console.log(request, actorParams);
+
   const {icrc21_canister_call_consent_message: canisterCallConsentMessage} =
     await getIcrc21Actor(actorParams);
   return await canisterCallConsentMessage(request);
