@@ -50,43 +50,43 @@ describe('SignerOptions', () => {
     });
   });
 
-  describe('Mode', () => {
+  describe('Host', () => {
     const owner = Ed25519KeyIdentity.generate();
 
-    it('should validate when mode is production (default)', () => {
+    it('should validate when host is not provided (optional)', () => {
       const validSignerOptions = {
         owner
       };
 
       const result = SignerOptionsSchema.parse(validSignerOptions);
-      expect(result.mode).toBe('production');
+      expect(result.host).toBeUndefined();
     });
 
-    it('should validate when mode is explicitly production', () => {
+    it('should validate when a valid host is provided', () => {
       const validSignerOptions = {
         owner,
-        mode: 'production'
+        host: 'https://test.com'
       };
 
       expect(() => SignerOptionsSchema.parse(validSignerOptions)).not.toThrow();
     });
 
-    it('should validate when mode is development', () => {
-      const validSignerOptions = {
-        owner,
-        mode: 'development'
-      };
-
-      expect(() => SignerOptionsSchema.parse(validSignerOptions)).not.toThrow();
-    });
-
-    it('should throw an error for an invalid mode value', () => {
+    it('should throw an error for an invalid host URL', () => {
       const invalidSignerOptions = {
         owner,
-        mode: 'invalid-mode'
+        host: 'invalid-url'
       };
 
-      expect(() => SignerOptionsSchema.parse(invalidSignerOptions)).toThrow();
+      expect(() => SignerOptionsSchema.parse(invalidSignerOptions)).toThrow('Invalid url');
+    });
+
+    it('should validate when localhost is used as host', () => {
+      const validSignerOptions = {
+        owner,
+        host: 'http://localhost:4987'
+      };
+
+      expect(() => SignerOptionsSchema.parse(validSignerOptions)).not.toThrow();
     });
   });
 });
