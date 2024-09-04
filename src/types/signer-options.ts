@@ -1,4 +1,4 @@
-import {HttpAgent, ProxyAgent, type Agent, type Identity} from '@dfinity/agent';
+import {type Identity} from '@dfinity/agent';
 import {isNullish} from '@dfinity/utils';
 import {z} from 'zod';
 
@@ -28,6 +28,10 @@ const IdentityNotAnonymousSchema = IdentitySchema.refine(
 
 export type IdentityNotAnonymous = z.infer<typeof IdentityNotAnonymousSchema>;
 
+export const SignerModeSchema = z.enum(['production', 'development']);
+
+export type SignerMode = z.infer<typeof SignerModeSchema>;
+
 export const SignerOptionsSchema = z.object({
   /**
    * The owner who interacts with the signer.
@@ -37,17 +41,12 @@ export const SignerOptionsSchema = z.object({
    */
   owner: IdentityNotAnonymousSchema,
 
-  // TODO: instead of an agent, should the consumer only pas a "DEV" mode?
-  // The library can take care of creating the Anonymous agent for consent message, at least for now.
-
   /**
-   * An agent that the signer can use to fetch the consent message during a canister call.
-   *
-   * This should be an instance of either `HttpAgent` or `ProxyAgent`.
+   * The mode in which the signer is running.
+   * Can be either "production" or "development". In "development" mode, a local agent that tries to fetch the root key locally will be used.
+   * Defaults to "production".
    */
-  agent: z.custom<Agent>((agent) => agent instanceof ProxyAgent || agent instanceof HttpAgent, {
-    message: 'Invalid agent instance.'
-  })
+  mode: SignerModeSchema.default('production')
 });
 
 export type SignerOptions = z.infer<typeof SignerOptionsSchema>;
