@@ -8,6 +8,7 @@ import {
   ICRC49_CALL_CANISTER
 } from './constants/icrc.constants';
 import {SIGNER_DEFAULT_SCOPES, SignerErrorCode} from './constants/signer.constants';
+import {icrc21_consent_info} from './declarations/icrc-21';
 import {
   notifyAccounts,
   notifyError,
@@ -46,6 +47,7 @@ import type {SignerMessageEvent} from './types/signer';
 import type {SignerOptions} from './types/signer-options';
 import {
   AccountsPromptSchema,
+  ConsentMessageAnswer,
   ConsentMessagePromptSchema,
   PermissionsPromptSchema,
   type AccountsConfirmation,
@@ -507,7 +509,7 @@ export class Signer {
       IcrcCallCanisterRequestSchema.safeParse(data);
 
     if (isCallCanisterRequest) {
-      const {id: requestId} = callData;
+      const {id: requestId, params} = callData;
 
       const permission = await this.assertAndPromptPermissions({
         method: ICRC49_CALL_CANISTER,
@@ -522,6 +524,14 @@ export class Signer {
         });
         return {handled: true};
       }
+
+      const {result: userConsent} = await this.assertAndPromptConsentMessage({requestId, params});
+
+      if (userConsent !== 'approved') {
+        return {handled: true};
+      }
+
+      // TODO: call canister
 
       return {handled: true};
     }
@@ -610,9 +620,9 @@ export class Signer {
   }: {
     params: IcrcCallCanisterRequestParams;
     requestId: RpcId;
-  }) {
+  }): Promise<{result: 'approved' | 'rejected' | 'error'}> {
     try {
-      const msg = await consentMessage({
+      const response = await consentMessage({
         agent: this.#agent,
         canisterId,
         request: {
@@ -629,7 +639,39 @@ export class Signer {
         }
       });
 
-      // TODO
-    } catch (err: unknown) {}
+      if ('Err' in response) {
+        // TODO: notify error
+        return {result: 'error'};
+      }
+
+      return await this.promptConsentMessage(response.Ok);
+    } catch (err: unknown) {
+      // TODO: notify error
+      return {result: 'error'};
+    }
+  }
+
+  private async promptConsentMessage(
+    consentInfo: icrc21_consent_info
+  ): Promise<{result: 'approved' | 'rejected'}> {
+    const promise = new Promise<{result: 'approved' | 'rejected'}>((resolve, reject) => {
+      const approve: ConsentMessageAnswer = () => {
+        resolve({result: 'approved'});
+      };
+
+      const userReject: ConsentMessageAnswer = () => {
+        resolve({result: 'rejected'});
+      };
+
+      // The consumer currently has no way to unregister the prompt, so we know that it is defined. However, to be future-proof, it's better to ensure it is defined.
+      if (isNullish(this.#consentMessagePrompt)) {
+        reject(new MissingPromptError());
+        return;
+      }
+
+      this.#consentMessagePrompt({approve, reject: userReject, consentInfo});
+    });
+
+    return await promise;
   }
 }
