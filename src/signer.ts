@@ -525,6 +525,9 @@ export class Signer {
         return {handled: true};
       }
 
+      // TODO: asserting that the sender = owner of the accounts = principal derived by II in the signer
+      // i.e. sender === this.#owner
+
       const {result: userConsent} = await this.assertAndPromptConsentMessage({requestId, params});
 
       if (userConsent !== 'approved') {
@@ -616,7 +619,7 @@ export class Signer {
 
   private async assertAndPromptConsentMessage({
     requestId,
-    params: {canisterId, method, arg}
+    params: {canisterId, method, arg, sender}
   }: {
     params: IcrcCallCanisterRequestParams;
     requestId: RpcId;
