@@ -1,6 +1,7 @@
 import type {Agent} from '@dfinity/agent';
 import type {Principal} from '@dfinity/principal';
 import {assertNonNullish, isNullish, nonNullish} from '@dfinity/utils';
+import {consentMessage} from './api/canister.api';
 import {
   ICRC25_REQUEST_PERMISSIONS,
   ICRC27_ACCOUNTS,
@@ -25,6 +26,7 @@ import {
 import type {IcrcAccounts} from './types/icrc-accounts';
 import {
   IcrcAccountsRequestSchema,
+  IcrcCallCanisterRequestParams,
   IcrcCallCanisterRequestSchema,
   IcrcPermissionsRequestSchema,
   IcrcRequestAnyPermissionsRequestSchema,
@@ -513,18 +515,12 @@ export class Signer {
         origin
       });
 
-      switch (permission) {
-        case 'denied': {
-          notifyErrorPermissionNotGranted({
-            id: requestId ?? null,
-            origin
-          });
-          break;
-        }
-        case 'granted': {
-          // TODO: process call canister
-          break;
-        }
+      if (permission === 'denied') {
+        notifyErrorPermissionNotGranted({
+          id: requestId ?? null,
+          origin
+        });
+        return {handled: true};
       }
 
       return {handled: true};
@@ -606,5 +602,34 @@ export class Signer {
       default:
         return currentPermission;
     }
+  }
+
+  private async assertAndPromptConsentMessage({
+    requestId,
+    params: {canisterId, method, arg}
+  }: {
+    params: IcrcCallCanisterRequestParams;
+    requestId: RpcId;
+  }) {
+    try {
+      const msg = await consentMessage({
+        agent: this.#agent,
+        canisterId,
+        request: {
+          method,
+          arg,
+          // TODO: consumer should be able to define user_preferences
+          user_preferences: {
+            metadata: {
+              language: 'en',
+              utc_offset_minutes: []
+            },
+            device_spec: []
+          }
+        }
+      });
+
+      // TODO
+    } catch (err: unknown) {}
   }
 }
