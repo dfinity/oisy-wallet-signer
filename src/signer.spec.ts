@@ -1,4 +1,3 @@
-import {HttpAgent} from '@dfinity/agent';
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import type {MockInstance} from 'vitest';
 import {mockAccounts, mockPrincipalText} from './constants/icrc-accounts.mocks';
@@ -41,20 +40,12 @@ import {
 import type {SessionPermissions} from './types/signer-sessions';
 import {del, get} from './utils/storage.utils';
 
-vi.mock('@dfinity/agent', async (importOriginal) => {
-  return {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-    ...(await importOriginal<typeof import('@dfinity/agent')>()),
-    createSync: vi.fn()
-  };
-});
-
 describe('Signer', () => {
   const identity = Ed25519KeyIdentity.generate();
 
   const signerOptions: SignerOptions = {
     owner: identity,
-    agent: HttpAgent.createSync()
+    mode: 'development'
   };
 
   it('should init a signer', () => {

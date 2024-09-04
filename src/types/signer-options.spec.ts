@@ -1,26 +1,15 @@
-import {AnonymousIdentity, HttpAgent, ProxyAgent} from '@dfinity/agent';
+import {AnonymousIdentity} from '@dfinity/agent';
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {describe} from 'vitest';
 import {SignerOptionsSchema} from './signer-options';
 
-vi.mock('@dfinity/agent', async (importOriginal) => {
-  return {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-    ...(await importOriginal<typeof import('@dfinity/agent')>()),
-    createSync: vi.fn()
-  };
-});
-
 describe('SignerOptions', () => {
   describe('Owner', () => {
-    const agent = HttpAgent.createSync();
-
     it('should validate a valid owner', () => {
       const identity = Ed25519KeyIdentity.generate();
 
       const validSignerOptions = {
-        owner: identity,
-        agent
+        owner: identity
       };
 
       expect(() => SignerOptionsSchema.parse(validSignerOptions)).not.toThrow();
@@ -30,8 +19,7 @@ describe('SignerOptions', () => {
       const invalidIdentity = {id: 'not-an-identity'};
 
       const invalidSignerOptions = {
-        owner: invalidIdentity,
-        agent
+        owner: invalidIdentity
       };
 
       expect(() => SignerOptionsSchema.parse(invalidSignerOptions)).toThrow(
@@ -43,8 +31,7 @@ describe('SignerOptions', () => {
       const invalidIdentity = {_principal: {id: 'not-a-principal'}};
 
       const invalidSignerOptions = {
-        owner: invalidIdentity,
-        agent
+        owner: invalidIdentity
       };
 
       expect(() => SignerOptionsSchema.parse(invalidSignerOptions)).toThrow(
@@ -54,8 +41,7 @@ describe('SignerOptions', () => {
 
     it('should throw an error for an anonymous Principal', () => {
       const invalidSignerOptions = {
-        owner: new AnonymousIdentity(),
-        agent
+        owner: new AnonymousIdentity()
       };
 
       expect(() => SignerOptionsSchema.parse(invalidSignerOptions)).toThrow(
@@ -64,42 +50,43 @@ describe('SignerOptions', () => {
     });
   });
 
-  describe('Agent', () => {
+  describe('Mode', () => {
     const owner = Ed25519KeyIdentity.generate();
 
-    it('should validate a valid HttpAgent', () => {
-      const agent = HttpAgent.createSync();
+    it('should validate when mode is production (default)', () => {
+      const validSignerOptions = {
+        owner
+      };
 
+      const result = SignerOptionsSchema.parse(validSignerOptions);
+      expect(result.mode).toBe('production');
+    });
+
+    it('should validate when mode is explicitly production', () => {
       const validSignerOptions = {
         owner,
-        agent
+        mode: 'production'
       };
 
       expect(() => SignerOptionsSchema.parse(validSignerOptions)).not.toThrow();
     });
 
-    it('should validate a valid ProxyAgent', () => {
-      const agent = new ProxyAgent(() => undefined);
-
+    it('should validate when mode is development', () => {
       const validSignerOptions = {
         owner,
-        agent
+        mode: 'development'
       };
 
       expect(() => SignerOptionsSchema.parse(validSignerOptions)).not.toThrow();
     });
 
-    it('should throw an error for an invalid agent', () => {
-      const invalidAgent = {};
-
+    it('should throw an error for an invalid mode value', () => {
       const invalidSignerOptions = {
         owner,
-        agent: invalidAgent
+        mode: 'invalid-mode'
       };
 
-      expect(() => SignerOptionsSchema.parse(invalidSignerOptions)).toThrow(
-        'Invalid agent instance.'
-      );
+      expect(() => SignerOptionsSchema.parse(invalidSignerOptions)).toThrow();
     });
   });
 });
