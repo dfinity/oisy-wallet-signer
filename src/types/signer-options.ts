@@ -28,9 +28,9 @@ const IdentityNotAnonymousSchema = IdentitySchema.refine(
 
 export type IdentityNotAnonymous = z.infer<typeof IdentityNotAnonymousSchema>;
 
-export const SignerModeSchema = z.enum(['production', 'development']);
+export const SignerHostSchema = z.string().url();
 
-export type SignerMode = z.infer<typeof SignerModeSchema>;
+export type SignerHost = z.infer<typeof SignerHostSchema>;
 
 export const SignerOptionsSchema = z.object({
   /**
@@ -42,11 +42,10 @@ export const SignerOptionsSchema = z.object({
   owner: IdentityNotAnonymousSchema,
 
   /**
-   * The mode in which the signer is running.
-   * Can be either "production" or "development". In "development" mode, a local agent that tries to fetch the root key locally will be used.
-   * Defaults to "production".
+   * The replica's host to which the signer should connect to.
+   * If localhost or 127.0.0.1 are provided, the signer will automatically connect to a local replica and fetch the root key for the agent.
    */
-  mode: SignerModeSchema.default('production')
+  host: SignerHostSchema.optional()
 });
 
 export type SignerOptions = z.infer<typeof SignerOptionsSchema>;
