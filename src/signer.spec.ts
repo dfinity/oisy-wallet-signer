@@ -45,7 +45,7 @@ describe('Signer', () => {
 
   const signerOptions: SignerOptions = {
     owner: identity,
-    mode: 'development'
+    host: 'http://localhost:5987'
   };
 
   it('should init a signer', () => {
