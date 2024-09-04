@@ -3,8 +3,10 @@ import {ICRC27_ACCOUNTS} from '../constants/icrc.constants';
 import type {IcrcScopesArray} from './icrc-responses';
 import {
   AccountsPromptSchema,
+  ConsentMessagePromptSchema,
   PermissionsPromptSchema,
   type AccountsPromptPayload,
+  type ConsentMessagePromptPayload,
   type PermissionsPromptPayload
 } from './signer-prompts';
 
@@ -47,6 +49,22 @@ describe('SignerPrompts', () => {
       const invalidPrompt = 123;
 
       expect(() => AccountsPromptSchema.parse(invalidPrompt)).toThrow();
+    });
+  });
+
+  describe('Consent message', () => {
+    it('should validate a ConsentMessagePrompt', () => {
+      const prompt = (payload: ConsentMessagePromptPayload): void => {
+        payload.approve();
+      };
+
+      expect(() => ConsentMessagePromptSchema.parse(prompt)).not.toThrow();
+    });
+
+    it('should fail with an invalid ConsentMessagePrompt', () => {
+      const invalidPrompt = 123;
+
+      expect(() => ConsentMessagePromptSchema.parse(invalidPrompt)).toThrow();
     });
   });
 });
