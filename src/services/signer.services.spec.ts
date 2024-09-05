@@ -192,18 +192,26 @@ describe('Signer services', () => {
       });
     });
 
-    it.skip('should throw MissingPromptError if prompt is undefined', async () => {
-      // TODO: missing prompt error test
-      // try {
-      //   await assertAndPromptConsentMessage({
-      //     requestId,
-      //     params,
-      //     prompt: undefined,
-      //     ...signerOptions
-      //   });
-      // } catch (error) {
-      //   expect(error).toBeInstanceOf(MissingPromptError);
-      // }
+    it('should notify MissingPromptError if prompt is undefined', async () => {
+      await assertAndPromptConsentMessage({
+        notify,
+        params,
+        prompt: undefined,
+        options: signerOptions
+      });
+
+      const errorNotify = {
+        code: SignerErrorCode.PERMISSIONS_PROMPT_NOT_REGISTERED,
+        message: 'The signer has not registered a prompt to respond to permission requests.'
+      };
+
+      const expectedMessage: RpcResponseWithError = {
+        jsonrpc: JSON_RPC_VERSION_2,
+        id: requestId,
+        error: errorNotify
+      };
+
+      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
     });
 
     it('should return error if consentMessage throws', async () => {
