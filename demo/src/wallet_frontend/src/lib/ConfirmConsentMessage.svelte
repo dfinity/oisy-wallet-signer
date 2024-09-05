@@ -70,7 +70,7 @@
 	</p>
 
 	<div class="flex">
-		<Button type="button" testId="reject-consent-message">Reject</Button>
-		<Button type="button" testId="approve-consent-message">Approve</Button>
+		<Button type="button" onclick={onApprove} testId="reject-consent-message">Reject</Button>
+		<Button type="button" onclick={onReject} testId="approve-consent-message">Approve</Button>
 	</div>
 {/if}
