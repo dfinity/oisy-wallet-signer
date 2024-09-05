@@ -1,7 +1,7 @@
 import {beforeEach, type Mock} from 'vitest';
-import {mockAccounts} from '../constants/icrc-accounts.mocks';
 import {ICRC27_ACCOUNTS} from '../constants/icrc.constants';
 import {SIGNER_SUPPORTED_STANDARDS, SignerErrorCode} from '../constants/signer.constants';
+import {mockAccounts} from '../mocks/icrc-accounts.mocks';
 import type {
   IcrcReadyResponse,
   IcrcScopesArray,

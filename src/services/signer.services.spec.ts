@@ -2,9 +2,9 @@ import {Ed25519KeyIdentity} from '@dfinity/identity';
 import type {Mock, MockInstance} from 'vitest';
 import * as api from '../api/canister.api';
 import {consentMessage} from '../api/canister.api';
-import {mockPrincipalText} from '../constants/icrc-accounts.mocks';
 import {SignerErrorCode} from '../constants/signer.constants';
-import type {icrc21_consent_info} from '../declarations/icrc-21';
+import {mockConsentInfo} from '../mocks/consent-message.mocks';
+import {mockPrincipalText} from '../mocks/icrc-accounts.mocks';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import {JSON_RPC_VERSION_2, type RpcId, type RpcResponseWithError} from '../types/rpc';
 import type {SignerOptions} from '../types/signer-options';
@@ -14,14 +14,6 @@ import {assertAndPromptConsentMessage, notifyErrorPermissionNotGranted} from './
 describe('Signer services', () => {
   let requestId: RpcId;
   let spy: MockInstance;
-
-  const mockConsentInfo: icrc21_consent_info = {
-    consent_message: {GenericDisplayMessage: 'Test Consent Message'},
-    metadata: {
-      language: 'en',
-      utc_offset_minutes: [0]
-    }
-  };
 
   const params: IcrcCallCanisterRequestParams = {
     canisterId: mockPrincipalText,

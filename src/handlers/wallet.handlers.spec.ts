@@ -1,5 +1,4 @@
 import {DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS} from '../constants/core.constants';
-import {mockPrincipalText} from '../constants/icrc-accounts.mocks';
 import {
   ICRC25_PERMISSIONS,
   ICRC25_REQUEST_PERMISSIONS,
@@ -7,6 +6,7 @@ import {
   ICRC27_ACCOUNTS,
   ICRC49_CALL_CANISTER
 } from '../constants/icrc.constants';
+import {mockPrincipalText} from '../mocks/icrc-accounts.mocks';
 import type {IcrcAnyRequestedScopes, IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import {JSON_RPC_VERSION_2} from '../types/rpc';
 import type {ReadyOrError} from '../utils/timeout.utils';

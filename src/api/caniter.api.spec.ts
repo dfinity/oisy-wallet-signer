@@ -1,10 +1,10 @@
 import {Ed25519KeyIdentity} from '@dfinity/identity';
-import {mockCanisterId} from '../constants/icrc-accounts.mocks';
 import type {
   _SERVICE as Icrc21Actor,
   icrc21_consent_message_request,
   icrc21_consent_message_response
 } from '../declarations/icrc-21';
+import {mockCanisterId} from '../mocks/icrc-accounts.mocks';
 import type {SignerOptions} from '../types/signer-options';
 import * as actor from './actors.api';
 import {consentMessage} from './canister.api';
