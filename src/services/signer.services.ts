@@ -1,17 +1,17 @@
 import {isNullish} from '@dfinity/utils';
 import {consentMessage} from '../api/canister.api';
 import {SignerErrorCode} from '../constants/signer.constants';
-import {icrc21_consent_info} from '../declarations/icrc-21';
+import type {icrc21_consent_info} from '../declarations/icrc-21';
 import {notifyError} from '../handlers/signer.handlers';
-import {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
-import {RpcId} from '../types/rpc';
+import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
+import type {RpcId} from '../types/rpc';
 import {MissingPromptError} from '../types/signer-errors';
 import type {Notify} from '../types/signer-handlers';
-import {SignerOptions} from '../types/signer-options';
-import {ConsentMessageAnswer, ConsentMessagePrompt} from '../types/signer-prompts';
+import type {SignerOptions} from '../types/signer-options';
+import type {ConsentMessageAnswer, ConsentMessagePrompt} from '../types/signer-prompts';
 
 export const assertAndPromptConsentMessage = async ({
-  requestId,
+  requestId: _,
   params: {canisterId, method, arg},
   prompt,
   ...rest
@@ -20,6 +20,9 @@ export const assertAndPromptConsentMessage = async ({
   requestId: RpcId;
   prompt: ConsentMessagePrompt | undefined;
 } & SignerOptions): Promise<{result: 'approved' | 'rejected' | 'error'}> => {
+  // TODO: asserting that the sender = owner of the accounts = principal derived by II in the signer
+  // i.e. sender === this.#owner
+
   try {
     const response = await consentMessage({
       ...rest,
