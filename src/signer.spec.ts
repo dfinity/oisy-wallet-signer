@@ -41,6 +41,7 @@ import {
   type PermissionsPromptPayload
 } from './types/signer-prompts';
 import type {SessionPermissions} from './types/signer-sessions';
+import {mapIcrc21ErrorToString} from './utils/icrc-21.utils';
 import {del, get} from './utils/storage.utils';
 
 describe('Signer', () => {
@@ -975,9 +976,15 @@ describe('Signer', () => {
         });
 
         describe('Call canister error', () => {
+          let notifyErrorSpy: MockInstance;
+
+          const error = {GenericError: {description: 'Error', error_code: 1n}};
+
           beforeEach(() => {
+            notifyErrorSpy = vi.spyOn(signerHandlers, 'notifyError');
+
             spy.mockResolvedValue({
-              Err: {GenericError: {description: 'Error', error_code: 1n}}
+              Err: error
             });
           });
 
@@ -1003,11 +1010,18 @@ describe('Signer', () => {
             const messageEvent = new MessageEvent('message', requestCallCanisterMsg);
             window.dispatchEvent(messageEvent);
 
-            // TODO: wait for notifyError and then test prompt has not be called maybe?
-
             await vi.waitFor(() => {
-              expect(promptSpy).not.toHaveBeenCalledTimes(1);
+              expect(notifyErrorSpy).toHaveBeenCalledWith({
+                id: testId,
+                origin: testOrigin,
+                error: {
+                  code: SignerErrorCode.REQUEST_NOT_SUPPORTED,
+                  message: mapIcrc21ErrorToString(error)
+                }
+              });
             });
+
+            expect(promptSpy).not.toHaveBeenCalledTimes(1);
           });
         });
       });
