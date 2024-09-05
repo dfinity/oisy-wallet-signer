@@ -1,0 +1,76 @@
+<script lang="ts">
+	import type { Signer } from '@dfinity/oisy-wallet-signer/signer';
+	import { isNullish, nonNullish } from '@dfinity/utils';
+	import { ICRC49_CALL_CANISTER } from '@dfinity/oisy-wallet-signer';
+	import {
+		type ConsentMessageAnswer,
+		type ConsentMessagePromptPayload
+	} from '@dfinity/oisy-wallet-signer/types/signer-prompts';
+	import type { icrc21_consent_info } from '@dfinity/oisy-wallet-signer/declarations/icrc-21';
+	import Button from '$core/components/Button.svelte';
+
+	type Props = {
+		signer: Signer | undefined;
+	};
+
+	let { signer }: Props = $props();
+
+	let approve = $state<ConsentMessageAnswer | undefined>(undefined);
+	let reject = $state<ConsentMessageAnswer | undefined>(undefined);
+	let consentInfo = $state<icrc21_consent_info | undefined>(undefined);
+
+	let displayMessage: string | undefined = $derived(
+		nonNullish(consentInfo)
+			? (consentInfo.consent_message as { GenericDisplayMessage: string }).GenericDisplayMessage
+			: undefined
+	);
+
+	const resetPrompt = () => {
+		approve = undefined;
+		reject = undefined;
+		consentInfo = undefined;
+	};
+
+	$effect(() => {
+		if (isNullish(signer)) {
+			resetPrompt();
+			return;
+		}
+
+		signer.register({
+			method: ICRC49_CALL_CANISTER,
+			prompt: ({
+				approve: approveConsent,
+				reject: rejectConsent,
+				consentInfo: info
+			}: ConsentMessagePromptPayload) => {
+				approve = approveConsent;
+				reject = rejectConsent;
+				consentInfo = info;
+			}
+		});
+	});
+
+	const onApprove = () => {
+		approve?.();
+		resetPrompt();
+	};
+
+	const onReject = () => {
+		reject?.();
+		resetPrompt();
+	};
+</script>
+
+{#if nonNullish(displayMessage)}
+	<p class="font-bold">Consent Message</p>
+
+	<p class="mt-2 mb-4 text-sm" data-tid="consent-message">
+		{displayMessage}
+	</p>
+
+	<div class="flex">
+		<Button type="button" onclick={onApprove} testId="reject-consent-message">Reject</Button>
+		<Button type="button" onclick={onReject} testId="approve-consent-message">Approve</Button>
+	</div>
+{/if}

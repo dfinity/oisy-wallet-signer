@@ -4,7 +4,7 @@
 	import { fade } from 'svelte/transition';
 	import Button from '$core/components/Button.svelte';
 	import Value from '$core/components/Value.svelte';
-	import type { IcrcAccounts } from '@dfinity/oisy-wallet-signer';
+	import { accountsStore } from '$lib/stores/accounts.store';
 
 	type Props = {
 		wallet: Wallet | undefined;
@@ -12,23 +12,22 @@
 
 	let { wallet }: Props = $props();
 
-	let accounts: IcrcAccounts | undefined = $state(undefined);
-
 	const onclick = async () => {
-		accounts = await wallet?.accounts();
+		const accounts = await wallet?.accounts();
+		accountsStore.set(accounts);
 	};
 
 	const onreset = async () => {
-		accounts = undefined;
+		accountsStore.set(null);
 	};
 </script>
 
 {#if nonNullish(wallet)}
 	<div in:fade>
 		<Value id="accounts" testId="accounts" title="Accounts">
-			{#if nonNullish(accounts)}
+			{#if nonNullish($accountsStore)}
 				<ul in:fade data-tid="accounts-list">
-					{#each accounts as account}
+					{#each $accountsStore as account}
 						<li>{account.owner}</li>
 					{/each}
 				</ul>
