@@ -42,7 +42,7 @@ export const assertAndPromptConsentMessage = async ({
     });
 
     if ('Err' in response) {
-      // TODO: notify error
+      // TODO: notify error 2000
       return {result: 'error'};
     }
 
@@ -50,7 +50,9 @@ export const assertAndPromptConsentMessage = async ({
 
     return await promptConsentMessage({consentInfo, prompt});
   } catch (err: unknown) {
-    // TODO: notify error
+    // TODO: 2000 for not supported consent message - i.e. method is not implemented
+    // TODO: fine grained error for example out of cycles, stopped etc. should not throw 4000
+    // TODO: notify error 4000
     return {result: 'error'};
   }
 };
@@ -68,6 +70,7 @@ const promptConsentMessage = async ({
     };
 
     const userReject: ConsentMessageAnswer = () => {
+      // TODO: error 3001
       resolve({result: 'rejected'});
     };
 
