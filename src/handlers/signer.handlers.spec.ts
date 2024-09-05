@@ -1,4 +1,4 @@
-import type {Mock} from 'vitest';
+import {beforeEach, Mock} from 'vitest';
 import {mockAccounts} from '../constants/icrc-accounts.mocks';
 import {ICRC27_ACCOUNTS} from '../constants/icrc.constants';
 import {SIGNER_SUPPORTED_STANDARDS, SignerErrorCode} from '../constants/signer.constants';
@@ -18,7 +18,7 @@ import {
 } from './signer.handlers';
 
 describe('Signer handlers', () => {
-  const id: RpcId = 'test-123';
+  let id: RpcId;
   const origin = 'https://hello.com';
 
   let originalOpener: typeof window.opener;
@@ -26,6 +26,7 @@ describe('Signer handlers', () => {
   let postMessageMock: Mock;
 
   beforeEach(() => {
+    id = crypto.randomUUID();
     originalOpener = window.opener;
 
     postMessageMock = vi.fn();
