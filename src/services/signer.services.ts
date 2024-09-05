@@ -4,28 +4,29 @@ import {SignerErrorCode} from '../constants/signer.constants';
 import type {icrc21_consent_info} from '../declarations/icrc-21';
 import {notifyError} from '../handlers/signer.handlers';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
-import type {RpcId} from '../types/rpc';
 import {MissingPromptError} from '../types/signer-errors';
 import type {Notify} from '../types/signer-handlers';
 import type {SignerOptions} from '../types/signer-options';
 import type {ConsentMessageAnswer, ConsentMessagePrompt} from '../types/signer-prompts';
+import {mapIcrc21ErrorToString} from '../utils/icrc-21.utils';
 
 export const assertAndPromptConsentMessage = async ({
-  requestId: _,
   params: {canisterId, method, arg},
   prompt,
-  ...rest
+  notify,
+  options
 }: {
   params: IcrcCallCanisterRequestParams;
-  requestId: RpcId;
   prompt: ConsentMessagePrompt | undefined;
-} & SignerOptions): Promise<{result: 'approved' | 'rejected' | 'error'}> => {
+  notify: Notify;
+  options: SignerOptions;
+}): Promise<{result: 'approved' | 'rejected' | 'error'}> => {
   // TODO: asserting that the sender = owner of the accounts = principal derived by II in the signer
   // i.e. sender === this.#owner
 
   try {
     const response = await consentMessage({
-      ...rest,
+      ...options,
       canisterId,
       request: {
         method,
@@ -42,7 +43,13 @@ export const assertAndPromptConsentMessage = async ({
     });
 
     if ('Err' in response) {
-      // TODO: notify error 2000
+      const {Err} = response;
+
+      notifyErrorRequestNotSupported({
+        ...notify,
+        message: mapIcrc21ErrorToString(Err)
+      });
+
       return {result: 'error'};
     }
 
@@ -86,12 +93,15 @@ const promptConsentMessage = async ({
   return await promise;
 };
 
-export const notifyErrorRequestNotSupported = (notify: Notify): void => {
+export const notifyErrorRequestNotSupported = ({
+  message,
+  ...notify
+}: Notify & {message?: string}): void => {
   notifyError({
     ...notify,
     error: {
       code: SignerErrorCode.REQUEST_NOT_SUPPORTED,
-      message: 'The request sent by the relying party is not supported by the signer.'
+      message: message ?? 'The request sent by the relying party is not supported by the signer.'
     }
   });
 };
