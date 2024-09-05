@@ -643,8 +643,6 @@ export class Signer {
         }
       });
 
-      console.log('----------------->', response);
-
       if ('Err' in response) {
         // TODO: notify error
         return {result: 'error'};
