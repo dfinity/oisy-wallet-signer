@@ -7,6 +7,11 @@ import {
 } from './constants/icrc.constants';
 import {SIGNER_DEFAULT_SCOPES, SignerErrorCode} from './constants/signer.constants';
 import {
+  notifyErrorPermissionNotGranted,
+  notifyErrorRequestNotSupported,
+  notifyMissingPromptError
+} from './handlers/signer-errors.handlers';
+import {
   notifyAccounts,
   notifyError,
   notifyPermissionScopes,
@@ -15,12 +20,7 @@ import {
   type NotifyAccounts,
   type NotifyPermissions
 } from './handlers/signer.handlers';
-import {
-  assertAndPromptConsentMessage,
-  notifyErrorPermissionNotGranted,
-  notifyErrorRequestNotSupported,
-  notifyMissingPromptError
-} from './services/signer.services';
+import {assertAndPromptConsentMessage} from './services/signer.services';
 import {
   readSessionValidScopes,
   saveSessionScopes,
