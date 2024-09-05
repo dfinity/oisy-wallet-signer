@@ -30,7 +30,13 @@ export enum SignerErrorCode {
    * An error is thrown when the permission to perform a feature is denied.
    * @see https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#errors
    */
-  PERMISSION_NOT_GRANTED = 3000
+  PERMISSION_NOT_GRANTED = 3000,
+
+  /**
+   * An error is thrown when the user cancel or deny an action.
+   * @see https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#errors-3
+   */
+  ACTION_ABORTED = 3001
 }
 
 export const SIGNER_SUPPORTED_STANDARDS: IcrcSupportedStandards = Object.values(
