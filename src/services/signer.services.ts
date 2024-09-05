@@ -5,7 +5,7 @@ import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import type {RpcId} from '../types/rpc';
 import {MissingPromptError} from '../types/signer-errors';
 import type {SignerOptions} from '../types/signer-options';
-import {ConsentMessageAnswer, type ConsentMessagePrompt} from '../types/signer-prompts';
+import type {ConsentMessageAnswer, ConsentMessagePrompt} from '../types/signer-prompts';
 
 export const assertAndPromptConsentMessage = async ({
   requestId,
