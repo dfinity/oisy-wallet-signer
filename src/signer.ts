@@ -17,7 +17,8 @@ import {
 } from './handlers/signer.handlers';
 import {
   assertAndPromptConsentMessage,
-  notifyErrorPermissionNotGranted
+  notifyErrorPermissionNotGranted,
+  notifyErrorRequestNotSupported
 } from './services/signer.services';
 import {
   readSessionValidScopes,
@@ -143,13 +144,9 @@ export class Signer {
       return;
     }
 
-    notifyError({
+    notifyErrorRequestNotSupported({
       id: requestData?.id ?? null,
-      origin,
-      error: {
-        code: SignerErrorCode.REQUEST_NOT_SUPPORTED,
-        message: 'The request sent by the relying party is not supported by the signer.'
-      }
+      origin
     });
   };
 
@@ -524,11 +521,16 @@ export class Signer {
       }
 
       const {result: userConsent} = await assertAndPromptConsentMessage({
-        requestId,
+        notify: {
+          id: requestId,
+          origin
+        },
         params,
         prompt: this.#consentMessagePrompt,
-        host: this.#host,
-        owner: this.#owner
+        options: {
+          host: this.#host,
+          owner: this.#owner
+        }
       });
 
       if (userConsent !== 'approved') {
