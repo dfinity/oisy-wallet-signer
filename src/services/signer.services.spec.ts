@@ -11,11 +11,7 @@ import type {Notify} from '../types/signer-handlers';
 import type {SignerOptions} from '../types/signer-options';
 import type {ConsentMessagePromptPayload} from '../types/signer-prompts';
 import {mapIcrc21ErrorToString} from '../utils/icrc-21.utils';
-import {
-  assertAndPromptConsentMessage,
-  notifyErrorPermissionNotGranted,
-  notifyErrorRequestNotSupported
-} from './signer.services';
+import {assertAndPromptConsentMessage} from './signer.services';
 
 describe('Signer services', () => {
   let requestId: RpcId;
@@ -35,8 +31,6 @@ describe('Signer services', () => {
     owner: Ed25519KeyIdentity.generate(),
     host: 'http://localhost:5987'
   };
-
-  const origin = 'https://hello.com';
 
   let originalOpener: typeof window.opener;
 
@@ -142,7 +136,7 @@ describe('Signer services', () => {
           error: errorNotify
         };
 
-        expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
+        expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, testOrigin);
       });
     });
 
@@ -188,7 +182,7 @@ describe('Signer services', () => {
           error: errorNotify
         };
 
-        expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
+        expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, testOrigin);
       });
     });
 
@@ -236,7 +230,7 @@ describe('Signer services', () => {
           error: errorNotify
         };
 
-        expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
+        expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, testOrigin);
       });
 
       it('should call notifyNetworkError with an the error message when consentMessage throws an error', async () => {
@@ -264,7 +258,7 @@ describe('Signer services', () => {
           error: errorNotify
         };
 
-        expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
+        expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, testOrigin);
       });
     });
 
@@ -287,7 +281,7 @@ describe('Signer services', () => {
         error: errorNotify
       };
 
-      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
+      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, testOrigin);
     });
 
     it('should return error if consentMessage throws', async () => {
@@ -305,66 +299,6 @@ describe('Signer services', () => {
       expect(result).toEqual({result: 'error'});
 
       expect(prompt).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('notifyErrorPermissionNotGranted', () => {
-    describe('notifyErrorNotSupported', () => {
-      it('should post an error message with default message when none is provided', () => {
-        const error = {
-          code: SignerErrorCode.REQUEST_NOT_SUPPORTED,
-          message: 'The request sent by the relying party is not supported by the signer.'
-        };
-
-        notifyErrorRequestNotSupported({id: requestId, origin});
-
-        const expectedMessage: RpcResponseWithError = {
-          jsonrpc: JSON_RPC_VERSION_2,
-          id: requestId,
-          error
-        };
-
-        expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
-      });
-
-      it('should post an error message with custom message when provided', () => {
-        const message = 'This is a test';
-
-        const error = {
-          code: SignerErrorCode.REQUEST_NOT_SUPPORTED,
-          message
-        };
-
-        notifyErrorRequestNotSupported({id: requestId, origin, message});
-
-        const expectedMessage: RpcResponseWithError = {
-          jsonrpc: JSON_RPC_VERSION_2,
-          id: requestId,
-          error
-        };
-
-        expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
-      });
-    });
-
-    describe('notifyErrorPermissionNotGranted', () => {
-      it('should post an error message indicating permission not granted', () => {
-        const error = {
-          code: SignerErrorCode.PERMISSION_NOT_GRANTED,
-          message:
-            'The signer has not granted the necessary permissions to process the request from the relying party.'
-        };
-
-        notifyErrorPermissionNotGranted({id: requestId, origin});
-
-        const expectedMessage: RpcResponseWithError = {
-          jsonrpc: JSON_RPC_VERSION_2,
-          id: requestId,
-          error
-        };
-
-        expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
-      });
     });
   });
 });
