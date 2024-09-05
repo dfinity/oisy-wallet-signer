@@ -18,7 +18,8 @@ import {
 import {
   assertAndPromptConsentMessage,
   notifyErrorPermissionNotGranted,
-  notifyErrorRequestNotSupported
+  notifyErrorRequestNotSupported,
+  notifyMissingPromptError
 } from './services/signer.services';
 import {
   readSessionValidScopes,
@@ -301,7 +302,7 @@ export class Signer {
       } = requestPermissionsData;
 
       if (isNullish(this.#permissionsPrompt)) {
-        this.notifyMissingPromptError(requestId);
+        this.assertWalletOriginAndNotifyMissingPromptError(requestId);
 
         return {handled: true};
       }
@@ -368,16 +369,12 @@ export class Signer {
     });
   }
 
-  private notifyMissingPromptError(id: RpcId | undefined): void {
+  private assertWalletOriginAndNotifyMissingPromptError(id: RpcId | undefined): void {
     assertNonNullish(this.#walletOrigin, "The relying party's origin is unknown.");
 
-    notifyError({
+    notifyMissingPromptError({
       id: id ?? null,
-      origin: this.#walletOrigin,
-      error: {
-        code: SignerErrorCode.PERMISSIONS_PROMPT_NOT_REGISTERED,
-        message: 'The signer has not registered a prompt to respond to permission requests.'
-      }
+      origin: this.#walletOrigin
     });
   }
 
@@ -452,7 +449,7 @@ export class Signer {
       await promptFn();
     } catch (err: unknown) {
       if (err instanceof MissingPromptError) {
-        this.notifyMissingPromptError(requestId);
+        this.assertWalletOriginAndNotifyMissingPromptError(requestId);
         return;
       }
 

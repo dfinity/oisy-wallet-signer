@@ -146,7 +146,7 @@ describe('Signer services', () => {
       });
     });
 
-    describe('Call consent message error', () => {
+    describe('Call consent message responds with an error', () => {
       const error = {GenericError: {description: 'Error', error_code: 1n}};
 
       beforeEach(() => {
@@ -192,18 +192,102 @@ describe('Signer services', () => {
       });
     });
 
-    it.skip('should throw MissingPromptError if prompt is undefined', async () => {
-      // TODO: missing prompt error test
-      // try {
-      //   await assertAndPromptConsentMessage({
-      //     requestId,
-      //     params,
-      //     prompt: undefined,
-      //     ...signerOptions
-      //   });
-      // } catch (error) {
-      //   expect(error).toBeInstanceOf(MissingPromptError);
-      // }
+    describe('Call consent message throws an error', () => {
+      it('should return error when consentMessage throws an error', async () => {
+        spy.mockImplementation(() => {
+          // eslint-disable-next-line @typescript-eslint/no-throw-literal
+          throw 'Test';
+        });
+
+        const mockSpy = vi.fn();
+
+        const result = await assertAndPromptConsentMessage({
+          notify,
+          params,
+          prompt: mockSpy,
+          options: signerOptions
+        });
+
+        expect(result).toEqual({result: 'error'});
+        expect(mockSpy).not.toHaveBeenCalled();
+      });
+
+      it('should call notifyNetworkError with an unknown error message when consentMessage throws some error', async () => {
+        spy.mockImplementation(() => {
+          // eslint-disable-next-line @typescript-eslint/no-throw-literal
+          throw 'Test';
+        });
+
+        await assertAndPromptConsentMessage({
+          notify,
+          params,
+          prompt: vi.fn(),
+          options: signerOptions
+        });
+
+        const errorNotify = {
+          code: SignerErrorCode.NETWORK_ERROR,
+          message: 'An unknown error occurred'
+        };
+
+        const expectedMessage: RpcResponseWithError = {
+          jsonrpc: JSON_RPC_VERSION_2,
+          id: requestId,
+          error: errorNotify
+        };
+
+        expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
+      });
+
+      it('should call notifyNetworkError with an the error message when consentMessage throws an error', async () => {
+        const errorMessage = 'This is a test';
+
+        spy.mockImplementation(() => {
+          throw new Error(errorMessage);
+        });
+
+        await assertAndPromptConsentMessage({
+          notify,
+          params,
+          prompt: vi.fn(),
+          options: signerOptions
+        });
+
+        const errorNotify = {
+          code: SignerErrorCode.NETWORK_ERROR,
+          message: errorMessage
+        };
+
+        const expectedMessage: RpcResponseWithError = {
+          jsonrpc: JSON_RPC_VERSION_2,
+          id: requestId,
+          error: errorNotify
+        };
+
+        expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
+      });
+    });
+
+    it('should notify MissingPromptError if prompt is undefined', async () => {
+      await assertAndPromptConsentMessage({
+        notify,
+        params,
+        prompt: undefined,
+        options: signerOptions
+      });
+
+      const errorNotify = {
+        code: SignerErrorCode.PERMISSIONS_PROMPT_NOT_REGISTERED,
+        message: 'The signer has not registered a prompt to respond to permission requests.'
+      };
+
+      const expectedMessage: RpcResponseWithError = {
+        jsonrpc: JSON_RPC_VERSION_2,
+        id: requestId,
+        error: errorNotify
+      };
+
+      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
     });
 
     it('should return error if consentMessage throws', async () => {
