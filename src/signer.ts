@@ -9,14 +9,16 @@ import {SIGNER_DEFAULT_SCOPES, SignerErrorCode} from './constants/signer.constan
 import {
   notifyAccounts,
   notifyError,
-  notifyErrorPermissionNotGranted,
   notifyPermissionScopes,
   notifyReady,
   notifySupportedStandards,
   type NotifyAccounts,
   type NotifyPermissions
 } from './handlers/signer.handlers';
-import {assertAndPromptConsentMessage} from './services/signer.services';
+import {
+  assertAndPromptConsentMessage,
+  notifyErrorPermissionNotGranted
+} from './services/signer.services';
 import {
   readSessionValidScopes,
   saveSessionScopes,

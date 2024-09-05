@@ -1,11 +1,14 @@
 import {isNullish} from '@dfinity/utils';
 import {consentMessage} from '../api/canister.api';
-import type {icrc21_consent_info} from '../declarations/icrc-21';
-import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
-import type {RpcId} from '../types/rpc';
+import {SignerErrorCode} from '../constants/signer.constants';
+import {icrc21_consent_info} from '../declarations/icrc-21';
+import {notifyError} from '../handlers/signer.handlers';
+import {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
+import {RpcId} from '../types/rpc';
 import {MissingPromptError} from '../types/signer-errors';
-import type {SignerOptions} from '../types/signer-options';
-import type {ConsentMessageAnswer, ConsentMessagePrompt} from '../types/signer-prompts';
+import type {Notify} from '../types/signer-handlers';
+import {SignerOptions} from '../types/signer-options';
+import {ConsentMessageAnswer, ConsentMessagePrompt} from '../types/signer-prompts';
 
 export const assertAndPromptConsentMessage = async ({
   requestId,
@@ -75,4 +78,15 @@ const promptConsentMessage = async ({
   });
 
   return await promise;
+};
+
+export const notifyErrorPermissionNotGranted = (notify: Notify): void => {
+  notifyError({
+    ...notify,
+    error: {
+      code: SignerErrorCode.PERMISSION_NOT_GRANTED,
+      message:
+        'The signer has not granted the necessary permissions to process the request from the relying party.'
+    }
+  });
 };

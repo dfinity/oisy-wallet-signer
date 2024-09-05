@@ -1,15 +1,18 @@
 import {Ed25519KeyIdentity} from '@dfinity/identity';
-import type {MockInstance} from 'vitest';
+import {MockInstance, beforeEach, type Mock} from 'vitest';
 import * as api from '../api/canister.api';
 import {consentMessage} from '../api/canister.api';
 import {mockPrincipalText} from '../constants/icrc-accounts.mocks';
-import type {icrc21_consent_info} from '../declarations/icrc-21';
-import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
-import type {SignerOptions} from '../types/signer-options';
-import type {ConsentMessagePromptPayload} from '../types/signer-prompts';
-import {assertAndPromptConsentMessage} from './signer.services';
+import {SignerErrorCode} from '../constants/signer.constants';
+import {icrc21_consent_info} from '../declarations/icrc-21';
+import {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
+import {JSON_RPC_VERSION_2, type RpcId, type RpcResponseWithError} from '../types/rpc';
+import {SignerOptions} from '../types/signer-options';
+import {ConsentMessagePromptPayload} from '../types/signer-prompts';
+import {assertAndPromptConsentMessage, notifyErrorPermissionNotGranted} from './signer.services';
 
 describe('Signer services', () => {
+  let requestId: RpcId;
   let spy: MockInstance;
 
   const mockConsentInfo: icrc21_consent_info = {
@@ -31,8 +34,6 @@ describe('Signer services', () => {
     owner: Ed25519KeyIdentity.generate(),
     host: 'http://localhost:5987'
   };
-
-  let requestId: string;
 
   beforeEach(() => {
     requestId = crypto.randomUUID();
@@ -142,6 +143,46 @@ describe('Signer services', () => {
       expect(result).toEqual({result: 'error'});
 
       expect(prompt).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('notifyErrorPermissionNotGranted', () => {
+    const origin = 'https://hello.com';
+
+    let originalOpener: typeof window.opener;
+
+    let postMessageMock: Mock;
+
+    beforeEach(() => {
+      originalOpener = window.opener;
+
+      postMessageMock = vi.fn();
+
+      vi.stubGlobal('opener', {postMessage: postMessageMock});
+    });
+
+    afterEach(() => {
+      window.opener = originalOpener;
+
+      vi.restoreAllMocks();
+    });
+
+    it('should post an error message indicating permission not granted', () => {
+      const error = {
+        code: SignerErrorCode.PERMISSION_NOT_GRANTED,
+        message:
+          'The signer has not granted the necessary permissions to process the request from the relying party.'
+      };
+
+      notifyErrorPermissionNotGranted({id: requestId, origin});
+
+      const expectedMessage: RpcResponseWithError = {
+        jsonrpc: JSON_RPC_VERSION_2,
+        id: requestId,
+        error
+      };
+
+      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
     });
   });
 });
