@@ -1,7 +1,6 @@
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import type {MockInstance} from 'vitest';
 import * as actors from './api/actors.api';
-import {mockAccounts, mockPrincipalText} from './constants/icrc-accounts.mocks';
 import {
   ICRC25_PERMISSIONS,
   ICRC25_PERMISSION_GRANTED,
@@ -17,6 +16,7 @@ import {
   SignerErrorCode
 } from './constants/signer.constants';
 import * as signerHandlers from './handlers/signer.handlers';
+import {mockAccounts, mockPrincipalText} from './mocks/icrc-accounts.mocks';
 import {saveSessionScopes} from './sessions/signer.sessions';
 import {Signer} from './signer';
 import type {

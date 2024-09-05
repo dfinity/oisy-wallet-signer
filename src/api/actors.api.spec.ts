@@ -2,8 +2,8 @@ import {Actor} from '@dfinity/agent';
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {createAgent} from '@dfinity/utils';
 import {beforeEach} from 'vitest';
-import {mockCanisterId} from '../constants/icrc-accounts.mocks';
 import {idlFactory} from '../declarations/icrc-21.idl';
+import {mockCanisterId} from '../mocks/icrc-accounts.mocks';
 import type {SignerOptions} from '../types/signer-options';
 import {getIcrc21Actor, resetActors} from './actors.api';
 

@@ -1,5 +1,5 @@
 import {IDL} from '@dfinity/candid';
-import {mockPrincipalText} from '../constants/icrc-accounts.mocks';
+import {mockPrincipalText} from '../mocks/icrc-accounts.mocks';
 import {
   WalletRequestOptionsSchema,
   extendIcrcCallCanisterRequestParamsSchema,

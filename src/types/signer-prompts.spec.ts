@@ -1,5 +1,5 @@
-import {mockAccounts} from '../constants/icrc-accounts.mocks';
 import {ICRC27_ACCOUNTS} from '../constants/icrc.constants';
+import {mockAccounts} from '../mocks/icrc-accounts.mocks';
 import type {IcrcScopesArray} from './icrc-responses';
 import {
   AccountsPromptSchema,
