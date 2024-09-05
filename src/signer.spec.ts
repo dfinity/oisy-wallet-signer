@@ -33,11 +33,11 @@ import type {SignerMessageEventData} from './types/signer';
 import type {SignerOptions} from './types/signer-options';
 import {
   AccountsPromptSchema,
-  ConsentMessageAnswer,
   ConsentMessagePromptSchema,
   PermissionsPromptSchema,
   type AccountsConfirmation,
   type AccountsPromptPayload,
+  type ConsentMessageAnswer,
   type ConsentMessagePromptPayload,
   type PermissionsConfirmation,
   type PermissionsPromptPayload
