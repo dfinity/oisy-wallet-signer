@@ -97,23 +97,53 @@ describe('Signer services', () => {
       });
     });
 
-    it('should return rejected when user rejects the consent message', async () => {
-      spy.mockResolvedValue({
-        Ok: mockConsentInfo
+    describe('User reject consent', () => {
+      beforeEach(() => {
+        spy.mockResolvedValue({
+          Ok: mockConsentInfo
+        });
       });
 
-      const prompt = ({reject}: ConsentMessagePromptPayload): void => {
-        reject();
-      };
+      it('should return rejected when user rejects the consent message', async () => {
+        const prompt = ({reject}: ConsentMessagePromptPayload): void => {
+          reject();
+        };
 
-      const result = await assertAndPromptConsentMessage({
-        notify,
-        params,
-        prompt,
-        options: signerOptions
+        const result = await assertAndPromptConsentMessage({
+          notify,
+          params,
+          prompt,
+          options: signerOptions
+        });
+
+        expect(result).toEqual({result: 'rejected'});
       });
 
-      expect(result).toEqual({result: 'rejected'});
+      it('should call notifyErrorActionAborted when user rejects consent message', async () => {
+        const prompt = ({reject}: ConsentMessagePromptPayload): void => {
+          reject();
+        };
+
+        await assertAndPromptConsentMessage({
+          notify,
+          params,
+          prompt,
+          options: signerOptions
+        });
+
+        const errorNotify = {
+          code: SignerErrorCode.ACTION_ABORTED,
+          message: 'The signer has canceled the action requested by the relying party.'
+        };
+
+        const expectedMessage: RpcResponseWithError = {
+          jsonrpc: JSON_RPC_VERSION_2,
+          id: requestId,
+          error: errorNotify
+        };
+
+        expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
+      });
     });
 
     describe('Call consent message error', () => {

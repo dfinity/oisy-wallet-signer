@@ -55,7 +55,13 @@ export const assertAndPromptConsentMessage = async ({
 
     const {Ok: consentInfo} = response;
 
-    return await promptConsentMessage({consentInfo, prompt});
+    const {result} = await promptConsentMessage({consentInfo, prompt});
+
+    if (result === 'rejected') {
+      notifyErrorActionAborted(notify);
+    }
+
+    return {result};
   } catch (err: unknown) {
     // TODO: 2000 for not supported consent message - i.e. method is not implemented
     // TODO: fine grained error for example out of cycles, stopped etc. should not throw 4000
@@ -77,7 +83,6 @@ const promptConsentMessage = async ({
     };
 
     const userReject: ConsentMessageAnswer = () => {
-      // TODO: error 3001
       resolve({result: 'rejected'});
     };
 
@@ -102,6 +107,16 @@ export const notifyErrorRequestNotSupported = ({
     error: {
       code: SignerErrorCode.REQUEST_NOT_SUPPORTED,
       message: message ?? 'The request sent by the relying party is not supported by the signer.'
+    }
+  });
+};
+
+const notifyErrorActionAborted = (notify: Notify): void => {
+  notifyError({
+    ...notify,
+    error: {
+      code: SignerErrorCode.ACTION_ABORTED,
+      message: 'The signer has canceled the action requested by the relying party.'
     }
   });
 };
