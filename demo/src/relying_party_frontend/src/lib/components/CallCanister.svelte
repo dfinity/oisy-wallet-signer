@@ -62,6 +62,26 @@
 			fee: []
 		}
 
+		// TODO: we want to create and expose opiniated version WalletIcrc and WalletICP to ease the client integration.
+		//
+		// Basically:
+		// Wallet -> RelyingParty
+		// class WalletICP extends RelyingParty
+		//
+		// result = wallet?.icrc1_transfer({
+		// 	params: {
+		// 		sender: account.owner,
+		// 		canisterId: "ryjl3-tyaaa-aaaaa-aaaba-cai",
+		// 		myValue
+		// 	}
+		// })
+		//
+		// interface Params {
+		// 	arg: Uint8Array | {
+		// 		value: T, type: D
+		// 	}
+		// }
+
 		result = await wallet?.call({
 			params: {
 				sender: account.owner,
