@@ -1,10 +1,10 @@
-import {mockAccounts, mockPrincipalText} from '../constants/icrc-accounts.mocks';
 import {
   ICRC25_PERMISSIONS,
   ICRC25_PERMISSION_GRANTED,
   ICRC25_REQUEST_PERMISSIONS,
   ICRC27_ACCOUNTS
 } from '../constants/icrc.constants';
+import {mockAccounts, mockPrincipalText} from '../mocks/icrc-accounts.mocks';
 import {
   IcrcAccountsResponseSchema,
   IcrcCallCanisterResultResponseSchema,

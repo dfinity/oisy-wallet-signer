@@ -1,5 +1,4 @@
 import {IDL} from '@dfinity/candid';
-import {mockAccounts, mockPrincipalText} from './constants/icrc-accounts.mocks';
 import {
   ICRC25_PERMISSIONS,
   ICRC25_REQUEST_PERMISSIONS,
@@ -18,6 +17,7 @@ import {
   WALLET_TIMEOUT_REQUEST_SUPPORTED_STANDARD
 } from './constants/wallet.constants';
 import * as walletHandlers from './handlers/wallet.handlers';
+import {mockAccounts, mockPrincipalText} from './mocks/icrc-accounts.mocks';
 import type {IcrcAnyRequestedScopes} from './types/icrc-requests';
 import {
   IcrcAccountsResponseSchema,

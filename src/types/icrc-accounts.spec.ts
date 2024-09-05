@@ -1,5 +1,5 @@
 import {Principal} from '@dfinity/principal';
-import {mockPrincipalText} from '../constants/icrc-accounts.mocks';
+import {mockPrincipalText} from '../mocks/icrc-accounts.mocks';
 import {IcrcAccountSchema, IcrcAccountsSchema} from './icrc-accounts';
 
 describe('ICRC accounts', () => {
