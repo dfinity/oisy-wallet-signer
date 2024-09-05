@@ -15,7 +15,10 @@ import {
   type NotifyAccounts,
   type NotifyPermissions
 } from './handlers/signer.handlers';
-import {notifyErrorPermissionNotGranted} from './services/signer.services';
+import {
+  assertAndPromptConsentMessage,
+  notifyErrorPermissionNotGranted
+} from './services/signer.services';
 import {
   readSessionValidScopes,
   saveSessionScopes,
@@ -41,7 +44,7 @@ import {
 import {RpcRequestSchema, type RpcId} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
 import {MissingPromptError} from './types/signer-errors';
-import type {IdentityNotAnonymous, SignerOptions} from './types/signer-options';
+import type {IdentityNotAnonymous, SignerHost, SignerOptions} from './types/signer-options';
 import {
   AccountsPromptSchema,
   ConsentMessagePromptSchema,
@@ -55,6 +58,7 @@ import {
 
 export class Signer {
   readonly #owner: IdentityNotAnonymous;
+  readonly #host: SignerHost;
 
   #walletOrigin: string | undefined | null;
 
@@ -62,8 +66,9 @@ export class Signer {
   #accountsPrompt: AccountsPrompt | undefined;
   #consentMessagePrompt: ConsentMessagePrompt | undefined;
 
-  private constructor({owner}: SignerOptions) {
+  private constructor({owner, host}: SignerOptions) {
     this.#owner = owner;
+    this.#host = host;
 
     window.addEventListener('message', this.onMessageListener);
   }
@@ -502,7 +507,7 @@ export class Signer {
       IcrcCallCanisterRequestSchema.safeParse(data);
 
     if (isCallCanisterRequest) {
-      const {id: requestId} = callData;
+      const {id: requestId, params} = callData;
 
       const permission = await this.assertAndPromptPermissions({
         method: ICRC49_CALL_CANISTER,
@@ -510,19 +515,27 @@ export class Signer {
         origin
       });
 
-      switch (permission) {
-        case 'denied': {
-          notifyErrorPermissionNotGranted({
-            id: requestId ?? null,
-            origin
-          });
-          break;
-        }
-        case 'granted': {
-          // TODO: process call canister
-          break;
-        }
+      if (permission === 'denied') {
+        notifyErrorPermissionNotGranted({
+          id: requestId ?? null,
+          origin
+        });
+        return {handled: true};
       }
+
+      const {result: userConsent} = await assertAndPromptConsentMessage({
+        requestId,
+        params,
+        prompt: this.#consentMessagePrompt,
+        host: this.#host,
+        owner: this.#owner
+      });
+
+      if (userConsent !== 'approved') {
+        return {handled: true};
+      }
+
+      // TODO: call canister
 
       return {handled: true};
     }
