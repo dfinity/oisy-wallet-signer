@@ -1,5 +1,5 @@
-import {mockPrincipalText} from '../constants/icrc-accounts.mocks';
 import {ICRC27_ACCOUNTS} from '../constants/icrc.constants';
+import {mockPrincipalText} from '../mocks/icrc-accounts.mocks';
 import {
   IcrcAccountsRequestSchema,
   IcrcCallCanisterRequestParamsSchema,
