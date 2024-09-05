@@ -1,4 +1,4 @@
-import {beforeEach, Mock} from 'vitest';
+import {beforeEach, type Mock} from 'vitest';
 import {mockAccounts} from '../constants/icrc-accounts.mocks';
 import {ICRC27_ACCOUNTS} from '../constants/icrc.constants';
 import {SIGNER_SUPPORTED_STANDARDS, SignerErrorCode} from '../constants/signer.constants';
