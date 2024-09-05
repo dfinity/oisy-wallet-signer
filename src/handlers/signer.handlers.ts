@@ -1,4 +1,4 @@
-import {SIGNER_SUPPORTED_STANDARDS, SignerErrorCode} from '../constants/signer.constants';
+import {SIGNER_SUPPORTED_STANDARDS} from '../constants/signer.constants';
 import type {IcrcAccounts} from '../types/icrc-accounts';
 import type {
   IcrcAccountsResponse,
@@ -9,16 +9,11 @@ import type {
 } from '../types/icrc-responses';
 import {
   JSON_RPC_VERSION_2,
-  type RpcId,
   type RpcResponse,
   type RpcResponseError,
   type RpcResponseWithError
 } from '../types/rpc';
-
-interface Notify {
-  id: RpcId;
-  origin: string;
-}
+import type {Notify} from '../types/signer-handlers';
 
 export const notifyReady = ({id, origin}: Notify): void => {
   const msg: IcrcReadyResponse = {
@@ -64,17 +59,6 @@ export const notifyAccounts = ({id, origin, accounts}: NotifyAccounts): void => 
   };
 
   notify({msg, origin});
-};
-
-export const notifyErrorPermissionNotGranted = (notify: Notify): void => {
-  notifyError({
-    ...notify,
-    error: {
-      code: SignerErrorCode.PERMISSION_NOT_GRANTED,
-      message:
-        'The signer has not granted the necessary permissions to process the request from the relying party.'
-    }
-  });
 };
 
 export const notifyError = ({
