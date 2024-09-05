@@ -9,13 +9,13 @@ import {SIGNER_DEFAULT_SCOPES, SignerErrorCode} from './constants/signer.constan
 import {
   notifyAccounts,
   notifyError,
-  notifyErrorPermissionNotGranted,
   notifyPermissionScopes,
   notifyReady,
   notifySupportedStandards,
   type NotifyAccounts,
   type NotifyPermissions
 } from './handlers/signer.handlers';
+import {notifyErrorPermissionNotGranted} from './services/signer.services';
 import {
   readSessionValidScopes,
   saveSessionScopes,
@@ -40,6 +40,7 @@ import {
 } from './types/icrc-standards';
 import {RpcRequestSchema, type RpcId} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
+import {MissingPromptError} from './types/signer-errors';
 import type {IdentityNotAnonymous, SignerOptions} from './types/signer-options';
 import {
   AccountsPromptSchema,
@@ -51,8 +52,6 @@ import {
   type PermissionsConfirmation,
   type PermissionsPrompt
 } from './types/signer-prompts';
-
-class MissingPromptError extends Error {}
 
 export class Signer {
   readonly #owner: IdentityNotAnonymous;

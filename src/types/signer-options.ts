@@ -28,7 +28,7 @@ const IdentityNotAnonymousSchema = IdentitySchema.refine(
 
 export type IdentityNotAnonymous = z.infer<typeof IdentityNotAnonymousSchema>;
 
-export const SignerHostSchema = z.string().url();
+export const SignerHostSchema = z.string().url().optional();
 
 export type SignerHost = z.infer<typeof SignerHostSchema>;
 
@@ -45,7 +45,7 @@ export const SignerOptionsSchema = z.object({
    * The replica's host to which the signer should connect to.
    * If localhost or 127.0.0.1 are provided, the signer will automatically connect to a local replica and fetch the root key for the agent.
    */
-  host: SignerHostSchema.optional()
+  host: SignerHostSchema
 });
 
 export type SignerOptions = z.infer<typeof SignerOptionsSchema>;

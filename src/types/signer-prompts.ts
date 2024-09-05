@@ -57,6 +57,8 @@ export type AccountsPrompt = z.infer<typeof AccountsPromptSchema>;
 
 const ConsentMessageAnswerSchema = z.function().returns(z.void());
 
+export type ConsentMessageAnswer = z.infer<typeof ConsentMessageAnswerSchema>;
+
 const ConsentMessagePromptPayloadSchema = z.object({
   consentInfo: z.custom<icrc21_consent_info>(),
   approve: ConsentMessageAnswerSchema,
