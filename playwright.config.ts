@@ -21,7 +21,8 @@ export default defineConfig({
   use: {
     testIdAttribute: 'data-tid',
     trace: 'on',
-    ...(DEV && {headless: false})
+    ...(DEV && {headless: false}),
+    screenshot: "only-on-failure",
   },
   projects: [
     {
