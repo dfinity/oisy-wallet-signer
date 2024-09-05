@@ -40,6 +40,7 @@ import {
 } from './types/signer-prompts';
 import type {SessionPermissions} from './types/signer-sessions';
 import {del, get} from './utils/storage.utils';
+import * as api from '../api/canister.api';
 
 describe('Signer', () => {
   const identity = Ed25519KeyIdentity.generate();
@@ -887,6 +888,30 @@ describe('Signer', () => {
               testOrigin
             );
           });
+        });
+      });
+
+      describe('Consent message', () => {
+        let spy: MockInstance;
+
+        beforeEach(() => {
+          spy = vi.spyOn(api, 'consentMessage');
+        });
+
+        describe("Call canister success", () => {
+          beforeEach(() => {
+            spy.mockResolvedValue({
+              Ok: mockConsentInfo
+            });
+          });
+        });
+
+        describe("Call canister error", () => {
+          beforeEach(() => {
+            spy.mockResolvedValue({
+              Err: {GenericError: {description: 'Error', error_code: 1n}}
+            });
+          })
         });
       });
     });
