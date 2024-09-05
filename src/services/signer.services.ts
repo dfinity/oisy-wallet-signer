@@ -86,6 +86,16 @@ const promptConsentMessage = async ({
   return await promise;
 };
 
+export const notifyErrorRequestNotSupported = (notify: Notify): void => {
+  notifyError({
+    ...notify,
+    error: {
+      code: SignerErrorCode.REQUEST_NOT_SUPPORTED,
+      message: 'The request sent by the relying party is not supported by the signer.'
+    }
+  });
+};
+
 export const notifyErrorPermissionNotGranted = (notify: Notify): void => {
   notifyError({
     ...notify,
