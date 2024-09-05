@@ -523,9 +523,6 @@ export class Signer {
         return {handled: true};
       }
 
-      // TODO: asserting that the sender = owner of the accounts = principal derived by II in the signer
-      // i.e. sender === this.#owner
-
       const {result: userConsent} = await assertAndPromptConsentMessage({
         requestId,
         params,
