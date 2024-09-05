@@ -71,7 +71,11 @@ export const assertAndPromptConsentMessage = async ({
     // TODO: 2000 for not supported consent message - i.e. method is not implemented.
     // TODO: Likewise for example if canister is out of cycles or stopped etc. it should not throw 4000.
 
-    // TODO: notify error 4000
+    notifyNetworkError({
+      ...notify,
+      message: err instanceof Error ? err.message : 'An unknown error occurred'
+    });
+
     return {result: 'error'};
   }
 };
@@ -117,6 +121,16 @@ const notifyErrorActionAborted = (notify: Notify): void => {
     error: {
       code: SignerErrorCode.ACTION_ABORTED,
       message: 'The signer has canceled the action requested by the relying party.'
+    }
+  });
+};
+
+const notifyNetworkError = ({message, ...notify}: Notify & {message: string}): void => {
+  notifyError({
+    ...notify,
+    error: {
+      code: SignerErrorCode.NETWORK_ERROR,
+      message
     }
   });
 };
