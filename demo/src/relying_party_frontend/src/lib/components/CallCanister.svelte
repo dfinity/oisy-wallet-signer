@@ -8,7 +8,7 @@
 	import { accountsStore } from '$lib/stores/accounts.store';
 	import { IDL } from '@dfinity/candid';
 	import type { TransferArg } from '@dfinity/ledger-icp/dist/candid/ledger';
-	import { Principal } from '@dfinity/principal';
+	import { authStore } from '$core/stores/auth.store';
 
 	type Props = {
 		wallet: Wallet | undefined;
@@ -20,6 +20,10 @@
 
 	const onclick = async () => {
 		// TODO: handle errors
+		if (isNullish($authStore.identity)) {
+			return;
+		}
+
 		if (isNullish($accountsStore)) {
 			return;
 		}
@@ -52,7 +56,7 @@
 
 		const arg: TransferArg = {
 			to: {
-				owner: Principal.fromText(account.owner),
+				owner: $authStore.identity.getPrincipal(),
 				subaccount: []
 			},
 			created_at_time: [],
