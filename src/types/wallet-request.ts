@@ -44,14 +44,13 @@ export type WalletRequestOptionsWithTimeout = z.infer<typeof WalletRequestOption
  * @returns {z.ZodObject} - A Zod schema object that includes the base fields and the custom `arg` and `argType`.
  */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-export const extendIcrcCallCanisterRequestParamsSchema = <T>() => {
-  return IcrcCallCanisterRequestParamsSchema.omit({arg: true}).extend({
+export const extendIcrcCallCanisterRequestParamsSchema = <T>() =>
+  IcrcCallCanisterRequestParamsSchema.omit({arg: true}).extend({
     arg: z.custom<T>().refine(nonNullish, {
       message: 'arg is required'
     }),
     argType: z.instanceof(Type) as z.ZodType<Type>
   });
-};
 
 /**
  * Represents the type of parameters used in a wallet call, based on the

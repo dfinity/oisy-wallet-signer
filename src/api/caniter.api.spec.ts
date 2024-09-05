@@ -83,15 +83,13 @@ describe('canister.api', () => {
         ...icrc21Actor,
         icrc21_canister_call_consent_message: vi
           .fn()
-          .mockImplementation(async (_request: icrc21_consent_message_request) => {
-            return consentMessageResponse;
-          }) as unknown as Icrc21Actor['icrc21_canister_call_consent_message']
+          .mockImplementation(
+            async (_request: icrc21_consent_message_request) => consentMessageResponse
+          ) as unknown as Icrc21Actor['icrc21_canister_call_consent_message']
       };
 
       const spy = vi.spyOn(actor, 'getIcrc21Actor');
-      spy.mockImplementation(async () => {
-        return mockIcrc21Actor;
-      });
+      spy.mockImplementation(async () => mockIcrc21Actor);
 
       const result = await consentMessage({
         ...signerOptions,
@@ -122,9 +120,7 @@ describe('canister.api', () => {
       };
 
       const spy = vi.spyOn(actor, 'getIcrc21Actor');
-      spy.mockImplementation(async () => {
-        return mockIcrc21Actor;
-      });
+      spy.mockImplementation(async () => mockIcrc21Actor);
 
       await expect(
         consentMessage({

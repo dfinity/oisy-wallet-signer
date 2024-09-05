@@ -307,9 +307,9 @@ describe('Wallet', () => {
 
         it.each(options)(
           'should timeout for $title if wallet does not answer with expected standards',
-          async ({options}) => {
+          async ({options}) =>
             // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
-            return new Promise<void>(async (resolve) => {
+            new Promise<void>(async (resolve) => {
               vi.useFakeTimers();
 
               const timeout =
@@ -326,13 +326,12 @@ describe('Wallet', () => {
               });
 
               await vi.advanceTimersByTimeAsync(timeout);
-            });
-          }
+            })
         );
 
-        it('should timeout if response ID is not the same as request ID', async () => {
+        it('should timeout if response ID is not the same as request ID', async () =>
           // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
-          return new Promise<void>(async (resolve) => {
+          new Promise<void>(async (resolve) => {
             vi.useFakeTimers();
 
             const spy = vi.spyOn(IcrcSupportedStandardsResponseSchema, 'safeParse');
@@ -363,8 +362,7 @@ describe('Wallet', () => {
             window.dispatchEvent(messageEventSupportedStandards);
 
             await vi.advanceTimersByTimeAsync(WALLET_TIMEOUT_REQUEST_SUPPORTED_STANDARD);
-          });
-        });
+          }));
 
         it('should throw error if the message signer standards received comes from another origin', async () => {
           const hackerOrigin = 'https://hacker.com';
@@ -508,9 +506,9 @@ describe('Wallet', () => {
 
           it.each(options)(
             'should timeout for $title if wallet does not answer with expected permissions',
-            async ({options}) => {
+            async ({options}) =>
               // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
-              return new Promise<void>(async (resolve) => {
+              new Promise<void>(async (resolve) => {
                 vi.useFakeTimers();
 
                 const timeout = options?.timeoutInMilliseconds ?? WALLET_TIMEOUT_PERMISSIONS;
@@ -526,13 +524,12 @@ describe('Wallet', () => {
                 });
 
                 await vi.advanceTimersByTimeAsync(timeout);
-              });
-            }
+              })
           );
 
-          it('should timeout if response ID is not the same as request ID', async () => {
+          it('should timeout if response ID is not the same as request ID', async () =>
             // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
-            return new Promise<void>(async (resolve) => {
+            new Promise<void>(async (resolve) => {
               vi.useFakeTimers();
 
               const spy = vi.spyOn(IcrcScopesResponseSchema, 'safeParse');
@@ -563,8 +560,7 @@ describe('Wallet', () => {
               window.dispatchEvent(messageEventScopes);
 
               await vi.advanceTimersByTimeAsync(WALLET_TIMEOUT_PERMISSIONS);
-            });
-          });
+            }));
 
           it('should throw error if the message permissions received comes from another origin', async () => {
             const hackerOrigin = 'https://hacker.com';
@@ -688,9 +684,9 @@ describe('Wallet', () => {
 
           it.each(options)(
             'should timeout for $title if wallet does not answer with expected permissions',
-            async ({options}) => {
+            async ({options}) =>
               // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
-              return new Promise<void>(async (resolve) => {
+              new Promise<void>(async (resolve) => {
                 vi.useFakeTimers();
 
                 const timeout =
@@ -707,13 +703,12 @@ describe('Wallet', () => {
                 });
 
                 await vi.advanceTimersByTimeAsync(timeout);
-              });
-            }
+              })
           );
 
-          it('should timeout if response ID is not the same as request ID', async () => {
+          it('should timeout if response ID is not the same as request ID', async () =>
             // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
-            return new Promise<void>(async (resolve) => {
+            new Promise<void>(async (resolve) => {
               vi.useFakeTimers();
 
               const spy = vi.spyOn(IcrcScopesResponseSchema, 'safeParse');
@@ -744,8 +739,7 @@ describe('Wallet', () => {
               window.dispatchEvent(messageEventScopes);
 
               await vi.advanceTimersByTimeAsync(WALLET_TIMEOUT_REQUEST_PERMISSIONS);
-            });
-          });
+            }));
 
           it('should throw error if the message received comes from another origin', async () => {
             const hackerOrigin = 'https://hacker.com';
@@ -913,9 +907,9 @@ describe('Wallet', () => {
 
         it.each(options)(
           'should timeout for $title if wallet does not answer with expected accounts',
-          async ({options}) => {
+          async ({options}) =>
             // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
-            return new Promise<void>(async (resolve) => {
+            new Promise<void>(async (resolve) => {
               vi.useFakeTimers();
 
               const timeout = options?.timeoutInMilliseconds ?? WALLET_TIMEOUT_ACCOUNTS;
@@ -931,13 +925,12 @@ describe('Wallet', () => {
               });
 
               await vi.advanceTimersByTimeAsync(timeout);
-            });
-          }
+            })
         );
 
-        it('should timeout if response ID is not the same as request ID', async () => {
+        it('should timeout if response ID is not the same as request ID', async () =>
           // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
-          return new Promise<void>(async (resolve) => {
+          new Promise<void>(async (resolve) => {
             vi.useFakeTimers();
 
             const spy = vi.spyOn(IcrcAccountsResponseSchema, 'safeParse');
@@ -968,8 +961,7 @@ describe('Wallet', () => {
             window.dispatchEvent(messageEventSupportedStandards);
 
             await vi.advanceTimersByTimeAsync(WALLET_TIMEOUT_ACCOUNTS);
-          });
-        });
+          }));
 
         it('should throw error if the message accounts received comes from another origin', async () => {
           const hackerOrigin = 'https://hacker.com';
@@ -1126,9 +1118,9 @@ describe('Wallet', () => {
 
         it.each(options)(
           'should timeout for $title if wallet does not answer with result',
-          async ({options}) => {
+          async ({options}) =>
             // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
-            return new Promise<void>(async (resolve) => {
+            new Promise<void>(async (resolve) => {
               vi.useFakeTimers();
 
               const timeout = options?.timeoutInMilliseconds ?? WALLET_TIMEOUT_CALL_CANISTER;
@@ -1144,13 +1136,12 @@ describe('Wallet', () => {
               });
 
               await vi.advanceTimersByTimeAsync(timeout);
-            });
-          }
+            })
         );
 
-        it('should timeout if response ID is not the same as request ID', async () => {
+        it('should timeout if response ID is not the same as request ID', async () =>
           // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
-          return new Promise<void>(async (resolve) => {
+          new Promise<void>(async (resolve) => {
             vi.useFakeTimers();
 
             const spy = vi.spyOn(IcrcCallCanisterResultResponseSchema, 'safeParse');
@@ -1179,8 +1170,7 @@ describe('Wallet', () => {
             window.dispatchEvent(messageEventScopes);
 
             await vi.advanceTimersByTimeAsync(WALLET_TIMEOUT_CALL_CANISTER);
-          });
-        });
+          }));
 
         it('should throw error if the message received comes from another origin', async () => {
           const hackerOrigin = 'https://hacker.com';

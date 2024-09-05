@@ -22,6 +22,16 @@
         "caughtErrorsIgnorePattern": "^_"
       }
     ],
-    "@typescript-eslint/array-type": ["error", {"default": "array"}]
+    "@typescript-eslint/array-type": ["error", {"default": "array"}],
+    "arrow-body-style": ["warn", "as-needed"],
+    "no-else-return": ["warn", {"allowElseIf": false}],
+    "no-console": ["error", {"allow": ["error", "warn"]}],
+    "no-continue": "warn",
+    "@typescript-eslint/no-unnecessary-type-assertion": "error",
+    "no-delete-var": "error",
+    "curly": "error",
+    "import/no-duplicates": ["error", {"prefer-inline": true}],
+    "@typescript-eslint/no-inferrable-types": "error",
+    "prefer-template": "error"
   }
 }
