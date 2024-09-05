@@ -17,8 +17,8 @@ import {
 } from './handlers/signer.handlers';
 import {
   assertAndPromptConsentMessage,
-  notifyErrorRequestNotSupported,
-  notifyErrorPermissionNotGranted
+  notifyErrorPermissionNotGranted,
+  notifyErrorRequestNotSupported
 } from './services/signer.services';
 import {
   readSessionValidScopes,
@@ -521,11 +521,16 @@ export class Signer {
       }
 
       const {result: userConsent} = await assertAndPromptConsentMessage({
-        requestId,
+        notify: {
+          id: requestId,
+          origin
+        },
         params,
         prompt: this.#consentMessagePrompt,
-        host: this.#host,
-        owner: this.#owner
+        options: {
+          host: this.#host,
+          owner: this.#owner
+        }
       });
 
       if (userConsent !== 'approved') {
