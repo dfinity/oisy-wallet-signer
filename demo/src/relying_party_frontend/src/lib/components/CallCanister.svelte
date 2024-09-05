@@ -16,7 +16,7 @@
 
 	let { wallet }: Props = $props();
 
-	let result: IcrcCallCanisterResult | undefined = $state(undefined);
+	let result = $state<IcrcCallCanisterResult | undefined>(undefined);
 
 	const onclick = async () => {
 		// TODO: handle errors

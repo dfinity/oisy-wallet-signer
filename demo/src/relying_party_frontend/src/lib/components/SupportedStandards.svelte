@@ -11,7 +11,7 @@
 
 	let { wallet }: Props = $props();
 
-	let supportedStandards: IcrcSupportedStandards | undefined = $state(undefined);
+	let supportedStandards = $state<IcrcSupportedStandards | undefined>(undefined);
 
 	$effect(() => {
 		(async () => {

@@ -8,7 +8,7 @@
 	import ConfirmAccounts from '$lib/ConfirmAccounts.svelte';
 	import ConfirmConsentMessage from '$lib/ConfirmConsentMessage.svelte';
 
-	let signer: Signer | undefined = $state(undefined);
+	let signer = $state<Signer | undefined>(undefined);
 
 	$effect(() => {
 		if ($notSignedIn) {

@@ -12,7 +12,7 @@
 
 	let { wallet }: Props = $props();
 
-	let scopes: IcrcScopesArray | undefined = $state(undefined);
+	let scopes = $state<IcrcScopesArray | undefined>(undefined);
 
 	const loadPermissions = async () => {
 		if (isNullish(wallet)) {

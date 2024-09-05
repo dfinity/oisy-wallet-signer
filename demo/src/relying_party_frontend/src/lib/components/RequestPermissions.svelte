@@ -14,7 +14,7 @@
 
 	let { wallet }: Props = $props();
 
-	let scopes: IcrcScopesArray | undefined = $state(undefined);
+	let scopes = $state<IcrcScopesArray | undefined>(undefined);
 
 	const onclick = async () => {
 		scopes = await wallet?.requestPermissions();

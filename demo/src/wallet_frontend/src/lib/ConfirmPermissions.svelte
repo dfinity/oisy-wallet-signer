@@ -15,8 +15,8 @@
 
 	let { signer }: Props = $props();
 
-	let scopes: IcrcScope[] | undefined = $state(undefined);
-	let confirm: PermissionsConfirmation | undefined = $state(undefined);
+	let scopes = $state<IcrcScope[] | undefined>(undefined);
+	let confirm = $state<PermissionsConfirmation | undefined>(undefined);
 
 	const sortScope = (
 		{ scope: { method: methodA } }: IcrcScope,

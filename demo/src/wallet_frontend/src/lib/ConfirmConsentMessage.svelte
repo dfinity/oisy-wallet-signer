@@ -15,9 +15,9 @@
 
 	let { signer }: Props = $props();
 
-	let approve: ConsentMessageAnswer | undefined = $state(undefined);
-	let reject: ConsentMessageAnswer | undefined = $state(undefined);
-	let consentInfo: icrc21_consent_info | undefined = $state(undefined);
+	let approve = $state<ConsentMessageAnswer | undefined>(undefined);
+	let reject = $state<ConsentMessageAnswer | undefined>(undefined);
+	let consentInfo = $state<icrc21_consent_info | undefined>(undefined);
 
 	let displayMessage: string | undefined = $derived(
 		nonNullish(consentInfo)
