@@ -36,7 +36,13 @@ export enum SignerErrorCode {
    * An error is thrown when the user cancel or deny an action.
    * @see https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#errors-3
    */
-  ACTION_ABORTED = 3001
+  ACTION_ABORTED = 3001,
+
+  /**
+   * An unexpected "network" error happened. Like not being able to call the IC.
+   * @see https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#errors-3
+   */
+  NETWORK_ERROR = 4000
 }
 
 export const SIGNER_SUPPORTED_STANDARDS: IcrcSupportedStandards = Object.values(
