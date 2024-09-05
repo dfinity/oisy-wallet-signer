@@ -33,10 +33,12 @@ import type {SignerMessageEventData} from './types/signer';
 import type {SignerOptions} from './types/signer-options';
 import {
   AccountsPromptSchema,
+  ConsentMessageAnswer,
   ConsentMessagePromptSchema,
   PermissionsPromptSchema,
   type AccountsConfirmation,
   type AccountsPromptPayload,
+  type ConsentMessagePromptPayload,
   type PermissionsConfirmation,
   type PermissionsPromptPayload
 } from './types/signer-prompts';
@@ -895,6 +897,7 @@ describe('Signer', () => {
 
       describe('Consent message', () => {
         let spy: MockInstance;
+        let notifyErrorSpy: MockInstance;
 
         const requestCallCanisterMsg = {
           data: requestCallCanisterData,
@@ -903,6 +906,7 @@ describe('Signer', () => {
 
         beforeEach(() => {
           spy = vi.spyOn(api, 'consentMessage');
+          notifyErrorSpy = vi.spyOn(signerHandlers, 'notifyError');
         });
 
         describe('Call canister success', () => {
@@ -973,16 +977,56 @@ describe('Signer', () => {
               expect(promptSpy).toHaveBeenCalledTimes(1);
             });
           });
+
+          it('should notify aborted error for icrc49_call_canister if user reject consent', async () => {
+            let reject: ConsentMessageAnswer | undefined;
+
+            const prompt = ({reject: r}: ConsentMessagePromptPayload): void => {
+              reject = r;
+            };
+
+            signer.register({
+              method: ICRC49_CALL_CANISTER,
+              prompt
+            });
+
+            saveSessionScopes({
+              owner: signerOptions.owner.getPrincipal(),
+              origin: testOrigin,
+              scopes: [
+                {
+                  scope: {method: ICRC49_CALL_CANISTER},
+                  state: IcrcPermissionStateSchema.enum.granted
+                }
+              ]
+            });
+
+            const messageEvent = new MessageEvent('message', requestCallCanisterMsg);
+            window.dispatchEvent(messageEvent);
+
+            await vi.waitFor(() => {
+              expect(reject).not.toBeUndefined();
+            });
+
+            reject?.();
+
+            await vi.waitFor(() => {
+              expect(notifyErrorSpy).toHaveBeenCalledWith({
+                id: testId,
+                origin: testOrigin,
+                error: {
+                  code: SignerErrorCode.ACTION_ABORTED,
+                  message: 'The signer has canceled the action requested by the relying party.'
+                }
+              });
+            });
+          });
         });
 
         describe('Call canister error', () => {
-          let notifyErrorSpy: MockInstance;
-
           const error = {GenericError: {description: 'Error', error_code: 1n}};
 
           beforeEach(() => {
-            notifyErrorSpy = vi.spyOn(signerHandlers, 'notifyError');
-
             spy.mockResolvedValue({
               Err: error
             });
