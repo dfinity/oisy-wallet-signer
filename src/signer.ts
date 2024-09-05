@@ -17,6 +17,7 @@ import {
 } from './handlers/signer.handlers';
 import {
   assertAndPromptConsentMessage,
+  notifyErrorRequestNotSupported,
   notifyErrorPermissionNotGranted
 } from './services/signer.services';
 import {
@@ -143,13 +144,9 @@ export class Signer {
       return;
     }
 
-    notifyError({
+    notifyErrorRequestNotSupported({
       id: requestData?.id ?? null,
-      origin,
-      error: {
-        code: SignerErrorCode.REQUEST_NOT_SUPPORTED,
-        message: 'The request sent by the relying party is not supported by the signer.'
-      }
+      origin
     });
   };
 
