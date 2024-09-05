@@ -213,8 +213,8 @@ export class Wallet {
       data: WalletMessageEventData;
       id: RpcId;
     }) => Promise<{handled: boolean; result?: T}>;
-  }): Promise<T> => {
-    return await new Promise<T>((resolve, reject) => {
+  }): Promise<T> =>
+    await new Promise<T>((resolve, reject) => {
       const {success: optionsSuccess, error} = WalletRequestOptionsSchema.safeParse(options);
 
       if (!optionsSuccess) {
@@ -280,7 +280,6 @@ export class Wallet {
 
       postRequest(requestId);
     });
-  };
 
   /**
    * List the standards supported by the wallet.
