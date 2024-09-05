@@ -7,7 +7,7 @@
 		type ConsentMessagePromptPayload
 	} from '@dfinity/oisy-wallet-signer/types/signer-prompts';
 	import type { icrc21_consent_info } from '@dfinity/oisy-wallet-signer/declarations/icrc-21';
-    import Button from "$core/components/Button.svelte";
+	import Button from '$core/components/Button.svelte';
 
 	type Props = {
 		signer: Signer | undefined;
@@ -63,14 +63,14 @@
 </script>
 
 {#if nonNullish(displayMessage)}
-    <p class="font-bold">Consent Message</p>
+	<p class="font-bold">Consent Message</p>
 
-    <p class="mt-2 mb-4 text-sm" data-tid="consent-message">
-        {displayMessage}
-    </p>
+	<p class="mt-2 mb-4 text-sm" data-tid="consent-message">
+		{displayMessage}
+	</p>
 
-    <div class="flex">
-        <Button type="button" testId="reject-consent-message">Reject</Button>
-        <Button type="button" testId="approve-consent-message">Approve</Button>
-    </div>
+	<div class="flex">
+		<Button type="button" testId="reject-consent-message">Reject</Button>
+		<Button type="button" testId="approve-consent-message">Approve</Button>
+	</div>
 {/if}

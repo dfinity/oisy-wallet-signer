@@ -1,14 +1,14 @@
 <script lang="ts">
 	import type { Wallet } from '@dfinity/oisy-wallet-signer/wallet';
-	import {isNullish, nonNullish} from '@dfinity/utils';
+	import { isNullish, nonNullish } from '@dfinity/utils';
 	import { fade } from 'svelte/transition';
 	import Button from '$core/components/Button.svelte';
 	import Value from '$core/components/Value.svelte';
-	import type {IcrcCallCanisterResult} from '@dfinity/oisy-wallet-signer';
-	import {accountsStore} from "$lib/stores/accounts.store";
-	import {IDL} from '@dfinity/candid';
-	import type {TransferArg} from '@dfinity/ledger-icp/dist/candid/ledger'
-	import {Principal} from "@dfinity/principal";
+	import type { IcrcCallCanisterResult } from '@dfinity/oisy-wallet-signer';
+	import { accountsStore } from '$lib/stores/accounts.store';
+	import { IDL } from '@dfinity/candid';
+	import type { TransferArg } from '@dfinity/ledger-icp/dist/candid/ledger';
+	import { Principal } from '@dfinity/principal';
 
 	type Props = {
 		wallet: Wallet | undefined;
@@ -37,17 +37,17 @@
 		const Icrc1Timestamp = IDL.Nat64;
 
 		const Account = IDL.Record({
-			'owner' : IDL.Principal,
-			'subaccount' : IDL.Opt(SubAccount),
+			owner: IDL.Principal,
+			subaccount: IDL.Opt(SubAccount)
 		});
 
 		const TransferArg = IDL.Record({
-			'to' : Account,
-			'fee' : IDL.Opt(Icrc1Tokens),
-			'memo' : IDL.Opt(IDL.Vec(IDL.Nat8)),
-			'from_subaccount' : IDL.Opt(SubAccount),
-			'created_at_time' : IDL.Opt(Icrc1Timestamp),
-			'amount' : Icrc1Tokens,
+			to: Account,
+			fee: IDL.Opt(Icrc1Tokens),
+			memo: IDL.Opt(IDL.Vec(IDL.Nat8)),
+			from_subaccount: IDL.Opt(SubAccount),
+			created_at_time: IDL.Opt(Icrc1Timestamp),
+			amount: Icrc1Tokens
 		});
 
 		const arg: TransferArg = {
@@ -60,7 +60,7 @@
 			memo: [],
 			amount: 123n,
 			fee: []
-		}
+		};
 
 		// TODO: we want to create and expose opiniated version WalletIcrc and WalletICP to ease the client integration.
 		//
@@ -85,8 +85,8 @@
 		result = await wallet?.call({
 			params: {
 				sender: account.owner,
-				method: "icrc1_transfer",
-				canisterId: "ryjl3-tyaaa-aaaaa-aaaba-cai",
+				method: 'icrc1_transfer',
+				canisterId: 'ryjl3-tyaaa-aaaaa-aaaba-cai',
 				arg,
 				argType: TransferArg
 			}

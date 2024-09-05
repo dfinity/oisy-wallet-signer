@@ -4,7 +4,7 @@
 	import { fade } from 'svelte/transition';
 	import Button from '$core/components/Button.svelte';
 	import Value from '$core/components/Value.svelte';
-	import {accountsStore} from "$lib/stores/accounts.store";
+	import { accountsStore } from '$lib/stores/accounts.store';
 
 	type Props = {
 		wallet: Wallet | undefined;
