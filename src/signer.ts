@@ -1,13 +1,11 @@
 import {assertNonNullish, isNullish, nonNullish} from '@dfinity/utils';
 import {resetActors} from './api/actors.api';
-import {consentMessage} from './api/canister.api';
 import {
   ICRC25_REQUEST_PERMISSIONS,
   ICRC27_ACCOUNTS,
   ICRC49_CALL_CANISTER
 } from './constants/icrc.constants';
 import {SIGNER_DEFAULT_SCOPES, SignerErrorCode} from './constants/signer.constants';
-import {icrc21_consent_info} from './declarations/icrc-21';
 import {
   notifyAccounts,
   notifyError,
@@ -18,6 +16,7 @@ import {
   type NotifyAccounts,
   type NotifyPermissions
 } from './handlers/signer.handlers';
+import {assertAndPromptConsentMessage} from './services/signer.services';
 import {
   readSessionValidScopes,
   saveSessionScopes,
@@ -26,7 +25,6 @@ import {
 import type {IcrcAccounts} from './types/icrc-accounts';
 import {
   IcrcAccountsRequestSchema,
-  IcrcCallCanisterRequestParams,
   IcrcCallCanisterRequestSchema,
   IcrcPermissionsRequestSchema,
   IcrcRequestAnyPermissionsRequestSchema,
@@ -43,10 +41,10 @@ import {
 } from './types/icrc-standards';
 import {RpcRequestSchema, type RpcId} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
-import {IdentityNotAnonymous, SignerHost, SignerOptions} from './types/signer-options';
+import {MissingPromptError} from './types/signer-errors';
+import type {IdentityNotAnonymous, SignerHost, SignerOptions} from './types/signer-options';
 import {
   AccountsPromptSchema,
-  ConsentMessageAnswer,
   ConsentMessagePromptSchema,
   PermissionsPromptSchema,
   type AccountsConfirmation,
@@ -55,8 +53,6 @@ import {
   type PermissionsConfirmation,
   type PermissionsPrompt
 } from './types/signer-prompts';
-
-class MissingPromptError extends Error {}
 
 export class Signer {
   readonly #owner: IdentityNotAnonymous;
@@ -528,7 +524,13 @@ export class Signer {
       // TODO: asserting that the sender = owner of the accounts = principal derived by II in the signer
       // i.e. sender === this.#owner
 
-      const {result: userConsent} = await this.assertAndPromptConsentMessage({requestId, params});
+      const {result: userConsent} = await assertAndPromptConsentMessage({
+        requestId,
+        params,
+        prompt: this.#consentMessagePrompt,
+        host: this.#host,
+        owner: this.#owner
+      });
 
       if (userConsent !== 'approved') {
         return {handled: true};
@@ -615,67 +617,5 @@ export class Signer {
       default:
         return currentPermission;
     }
-  }
-
-  private async assertAndPromptConsentMessage({
-    requestId,
-    params: {canisterId, method, arg, sender}
-  }: {
-    params: IcrcCallCanisterRequestParams;
-    requestId: RpcId;
-  }): Promise<{result: 'approved' | 'rejected' | 'error'}> {
-    try {
-      const response = await consentMessage({
-        owner: this.#owner,
-        host: this.#host,
-        canisterId,
-        request: {
-          method,
-          arg,
-          // TODO: consumer should be able to define user_preferences
-          user_preferences: {
-            metadata: {
-              language: 'en',
-              utc_offset_minutes: []
-            },
-            device_spec: []
-          }
-        }
-      });
-
-      if ('Err' in response) {
-        // TODO: notify error
-        return {result: 'error'};
-      }
-
-      return await this.promptConsentMessage(response.Ok);
-    } catch (err: unknown) {
-      // TODO: notify error
-      return {result: 'error'};
-    }
-  }
-
-  private async promptConsentMessage(
-    consentInfo: icrc21_consent_info
-  ): Promise<{result: 'approved' | 'rejected'}> {
-    const promise = new Promise<{result: 'approved' | 'rejected'}>((resolve, reject) => {
-      const approve: ConsentMessageAnswer = () => {
-        resolve({result: 'approved'});
-      };
-
-      const userReject: ConsentMessageAnswer = () => {
-        resolve({result: 'rejected'});
-      };
-
-      // The consumer currently has no way to unregister the prompt, so we know that it is defined. However, to be future-proof, it's better to ensure it is defined.
-      if (isNullish(this.#consentMessagePrompt)) {
-        reject(new MissingPromptError());
-        return;
-      }
-
-      this.#consentMessagePrompt({approve, reject: userReject, consentInfo});
-    });
-
-    return await promise;
   }
 }
