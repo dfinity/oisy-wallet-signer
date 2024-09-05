@@ -1,4 +1,4 @@
-import {Browser, BrowserContext, Page} from '@playwright/test';
+import {Browser, BrowserContext, Page, expect} from '@playwright/test';
 
 export interface IdentityPageParams {
   page: Page;
@@ -23,5 +23,15 @@ export abstract class IdentityPage {
 
   async close(): Promise<void> {
     await this.page.close();
+  }
+
+  async getUserId(): Promise<string> {
+    await expect(this.page.getByTestId('user-id')).toBeVisible();
+
+    const output = this.page.getByTestId('user-id');
+
+    await expect(output).toContainText(/\S+/);
+
+    return await output.innerText();
   }
 }

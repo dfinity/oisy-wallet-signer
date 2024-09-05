@@ -9,8 +9,9 @@
 	import RequestPermissions from '$lib/components/RequestPermissions.svelte';
 	import Permissions from '$lib/components/Permissions.svelte';
 	import Accounts from '$lib/components/Accounts.svelte';
+	import CallCanister from '$lib/components/CallCanister.svelte';
 
-	let wallet: Wallet | undefined = $state(undefined);
+	let wallet = $state<Wallet | undefined>(undefined);
 
 	const onclick = async () => {
 		wallet = await Wallet.connect({
@@ -44,3 +45,5 @@
 <RequestPermissions {wallet} />
 
 <Accounts {wallet} />
+
+<CallCanister {wallet} />

@@ -1,6 +1,7 @@
 import {InternetIdentityPage} from '@dfinity/internet-identity-playwright';
 import {assertNonNullish} from '@dfinity/utils';
 import {expect} from '@playwright/test';
+import {mockConsentMessage} from '../mocks/consent-message.mocks';
 import {IdentityPage, IdentityPageParams} from './identity.page';
 
 export class WalletPage extends IdentityPage {
@@ -31,7 +32,11 @@ export class WalletPage extends IdentityPage {
     await this.approvePermissions({countPermissions: 2});
   }
 
-  async approveAccountsPermissions(): Promise<void> {
+  async approveAccountsPermission(): Promise<void> {
+    await this.approvePermissions({countPermissions: 1});
+  }
+
+  async approveCallCanisterPermission(): Promise<void> {
     await this.approvePermissions({countPermissions: 1});
   }
 
@@ -50,5 +55,20 @@ export class WalletPage extends IdentityPage {
     await expect(block.getByText('1 permissions approved')).toBeVisible();
 
     await this.page.getByTestId('submit-permissions-button').click();
+  }
+
+  async assertConsentMessage(partyUserId: string): Promise<void> {
+    const walletUserId = await this.getUserId();
+
+    await expect(this.page.getByTestId('consent-message')).toBeVisible();
+
+    const p = this.page.getByTestId('consent-message');
+
+    await expect(p).toContainText(
+      mockConsentMessage({
+        partyUserId,
+        walletUserId
+      })
+    );
   }
 }

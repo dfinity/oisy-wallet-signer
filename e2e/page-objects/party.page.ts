@@ -112,7 +112,7 @@ export class PartyPage extends IdentityPage {
 
     await this.page.getByTestId('accounts-button').click();
 
-    await this.#walletPage?.approveAccountsPermissions();
+    await this.#walletPage?.approveAccountsPermission();
 
     await this.assertAccounts();
   }
@@ -143,5 +143,17 @@ export class PartyPage extends IdentityPage {
     expect(await accounts.count()).toBe(1);
 
     // TODO: check principal
+  }
+
+  async approvePermissionsConsentMessage(): Promise<void> {
+    const partyUserId = await this.getUserId();
+
+    await expect(this.page.getByTestId('call-canister-button')).toBeVisible();
+
+    await this.page.getByTestId('call-canister-button').click();
+
+    await this.#walletPage?.approveCallCanisterPermission();
+
+    await this.#walletPage?.assertConsentMessage(partyUserId);
   }
 }

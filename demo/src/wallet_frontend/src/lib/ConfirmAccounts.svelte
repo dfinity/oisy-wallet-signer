@@ -15,7 +15,7 @@
 
 	let { signer }: Props = $props();
 
-	let confirm: AccountsConfirmation | undefined = $state(undefined);
+	let confirm = $state<AccountsConfirmation | undefined>(undefined);
 
 	const resetPrompt = () => {
 		confirm = undefined;
