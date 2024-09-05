@@ -4,7 +4,6 @@ import {SignerErrorCode} from '../constants/signer.constants';
 import type {icrc21_consent_info} from '../declarations/icrc-21';
 import {notifyError} from '../handlers/signer.handlers';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
-import {MissingPromptError} from '../types/signer-errors';
 import type {Notify} from '../types/signer-handlers';
 import type {SignerOptions} from '../types/signer-options';
 import type {ConsentMessageAnswer, ConsentMessagePrompt} from '../types/signer-prompts';
@@ -23,6 +22,12 @@ export const assertAndPromptConsentMessage = async ({
 }): Promise<{result: 'approved' | 'rejected' | 'error'}> => {
   // TODO: asserting that the sender = owner of the accounts = principal derived by II in the signer
   // i.e. sender === this.#owner
+
+  // The consumer currently has no way to unregister the prompt, so we know that it is defined. However, to be future-proof, it's better to ensure it is defined.
+  if (isNullish(prompt)) {
+    notifyMissingPromptError(notify);
+    return {result: 'error'};
+  }
 
   try {
     const response = await consentMessage({
@@ -63,8 +68,9 @@ export const assertAndPromptConsentMessage = async ({
 
     return {result};
   } catch (err: unknown) {
-    // TODO: 2000 for not supported consent message - i.e. method is not implemented
-    // TODO: fine grained error for example out of cycles, stopped etc. should not throw 4000
+    // TODO: 2000 for not supported consent message - i.e. method is not implemented.
+    // TODO: Likewise for example if canister is out of cycles or stopped etc. it should not throw 4000.
+
     // TODO: notify error 4000
     return {result: 'error'};
   }
@@ -75,9 +81,9 @@ const promptConsentMessage = async ({
   consentInfo
 }: {
   consentInfo: icrc21_consent_info;
-  prompt: ConsentMessagePrompt | undefined;
+  prompt: ConsentMessagePrompt;
 }): Promise<{result: 'approved' | 'rejected'}> => {
-  const promise = new Promise<{result: 'approved' | 'rejected'}>((resolve, reject) => {
+  const promise = new Promise<{result: 'approved' | 'rejected'}>((resolve) => {
     const approve: ConsentMessageAnswer = () => {
       resolve({result: 'approved'});
     };
@@ -85,12 +91,6 @@ const promptConsentMessage = async ({
     const userReject: ConsentMessageAnswer = () => {
       resolve({result: 'rejected'});
     };
-
-    // The consumer currently has no way to unregister the prompt, so we know that it is defined. However, to be future-proof, it's better to ensure it is defined.
-    if (isNullish(prompt)) {
-      reject(new MissingPromptError());
-      return;
-    }
 
     prompt({approve, reject: userReject, consentInfo});
   });
@@ -128,6 +128,16 @@ export const notifyErrorPermissionNotGranted = (notify: Notify): void => {
       code: SignerErrorCode.PERMISSION_NOT_GRANTED,
       message:
         'The signer has not granted the necessary permissions to process the request from the relying party.'
+    }
+  });
+};
+
+export const notifyMissingPromptError = (notify: Notify): void => {
+  notifyError({
+    ...notify,
+    error: {
+      code: SignerErrorCode.PERMISSIONS_PROMPT_NOT_REGISTERED,
+      message: 'The signer has not registered a prompt to respond to permission requests.'
     }
   });
 };
