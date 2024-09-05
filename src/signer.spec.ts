@@ -912,7 +912,7 @@ describe('Signer', () => {
           });
 
           it('should prompt consent message for icrc49_call_canister if permissions were already granted', async () => {
-            let promptSpy = vi.fn();
+            const promptSpy = vi.fn();
 
             signer.register({
               method: ICRC49_CALL_CANISTER,
@@ -940,7 +940,7 @@ describe('Signer', () => {
 
           it('should prompt consent message after prompt for icrc49_call_canister permissions', async () => {
             let confirmScopes: PermissionsConfirmation | undefined;
-            let promptSpy = vi.fn();
+            const promptSpy = vi.fn();
 
             signer.register({
               method: ICRC25_REQUEST_PERMISSIONS,
@@ -982,7 +982,7 @@ describe('Signer', () => {
           });
 
           it('should not prompt consent message for icrc49_call_canister if getting message throws an error', async () => {
-            let promptSpy = vi.fn();
+            const promptSpy = vi.fn();
 
             signer.register({
               method: ICRC49_CALL_CANISTER,
