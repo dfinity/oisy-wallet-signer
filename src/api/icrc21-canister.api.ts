@@ -13,7 +13,7 @@ import type {SignerOptions} from '../types/signer-options';
 import {AgentApi} from './agent.api';
 
 export class Icrc21Canister extends AgentApi {
-  #actors: Record<PrincipalText, ActorSubclass<Icrc21Actor>> | undefined | null;
+  #actors: Record<PrincipalText, ActorSubclass<Icrc21Actor>> | undefined;
 
   async consentMessage({
     request,
