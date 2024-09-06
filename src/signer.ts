@@ -1,5 +1,4 @@
 import {assertNonNullish, isNullish, nonNullish} from '@dfinity/utils';
-import {resetActors} from './api/actors.api';
 import {
   ICRC25_REQUEST_PERMISSIONS,
   ICRC27_ACCOUNTS,
@@ -20,7 +19,7 @@ import {
   type NotifyAccounts,
   type NotifyPermissions
 } from './handlers/signer.handlers';
-import {assertAndPromptConsentMessage, callCanister} from './services/signer.services';
+import {SignerService} from './services/signer.service';
 import {
   readSessionValidScopes,
   saveSessionScopes,
@@ -45,7 +44,6 @@ import {
 import {RpcRequestSchema, type RpcId} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
 import {MissingPromptError} from './types/signer-errors';
-import {Notify} from './types/signer-handlers';
 import type {IdentityNotAnonymous, SignerHost, SignerOptions} from './types/signer-options';
 import {
   AccountsPromptSchema,
@@ -68,6 +66,8 @@ export class Signer {
   #permissionsPrompt: PermissionsPrompt | undefined;
   #accountsPrompt: AccountsPrompt | undefined;
   #consentMessagePrompt: CallCanisterPrompt | undefined;
+
+  readonly #signerService = new SignerService();
 
   private constructor({owner, host}: SignerOptions) {
     this.#owner = owner;
@@ -94,7 +94,6 @@ export class Signer {
   disconnect = (): void => {
     window.removeEventListener('message', this.onMessageListener);
     this.#walletOrigin = null;
-    resetActors();
   };
 
   private readonly onMessageListener = (message: SignerMessageEvent): void => {
@@ -518,33 +517,24 @@ export class Signer {
         return {handled: true};
       }
 
-      const notify: Notify = {
-        id: requestId,
-        origin
-      };
-
-      // TODO: maybe instead of splitting the options in the constructor we should hold it as it.
-      const options: SignerOptions = {
-        host: this.#host,
-        owner: this.#owner
-      };
-
-      const {result: userConsent} = await assertAndPromptConsentMessage({
-        notify,
+      const {result: userConsent} = await this.#signerService.assertAndPromptConsentMessage({
+        notify: {
+          id: requestId,
+          origin
+        },
         params,
         prompt: this.#consentMessagePrompt,
-        options
+        options: {
+          host: this.#host,
+          owner: this.#owner
+        }
       });
 
       if (userConsent !== 'approved') {
         return {handled: true};
       }
 
-      await callCanister({
-        notify,
-        options,
-        params
-      });
+      // TODO: call canister
 
       return {handled: true};
     }
