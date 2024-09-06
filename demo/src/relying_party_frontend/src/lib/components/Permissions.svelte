@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Wallet } from '@dfinity/oisy-wallet-signer/wallet';
+	import type { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
 	import { isNullish, nonNullish } from '@dfinity/utils';
 	import type { IcrcScopesArray } from '@dfinity/oisy-wallet-signer';
 	import { fade } from 'svelte/transition';
@@ -7,7 +7,7 @@
 	import PermissionsScopes from '$lib/components/PermissionsScopes.svelte';
 
 	type Props = {
-		wallet: Wallet | undefined;
+		wallet: IcpWallet | undefined;
 	};
 
 	let { wallet }: Props = $props();
