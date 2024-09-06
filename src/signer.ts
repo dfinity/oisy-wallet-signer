@@ -27,6 +27,7 @@ import {
   sessionScopeState
 } from './sessions/signer.sessions';
 import type {IcrcAccounts} from './types/icrc-accounts';
+import type {IcrcApproveMethod} from './types/icrc-prompts';
 import {
   IcrcAccountsRequestSchema,
   IcrcCallCanisterRequestSchema,
@@ -39,7 +40,6 @@ import type {IcrcScope, IcrcScopesArray} from './types/icrc-responses';
 import {
   IcrcPermissionStateSchema,
   IcrcScopedMethodSchema,
-  type IcrcApproveMethod,
   type IcrcPermissionState,
   type IcrcScopedMethod
 } from './types/icrc-standards';
