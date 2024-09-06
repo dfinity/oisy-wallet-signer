@@ -1,11 +1,12 @@
 import {Actor, type ActorMethod, type ActorSubclass} from '@dfinity/agent';
 import type {IDL} from '@dfinity/candid';
 import {Principal} from '@dfinity/principal';
-import {createAgent, isNullish} from '@dfinity/utils';
+import {isNullish} from '@dfinity/utils';
 import type {_SERVICE as Icrc21Actor} from '../declarations/icrc-21';
 import {idlFactory} from '../declarations/icrc-21.idl';
 import type {PrincipalText} from '../types/principal';
 import type {SignerOptions} from '../types/signer-options';
+import {getAgent} from './agents.api';
 
 let actors: Record<PrincipalText, ActorSubclass<Icrc21Actor>> | undefined | null;
 
@@ -44,23 +45,13 @@ export const resetActors = (): void => {
 const createActor = async <T = Record<string, ActorMethod>>({
   canisterId,
   idlFactory,
-  owner: identity,
+  owner,
   host
 }: {
   canisterId: string | Principal;
   idlFactory: IDL.InterfaceFactory;
 } & SignerOptions): Promise<ActorSubclass<T>> => {
-  const mainnetHost = 'https://icp-api.io';
-
-  const {hostname} = new URL(host ?? mainnetHost);
-
-  const local = ['localhost', '127.0.0.1'].includes(hostname);
-
-  const agent = await createAgent({
-    identity,
-    ...(local && {fetchRootKey: true}),
-    host: host ?? mainnetHost
-  });
+  const agent = await getAgent({owner, host});
 
   return await Actor.createActor(idlFactory, {
     agent,
