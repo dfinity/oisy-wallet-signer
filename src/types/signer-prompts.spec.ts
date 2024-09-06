@@ -1,9 +1,17 @@
-import {ICRC27_ACCOUNTS} from '../constants/icrc.constants';
+import {
+  ICRC25_PERMISSIONS,
+  ICRC25_REQUEST_PERMISSIONS,
+  ICRC25_SUPPORTED_STANDARDS,
+  ICRC27_ACCOUNTS,
+  ICRC29_STATUS,
+  ICRC49_CALL_CANISTER
+} from '../constants/icrc.constants';
 import {mockAccounts} from '../mocks/icrc-accounts.mocks';
 import type {IcrcScopesArray} from './icrc-responses';
 import {
   AccountsPromptSchema,
   ConsentMessagePromptSchema,
+  IcrcApproveMethodSchema,
   PermissionsPromptSchema,
   type AccountsPromptPayload,
   type ConsentMessagePromptPayload,
@@ -11,6 +19,52 @@ import {
 } from './signer-prompts';
 
 describe('SignerPrompts', () => {
+  describe('Prompts', () => {
+    const approveEnums = [
+      {
+        title: 'ICRC25_REQUEST_PERMISSIONS',
+        validEnum: ICRC25_REQUEST_PERMISSIONS
+      },
+      {
+        title: 'ICRC27_ACCOUNTS',
+        validEnum: ICRC27_ACCOUNTS
+      },
+      {
+        title: 'ICRC49_CALL_CANISTER',
+        validEnum: ICRC49_CALL_CANISTER
+      }
+    ];
+
+    const invalidApproveEnums = [
+      {
+        title: 'ICRC25_PERMISSIONS',
+        validEnum: ICRC25_PERMISSIONS
+      },
+      {
+        title: 'ICRC25_SUPPORTED_STANDARDS',
+        validEnum: ICRC25_SUPPORTED_STANDARDS
+      },
+      {
+        title: 'ICRC29_STATUS',
+        validEnum: ICRC29_STATUS
+      }
+    ];
+
+    it.each(approveEnums)(
+      'should validate $title with IcrcApproveMethodSchema',
+      async ({validEnum}) => {
+        expect(IcrcApproveMethodSchema.safeParse(validEnum).success).toBe(true);
+      }
+    );
+
+    it.each(invalidApproveEnums)(
+      'should not validate $title with IcrcApproveMethodSchema',
+      async ({validEnum}) => {
+        expect(IcrcApproveMethodSchema.safeParse(validEnum).success).toBe(false);
+      }
+    );
+  });
+
   describe('Permissions', () => {
     const scopes: IcrcScopesArray = [
       {

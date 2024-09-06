@@ -27,7 +27,6 @@ import {
   sessionScopeState
 } from './sessions/signer.sessions';
 import type {IcrcAccounts} from './types/icrc-accounts';
-import type {IcrcApproveMethod} from './types/icrc-prompts';
 import {
   IcrcAccountsRequestSchema,
   IcrcCallCanisterRequestSchema,
@@ -54,6 +53,7 @@ import {
   type AccountsConfirmation,
   type AccountsPrompt,
   type ConsentMessagePrompt,
+  type IcrcApproveMethod,
   type PermissionsConfirmation,
   type PermissionsPrompt
 } from './types/signer-prompts';
