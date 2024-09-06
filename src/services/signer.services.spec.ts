@@ -324,7 +324,7 @@ describe('Signer services', () => {
     });
 
     it('should call notifySenderNotAllowedError if sender does not match owner', async () => {
-      const result = await assertAndPromptConsentMessage({
+      await assertAndPromptConsentMessage({
         notify,
         params: invalidParams,
         prompt,
