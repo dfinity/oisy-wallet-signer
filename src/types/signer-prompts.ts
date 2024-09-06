@@ -16,6 +16,8 @@ export const PromptMethodSchema = z.enum([
 
 export type PromptMethod = z.infer<typeof PromptMethodSchema>;
 
+// Prompt for permissions
+
 const PermissionsConfirmationSchema = z.function().args(IcrcScopesArraySchema).returns(z.void());
 
 export type PermissionsConfirmation = z.infer<typeof PermissionsConfirmationSchema>;
@@ -45,6 +47,8 @@ export const PermissionsPromptSchema = z
 
 export type PermissionsPrompt = z.infer<typeof PermissionsPromptSchema>;
 
+// Prompt for accounts
+
 const AccountsConfirmationSchema = z.function().args(IcrcAccountsSchema).returns(z.void());
 
 export type AccountsConfirmation = z.infer<typeof AccountsConfirmationSchema>;
@@ -68,17 +72,19 @@ export const AccountsPromptSchema = z
 
 export type AccountsPrompt = z.infer<typeof AccountsPromptSchema>;
 
+// Prompt for call canister
+
 const ConsentMessageAnswerSchema = z.function().returns(z.void());
 
 export type ConsentMessageAnswer = z.infer<typeof ConsentMessageAnswerSchema>;
 
-const ConsentMessagePromptPayloadSchema = z.object({
+const CallCanisterPromptPayloadSchema = z.object({
   consentInfo: z.custom<icrc21_consent_info>(),
   approve: ConsentMessageAnswerSchema,
   reject: ConsentMessageAnswerSchema
 });
 
-export type ConsentMessagePromptPayload = z.infer<typeof ConsentMessagePromptPayloadSchema>;
+export type ConsentMessagePromptPayload = z.infer<typeof CallCanisterPromptPayloadSchema>;
 
 /**
  * A function that is invoked when the signer requires the user - or consumer of the library - to approve or reject a consent message.
@@ -88,9 +94,9 @@ export type ConsentMessagePromptPayload = z.infer<typeof ConsentMessagePromptPay
  * @param {() => void} params.approve - A function to be called by the consumer to approve the consent message.
  * @param {() => void} params.reject - A function to be called by the consumer to reject the consent message.
  */
-export const ConsentMessagePromptSchema = z
+export const CallCanisterPromptSchema = z
   .function()
-  .args(ConsentMessagePromptPayloadSchema)
+  .args(CallCanisterPromptPayloadSchema)
   .returns(z.void());
 
-export type ConsentMessagePrompt = z.infer<typeof ConsentMessagePromptSchema>;
+export type CallCanisterPrompt = z.infer<typeof CallCanisterPromptSchema>;

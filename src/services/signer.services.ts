@@ -12,7 +12,7 @@ import {
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import type {Notify} from '../types/signer-handlers';
 import type {SignerOptions} from '../types/signer-options';
-import type {ConsentMessageAnswer, ConsentMessagePrompt} from '../types/signer-prompts';
+import type {CallCanisterPrompt, ConsentMessageAnswer} from '../types/signer-prompts';
 import {mapIcrc21ErrorToString} from '../utils/icrc-21.utils';
 
 export const assertAndPromptConsentMessage = async ({
@@ -22,7 +22,7 @@ export const assertAndPromptConsentMessage = async ({
   options: {owner, host}
 }: {
   params: IcrcCallCanisterRequestParams;
-  prompt: ConsentMessagePrompt | undefined;
+  prompt: CallCanisterPrompt | undefined;
   notify: Notify;
   options: SignerOptions;
 }): Promise<{result: 'approved' | 'rejected' | 'error'}> => {
@@ -110,7 +110,7 @@ const promptConsentMessage = async ({
   consentInfo
 }: {
   consentInfo: icrc21_consent_info;
-  prompt: ConsentMessagePrompt;
+  prompt: CallCanisterPrompt;
 }): Promise<{result: 'approved' | 'rejected'}> => {
   const promise = new Promise<{result: 'approved' | 'rejected'}>((resolve) => {
     const approve: ConsentMessageAnswer = () => {
