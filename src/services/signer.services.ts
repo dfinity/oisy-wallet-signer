@@ -90,6 +90,18 @@ export const assertAndPromptConsentMessage = async ({
   }
 };
 
+export const callCanister = async ({
+  params,
+  notify,
+  options: {owner, host}
+}: {
+  params: IcrcCallCanisterRequestParams;
+  notify: Notify;
+  options: SignerOptions;
+}): Promise<{result: 'success' | 'error'}> => {
+  return {result: 'success'};
+};
+
 const assertSender = ({
   notify,
   owner,

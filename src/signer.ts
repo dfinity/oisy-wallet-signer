@@ -20,7 +20,7 @@ import {
   type NotifyAccounts,
   type NotifyPermissions
 } from './handlers/signer.handlers';
-import {assertAndPromptConsentMessage} from './services/signer.services';
+import {assertAndPromptConsentMessage, callCanister} from './services/signer.services';
 import {
   readSessionValidScopes,
   saveSessionScopes,
@@ -45,6 +45,7 @@ import {
 import {RpcRequestSchema, type RpcId} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
 import {MissingPromptError} from './types/signer-errors';
+import {Notify} from './types/signer-handlers';
 import type {IdentityNotAnonymous, SignerHost, SignerOptions} from './types/signer-options';
 import {
   AccountsPromptSchema,
@@ -517,24 +518,33 @@ export class Signer {
         return {handled: true};
       }
 
+      const notify: Notify = {
+        id: requestId,
+        origin
+      };
+
+      // TODO: maybe instead of splitting the options in the constructor we should hold it as it.
+      const options: SignerOptions = {
+        host: this.#host,
+        owner: this.#owner
+      };
+
       const {result: userConsent} = await assertAndPromptConsentMessage({
-        notify: {
-          id: requestId,
-          origin
-        },
+        notify,
         params,
         prompt: this.#consentMessagePrompt,
-        options: {
-          host: this.#host,
-          owner: this.#owner
-        }
+        options
       });
 
       if (userConsent !== 'approved') {
         return {handled: true};
       }
 
-      // TODO: call canister
+      await callCanister({
+        notify,
+        options,
+        params
+      });
 
       return {handled: true};
     }

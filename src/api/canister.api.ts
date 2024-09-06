@@ -17,3 +17,8 @@ export const consentMessage = async ({
     await getIcrc21Actor(actorParams);
   return await canisterCallConsentMessage(request);
 };
+
+export const call = async () => {
+  // TODO: agent.call
+  // TODO: pollForResponse
+};
