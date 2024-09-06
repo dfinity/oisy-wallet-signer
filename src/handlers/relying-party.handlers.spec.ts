@@ -17,9 +17,9 @@ import {
   requestPermissions,
   requestSupportedStandards,
   retryRequestStatus
-} from './wallet.handlers';
+} from './relying-party.handlers';
 
-describe('Wallet handlers', () => {
+describe('Relying Party handlers', () => {
   const testId = crypto.randomUUID();
   const testOrigin = 'https://hello.com';
 

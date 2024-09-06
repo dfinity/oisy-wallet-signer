@@ -7,17 +7,18 @@ import {
   ICRC29_STATUS,
   ICRC49_CALL_CANISTER
 } from './constants/icrc.constants';
-import {SignerErrorCode} from './constants/signer.constants';
 import {
-  WALLET_DEFAULT_SCOPES,
-  WALLET_TIMEOUT_ACCOUNTS,
-  WALLET_TIMEOUT_CALL_CANISTER,
-  WALLET_TIMEOUT_PERMISSIONS,
-  WALLET_TIMEOUT_REQUEST_PERMISSIONS,
-  WALLET_TIMEOUT_REQUEST_SUPPORTED_STANDARD
-} from './constants/wallet.constants';
-import * as walletHandlers from './handlers/wallet.handlers';
+  RELYING_PARTY_DEFAULT_SCOPES,
+  RELYING_PARTY_TIMEOUT_ACCOUNTS,
+  RELYING_PARTY_TIMEOUT_CALL_CANISTER,
+  RELYING_PARTY_TIMEOUT_PERMISSIONS,
+  RELYING_PARTY_TIMEOUT_REQUEST_PERMISSIONS,
+  RELYING_PARTY_TIMEOUT_REQUEST_SUPPORTED_STANDARD
+} from './constants/relying-party.constants';
+import {SignerErrorCode} from './constants/signer.constants';
+import * as relyingPartyHandlers from './handlers/relying-party.handlers';
 import {mockAccounts, mockPrincipalText} from './mocks/icrc-accounts.mocks';
+import {RelyingParty} from './relying-party';
 import type {IcrcAnyRequestedScopes} from './types/icrc-requests';
 import {
   IcrcAccountsResponseSchema,
@@ -26,15 +27,14 @@ import {
   IcrcSupportedStandardsResponseSchema,
   type IcrcCallCanisterResult
 } from './types/icrc-responses';
+import {RelyingPartyResponseError} from './types/relying-party-errors';
+import type {RelyingPartyOptions} from './types/relying-party-options';
+import type {RelyingPartyCallParams} from './types/relying-party-request';
 import {JSON_RPC_VERSION_2, RpcResponseWithResultOrErrorSchema} from './types/rpc';
-import {WalletResponseError} from './types/wallet-errors';
-import type {WalletOptions} from './types/wallet-options';
-import type {WalletCallParams} from './types/wallet-request';
 import {WALLET_WINDOW_CENTER, WALLET_WINDOW_TOP_RIGHT, windowFeatures} from './utils/window.utils';
-import {Wallet} from './wallet';
 
-describe('Wallet', () => {
-  const mockParameters: WalletOptions = {url: 'https://test.com'};
+describe('Relying Party', () => {
+  const mockParameters: RelyingPartyOptions = {url: 'https://test.com'};
 
   const messageEventReady = new MessageEvent('message', {
     origin: mockParameters.url,
@@ -68,25 +68,25 @@ describe('Wallet', () => {
     describe('Connect', () => {
       describe('Connection errors', () => {
         it('should throw connection timeout error', async () => {
-          vi.spyOn(walletHandlers, 'retryRequestStatus').mockResolvedValue('timeout');
+          vi.spyOn(relyingPartyHandlers, 'retryRequestStatus').mockResolvedValue('timeout');
 
-          await expect(Wallet.connect(mockParameters)).rejects.toThrow(
-            'Connection timeout. Unable to connect to the wallet.'
+          await expect(RelyingParty.connect(mockParameters)).rejects.toThrow(
+            'Connection timeout. Unable to connect to the signer.'
           );
         });
 
-        it('should assert edge case wallet not defined but request status success', async () => {
-          vi.spyOn(walletHandlers, 'retryRequestStatus').mockResolvedValue('ready');
+        it('should assert edge case signer not defined but request status success', async () => {
+          vi.spyOn(relyingPartyHandlers, 'retryRequestStatus').mockResolvedValue('ready');
 
-          await expect(Wallet.connect(mockParameters)).rejects.toThrow(
-            'Unexpected error. The request status succeeded, but the wallet response is not defined.'
+          await expect(RelyingParty.connect(mockParameters)).rejects.toThrow(
+            'Unexpected error. The request status succeeded, but the signer response is not defined.'
           );
         });
 
         it('should throw error if the message ready received comes from another origin', async () => {
           const hackerOrigin = 'https://hacker.com';
 
-          const promise = Wallet.connect(mockParameters);
+          const promise = RelyingParty.connect(mockParameters);
 
           const messageEvent = new MessageEvent('message', {
             origin: hackerOrigin,
@@ -100,14 +100,14 @@ describe('Wallet', () => {
           window.dispatchEvent(messageEvent);
 
           await expect(promise).rejects.toThrow(
-            `The response origin ${hackerOrigin} does not match the requested wallet URL ${mockParameters.url}.`
+            `The response origin ${hackerOrigin} does not match the requested signer URL ${mockParameters.url}.`
           );
         });
 
-        it('should throw error if the wallet options are not well formatted', async () => {
+        it('should throw error if the signer options are not well formatted', async () => {
           const incorrectOrigin = 'test';
 
-          await expect(Wallet.connect({url: incorrectOrigin})).rejects.toThrow(
+          await expect(RelyingParty.connect({url: incorrectOrigin})).rejects.toThrow(
             'Wallet options cannot be parsed:'
           );
         });
@@ -142,17 +142,17 @@ describe('Wallet', () => {
           const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
           const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
 
-          const promise = Wallet.connect(params);
+          const promise = RelyingParty.connect(params);
 
           window.dispatchEvent(messageEventReady);
 
-          const wallet = await promise;
+          const relyingParty = await promise;
 
-          expect(wallet).toBeInstanceOf(Wallet);
+          expect(relyingParty).toBeInstanceOf(RelyingParty);
 
           expect(window.open).toHaveBeenCalledWith(
             mockParameters.url,
-            'walletWindow',
+            'relyingPartyWindow',
             expectedOptions
           );
           expect(window.open).toHaveBeenCalledTimes(1);
@@ -161,11 +161,11 @@ describe('Wallet', () => {
           expect(removeEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
         });
 
-        it('should call the wallet to poll for status', async () => {
-          const spy = vi.spyOn(walletHandlers, 'retryRequestStatus');
+        it('should call the signer to poll for status', async () => {
+          const spy = vi.spyOn(relyingPartyHandlers, 'retryRequestStatus');
           const spyPostMessage = vi.spyOn(window, 'postMessage');
 
-          const promise = Wallet.connect(mockParameters);
+          const promise = RelyingParty.connect(mockParameters);
 
           expect(spy).toHaveBeenCalledTimes(1);
 
@@ -185,7 +185,7 @@ describe('Wallet', () => {
         it('should not process message which are not RpcResponse', async () => {
           const safeParseSpy = vi.spyOn(RpcResponseWithResultOrErrorSchema, 'safeParse');
 
-          const promise = Wallet.connect(mockParameters);
+          const promise = RelyingParty.connect(mockParameters);
 
           const messageEventNotRpc = new MessageEvent('message', {
             data: 'test',
@@ -196,9 +196,9 @@ describe('Wallet', () => {
 
           window.dispatchEvent(messageEventReady);
 
-          const wallet = await promise;
+          const relyingParty = await promise;
 
-          expect(wallet).toBeInstanceOf(Wallet);
+          expect(relyingParty).toBeInstanceOf(RelyingParty);
 
           // Two responses as triggered above
           expect(safeParseSpy).toHaveBeenCalledWith(messageEventNotRpc.data);
@@ -215,13 +215,13 @@ describe('Wallet', () => {
         });
 
         it('should not close popup on connection success', async () => {
-          const promise = Wallet.connect(mockParameters);
+          const promise = RelyingParty.connect(mockParameters);
 
           window.dispatchEvent(messageEventReady);
 
-          const wallet = await promise;
+          const relyingParty = await promise;
 
-          expect(wallet).toBeInstanceOf(Wallet);
+          expect(relyingParty).toBeInstanceOf(RelyingParty);
 
           expect(window.open).toHaveBeenCalledTimes(1);
           expect(window.close).not.toHaveBeenCalled();
@@ -232,8 +232,8 @@ describe('Wallet', () => {
           new Promise<void>(async (resolve) => {
             vi.useFakeTimers();
 
-            Wallet.connect(mockParameters).catch((err: Error) => {
-              expect(err.message).toBe('Connection timeout. Unable to connect to the wallet.');
+            RelyingParty.connect(mockParameters).catch((err: Error) => {
+              expect(err.message).toBe('Connection timeout. Unable to connect to the signer.');
 
               expect(window.open).toHaveBeenCalledTimes(1);
               expect(window.close).toHaveBeenCalledTimes(1);
@@ -249,7 +249,7 @@ describe('Wallet', () => {
 
       describe('Disconnect', () => {
         it('should close popup on disconnect', async () => {
-          const promise = Wallet.connect(mockParameters);
+          const promise = RelyingParty.connect(mockParameters);
 
           window.dispatchEvent(messageEventReady);
 
@@ -266,7 +266,7 @@ describe('Wallet', () => {
     });
 
     describe('Supported standards', () => {
-      let wallet: Wallet;
+      let relyingParty: RelyingParty;
 
       const supportedStandards = [
         {
@@ -276,22 +276,22 @@ describe('Wallet', () => {
       ];
 
       beforeEach(async () => {
-        const promise = Wallet.connect(mockParameters);
+        const promise = RelyingParty.connect(mockParameters);
 
         window.dispatchEvent(messageEventReady);
 
-        wallet = await promise;
+        relyingParty = await promise;
       });
 
       afterEach(async () => {
-        await wallet.disconnect();
+        await relyingParty.disconnect();
       });
 
       describe('Request errors', () => {
-        it('should throw error if the wallet request options are not well formatted', async () => {
+        it('should throw error if the relyingParty request options are not well formatted', async () => {
           await expect(
             // @ts-expect-error: we are testing this on purpose
-            wallet.supportedStandards({options: {timeoutInMilliseconds: 'test'}})
+            relyingParty.supportedStandards({options: {timeoutInMilliseconds: 'test'}})
           ).rejects.toThrow('Wallet request options cannot be parsed:');
         });
 
@@ -306,18 +306,18 @@ describe('Wallet', () => {
         ];
 
         it.each(options)(
-          'should timeout for $title if wallet does not answer with expected standards',
+          'should timeout for $title if signer does not answer with expected standards',
           async ({options}) =>
             // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
             new Promise<void>(async (resolve) => {
               vi.useFakeTimers();
 
               const timeout =
-                options?.timeoutInMilliseconds ?? WALLET_TIMEOUT_REQUEST_SUPPORTED_STANDARD;
+                options?.timeoutInMilliseconds ?? RELYING_PARTY_TIMEOUT_REQUEST_SUPPORTED_STANDARD;
 
-              wallet.supportedStandards({options}).catch((err: Error) => {
+              relyingParty.supportedStandards({options}).catch((err: Error) => {
                 expect(err.message).toBe(
-                  `Request to wallet timed out after ${timeout} milliseconds.`
+                  `Request to signer timed out after ${timeout} milliseconds.`
                 );
 
                 vi.useRealTimers();
@@ -336,9 +336,9 @@ describe('Wallet', () => {
 
             const spy = vi.spyOn(IcrcSupportedStandardsResponseSchema, 'safeParse');
 
-            wallet.supportedStandards().catch((err: Error) => {
+            relyingParty.supportedStandards().catch((err: Error) => {
               expect(err.message).toBe(
-                `Request to wallet timed out after ${WALLET_TIMEOUT_REQUEST_SUPPORTED_STANDARD} milliseconds.`
+                `Request to signer timed out after ${RELYING_PARTY_TIMEOUT_REQUEST_SUPPORTED_STANDARD} milliseconds.`
               );
 
               expect(spy).toHaveBeenCalledTimes(1);
@@ -361,13 +361,13 @@ describe('Wallet', () => {
 
             window.dispatchEvent(messageEventSupportedStandards);
 
-            await vi.advanceTimersByTimeAsync(WALLET_TIMEOUT_REQUEST_SUPPORTED_STANDARD);
+            await vi.advanceTimersByTimeAsync(RELYING_PARTY_TIMEOUT_REQUEST_SUPPORTED_STANDARD);
           }));
 
         it('should throw error if the message signer standards received comes from another origin', async () => {
           const hackerOrigin = 'https://hacker.com';
 
-          const promise = wallet.supportedStandards();
+          const promise = relyingParty.supportedStandards();
 
           const messageEvent = new MessageEvent('message', {
             origin: hackerOrigin,
@@ -383,14 +383,14 @@ describe('Wallet', () => {
           window.dispatchEvent(messageEvent);
 
           await expect(promise).rejects.toThrow(
-            `The response origin ${hackerOrigin} does not match the wallet origin ${mockParameters.url}.`
+            `The response origin ${hackerOrigin} does not match the signer origin ${mockParameters.url}.`
           );
         });
 
-        it('should throw a wallet response error if the wallet notify an error', async () => {
+        it('should throw a response error if the signer notify an error', async () => {
           const testId = crypto.randomUUID();
 
-          const promise = wallet.supportedStandards({options: {requestId: testId}});
+          const promise = relyingParty.supportedStandards({options: {requestId: testId}});
 
           const errorMsg = 'This is a test error.';
 
@@ -413,7 +413,7 @@ describe('Wallet', () => {
             message: errorMsg
           };
 
-          await expect(promise).rejects.toThrowError(new WalletResponseError(error));
+          await expect(promise).rejects.toThrowError(new RelyingPartyResponseError(error));
         });
       });
 
@@ -431,11 +431,11 @@ describe('Wallet', () => {
           }
         });
 
-        it('should call the wallet with postMessage', async () => {
-          const spy = vi.spyOn(walletHandlers, 'requestSupportedStandards');
+        it('should call the signer with postMessage', async () => {
+          const spy = vi.spyOn(relyingPartyHandlers, 'requestSupportedStandards');
           const spyPostMessage = vi.spyOn(window, 'postMessage');
 
-          const promise = wallet.supportedStandards({options: {requestId}});
+          const promise = relyingParty.supportedStandards({options: {requestId}});
 
           window.dispatchEvent(messageEventSupportedStandards);
 
@@ -454,7 +454,7 @@ describe('Wallet', () => {
         });
 
         it('should respond with the supported standards', async () => {
-          const promise = wallet.supportedStandards({options: {requestId}});
+          const promise = relyingParty.supportedStandards({options: {requestId}});
 
           window.dispatchEvent(messageEventSupportedStandards);
 
@@ -466,7 +466,7 @@ describe('Wallet', () => {
     });
 
     describe('Permissions', () => {
-      let wallet: Wallet;
+      let relyingParty: RelyingParty;
 
       const scopes = [
         {scope: {method: ICRC27_ACCOUNTS}, state: 'granted'},
@@ -474,23 +474,23 @@ describe('Wallet', () => {
       ];
 
       beforeEach(async () => {
-        const promise = Wallet.connect(mockParameters);
+        const promise = RelyingParty.connect(mockParameters);
 
         window.dispatchEvent(messageEventReady);
 
-        wallet = await promise;
+        relyingParty = await promise;
       });
 
       afterEach(async () => {
-        await wallet.disconnect();
+        await relyingParty.disconnect();
       });
 
       describe('Query', () => {
         describe('Request errors', () => {
-          it('should throw error if the wallet request options are not well formatted', async () => {
+          it('should throw error if the signer request options are not well formatted', async () => {
             await expect(
               // @ts-expect-error: we are testing this on purpose
-              wallet.permissions({options: {timeoutInMilliseconds: 'test'}})
+              relyingParty.permissions({options: {timeoutInMilliseconds: 'test'}})
             ).rejects.toThrow('Wallet request options cannot be parsed:');
           });
 
@@ -505,17 +505,17 @@ describe('Wallet', () => {
           ];
 
           it.each(options)(
-            'should timeout for $title if wallet does not answer with expected permissions',
+            'should timeout for $title if signer does not answer with expected permissions',
             async ({options}) =>
               // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
               new Promise<void>(async (resolve) => {
                 vi.useFakeTimers();
 
-                const timeout = options?.timeoutInMilliseconds ?? WALLET_TIMEOUT_PERMISSIONS;
+                const timeout = options?.timeoutInMilliseconds ?? RELYING_PARTY_TIMEOUT_PERMISSIONS;
 
-                wallet.permissions({options}).catch((err: Error) => {
+                relyingParty.permissions({options}).catch((err: Error) => {
                   expect(err.message).toBe(
-                    `Request to wallet timed out after ${timeout} milliseconds.`
+                    `Request to signer timed out after ${timeout} milliseconds.`
                   );
 
                   vi.useRealTimers();
@@ -534,9 +534,9 @@ describe('Wallet', () => {
 
               const spy = vi.spyOn(IcrcScopesResponseSchema, 'safeParse');
 
-              wallet.permissions().catch((err: Error) => {
+              relyingParty.permissions().catch((err: Error) => {
                 expect(err.message).toBe(
-                  `Request to wallet timed out after ${WALLET_TIMEOUT_PERMISSIONS} milliseconds.`
+                  `Request to signer timed out after ${RELYING_PARTY_TIMEOUT_PERMISSIONS} milliseconds.`
                 );
 
                 expect(spy).toHaveBeenCalledTimes(1);
@@ -559,13 +559,13 @@ describe('Wallet', () => {
 
               window.dispatchEvent(messageEventScopes);
 
-              await vi.advanceTimersByTimeAsync(WALLET_TIMEOUT_PERMISSIONS);
+              await vi.advanceTimersByTimeAsync(RELYING_PARTY_TIMEOUT_PERMISSIONS);
             }));
 
           it('should throw error if the message permissions received comes from another origin', async () => {
             const hackerOrigin = 'https://hacker.com';
 
-            const promise = wallet.permissions();
+            const promise = relyingParty.permissions();
 
             const messageEvent = new MessageEvent('message', {
               origin: hackerOrigin,
@@ -581,14 +581,14 @@ describe('Wallet', () => {
             window.dispatchEvent(messageEvent);
 
             await expect(promise).rejects.toThrow(
-              `The response origin ${hackerOrigin} does not match the wallet origin ${mockParameters.url}.`
+              `The response origin ${hackerOrigin} does not match the signer origin ${mockParameters.url}.`
             );
           });
 
-          it('should throw a wallet response error if the wallet notify an error', async () => {
+          it('should throw a response error if the signer notify an error', async () => {
             const testId = crypto.randomUUID();
 
-            const promise = wallet.requestPermissions({options: {requestId: testId}});
+            const promise = relyingParty.requestPermissions({options: {requestId: testId}});
 
             const errorMsg = 'This is a test error.';
 
@@ -611,7 +611,7 @@ describe('Wallet', () => {
               message: errorMsg
             };
 
-            await expect(promise).rejects.toThrowError(new WalletResponseError(error));
+            await expect(promise).rejects.toThrowError(new RelyingPartyResponseError(error));
           });
         });
 
@@ -629,11 +629,11 @@ describe('Wallet', () => {
             }
           });
 
-          it('should call the wallet with postMessage', async () => {
-            const spy = vi.spyOn(walletHandlers, 'permissions');
+          it('should call the signer with postMessage', async () => {
+            const spy = vi.spyOn(relyingPartyHandlers, 'permissions');
             const spyPostMessage = vi.spyOn(window, 'postMessage');
 
-            const promise = wallet.permissions({options: {requestId}});
+            const promise = relyingParty.permissions({options: {requestId}});
 
             window.dispatchEvent(messageEventScopes);
 
@@ -652,7 +652,7 @@ describe('Wallet', () => {
           });
 
           it('should respond with the permissions', async () => {
-            const promise = wallet.permissions({options: {requestId}});
+            const promise = relyingParty.permissions({options: {requestId}});
 
             window.dispatchEvent(messageEventScopes);
 
@@ -665,10 +665,10 @@ describe('Wallet', () => {
 
       describe('Request', () => {
         describe('Request errors', () => {
-          it('should throw error if the wallet request options are not well formatted', async () => {
+          it('should throw error if the signer request options are not well formatted', async () => {
             await expect(
               // @ts-expect-error: we are testing this on purpose
-              wallet.requestPermissions({options: {timeoutInMilliseconds: 'test'}})
+              relyingParty.requestPermissions({options: {timeoutInMilliseconds: 'test'}})
             ).rejects.toThrow('Wallet request options cannot be parsed:');
           });
 
@@ -683,18 +683,18 @@ describe('Wallet', () => {
           ];
 
           it.each(options)(
-            'should timeout for $title if wallet does not answer with expected permissions',
+            'should timeout for $title if signer does not answer with expected permissions',
             async ({options}) =>
               // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
               new Promise<void>(async (resolve) => {
                 vi.useFakeTimers();
 
                 const timeout =
-                  options?.timeoutInMilliseconds ?? WALLET_TIMEOUT_REQUEST_PERMISSIONS;
+                  options?.timeoutInMilliseconds ?? RELYING_PARTY_TIMEOUT_REQUEST_PERMISSIONS;
 
-                wallet.requestPermissions({options}).catch((err: Error) => {
+                relyingParty.requestPermissions({options}).catch((err: Error) => {
                   expect(err.message).toBe(
-                    `Request to wallet timed out after ${timeout} milliseconds.`
+                    `Request to signer timed out after ${timeout} milliseconds.`
                   );
 
                   vi.useRealTimers();
@@ -713,9 +713,9 @@ describe('Wallet', () => {
 
               const spy = vi.spyOn(IcrcScopesResponseSchema, 'safeParse');
 
-              wallet.requestPermissions().catch((err: Error) => {
+              relyingParty.requestPermissions().catch((err: Error) => {
                 expect(err.message).toBe(
-                  `Request to wallet timed out after ${WALLET_TIMEOUT_REQUEST_PERMISSIONS} milliseconds.`
+                  `Request to signer timed out after ${RELYING_PARTY_TIMEOUT_REQUEST_PERMISSIONS} milliseconds.`
                 );
 
                 expect(spy).toHaveBeenCalledTimes(1);
@@ -738,13 +738,13 @@ describe('Wallet', () => {
 
               window.dispatchEvent(messageEventScopes);
 
-              await vi.advanceTimersByTimeAsync(WALLET_TIMEOUT_REQUEST_PERMISSIONS);
+              await vi.advanceTimersByTimeAsync(RELYING_PARTY_TIMEOUT_REQUEST_PERMISSIONS);
             }));
 
           it('should throw error if the message received comes from another origin', async () => {
             const hackerOrigin = 'https://hacker.com';
 
-            const promise = wallet.requestPermissions();
+            const promise = relyingParty.requestPermissions();
 
             const messageEvent = new MessageEvent('message', {
               origin: hackerOrigin,
@@ -760,14 +760,14 @@ describe('Wallet', () => {
             window.dispatchEvent(messageEvent);
 
             await expect(promise).rejects.toThrow(
-              `The response origin ${hackerOrigin} does not match the wallet origin ${mockParameters.url}.`
+              `The response origin ${hackerOrigin} does not match the signer origin ${mockParameters.url}.`
             );
           });
 
-          it('should throw a wallet response error if the wallet notify an error', async () => {
+          it('should throw a response error if the signer notify an error', async () => {
             const testId = crypto.randomUUID();
 
-            const promise = wallet.requestPermissions({options: {requestId: testId}});
+            const promise = relyingParty.requestPermissions({options: {requestId: testId}});
 
             const errorMsg = 'This is a test error.';
 
@@ -790,7 +790,7 @@ describe('Wallet', () => {
               message: errorMsg
             };
 
-            await expect(promise).rejects.toThrowError(new WalletResponseError(error));
+            await expect(promise).rejects.toThrowError(new RelyingPartyResponseError(error));
           });
         });
 
@@ -808,11 +808,11 @@ describe('Wallet', () => {
             }
           });
 
-          it('should call the wallet with postMessage and default scopes', async () => {
-            const spy = vi.spyOn(walletHandlers, 'requestPermissions');
+          it('should call the signer with postMessage and default scopes', async () => {
+            const spy = vi.spyOn(relyingPartyHandlers, 'requestPermissions');
             const spyPostMessage = vi.spyOn(window, 'postMessage');
 
-            const promise = wallet.requestPermissions({options: {requestId}});
+            const promise = relyingParty.requestPermissions({options: {requestId}});
 
             window.dispatchEvent(messageEventScopes);
 
@@ -825,19 +825,19 @@ describe('Wallet', () => {
               expect.objectContaining({
                 jsonrpc: JSON_RPC_VERSION_2,
                 method: ICRC25_REQUEST_PERMISSIONS,
-                params: WALLET_DEFAULT_SCOPES
+                params: RELYING_PARTY_DEFAULT_SCOPES
               }),
               mockParameters.url
             );
           });
 
-          it('should call the wallet with postMessage selected scopes', async () => {
-            const spy = vi.spyOn(walletHandlers, 'requestPermissions');
+          it('should call the signer with postMessage selected scopes', async () => {
+            const spy = vi.spyOn(relyingPartyHandlers, 'requestPermissions');
             const spyPostMessage = vi.spyOn(window, 'postMessage');
 
             const selectedScopes: IcrcAnyRequestedScopes = {scopes: [{method: ICRC27_ACCOUNTS}]};
 
-            const promise = wallet.requestPermissions({
+            const promise = relyingParty.requestPermissions({
               options: {requestId},
               params: selectedScopes
             });
@@ -860,7 +860,7 @@ describe('Wallet', () => {
           });
 
           it('should respond with the selected permissions', async () => {
-            const promise = wallet.requestPermissions({options: {requestId}});
+            const promise = relyingParty.requestPermissions({options: {requestId}});
 
             window.dispatchEvent(messageEventScopes);
 
@@ -873,25 +873,25 @@ describe('Wallet', () => {
     });
 
     describe('Accounts', () => {
-      let wallet: Wallet;
+      let relyingParty: RelyingParty;
 
       beforeEach(async () => {
-        const promise = Wallet.connect(mockParameters);
+        const promise = RelyingParty.connect(mockParameters);
 
         window.dispatchEvent(messageEventReady);
 
-        wallet = await promise;
+        relyingParty = await promise;
       });
 
       afterEach(async () => {
-        await wallet.disconnect();
+        await relyingParty.disconnect();
       });
 
       describe('Request errors', () => {
-        it('should throw error if the wallet request options are not well formatted', async () => {
+        it('should throw error if the signer request options are not well formatted', async () => {
           await expect(
             // @ts-expect-error: we are testing this on purpose
-            wallet.accounts({options: {timeoutInMilliseconds: 'test'}})
+            relyingParty.accounts({options: {timeoutInMilliseconds: 'test'}})
           ).rejects.toThrow('Wallet request options cannot be parsed:');
         });
 
@@ -906,17 +906,17 @@ describe('Wallet', () => {
         ];
 
         it.each(options)(
-          'should timeout for $title if wallet does not answer with expected accounts',
+          'should timeout for $title if signer does not answer with expected accounts',
           async ({options}) =>
             // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
             new Promise<void>(async (resolve) => {
               vi.useFakeTimers();
 
-              const timeout = options?.timeoutInMilliseconds ?? WALLET_TIMEOUT_ACCOUNTS;
+              const timeout = options?.timeoutInMilliseconds ?? RELYING_PARTY_TIMEOUT_ACCOUNTS;
 
-              wallet.accounts({options}).catch((err: Error) => {
+              relyingParty.accounts({options}).catch((err: Error) => {
                 expect(err.message).toBe(
-                  `Request to wallet timed out after ${timeout} milliseconds.`
+                  `Request to signer timed out after ${timeout} milliseconds.`
                 );
 
                 vi.useRealTimers();
@@ -935,9 +935,9 @@ describe('Wallet', () => {
 
             const spy = vi.spyOn(IcrcAccountsResponseSchema, 'safeParse');
 
-            wallet.accounts().catch((err: Error) => {
+            relyingParty.accounts().catch((err: Error) => {
               expect(err.message).toBe(
-                `Request to wallet timed out after ${WALLET_TIMEOUT_ACCOUNTS} milliseconds.`
+                `Request to signer timed out after ${RELYING_PARTY_TIMEOUT_ACCOUNTS} milliseconds.`
               );
 
               expect(spy).toHaveBeenCalledTimes(1);
@@ -960,13 +960,13 @@ describe('Wallet', () => {
 
             window.dispatchEvent(messageEventSupportedStandards);
 
-            await vi.advanceTimersByTimeAsync(WALLET_TIMEOUT_ACCOUNTS);
+            await vi.advanceTimersByTimeAsync(RELYING_PARTY_TIMEOUT_ACCOUNTS);
           }));
 
         it('should throw error if the message accounts received comes from another origin', async () => {
           const hackerOrigin = 'https://hacker.com';
 
-          const promise = wallet.supportedStandards();
+          const promise = relyingParty.supportedStandards();
 
           const messageEvent = new MessageEvent('message', {
             origin: hackerOrigin,
@@ -982,14 +982,14 @@ describe('Wallet', () => {
           window.dispatchEvent(messageEvent);
 
           await expect(promise).rejects.toThrow(
-            `The response origin ${hackerOrigin} does not match the wallet origin ${mockParameters.url}.`
+            `The response origin ${hackerOrigin} does not match the signer origin ${mockParameters.url}.`
           );
         });
 
-        it('should throw a wallet response error if the wallet notify an error', async () => {
+        it('should throw a response error if the signer notify an error', async () => {
           const testId = crypto.randomUUID();
 
-          const promise = wallet.accounts({options: {requestId: testId}});
+          const promise = relyingParty.accounts({options: {requestId: testId}});
 
           const errorMsg = 'This is a test error.';
 
@@ -1012,7 +1012,7 @@ describe('Wallet', () => {
             message: errorMsg
           };
 
-          await expect(promise).rejects.toThrowError(new WalletResponseError(error));
+          await expect(promise).rejects.toThrowError(new RelyingPartyResponseError(error));
         });
       });
 
@@ -1030,11 +1030,11 @@ describe('Wallet', () => {
           }
         });
 
-        it('should call the wallet with postMessage', async () => {
-          const spy = vi.spyOn(walletHandlers, 'requestAccounts');
+        it('should call the signer with postMessage', async () => {
+          const spy = vi.spyOn(relyingPartyHandlers, 'requestAccounts');
           const spyPostMessage = vi.spyOn(window, 'postMessage');
 
-          const promise = wallet.accounts({options: {requestId}});
+          const promise = relyingParty.accounts({options: {requestId}});
 
           window.dispatchEvent(messageEventSupportedStandards);
 
@@ -1053,7 +1053,7 @@ describe('Wallet', () => {
         });
 
         it('should respond with the accounts', async () => {
-          const promise = wallet.accounts({options: {requestId}});
+          const promise = relyingParty.accounts({options: {requestId}});
 
           window.dispatchEvent(messageEventSupportedStandards);
 
@@ -1065,13 +1065,13 @@ describe('Wallet', () => {
     });
 
     describe('Call', () => {
-      let wallet: Wallet;
+      let relyingParty: RelyingParty;
 
       interface MyTest {
         hello: string;
       }
 
-      const params: WalletCallParams<MyTest> = {
+      const params: RelyingPartyCallParams<MyTest> = {
         canisterId: mockPrincipalText,
         sender: mockPrincipalText,
         method: 'some_method',
@@ -1087,22 +1087,22 @@ describe('Wallet', () => {
       };
 
       beforeEach(async () => {
-        const promise = Wallet.connect(mockParameters);
+        const promise = RelyingParty.connect(mockParameters);
 
         window.dispatchEvent(messageEventReady);
 
-        wallet = await promise;
+        relyingParty = await promise;
       });
 
       afterEach(async () => {
-        await wallet.disconnect();
+        await relyingParty.disconnect();
       });
 
       describe('Request errors', () => {
-        it('should throw error if the wallet request options are not well formatted', async () => {
+        it('should throw error if the signer request options are not well formatted', async () => {
           await expect(
             // @ts-expect-error: we are testing this on purpose
-            wallet.call({options: {timeoutInMilliseconds: 'test'}})
+            relyingParty.call({options: {timeoutInMilliseconds: 'test'}})
           ).rejects.toThrow('Wallet request options cannot be parsed:');
         });
 
@@ -1117,17 +1117,17 @@ describe('Wallet', () => {
         ];
 
         it.each(options)(
-          'should timeout for $title if wallet does not answer with result',
+          'should timeout for $title if signer does not answer with result',
           async ({options}) =>
             // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
             new Promise<void>(async (resolve) => {
               vi.useFakeTimers();
 
-              const timeout = options?.timeoutInMilliseconds ?? WALLET_TIMEOUT_CALL_CANISTER;
+              const timeout = options?.timeoutInMilliseconds ?? RELYING_PARTY_TIMEOUT_CALL_CANISTER;
 
-              wallet.call({options, params}).catch((err: Error) => {
+              relyingParty.call({options, params}).catch((err: Error) => {
                 expect(err.message).toBe(
-                  `Request to wallet timed out after ${timeout} milliseconds.`
+                  `Request to signer timed out after ${timeout} milliseconds.`
                 );
 
                 vi.useRealTimers();
@@ -1146,9 +1146,9 @@ describe('Wallet', () => {
 
             const spy = vi.spyOn(IcrcCallCanisterResultResponseSchema, 'safeParse');
 
-            wallet.call({params}).catch((err: Error) => {
+            relyingParty.call({params}).catch((err: Error) => {
               expect(err.message).toBe(
-                `Request to wallet timed out after ${WALLET_TIMEOUT_CALL_CANISTER} milliseconds.`
+                `Request to signer timed out after ${RELYING_PARTY_TIMEOUT_CALL_CANISTER} milliseconds.`
               );
 
               expect(spy).toHaveBeenCalledTimes(1);
@@ -1169,13 +1169,13 @@ describe('Wallet', () => {
 
             window.dispatchEvent(messageEventScopes);
 
-            await vi.advanceTimersByTimeAsync(WALLET_TIMEOUT_CALL_CANISTER);
+            await vi.advanceTimersByTimeAsync(RELYING_PARTY_TIMEOUT_CALL_CANISTER);
           }));
 
         it('should throw error if the message received comes from another origin', async () => {
           const hackerOrigin = 'https://hacker.com';
 
-          const promise = wallet.call({params});
+          const promise = relyingParty.call({params});
 
           const messageEvent = new MessageEvent('message', {
             origin: hackerOrigin,
@@ -1189,14 +1189,14 @@ describe('Wallet', () => {
           window.dispatchEvent(messageEvent);
 
           await expect(promise).rejects.toThrow(
-            `The response origin ${hackerOrigin} does not match the wallet origin ${mockParameters.url}.`
+            `The response origin ${hackerOrigin} does not match the signer origin ${mockParameters.url}.`
           );
         });
 
-        it('should throw a wallet response error if the wallet notify an error', async () => {
+        it('should throw a response error if the signer notify an error', async () => {
           const testId = crypto.randomUUID();
 
-          const promise = wallet.call({options: {requestId: testId}, params});
+          const promise = relyingParty.call({options: {requestId: testId}, params});
 
           const errorMsg = 'This is a test error.';
 
@@ -1219,7 +1219,7 @@ describe('Wallet', () => {
             message: errorMsg
           };
 
-          await expect(promise).rejects.toThrowError(new WalletResponseError(error));
+          await expect(promise).rejects.toThrowError(new RelyingPartyResponseError(error));
         });
       });
 
@@ -1235,11 +1235,11 @@ describe('Wallet', () => {
           }
         });
 
-        it('should call the wallet with postMessage and encoded arguments', async () => {
-          const spy = vi.spyOn(walletHandlers, 'requestCallCanister');
+        it('should call the signer with postMessage and encoded arguments', async () => {
+          const spy = vi.spyOn(relyingPartyHandlers, 'requestCallCanister');
           const spyPostMessage = vi.spyOn(window, 'postMessage');
 
-          const promise = wallet.call({options: {requestId}, params});
+          const promise = relyingParty.call({options: {requestId}, params});
 
           window.dispatchEvent(messageEventScopes);
 
@@ -1264,7 +1264,7 @@ describe('Wallet', () => {
         });
 
         it('should respond with the result', async () => {
-          const promise = wallet.call({options: {requestId}, params});
+          const promise = relyingParty.call({options: {requestId}, params});
 
           window.dispatchEvent(messageEventScopes);
 
@@ -1294,8 +1294,8 @@ describe('Wallet', () => {
     });
 
     it('should throw cannot open window', async () => {
-      await expect(Wallet.connect(mockParameters)).rejects.toThrow(
-        'Unable to open the wallet window.'
+      await expect(RelyingParty.connect(mockParameters)).rejects.toThrow(
+        'Unable to open the signer window.'
       );
     });
   });
