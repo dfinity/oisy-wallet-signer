@@ -1,7 +1,7 @@
-import {WalletOptionsSchema} from './wallet-options';
+import {RelyingPartyOptionsSchema} from './relying-party-options';
 
-describe('WalletOptions', () => {
-  it('should validate correct wallet options with all fields', () => {
+describe('RelyingPartyOptions', () => {
+  it('should validate correct relying party options with all fields', () => {
     const validData = {
       url: 'https://example.com',
       windowOptions: {
@@ -15,17 +15,17 @@ describe('WalletOptions', () => {
       }
     };
 
-    const result = WalletOptionsSchema.safeParse(validData);
+    const result = RelyingPartyOptionsSchema.safeParse(validData);
     expect(result.success).toBe(true);
   });
 
-  it('should validate with correct wallet options and string window options', () => {
+  it('should validate with correct relying party options and string window options', () => {
     const validData = {
       url: 'https://example.com',
       windowOptions: 'width=400,height=300'
     };
 
-    const result = WalletOptionsSchema.safeParse(validData);
+    const result = RelyingPartyOptionsSchema.safeParse(validData);
     expect(result.success).toBe(true);
   });
 
@@ -34,7 +34,7 @@ describe('WalletOptions', () => {
       url: 'invalid-url'
     };
 
-    const result = WalletOptionsSchema.safeParse(invalidData);
+    const result = RelyingPartyOptionsSchema.safeParse(invalidData);
     expect(result.success).toBe(false);
   });
 
@@ -48,7 +48,7 @@ describe('WalletOptions', () => {
       }
     };
 
-    const result = WalletOptionsSchema.safeParse(invalidData);
+    const result = RelyingPartyOptionsSchema.safeParse(invalidData);
     expect(result.success).toBe(false);
   });
 
@@ -60,7 +60,7 @@ describe('WalletOptions', () => {
       }
     };
 
-    const result = WalletOptionsSchema.safeParse(invalidData);
+    const result = RelyingPartyOptionsSchema.safeParse(invalidData);
     expect(result.success).toBe(false);
   });
 
@@ -69,7 +69,7 @@ describe('WalletOptions', () => {
       url: 'https://example.com'
     };
 
-    const result = WalletOptionsSchema.safeParse(validData);
+    const result = RelyingPartyOptionsSchema.safeParse(validData);
     expect(result.success).toBe(true);
   });
 });

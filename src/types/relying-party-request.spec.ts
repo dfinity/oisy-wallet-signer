@@ -1,26 +1,26 @@
 import {IDL} from '@dfinity/candid';
 import {mockPrincipalText} from '../mocks/icrc-accounts.mocks';
 import {
-  WalletRequestOptionsSchema,
+  RelyingPartyRequestOptionsSchema,
   extendIcrcCallCanisterRequestParamsSchema,
-  type WalletCallParams
-} from './wallet-request';
+  type RelyingPartyCallParams
+} from './relying-party-request';
 
-describe('WalletRequest', () => {
+describe('RelyingPartyRequest', () => {
   describe('Options', () => {
     it('should validate with a specified timeoutInMilliseconds', () => {
       const validData = {
         timeoutInMilliseconds: 3000
       };
 
-      const result = WalletRequestOptionsSchema.safeParse(validData);
+      const result = RelyingPartyRequestOptionsSchema.safeParse(validData);
       expect(result.success).toBe(true);
     });
 
     it('should validate without specifying timeoutInMilliseconds', () => {
       const validData = {};
 
-      const result = WalletRequestOptionsSchema.safeParse(validData);
+      const result = RelyingPartyRequestOptionsSchema.safeParse(validData);
       expect(result.success).toBe(true);
     });
 
@@ -29,7 +29,7 @@ describe('WalletRequest', () => {
         timeoutInMilliseconds: 'three thousand'
       };
 
-      const result = WalletRequestOptionsSchema.safeParse(invalidData);
+      const result = RelyingPartyRequestOptionsSchema.safeParse(invalidData);
       expect(result.success).toBe(false);
     });
   });
@@ -46,7 +46,7 @@ describe('WalletRequest', () => {
     const schema = extendIcrcCallCanisterRequestParamsSchema<MyTest>();
 
     it('should validate correct parameters', () => {
-      const validParams: WalletCallParams<{hello: string}> = {
+      const validParams: RelyingPartyCallParams<{hello: string}> = {
         canisterId: mockPrincipalText,
         sender: mockPrincipalText,
         method: 'some_method',

@@ -4,34 +4,36 @@ import {z} from 'zod';
 import {IcrcCallCanisterRequestParamsSchema} from './icrc-requests';
 import {RpcIdSchema} from './rpc';
 
-export const WalletRequestOptionsTimeoutSchema = z.object({
+export const RelyingPartyRequestOptionsTimeoutSchema = z.object({
   /**
-   * Specifies the maximum duration in milliseconds for attempting to request an interaction with the wallet.
-   * If the wallet does not answer within this duration, the process will time out.
+   * Specifies the maximum duration in milliseconds for attempting to request an interaction with the relying party.
+   * If the relying party does not answer within this duration, the process will time out.
    */
   timeoutInMilliseconds: z.number()
 });
 
-export const WalletRequestOptionsSchema = z
+export const RelyingPartyRequestOptionsSchema = z
   .object({
     /**
      * A custom identifier for the request, used to correlate responses with their corresponding requests.
      *
-     * The wallet is expected to include this ID in its response, ensuring that the response can be accurately matched to the original request.
+     * The relying party is expected to include this ID in its response, ensuring that the response can be accurately matched to the original request.
      *
      * If not provided, the library will generate a unique identifier automatically.
      */
     requestId: RpcIdSchema.optional()
   })
-  .merge(WalletRequestOptionsTimeoutSchema.partial());
+  .merge(RelyingPartyRequestOptionsTimeoutSchema.partial());
 
-export type WalletRequestOptions = z.infer<typeof WalletRequestOptionsSchema>;
+export type RelyingPartyRequestOptions = z.infer<typeof RelyingPartyRequestOptionsSchema>;
 
-export const WalletRequestOptionsWithTimeoutSchema = WalletRequestOptionsSchema.omit({
+export const RelyingPartyRequestOptionsWithTimeoutSchema = RelyingPartyRequestOptionsSchema.omit({
   timeoutInMilliseconds: true
-}).merge(WalletRequestOptionsTimeoutSchema);
+}).merge(RelyingPartyRequestOptionsTimeoutSchema);
 
-export type WalletRequestOptionsWithTimeout = z.infer<typeof WalletRequestOptionsWithTimeoutSchema>;
+export type RelyingPartyRequestOptionsWithTimeout = z.infer<
+  typeof RelyingPartyRequestOptionsWithTimeoutSchema
+>;
 
 /**
  * Creates an extended schema for ICRC call canister request parameters.
@@ -53,7 +55,7 @@ export const extendIcrcCallCanisterRequestParamsSchema = <T>() =>
   });
 
 /**
- * Represents the type of parameters used in a wallet call, based on the
+ * Represents the type of parameters used in a relying party call, based on the
  * extended ICRC call canister request schema.
  *
  * This type is inferred from the return type of `extendIcrcCallCanisterRequestParamsSchema<T>`,
@@ -61,6 +63,6 @@ export const extendIcrcCallCanisterRequestParamsSchema = <T>() =>
  *
  * @template T - The type of the `arg` field in the schema.
  */
-export type WalletCallParams<T> = z.infer<
+export type RelyingPartyCallParams<T> = z.infer<
   ReturnType<typeof extendIcrcCallCanisterRequestParamsSchema<T>>
 >;
