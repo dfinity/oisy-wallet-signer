@@ -1,5 +1,4 @@
 import {assertNonNullish, isNullish, nonNullish} from '@dfinity/utils';
-import {resetActors} from './api/actors.api';
 import {
   ICRC25_REQUEST_PERMISSIONS,
   ICRC27_ACCOUNTS,
@@ -20,7 +19,7 @@ import {
   type NotifyAccounts,
   type NotifyPermissions
 } from './handlers/signer.handlers';
-import {assertAndPromptConsentMessage} from './services/signer.services';
+import {SignerService} from './services/signer.service';
 import {
   readSessionValidScopes,
   saveSessionScopes,
@@ -68,6 +67,8 @@ export class Signer {
   #accountsPrompt: AccountsPrompt | undefined;
   #consentMessagePrompt: CallCanisterPrompt | undefined;
 
+  readonly #signerService = new SignerService();
+
   private constructor({owner, host}: SignerOptions) {
     this.#owner = owner;
     this.#host = host;
@@ -93,7 +94,6 @@ export class Signer {
   disconnect = (): void => {
     window.removeEventListener('message', this.onMessageListener);
     this.#walletOrigin = null;
-    resetActors();
   };
 
   private readonly onMessageListener = (message: SignerMessageEvent): void => {
@@ -517,7 +517,7 @@ export class Signer {
         return {handled: true};
       }
 
-      const {result: userConsent} = await assertAndPromptConsentMessage({
+      const {result: userConsent} = await this.#signerService.assertAndPromptConsentMessage({
         notify: {
           id: requestId,
           origin

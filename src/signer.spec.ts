@@ -1,7 +1,6 @@
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import type {MockInstance} from 'vitest';
-import * as actors from './api/actors.api';
-import * as api from './api/canister.api';
+import {Icrc21Canister} from './api/icrc21-canister.api';
 import {
   ICRC25_PERMISSIONS,
   ICRC25_PERMISSION_GRANTED,
@@ -84,14 +83,6 @@ describe('Signer', () => {
     signer.disconnect();
 
     expect(removeEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
-  });
-
-  it('should clean actors on disconnect', () => {
-    const spy = vi.spyOn(actors, 'resetActors');
-
-    const signer = Signer.init(signerOptions);
-    signer.disconnect();
-    expect(spy).toHaveBeenNthCalledWith(1);
   });
 
   describe('onMessage', () => {
@@ -905,7 +896,7 @@ describe('Signer', () => {
         };
 
         beforeEach(() => {
-          spy = vi.spyOn(api, 'consentMessage');
+          spy = vi.spyOn(Icrc21Canister.prototype, 'consentMessage');
           notifyErrorSpy = vi.spyOn(signerHandlers, 'notifyError');
         });
 
