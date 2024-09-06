@@ -1,7 +1,6 @@
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import type {Mock, MockInstance} from 'vitest';
-import * as api from '../api/canister.api';
-import {consentMessage} from '../api/canister.api';
+import {Icrc21Canister} from '../api/icrc21-canister.api';
 import {SignerErrorCode} from '../constants/signer.constants';
 import {mockConsentInfo} from '../mocks/consent-message.mocks';
 import {mockPrincipalText} from '../mocks/icrc-accounts.mocks';
@@ -11,11 +10,12 @@ import type {Notify} from '../types/signer-handlers';
 import type {SignerOptions} from '../types/signer-options';
 import type {ConsentMessagePromptPayload} from '../types/signer-prompts';
 import {mapIcrc21ErrorToString} from '../utils/icrc-21.utils';
-import {assertAndPromptConsentMessage} from './signer.services';
+import {SignerService} from './signer.service';
 
 describe('Signer services', () => {
   let requestId: RpcId;
   let spy: MockInstance;
+  let signerService: SignerService;
 
   const testOrigin = 'https://hello.com';
   let notify: Notify;
@@ -46,12 +46,14 @@ describe('Signer services', () => {
     vi.stubGlobal('opener', {postMessage: postMessageMock});
 
     requestId = crypto.randomUUID();
-    spy = vi.spyOn(api, 'consentMessage');
+    spy = vi.spyOn(Icrc21Canister.prototype, 'consentMessage');
 
     notify = {
       id: requestId,
       origin: testOrigin
     };
+
+    signerService = new SignerService();
   });
 
   afterEach(() => {
@@ -69,7 +71,7 @@ describe('Signer services', () => {
       approve();
     };
 
-    const result = await assertAndPromptConsentMessage({
+    const result = await signerService.assertAndPromptConsentMessage({
       notify,
       params,
       prompt,
@@ -78,7 +80,7 @@ describe('Signer services', () => {
 
     expect(result).toEqual({result: 'approved'});
 
-    expect(consentMessage).toHaveBeenCalledWith({
+    expect(spy).toHaveBeenCalledWith({
       ...signerOptions,
       canisterId: params.canisterId,
       request: {
@@ -104,7 +106,7 @@ describe('Signer services', () => {
         reject();
       };
 
-      const result = await assertAndPromptConsentMessage({
+      const result = await signerService.assertAndPromptConsentMessage({
         notify,
         params,
         prompt,
@@ -119,7 +121,7 @@ describe('Signer services', () => {
         reject();
       };
 
-      await assertAndPromptConsentMessage({
+      await signerService.assertAndPromptConsentMessage({
         notify,
         params,
         prompt,
@@ -153,7 +155,7 @@ describe('Signer services', () => {
     it('should return error when consentMessage returns error', async () => {
       const prompt = vi.fn();
 
-      const result = await assertAndPromptConsentMessage({
+      const result = await signerService.assertAndPromptConsentMessage({
         notify,
         params,
         prompt,
@@ -165,7 +167,7 @@ describe('Signer services', () => {
     });
 
     it('should call notifyErrorRequestNotSupported when consentMessage returns error', async () => {
-      await assertAndPromptConsentMessage({
+      await signerService.assertAndPromptConsentMessage({
         notify,
         params,
         prompt: vi.fn(),
@@ -196,7 +198,7 @@ describe('Signer services', () => {
 
       const mockSpy = vi.fn();
 
-      const result = await assertAndPromptConsentMessage({
+      const result = await signerService.assertAndPromptConsentMessage({
         notify,
         params,
         prompt: mockSpy,
@@ -213,7 +215,7 @@ describe('Signer services', () => {
         throw 'Test';
       });
 
-      await assertAndPromptConsentMessage({
+      await signerService.assertAndPromptConsentMessage({
         notify,
         params,
         prompt: vi.fn(),
@@ -241,7 +243,7 @@ describe('Signer services', () => {
         throw new Error(errorMessage);
       });
 
-      await assertAndPromptConsentMessage({
+      await signerService.assertAndPromptConsentMessage({
         notify,
         params,
         prompt: vi.fn(),
@@ -264,7 +266,7 @@ describe('Signer services', () => {
   });
 
   it('should notify MissingPromptError if prompt is undefined', async () => {
-    await assertAndPromptConsentMessage({
+    await signerService.assertAndPromptConsentMessage({
       notify,
       params,
       prompt: undefined,
@@ -290,7 +292,7 @@ describe('Signer services', () => {
 
     const prompt = vi.fn();
 
-    const result = await assertAndPromptConsentMessage({
+    const result = await signerService.assertAndPromptConsentMessage({
       notify,
       params,
       prompt,
@@ -311,7 +313,7 @@ describe('Signer services', () => {
     };
 
     it('should return error if sender does not match owner', async () => {
-      const result = await assertAndPromptConsentMessage({
+      const result = await signerService.assertAndPromptConsentMessage({
         notify,
         params: invalidParams,
         prompt,
@@ -324,7 +326,7 @@ describe('Signer services', () => {
     });
 
     it('should call notifySenderNotAllowedError if sender does not match owner', async () => {
-      await assertAndPromptConsentMessage({
+      await signerService.assertAndPromptConsentMessage({
         notify,
         params: invalidParams,
         prompt,
