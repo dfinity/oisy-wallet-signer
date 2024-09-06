@@ -1,6 +1,6 @@
 import type {RpcResponseError, RpcResponseErrorCode} from './rpc';
 
-export class WalletResponseError extends Error {
+export class RelyingPartyResponseError extends Error {
   code: RpcResponseErrorCode;
 
   constructor({message, code}: RpcResponseError) {

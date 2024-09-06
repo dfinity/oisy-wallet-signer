@@ -34,10 +34,15 @@
       "import": "./dist/index.js",
       "require": "./dist/index.mjs"
     },
-    "./wallet": {
-      "types": "./dist/wallet.d.ts",
-      "import": "./dist/wallet.js",
-      "require": "./dist/wallet.mjs"
+    "./relying-party": {
+      "types": "./dist/relying-party.d.ts",
+      "import": "./dist/relying-party.js",
+      "require": "./dist/relying-party.mjs"
+    },
+    "./icp-wallet": {
+      "types": "./dist/icp-wallet.d.ts",
+      "import": "./dist/icp-wallet.js",
+      "require": "./dist/icp-wallet.mjs"
     },
     "./signer": {
       "types": "./dist/signer.d.ts",

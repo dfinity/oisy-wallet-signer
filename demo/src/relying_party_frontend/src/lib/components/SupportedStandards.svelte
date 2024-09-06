@@ -1,12 +1,12 @@
 <script lang="ts">
-	import type { Wallet } from '@dfinity/oisy-wallet-signer/wallet';
+	import type { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
 	import { isNullish, nonNullish } from '@dfinity/utils';
 	import type { IcrcSupportedStandards } from '@dfinity/oisy-wallet-signer';
 	import Value from '$core/components/Value.svelte';
 	import { fade } from 'svelte/transition';
 
 	type Props = {
-		wallet: Wallet | undefined;
+		wallet: IcpWallet | undefined;
 	};
 
 	let { wallet }: Props = $props();
