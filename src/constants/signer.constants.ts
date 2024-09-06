@@ -14,6 +14,11 @@ export enum SignerErrorCode {
   PERMISSIONS_PROMPT_NOT_REGISTERED = 501,
 
   /**
+   * The sender of a canister call does not match the owner of the signer.
+   */
+  SENDER_NOT_ALLOWED = 502,
+
+  /**
    * A generic error.
    * @see https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#errors
    */
