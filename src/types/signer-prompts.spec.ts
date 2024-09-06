@@ -11,8 +11,8 @@ import type {IcrcScopesArray} from './icrc-responses';
 import {
   AccountsPromptSchema,
   ConsentMessagePromptSchema,
-  IcrcApproveMethodSchema,
   PermissionsPromptSchema,
+  PromptMethodSchema,
   type AccountsPromptPayload,
   type ConsentMessagePromptPayload,
   type PermissionsPromptPayload
@@ -53,14 +53,14 @@ describe('SignerPrompts', () => {
     it.each(approveEnums)(
       'should validate $title with IcrcApproveMethodSchema',
       async ({validEnum}) => {
-        expect(IcrcApproveMethodSchema.safeParse(validEnum).success).toBe(true);
+        expect(PromptMethodSchema.safeParse(validEnum).success).toBe(true);
       }
     );
 
     it.each(invalidApproveEnums)(
       'should not validate $title with IcrcApproveMethodSchema',
       async ({validEnum}) => {
-        expect(IcrcApproveMethodSchema.safeParse(validEnum).success).toBe(false);
+        expect(PromptMethodSchema.safeParse(validEnum).success).toBe(false);
       }
     );
   });

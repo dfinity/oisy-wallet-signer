@@ -53,9 +53,9 @@ import {
   type AccountsConfirmation,
   type AccountsPrompt,
   type ConsentMessagePrompt,
-  type IcrcApproveMethod,
   type PermissionsConfirmation,
-  type PermissionsPrompt
+  type PermissionsPrompt,
+  type PromptMethod
 } from './types/signer-prompts';
 
 export class Signer {
@@ -182,7 +182,7 @@ export class Signer {
     method,
     prompt
   }: {
-    method: IcrcApproveMethod;
+    method: PromptMethod;
     prompt: PermissionsPrompt | AccountsPrompt | ConsentMessagePrompt;
   }): void => {
     // TODO: maybe we should replace method here with another custom enum or type, that would be maybe a bit more comprehensive?

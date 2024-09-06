@@ -8,13 +8,13 @@ import type {icrc21_consent_info} from '../declarations/icrc-21';
 import {IcrcAccountsSchema} from './icrc-accounts';
 import {IcrcScopesArraySchema} from './icrc-responses';
 
-export const IcrcApproveMethodSchema = z.enum([
+export const PromptMethodSchema = z.enum([
   ICRC25_REQUEST_PERMISSIONS,
   ICRC27_ACCOUNTS,
   ICRC49_CALL_CANISTER
 ]);
 
-export type IcrcApproveMethod = z.infer<typeof IcrcApproveMethodSchema>;
+export type PromptMethod = z.infer<typeof PromptMethodSchema>;
 
 const PermissionsConfirmationSchema = z.function().args(IcrcScopesArraySchema).returns(z.void());
 
