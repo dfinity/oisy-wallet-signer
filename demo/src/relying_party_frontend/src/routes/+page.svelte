@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
-	import { Wallet } from '@dfinity/oisy-wallet-signer/wallet';
+	import { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
 	import { isNullish } from '@dfinity/utils';
 	import Button from '$core/components/Button.svelte';
 	import UserId from '$core/components/UserId.svelte';
@@ -11,10 +11,10 @@
 	import Accounts from '$lib/components/Accounts.svelte';
 	import CallCanister from '$lib/components/CallCanister.svelte';
 
-	let wallet = $state<Wallet | undefined>(undefined);
+	let wallet = $state<IcpWallet | undefined>(undefined);
 
 	const onclick = async () => {
-		wallet = await Wallet.connect({
+		wallet = await IcpWallet.connect({
 			url: 'http://localhost:5174'
 		});
 	};
