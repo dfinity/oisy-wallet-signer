@@ -14,6 +14,7 @@ export const notifyErrorRequestNotSupported = ({
     }
   });
 };
+
 export const notifyErrorActionAborted = (notify: Notify): void => {
   notifyError({
     ...notify,
@@ -23,6 +24,7 @@ export const notifyErrorActionAborted = (notify: Notify): void => {
     }
   });
 };
+
 export const notifyNetworkError = ({message, ...notify}: Notify & {message: string}): void => {
   notifyError({
     ...notify,
@@ -32,6 +34,7 @@ export const notifyNetworkError = ({message, ...notify}: Notify & {message: stri
     }
   });
 };
+
 export const notifyErrorPermissionNotGranted = (notify: Notify): void => {
   notifyError({
     ...notify,
@@ -42,12 +45,23 @@ export const notifyErrorPermissionNotGranted = (notify: Notify): void => {
     }
   });
 };
+
 export const notifyMissingPromptError = (notify: Notify): void => {
   notifyError({
     ...notify,
     error: {
       code: SignerErrorCode.PERMISSIONS_PROMPT_NOT_REGISTERED,
       message: 'The signer has not registered a prompt to respond to permission requests.'
+    }
+  });
+};
+
+export const notifySenderNotAllowedError = (notify: Notify): void => {
+  notifyError({
+    ...notify,
+    error: {
+      code: SignerErrorCode.SENDER_NOT_ALLOWED,
+      message: 'The sender must match the owner of the signer.'
     }
   });
 };
