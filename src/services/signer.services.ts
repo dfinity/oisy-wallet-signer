@@ -1,3 +1,4 @@
+import {Principal} from '@dfinity/principal';
 import {isNullish} from '@dfinity/utils';
 import {consentMessage} from '../api/canister.api';
 import type {icrc21_consent_info} from '../declarations/icrc-21';
@@ -5,7 +6,8 @@ import {
   notifyErrorActionAborted,
   notifyErrorRequestNotSupported,
   notifyMissingPromptError,
-  notifyNetworkError
+  notifyNetworkError,
+  notifySenderNotAllowedError
 } from '../handlers/signer-errors.handlers';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import type {Notify} from '../types/signer-handlers';
@@ -14,18 +16,21 @@ import type {ConsentMessageAnswer, ConsentMessagePrompt} from '../types/signer-p
 import {mapIcrc21ErrorToString} from '../utils/icrc-21.utils';
 
 export const assertAndPromptConsentMessage = async ({
-  params: {canisterId, method, arg},
+  params: {canisterId, method, arg, sender},
   prompt,
   notify,
-  options
+  options: {owner, host}
 }: {
   params: IcrcCallCanisterRequestParams;
   prompt: ConsentMessagePrompt | undefined;
   notify: Notify;
   options: SignerOptions;
 }): Promise<{result: 'approved' | 'rejected' | 'error'}> => {
-  // TODO: asserting that the sender = owner of the accounts = principal derived by II in the signer
-  // i.e. sender === this.#owner
+  const {result: senderMatchOwner} = assertSender({sender, owner, notify});
+
+  if (senderMatchOwner === 'invalid') {
+    return {result: 'error'};
+  }
 
   // The consumer currently has no way to unregister the prompt, so we know that it is defined. However, to be future-proof, it's better to ensure it is defined.
   if (isNullish(prompt)) {
@@ -35,7 +40,8 @@ export const assertAndPromptConsentMessage = async ({
 
   try {
     const response = await consentMessage({
-      ...options,
+      owner,
+      host,
       canisterId,
       request: {
         method,
@@ -82,6 +88,21 @@ export const assertAndPromptConsentMessage = async ({
 
     return {result: 'error'};
   }
+};
+
+const assertSender = ({
+  notify,
+  owner,
+  sender
+}: {notify: Notify} & Pick<SignerOptions, 'owner'> &
+  Pick<IcrcCallCanisterRequestParams, 'sender'>): {result: 'valid' | 'invalid'} => {
+  if (owner.getPrincipal().toText() === Principal.fromText(sender).toText()) {
+    return {result: 'valid'};
+  }
+
+  notifySenderNotAllowedError(notify);
+
+  return {result: 'invalid'};
 };
 
 const promptConsentMessage = async ({

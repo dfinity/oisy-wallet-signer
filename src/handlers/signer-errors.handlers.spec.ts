@@ -2,8 +2,12 @@ import type {Mock} from 'vitest';
 import {SignerErrorCode} from '../constants/signer.constants';
 import {JSON_RPC_VERSION_2, type RpcId, type RpcResponseWithError} from '../types/rpc';
 import {
+  notifyErrorActionAborted,
   notifyErrorPermissionNotGranted,
-  notifyErrorRequestNotSupported
+  notifyErrorRequestNotSupported,
+  notifyMissingPromptError,
+  notifyNetworkError,
+  notifySenderNotAllowedError
 } from './signer-errors.handlers';
 
 describe('Signer-errors.handlers', () => {
@@ -78,6 +82,83 @@ describe('Signer-errors.handlers', () => {
       };
 
       notifyErrorPermissionNotGranted({id: requestId, origin: testOrigin});
+
+      const expectedMessage: RpcResponseWithError = {
+        jsonrpc: JSON_RPC_VERSION_2,
+        id: requestId,
+        error
+      };
+
+      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, testOrigin);
+    });
+  });
+
+  describe('notifyErrorActionAborted', () => {
+    it('should post an error message indicating action was aborted', () => {
+      const error = {
+        code: SignerErrorCode.ACTION_ABORTED,
+        message: 'The signer has canceled the action requested by the relying party.'
+      };
+
+      notifyErrorActionAborted({id: requestId, origin: testOrigin});
+
+      const expectedMessage: RpcResponseWithError = {
+        jsonrpc: JSON_RPC_VERSION_2,
+        id: requestId,
+        error
+      };
+
+      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, testOrigin);
+    });
+  });
+
+  describe('notifyNetworkError', () => {
+    it('should post an error message with a network error message', () => {
+      const customMessage = 'Network request failed';
+      const error = {
+        code: SignerErrorCode.NETWORK_ERROR,
+        message: customMessage
+      };
+
+      notifyNetworkError({id: requestId, origin: testOrigin, message: customMessage});
+
+      const expectedMessage: RpcResponseWithError = {
+        jsonrpc: JSON_RPC_VERSION_2,
+        id: requestId,
+        error
+      };
+
+      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, testOrigin);
+    });
+  });
+
+  describe('notifyMissingPromptError', () => {
+    it('should post an error message indicating missing prompt registration', () => {
+      const error = {
+        code: SignerErrorCode.PERMISSIONS_PROMPT_NOT_REGISTERED,
+        message: 'The signer has not registered a prompt to respond to permission requests.'
+      };
+
+      notifyMissingPromptError({id: requestId, origin: testOrigin});
+
+      const expectedMessage: RpcResponseWithError = {
+        jsonrpc: JSON_RPC_VERSION_2,
+        id: requestId,
+        error
+      };
+
+      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, testOrigin);
+    });
+  });
+
+  describe('notifySenderNotAllowedError', () => {
+    it('should post an error message indicating sender not allowed', () => {
+      const error = {
+        code: SignerErrorCode.SENDER_NOT_ALLOWED,
+        message: 'The sender must match the owner of the signer.'
+      };
+
+      notifySenderNotAllowedError({id: requestId, origin: testOrigin});
 
       const expectedMessage: RpcResponseWithError = {
         jsonrpc: JSON_RPC_VERSION_2,
