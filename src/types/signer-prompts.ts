@@ -1,7 +1,20 @@
 import {z} from 'zod';
+import {
+  ICRC25_REQUEST_PERMISSIONS,
+  ICRC27_ACCOUNTS,
+  ICRC49_CALL_CANISTER
+} from '../constants/icrc.constants';
 import type {icrc21_consent_info} from '../declarations/icrc-21';
 import {IcrcAccountsSchema} from './icrc-accounts';
 import {IcrcScopesArraySchema} from './icrc-responses';
+
+export const PromptMethodSchema = z.enum([
+  ICRC25_REQUEST_PERMISSIONS,
+  ICRC27_ACCOUNTS,
+  ICRC49_CALL_CANISTER
+]);
+
+export type PromptMethod = z.infer<typeof PromptMethodSchema>;
 
 const PermissionsConfirmationSchema = z.function().args(IcrcScopesArraySchema).returns(z.void());
 

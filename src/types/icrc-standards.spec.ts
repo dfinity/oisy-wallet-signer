@@ -8,12 +8,7 @@ import {
   ICRC29,
   ICRC29_STATUS
 } from '../constants/icrc.constants';
-import {
-  IcrcApproveMethodSchema,
-  IcrcMethodSchema,
-  IcrcScopedMethodSchema,
-  IcrcStandardSchema
-} from './icrc-standards';
+import {IcrcMethodSchema, IcrcScopedMethodSchema, IcrcStandardSchema} from './icrc-standards';
 
 describe('ICRC standards', () => {
   const methodEnums = [
@@ -46,46 +41,6 @@ describe('ICRC standards', () => {
   it('should not validate IcrcMethodSchema unkown value', () => {
     expect(IcrcMethodSchema.safeParse('INVALID_METHOD').success).toBe(false);
   });
-
-  const approveEnums = [
-    {
-      title: 'ICRC25_REQUEST_PERMISSIONS',
-      validEnum: ICRC25_REQUEST_PERMISSIONS
-    },
-    {
-      title: 'ICRC27_ACCOUNTS',
-      validEnum: ICRC27_ACCOUNTS
-    }
-  ];
-
-  const invalidApproveEnums = [
-    {
-      title: 'ICRC25_PERMISSIONS',
-      validEnum: ICRC25_PERMISSIONS
-    },
-    {
-      title: 'ICRC25_SUPPORTED_STANDARDS',
-      validEnum: ICRC25_SUPPORTED_STANDARDS
-    },
-    {
-      title: 'ICRC29_STATUS',
-      validEnum: ICRC29_STATUS
-    }
-  ];
-
-  it.each(approveEnums)(
-    'should validate $title with IcrcApproveMethodSchema',
-    async ({validEnum}) => {
-      expect(IcrcApproveMethodSchema.safeParse(validEnum).success).toBe(true);
-    }
-  );
-
-  it.each(invalidApproveEnums)(
-    'should not validate $title with IcrcApproveMethodSchema',
-    async ({validEnum}) => {
-      expect(IcrcApproveMethodSchema.safeParse(validEnum).success).toBe(false);
-    }
-  );
 
   const scopeEnums = [
     {
