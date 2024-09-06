@@ -3,7 +3,8 @@ import {
   ICRC25_REQUEST_PERMISSIONS,
   ICRC25_SUPPORTED_STANDARDS,
   ICRC27_ACCOUNTS,
-  ICRC29_STATUS
+  ICRC29_STATUS,
+  ICRC49_CALL_CANISTER
 } from '../constants/icrc.constants';
 import {IcrcApproveMethodSchema} from './icrc-prompts';
 
@@ -16,6 +17,10 @@ describe('ICRC prompts', () => {
     {
       title: 'ICRC27_ACCOUNTS',
       validEnum: ICRC27_ACCOUNTS
+    },
+    {
+      title: 'ICRC49_CALL_CANISTER',
+      validEnum: ICRC49_CALL_CANISTER
     }
   ];
 
