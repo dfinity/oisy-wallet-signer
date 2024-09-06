@@ -48,11 +48,11 @@ import {MissingPromptError} from './types/signer-errors';
 import type {IdentityNotAnonymous, SignerHost, SignerOptions} from './types/signer-options';
 import {
   AccountsPromptSchema,
-  ConsentMessagePromptSchema,
+  CallCanisterPromptSchema,
   PermissionsPromptSchema,
   type AccountsConfirmation,
   type AccountsPrompt,
-  type ConsentMessagePrompt,
+  type CallCanisterPrompt,
   type PermissionsConfirmation,
   type PermissionsPrompt,
   type PromptMethod
@@ -66,7 +66,7 @@ export class Signer {
 
   #permissionsPrompt: PermissionsPrompt | undefined;
   #accountsPrompt: AccountsPrompt | undefined;
-  #consentMessagePrompt: ConsentMessagePrompt | undefined;
+  #consentMessagePrompt: CallCanisterPrompt | undefined;
 
   private constructor({owner, host}: SignerOptions) {
     this.#owner = owner;
@@ -183,7 +183,7 @@ export class Signer {
     prompt
   }: {
     method: PromptMethod;
-    prompt: PermissionsPrompt | AccountsPrompt | ConsentMessagePrompt;
+    prompt: PermissionsPrompt | AccountsPrompt | CallCanisterPrompt;
   }): void => {
     // TODO: maybe we should replace method here with another custom enum or type, that would be maybe a bit more comprehensive?
     // TODO: is there a way to avoid casting?
@@ -199,8 +199,8 @@ export class Signer {
         return;
       }
       case ICRC49_CALL_CANISTER: {
-        ConsentMessagePromptSchema.parse(prompt);
-        this.#consentMessagePrompt = prompt as ConsentMessagePrompt;
+        CallCanisterPromptSchema.parse(prompt);
+        this.#consentMessagePrompt = prompt as CallCanisterPrompt;
         return;
       }
     }

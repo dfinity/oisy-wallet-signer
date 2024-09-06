@@ -10,7 +10,7 @@ import {mockAccounts} from '../mocks/icrc-accounts.mocks';
 import type {IcrcScopesArray} from './icrc-responses';
 import {
   AccountsPromptSchema,
-  ConsentMessagePromptSchema,
+  CallCanisterPromptSchema,
   PermissionsPromptSchema,
   PromptMethodSchema,
   type AccountsPromptPayload,
@@ -112,13 +112,13 @@ describe('SignerPrompts', () => {
         payload.approve();
       };
 
-      expect(() => ConsentMessagePromptSchema.parse(prompt)).not.toThrow();
+      expect(() => CallCanisterPromptSchema.parse(prompt)).not.toThrow();
     });
 
     it('should fail with an invalid ConsentMessagePrompt', () => {
       const invalidPrompt = 123;
 
-      expect(() => ConsentMessagePromptSchema.parse(invalidPrompt)).toThrow();
+      expect(() => CallCanisterPromptSchema.parse(invalidPrompt)).toThrow();
     });
   });
 });
