@@ -8,6 +8,7 @@ import {
   RELYING_PARTY_TIMEOUT_REQUEST_PERMISSIONS,
   RELYING_PARTY_TIMEOUT_REQUEST_SUPPORTED_STANDARD
 } from './constants/relying-party.constants';
+import {DEFAULT_SIGNER_WINDOW_TOP_RIGHT} from './constants/window.constants';
 import {
   permissions,
   requestAccounts,
@@ -42,7 +43,7 @@ import {
   type RpcId
 } from './types/rpc';
 import type {ReadyOrError} from './utils/timeout.utils';
-import {WALLET_WINDOW_TOP_RIGHT, windowFeatures} from './utils/window.utils';
+import {windowFeatures} from './utils/window.utils';
 
 export class RelyingParty {
   readonly #origin: string;
@@ -91,7 +92,7 @@ export class RelyingParty {
     const popupFeatures =
       typeof windowOptions === 'string'
         ? windowOptions
-        : windowFeatures(windowOptions ?? WALLET_WINDOW_TOP_RIGHT);
+        : windowFeatures(windowOptions ?? DEFAULT_SIGNER_WINDOW_TOP_RIGHT);
 
     const popup = window.open(url, 'relyingPartyWindow', popupFeatures);
 
