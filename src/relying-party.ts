@@ -67,13 +67,13 @@ export class RelyingParty {
    * @returns {Promise<RelyingParty>} A promise that resolves to an object, which can be used to interact with the signer when it is connected.
    */
   static async connect(options: RelyingPartyOptions): Promise<RelyingParty> {
-    return await this.connectWallet({
+    return await this.connectSigner({
       options,
       init: (params: {origin: string; popup: Window}) => new RelyingParty(params)
     });
   }
 
-  protected static async connectWallet<T extends RelyingParty>({
+  protected static async connectSigner<T extends RelyingParty>({
     options,
     init
   }: {
@@ -83,7 +83,7 @@ export class RelyingParty {
     const {success: optionsSuccess, error} = RelyingPartyOptionsSchema.safeParse(options);
 
     if (!optionsSuccess) {
-      throw new Error(`Wallet options cannot be parsed: ${error?.message ?? ''}`);
+      throw new Error(`Options cannot be parsed: ${error?.message ?? ''}`);
     }
 
     const {url, windowOptions, connectionOptions} = options;

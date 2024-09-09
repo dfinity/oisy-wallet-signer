@@ -11,7 +11,7 @@ export class IcpWallet extends RelyingParty {
    * @returns {Promise<IcpWallet>} A promise that resolves to an object, which can be used to interact with the ICP Wallet when it is connected.
    */
   static async connect(options: RelyingPartyOptions): Promise<IcpWallet> {
-    return await this.connectWallet({
+    return await this.connectSigner({
       options,
       init: (params: {origin: string; popup: Window}) => new IcpWallet(params)
     });
