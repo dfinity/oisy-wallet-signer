@@ -6,6 +6,8 @@ import {IcrcAccount} from './types/icrc-accounts';
 import type {IcrcCallCanisterResult} from './types/icrc-responses';
 import {PrincipalText} from './types/principal';
 
+const ICP_LEDGER_CANISTER_ID = 'ryjl3-tyaaa-aaaaa-aaaba-cai';
+
 export class IcpWallet extends RelyingParty {
   // TODO: documentation
   // TODO: return BlockHeight?
@@ -47,8 +49,7 @@ export class IcpWallet extends RelyingParty {
       params: {
         sender: owner,
         method: 'icrc1_transfer',
-        // TODO: constant from ic-js
-        canisterId: canisterId ?? 'ryjl3-tyaaa-aaaaa-aaaba-cai',
+        canisterId: canisterId ?? ICP_LEDGER_CANISTER_ID,
         arg
       }
     });
