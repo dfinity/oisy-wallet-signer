@@ -1,4 +1,3 @@
-import {IDL} from '@dfinity/candid';
 import {assertNonNullish, nonNullish, notEmptyString} from '@dfinity/utils';
 import {
   RELYING_PARTY_CONNECT_TIMEOUT_IN_MILLISECONDS,
@@ -18,7 +17,7 @@ import {
   retryRequestStatus
 } from './handlers/relying-party.handlers';
 import type {IcrcAccounts} from './types/icrc-accounts';
-import type {IcrcAnyRequestedScopes} from './types/icrc-requests';
+import type {IcrcAnyRequestedScopes, IcrcCallCanisterRequestParams} from './types/icrc-requests';
 import {
   IcrcAccountsResponseSchema,
   IcrcCallCanisterResultResponseSchema,
@@ -34,7 +33,6 @@ import {RelyingPartyResponseError} from './types/relying-party-errors';
 import {RelyingPartyOptionsSchema, type RelyingPartyOptions} from './types/relying-party-options';
 import {
   RelyingPartyRequestOptionsSchema,
-  type RelyingPartyCallParams,
   type RelyingPartyRequestOptions,
   type RelyingPartyRequestOptionsWithTimeout
 } from './types/relying-party-request';
@@ -493,17 +491,17 @@ export class RelyingParty {
    * @async
    * @template T - The type of the argument being passed to the canister call.
    * @param {Object} args - The arguments for the call.
-   * @param {RelyingPartyCallParams<T>} args.params - The parameters required to call the canister, including the canister ID, method name, and a generic argument of type `T`.
+   * @param {IcrcCallCanisterRequestParams} args.params - The parameters required to call the canister, including the canister ID, method name, and the encoded argument payload.
    * @param {RelyingPartyRequestOptions} [args.options] - The options for the signer request, which may include parameters such as timeout settings and other request-specific configurations.
    * @returns {Promise<IcrcCallCanisterResult>} A promise that resolves to the result of the canister call.
    * @see [ICRC49 Call Canister](https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_49_call_canister.md)
    */
-  call = async <T>({
+  call = async ({
     options: {timeoutInMilliseconds, ...rest} = {},
     params
   }: {
     options?: RelyingPartyRequestOptions;
-    params: RelyingPartyCallParams<T>;
+    params: IcrcCallCanisterRequestParams;
   }): Promise<IcrcCallCanisterResult> => {
     const handleMessage = async ({
       data,
@@ -524,18 +522,11 @@ export class RelyingParty {
     };
 
     const postRequest = (id: RpcId): void => {
-      const {arg: userArg, argType, ...rest} = params;
-
-      const arg = new Uint8Array(IDL.encode([argType], [userArg]));
-
       requestCallCanister({
         popup: this.#popup,
         origin: this.#origin,
         id,
-        params: {
-          ...rest,
-          arg
-        }
+        params
       });
     };
 
