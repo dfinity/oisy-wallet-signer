@@ -3,6 +3,7 @@ import type {Icrc1TransferRequest} from '@dfinity/ledger-icp';
 import {toIcrc1TransferRawRequest} from '@dfinity/ledger-icp/dist/types/canisters/ledger/ledger.request.converts';
 import {RelyingParty} from './relying-party';
 import {IcrcAccount} from './types/icrc-accounts';
+import type {IcrcCallCanisterResult} from './types/icrc-responses';
 import {PrincipalText} from './types/principal';
 
 export class IcpWallet extends RelyingParty {
@@ -16,7 +17,7 @@ export class IcpWallet extends RelyingParty {
   }: {
     request: Icrc1TransferRequest;
     canisterId?: PrincipalText;
-  } & Pick<IcrcAccount, 'owner'>): Promise<void> => {
+  } & Pick<IcrcAccount, 'owner'>): Promise<IcrcCallCanisterResult> => {
     // TODO: this should be exposed by Candid IDL
     const SubAccount = IDL.Vec(IDL.Nat8);
 
@@ -42,7 +43,7 @@ export class IcpWallet extends RelyingParty {
 
     const arg = new Uint8Array(IDL.encode([TransferArg], [rawRequest]));
 
-    await this.call({
+    return await this.call({
       params: {
         sender: owner,
         method: 'icrc1_transfer',

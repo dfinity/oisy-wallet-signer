@@ -6,9 +6,8 @@
 	import Value from '$core/components/Value.svelte';
 	import type { IcrcCallCanisterResult } from '@dfinity/oisy-wallet-signer';
 	import { accountsStore } from '$lib/stores/accounts.store';
-	import { IDL } from '@dfinity/candid';
-	import type { TransferArg } from '@dfinity/ledger-icp/dist/candid/ledger';
 	import { authStore } from '$core/stores/auth.store';
+	import type {Icrc1TransferRequest} from "@dfinity/ledger-icp";
 
 	type Props = {
 		wallet: IcpWallet | undefined;
@@ -34,67 +33,17 @@
 			return;
 		}
 
-		const SubAccount = IDL.Vec(IDL.Nat8);
-
-		const Icrc1Tokens = IDL.Nat;
-
-		const Icrc1Timestamp = IDL.Nat64;
-
-		const Account = IDL.Record({
-			owner: IDL.Principal,
-			subaccount: IDL.Opt(SubAccount)
-		});
-
-		const TransferArg = IDL.Record({
-			to: Account,
-			fee: IDL.Opt(Icrc1Tokens),
-			memo: IDL.Opt(IDL.Vec(IDL.Nat8)),
-			from_subaccount: IDL.Opt(SubAccount),
-			created_at_time: IDL.Opt(Icrc1Timestamp),
-			amount: Icrc1Tokens
-		});
-
-		const value: TransferArg = {
+		const request: Icrc1TransferRequest = {
 			to: {
 				owner: $authStore.identity.getPrincipal(),
 				subaccount: []
 			},
-			created_at_time: [],
-			from_subaccount: [],
-			memo: [],
 			amount: 123n,
-			fee: []
 		};
 
-		// TODO: we want to create and expose opiniated version WalletIcrc and WalletICP to ease the client integration.
-		//
-		// Basically:
-		// Wallet -> RelyingParty
-		// class WalletICP extends RelyingParty
-		//
-		// result = wallet?.icrc1_transfer({
-		// 	params: {
-		// 		sender: account.owner,
-		// 		canisterId: "ryjl3-tyaaa-aaaaa-aaaba-cai",
-		// 		myValue
-		// 	}
-		// })
-		//
-		// interface Params {
-		// 	arg: Uint8Array | {
-		// 		value: T, type: D
-		// 	}
-		// }
-
-		const arg = new Uint8Array(IDL.encode([TransferArg], [value]));
-
-		result = await wallet?.call({
-			params: {
-				sender: account.owner,
-				method: 'icrc1_transfer',
-				canisterId: 'ryjl3-tyaaa-aaaaa-aaaba-cai',
-				arg
-			}
+		result = await wallet?.icrc1Transfer({
+			owner: account.owner,
+			request
 		});
 	};
 
