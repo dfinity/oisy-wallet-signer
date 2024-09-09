@@ -1,12 +1,12 @@
 import {IDL} from '@dfinity/candid';
-import type {BlockHeight, Icrc1TransferRequest} from '@dfinity/ledger-icp';
+import type {Icrc1TransferRequest} from '@dfinity/ledger-icp';
 import {toIcrc1TransferRawRequest} from '@dfinity/ledger-icp/dist/types/canisters/ledger/ledger.request.converts';
 import {RelyingParty} from './relying-party';
 
 export class IcpWallet extends RelyingParty {
-  public icrc1Transfer = async (request: Icrc1TransferRequest): Promise<BlockHeight> => {
-    const rawRequest = toIcrc1TransferRawRequest(request);
-
+  // TODO: documentation
+  // TODO: return BlockHeight?
+  public icrc1Transfer = async (request: Icrc1TransferRequest): Promise<void> => {
     // TODO: this should be exposed by Candid IDL
     const SubAccount = IDL.Vec(IDL.Nat8);
 
@@ -28,13 +28,16 @@ export class IcpWallet extends RelyingParty {
       amount: Icrc1Tokens
     });
 
+    const rawRequest = toIcrc1TransferRawRequest(request);
+
+    const arg = new Uint8Array(IDL.encode([TransferArg], [rawRequest]));
+
     await this.call({
       params: {
         sender: account.owner,
         method: 'icrc1_transfer',
         canisterId: 'ryjl3-tyaaa-aaaaa-aaaba-cai',
-        arg,
-        argType: TransferArg
+        arg
       }
     });
   };
