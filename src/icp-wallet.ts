@@ -2,13 +2,29 @@ import {IDL} from '@dfinity/candid';
 import type {Icrc1TransferRequest} from '@dfinity/ledger-icp';
 import {toIcrc1TransferRawRequest} from '@dfinity/ledger-icp/dist/types/canisters/ledger/ledger.request.converts';
 import {RelyingParty} from './relying-party';
-import {IcrcAccount} from './types/icrc-accounts';
+import type {IcrcAccount} from './types/icrc-accounts';
 import type {IcrcCallCanisterResult} from './types/icrc-responses';
-import {PrincipalText} from './types/principal';
+import type {PrincipalText} from './types/principal';
+import type {RelyingPartyOptions} from './types/relying-party-options';
 
 const ICP_LEDGER_CANISTER_ID = 'ryjl3-tyaaa-aaaaa-aaaba-cai';
 
 export class IcpWallet extends RelyingParty {
+  /**
+   * Establishes a connection with an ICP Wallet.
+   *
+   * @override
+   * @static
+   * @param {RelyingPartyOptions} options - The options to initialize the ICP Wallet signer.
+   * @returns {Promise<IcpWallet>} A promise that resolves to an object, which can be used to interact with the ICP Wallet when it is connected.
+   */
+  static async connect(options: RelyingPartyOptions): Promise<IcpWallet> {
+    return await this.connectSigner({
+      options,
+      init: (params: {origin: string; popup: Window}) => new IcpWallet(params)
+    });
+  }
+
   // TODO: documentation
   // TODO: return BlockHeight?
   // TODO: zod but, we have to redeclare Icrc1TransferRequest

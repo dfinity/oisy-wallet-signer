@@ -60,17 +60,30 @@ export class RelyingParty {
   }
 
   /**
-   * Establish a connection with a relying party.
+   * Establishes a connection with a signer.
    *
    * @static
-   * @param {RelyingPartyOptions} options - The options to initialize the relying party.
-   * @returns {Promise<RelyingParty>} A promise that resolves when the signer was connected.
+   * @param {RelyingPartyOptions} options - The options to initialize the signer.
+   * @returns {Promise<RelyingParty>} A promise that resolves to an object, which can be used to interact with the signer when it is connected.
    */
   static async connect(options: RelyingPartyOptions): Promise<RelyingParty> {
+    return await this.connectSigner({
+      options,
+      init: (params: {origin: string; popup: Window}) => new RelyingParty(params)
+    });
+  }
+
+  protected static async connectSigner<T extends RelyingParty>({
+    options,
+    init
+  }: {
+    options: RelyingPartyOptions;
+    init: (params: {origin: string; popup: Window}) => T;
+  }): Promise<T> {
     const {success: optionsSuccess, error} = RelyingPartyOptionsSchema.safeParse(options);
 
     if (!optionsSuccess) {
-      throw new Error(`Wallet options cannot be parsed: ${error?.message ?? ''}`);
+      throw new Error(`Options cannot be parsed: ${error?.message ?? ''}`);
     }
 
     const {url, windowOptions, connectionOptions} = options;
@@ -90,7 +103,7 @@ export class RelyingParty {
 
     class MessageError extends Error {}
 
-    let response: RelyingParty | MessageError | undefined;
+    let response: T | MessageError | undefined;
 
     const onMessage = ({origin, data: msgData}: MessageEvent): void => {
       const {success} = RpcResponseWithResultOrErrorSchema.safeParse(msgData);
@@ -123,7 +136,7 @@ export class RelyingParty {
 
       const {success: isWalletReady} = IcrcReadyResponseSchema.safeParse(msgData);
       if (isWalletReady) {
-        response = new RelyingParty({origin, popup});
+        response = init({origin, popup});
       }
     };
 
@@ -133,7 +146,7 @@ export class RelyingParty {
       window.removeEventListener('message', onMessage);
     };
 
-    const connect = async (): Promise<RelyingParty> => {
+    const connect = async (): Promise<T> => {
       const result = await retryRequestStatus({
         popup,
         isReady: (): ReadyOrError | 'pending' =>
