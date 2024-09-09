@@ -12,11 +12,18 @@ jobs:
       contents: read
       id-token: write
 
+    env:
+      dist-directory: dist
+
     steps:
       - uses: actions/checkout@v3
       - name: Prepare
         uses: ./.github/actions/prepare
-      - run: npm run build
+
+      - name: Build
+        run: npm run build
+
       - run: npm publish --provenance --access public
+        working-directory: ${{env.dist-directory}}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

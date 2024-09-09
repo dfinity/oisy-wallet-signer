@@ -12,9 +12,12 @@
     "url": "https://github.com/dfinity/oisy-wallet-signer"
   },
   "files": [
-    "dist",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "*.js",
+    "*.js.map",
+    "*.d.ts",
+    "*.d.ts.map"
   ],
   "keywords": [
     "internet computer",
@@ -25,29 +28,30 @@
     "internet-identity",
     "wallet"
   ],
-  "main": "dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/types/index.d.ts",
+  "sideEffects": false,
+  "main": "index.js",
+  "module": "index.js",
+  "types": "index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.mjs"
+      "types": "./index.d.ts",
+      "import": "./index.js",
+      "require": "./index.mjs"
     },
     "./relying-party": {
-      "types": "./dist/relying-party.d.ts",
-      "import": "./dist/relying-party.js",
-      "require": "./dist/relying-party.mjs"
+      "types": "./relying-party.d.ts",
+      "import": "./relying-party.js",
+      "require": "./relying-party.mjs"
     },
     "./icp-wallet": {
-      "types": "./dist/icp-wallet.d.ts",
-      "import": "./dist/icp-wallet.js",
-      "require": "./dist/icp-wallet.mjs"
+      "types": "./icp-wallet.d.ts",
+      "import": "./icp-wallet.js",
+      "require": "./icp-wallet.mjs"
     },
     "./signer": {
-      "types": "./dist/signer.d.ts",
-      "import": "./dist/signer.js",
-      "require": "./dist/signer.mjs"
+      "types": "./signer.d.ts",
+      "import": "./signer.js",
+      "require": "./signer.mjs"
     }
   },
   "scripts": {
