@@ -2,6 +2,7 @@ import {assertNonNullish, nonNullish, notEmptyString} from '@dfinity/utils';
 import {
   RELYING_PARTY_CONNECT_TIMEOUT_IN_MILLISECONDS,
   RELYING_PARTY_DEFAULT_SCOPES,
+  RELYING_PARTY_SIGNER_WINDOW_TOP_RIGHT,
   RELYING_PARTY_TIMEOUT_ACCOUNTS,
   RELYING_PARTY_TIMEOUT_CALL_CANISTER,
   RELYING_PARTY_TIMEOUT_PERMISSIONS,
@@ -42,7 +43,7 @@ import {
   type RpcId
 } from './types/rpc';
 import type {ReadyOrError} from './utils/timeout.utils';
-import {WALLET_WINDOW_TOP_RIGHT, windowFeatures} from './utils/window.utils';
+import {windowFeatures} from './utils/window.utils';
 
 export class RelyingParty {
   readonly #origin: string;
@@ -91,7 +92,7 @@ export class RelyingParty {
     const popupFeatures =
       typeof windowOptions === 'string'
         ? windowOptions
-        : windowFeatures(windowOptions ?? WALLET_WINDOW_TOP_RIGHT);
+        : windowFeatures(windowOptions ?? RELYING_PARTY_SIGNER_WINDOW_TOP_RIGHT);
 
     const popup = window.open(url, 'relyingPartyWindow', popupFeatures);
 

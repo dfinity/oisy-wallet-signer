@@ -8,6 +8,8 @@ import {
 } from './constants/icrc.constants';
 import {
   RELYING_PARTY_DEFAULT_SCOPES,
+  RELYING_PARTY_SIGNER_WINDOW_CENTER,
+  RELYING_PARTY_SIGNER_WINDOW_TOP_RIGHT,
   RELYING_PARTY_TIMEOUT_ACCOUNTS,
   RELYING_PARTY_TIMEOUT_CALL_CANISTER,
   RELYING_PARTY_TIMEOUT_PERMISSIONS,
@@ -29,7 +31,7 @@ import {
 import {RelyingPartyResponseError} from './types/relying-party-errors';
 import type {RelyingPartyOptions} from './types/relying-party-options';
 import {JSON_RPC_VERSION_2, RpcResponseWithResultOrErrorSchema} from './types/rpc';
-import {WALLET_WINDOW_CENTER, WALLET_WINDOW_TOP_RIGHT, windowFeatures} from './utils/window.utils';
+import {windowFeatures} from './utils/window.utils';
 
 describe('Relying Party', () => {
   const mockParameters: RelyingPartyOptions = {url: 'https://test.com'};
@@ -116,15 +118,15 @@ describe('Relying Party', () => {
           {
             title: 'default options',
             params: mockParameters,
-            expectedOptions: windowFeatures(WALLET_WINDOW_TOP_RIGHT)
+            expectedOptions: windowFeatures(RELYING_PARTY_SIGNER_WINDOW_TOP_RIGHT)
           },
           {
             title: 'centered window',
             params: {
               ...mockParameters,
-              windowOptions: WALLET_WINDOW_CENTER
+              windowOptions: RELYING_PARTY_SIGNER_WINDOW_CENTER
             },
-            expectedOptions: windowFeatures(WALLET_WINDOW_CENTER)
+            expectedOptions: windowFeatures(RELYING_PARTY_SIGNER_WINDOW_CENTER)
           },
           {
             title: 'custom window',
