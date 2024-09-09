@@ -2,7 +2,7 @@
 	import Layout from '$core/components/Layout.svelte';
 	import '$core/styles/app.scss';
 	import type { Snippet } from 'svelte';
-	import {DEFAULT_SIGNER_WINDOW_SIZE} from "@dfinity/oisy-wallet-signer";
+	import { DEFAULT_SIGNER_WINDOW_SIZE } from '@dfinity/oisy-wallet-signer';
 
 	const size = DEFAULT_SIGNER_WINDOW_SIZE;
 
