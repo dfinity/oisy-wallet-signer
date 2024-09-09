@@ -27,8 +27,8 @@ export const RELYING_PARTY_SIGNER_WINDOW_FEATURES =
 
 export const RELYING_PARTY_SIGNER_WINDOW_TOP_RIGHT: WindowOptions = {
   position: 'top-right',
-  width: 350,
-  height: 600,
+  width: 576,
+  height: 625,
   features: RELYING_PARTY_SIGNER_WINDOW_FEATURES
 };
 
