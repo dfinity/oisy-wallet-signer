@@ -106,7 +106,7 @@ describe('Relying Party', () => {
           const incorrectOrigin = 'test';
 
           await expect(RelyingParty.connect({url: incorrectOrigin})).rejects.toThrow(
-            'Wallet options cannot be parsed:'
+            'Options cannot be parsed:'
           );
         });
       });
