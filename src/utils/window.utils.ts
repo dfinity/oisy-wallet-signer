@@ -1,5 +1,5 @@
 import {isNullish} from '@dfinity/utils';
-import {RELYING_PARTY_SIGNER_WINDOW_FEATURES} from '../constants/relying-party.constants';
+import {DEFAULT_SIGNER_WINDOW_FEATURES} from '../constants/window.constants';
 import type {WindowOptions} from '../types/relying-party-options';
 import {isBrowser} from './env.utils';
 
@@ -11,7 +11,7 @@ export const windowFeatures = ({position, ...rest}: WindowOptions): string | und
 const windowCenter = ({
   width,
   height,
-  features = RELYING_PARTY_SIGNER_WINDOW_FEATURES
+  features = DEFAULT_SIGNER_WINDOW_FEATURES
 }: Omit<WindowOptions, 'position'>): string | undefined => {
   if (!isBrowser()) {
     return undefined;
@@ -34,7 +34,7 @@ const windowCenter = ({
 const windowTopRight = ({
   width,
   height,
-  features = RELYING_PARTY_SIGNER_WINDOW_FEATURES
+  features = DEFAULT_SIGNER_WINDOW_FEATURES
 }: Omit<WindowOptions, 'position'>): string | undefined => {
   if (!isBrowser()) {
     return undefined;

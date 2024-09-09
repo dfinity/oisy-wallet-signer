@@ -2,13 +2,13 @@ import {assertNonNullish, nonNullish, notEmptyString} from '@dfinity/utils';
 import {
   RELYING_PARTY_CONNECT_TIMEOUT_IN_MILLISECONDS,
   RELYING_PARTY_DEFAULT_SCOPES,
-  RELYING_PARTY_SIGNER_WINDOW_TOP_RIGHT,
   RELYING_PARTY_TIMEOUT_ACCOUNTS,
   RELYING_PARTY_TIMEOUT_CALL_CANISTER,
   RELYING_PARTY_TIMEOUT_PERMISSIONS,
   RELYING_PARTY_TIMEOUT_REQUEST_PERMISSIONS,
   RELYING_PARTY_TIMEOUT_REQUEST_SUPPORTED_STANDARD
 } from './constants/relying-party.constants';
+import {DEFAULT_SIGNER_WINDOW_TOP_RIGHT} from './constants/window.constants';
 import {
   permissions,
   requestAccounts,
@@ -92,7 +92,7 @@ export class RelyingParty {
     const popupFeatures =
       typeof windowOptions === 'string'
         ? windowOptions
-        : windowFeatures(windowOptions ?? RELYING_PARTY_SIGNER_WINDOW_TOP_RIGHT);
+        : windowFeatures(windowOptions ?? DEFAULT_SIGNER_WINDOW_TOP_RIGHT);
 
     const popup = window.open(url, 'relyingPartyWindow', popupFeatures);
 

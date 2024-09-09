@@ -8,8 +8,6 @@ import {
 } from './constants/icrc.constants';
 import {
   RELYING_PARTY_DEFAULT_SCOPES,
-  RELYING_PARTY_SIGNER_WINDOW_CENTER,
-  RELYING_PARTY_SIGNER_WINDOW_TOP_RIGHT,
   RELYING_PARTY_TIMEOUT_ACCOUNTS,
   RELYING_PARTY_TIMEOUT_CALL_CANISTER,
   RELYING_PARTY_TIMEOUT_PERMISSIONS,
@@ -17,6 +15,10 @@ import {
   RELYING_PARTY_TIMEOUT_REQUEST_SUPPORTED_STANDARD
 } from './constants/relying-party.constants';
 import {SignerErrorCode} from './constants/signer.constants';
+import {
+  DEFAULT_SIGNER_WINDOW_CENTER,
+  DEFAULT_SIGNER_WINDOW_TOP_RIGHT
+} from './constants/window.constants';
 import * as relyingPartyHandlers from './handlers/relying-party.handlers';
 import {mockAccounts, mockPrincipalText} from './mocks/icrc-accounts.mocks';
 import {RelyingParty} from './relying-party';
@@ -118,15 +120,15 @@ describe('Relying Party', () => {
           {
             title: 'default options',
             params: mockParameters,
-            expectedOptions: windowFeatures(RELYING_PARTY_SIGNER_WINDOW_TOP_RIGHT)
+            expectedOptions: windowFeatures(DEFAULT_SIGNER_WINDOW_TOP_RIGHT)
           },
           {
             title: 'centered window',
             params: {
               ...mockParameters,
-              windowOptions: RELYING_PARTY_SIGNER_WINDOW_CENTER
+              windowOptions: DEFAULT_SIGNER_WINDOW_CENTER
             },
-            expectedOptions: windowFeatures(RELYING_PARTY_SIGNER_WINDOW_CENTER)
+            expectedOptions: windowFeatures(DEFAULT_SIGNER_WINDOW_CENTER)
           },
           {
             title: 'custom window',

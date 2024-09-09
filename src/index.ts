@@ -21,3 +21,4 @@ export type * from './types/rpc';
 export type * from './types/signer-options';
 
 export * from './constants/icrc.constants';
+export * from './constants/window.constants';
