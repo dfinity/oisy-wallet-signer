@@ -1,6 +1,6 @@
-import {RelyingPartyRequestOptionsSchema} from './relying-party-request';
+import {RelyingPartyRequestOptionsSchema} from './relying-party-requests';
 
-describe('RelyingPartyRequest', () => {
+describe('RelyingPartyRequests', () => {
   describe('Options', () => {
     it('should validate with a specified timeoutInMilliseconds', () => {
       const validData = {
