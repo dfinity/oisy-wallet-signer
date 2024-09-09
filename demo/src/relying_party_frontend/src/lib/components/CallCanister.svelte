@@ -7,7 +7,7 @@
 	import type { IcrcCallCanisterResult } from '@dfinity/oisy-wallet-signer';
 	import { accountsStore } from '$lib/stores/accounts.store';
 	import { authStore } from '$core/stores/auth.store';
-	import type {Icrc1TransferRequest} from "@dfinity/ledger-icp";
+	import type { Icrc1TransferRequest } from '@dfinity/ledger-icp';
 
 	type Props = {
 		wallet: IcpWallet | undefined;
@@ -38,7 +38,7 @@
 				owner: $authStore.identity.getPrincipal(),
 				subaccount: []
 			},
-			amount: 123n,
+			amount: 123n
 		};
 
 		result = await wallet?.icrc1Transfer({
