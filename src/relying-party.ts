@@ -35,7 +35,7 @@ import {
   RelyingPartyRequestOptionsSchema,
   type RelyingPartyRequestOptions,
   type RelyingPartyRequestOptionsWithTimeout
-} from './types/relying-party-request';
+} from './types/relying-party-requests';
 import {
   RpcResponseWithErrorSchema,
   RpcResponseWithResultOrErrorSchema,
