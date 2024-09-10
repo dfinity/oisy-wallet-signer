@@ -1,14 +1,20 @@
 import esbuild from 'esbuild';
-import {existsSync, mkdirSync, readFileSync, readdirSync, statSync} from 'node:fs';
+import {copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, statSync} from 'node:fs';
 import {join} from 'node:path';
 
-const peerDependencies = (packageJson) => {
+const PACKAGE_JSON = 'package.json';
+
+const readPackageJson = () => {
+  const packageJson = join(process.cwd(), PACKAGE_JSON);
   const json = readFileSync(packageJson, 'utf8');
-  const {peerDependencies} = JSON.parse(json);
-  return peerDependencies ?? {};
+  const {peerDependencies, files} = JSON.parse(json);
+  return {
+    workspacePeerDependencies: peerDependencies ?? {},
+    packageJsonFiles: files ?? []
+  };
 };
 
-const workspacePeerDependencies = peerDependencies(join(process.cwd(), 'package.json'));
+const {workspacePeerDependencies, packageJsonFiles} = readPackageJson();
 
 const dist = join(process.cwd(), 'dist');
 
@@ -37,25 +43,6 @@ const buildBrowser = (entryPoints) => {
     .catch(() => process.exit(1));
 };
 
-const buildNode = (entryPoints) => {
-  esbuild
-    .build({
-      entryPoints,
-      outdir: 'dist',
-      bundle: true,
-      sourcemap: true,
-      minify: true,
-      format: 'esm',
-      platform: 'node',
-      target: ['node20', 'esnext'],
-      banner: {
-        js: "import { createRequire as topLevelCreateRequire } from 'module';\n const require = topLevelCreateRequire(import.meta.url);"
-      },
-      external: [...Object.keys(workspacePeerDependencies)]
-    })
-    .catch(() => process.exit(1));
-};
-
 const bundleFiles = () => {
   const entryPoints = readdirSync(join(process.cwd(), 'src'))
     .filter(
@@ -68,12 +55,20 @@ const bundleFiles = () => {
     .map((file) => `src/${file}`);
 
   buildBrowser(entryPoints);
-  buildNode(entryPoints);
+};
+
+const copyFiles = () => {
+  const copyFile = (filename) => copyFileSync(join(process.cwd(), filename), join(dist, filename));
+
+  packageJsonFiles.filter((entry) => !entry.includes('*')).forEach(copyFile);
+
+  copyFile(PACKAGE_JSON);
 };
 
 export const build = () => {
   createDistFolder();
   bundleFiles();
+  copyFiles();
 };
 
 build();

@@ -248,9 +248,13 @@ describe('Signer', () => {
       jsonrpc: JSON_RPC_VERSION_2,
       method: ICRC25_REQUEST_PERMISSIONS,
       params: {
-        scopes: [{method: ICRC27_ACCOUNTS}]
+        scopes: [{method: ICRC49_CALL_CANISTER}, {method: ICRC27_ACCOUNTS}]
       }
     };
+
+    const requestPermissionsDataSortedScopes = requestPermissionsData.params.scopes.sort(
+      ({method: methodA}, {method: methodB}): number => methodA.localeCompare(methodB)
+    );
 
     const requestPermissionsMsg = {
       data: requestPermissionsData,
@@ -516,7 +520,7 @@ describe('Signer', () => {
         promptSpy.mockClear();
       });
 
-      it('should trigger the registered prompt for icrc25_request_permissions', () => {
+      it('should trigger the registered prompt for the request permissions', () => {
         const promptSpy = vi.fn();
 
         signer.register({
@@ -528,7 +532,29 @@ describe('Signer', () => {
         window.dispatchEvent(messageEvent);
 
         expect(promptSpy).toHaveBeenNthCalledWith(1, {
-          requestedScopes: requestPermissionsData.params.scopes.map((scope) => ({
+          requestedScopes: requestPermissionsDataSortedScopes.map((scope) => ({
+            scope: {...scope},
+            state: IcrcPermissionStateSchema.enum.denied
+          })),
+          confirmScopes: expect.any(Function)
+        });
+
+        promptSpy.mockClear();
+      });
+
+      it('should sort the scopes when triggering the prompt for the request permissions', () => {
+        const promptSpy = vi.fn();
+
+        signer.register({
+          method: ICRC25_REQUEST_PERMISSIONS,
+          prompt: promptSpy
+        });
+
+        const messageEvent = new MessageEvent('message', requestPermissionsMsg);
+        window.dispatchEvent(messageEvent);
+
+        expect(promptSpy).toHaveBeenNthCalledWith(1, {
+          requestedScopes: requestPermissionsDataSortedScopes.map((scope) => ({
             scope: {...scope},
             state: IcrcPermissionStateSchema.enum.denied
           })),
@@ -551,7 +577,7 @@ describe('Signer', () => {
             ...requestPermissionsData,
             params: {
               scopes: [
-                ...requestPermissionsData.params.scopes,
+                ...requestPermissionsDataSortedScopes,
                 {method: 'icrc25_request_permissions'},
                 {method: 'icrc25_permissions'}
               ]
@@ -564,7 +590,7 @@ describe('Signer', () => {
         window.dispatchEvent(messageEvent);
 
         expect(promptSpy).toHaveBeenNthCalledWith(1, {
-          requestedScopes: requestPermissionsData.params.scopes.map((scope) => ({
+          requestedScopes: requestPermissionsDataSortedScopes.map((scope) => ({
             scope: {...scope},
             state: IcrcPermissionStateSchema.enum.denied
           })),
