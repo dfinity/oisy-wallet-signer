@@ -54,7 +54,7 @@
 			amount: Icrc1Tokens
 		});
 
-		const arg: TransferArg = {
+		const value: TransferArg = {
 			to: {
 				owner: $authStore.identity.getPrincipal(),
 				subaccount: []
@@ -86,13 +86,14 @@
 		// 	}
 		// }
 
+		const arg = new Uint8Array(IDL.encode([TransferArg], [value]));
+
 		result = await wallet?.call({
 			params: {
 				sender: account.owner,
 				method: 'icrc1_transfer',
 				canisterId: 'ryjl3-tyaaa-aaaaa-aaaba-cai',
-				arg,
-				argType: TransferArg
+				arg
 			}
 		});
 	};

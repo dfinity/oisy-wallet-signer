@@ -1,4 +1,3 @@
-import {IDL} from '@dfinity/candid';
 import {
   ICRC25_PERMISSIONS,
   ICRC25_REQUEST_PERMISSIONS,
@@ -16,10 +15,14 @@ import {
   RELYING_PARTY_TIMEOUT_REQUEST_SUPPORTED_STANDARD
 } from './constants/relying-party.constants';
 import {SignerErrorCode} from './constants/signer.constants';
+import {
+  DEFAULT_SIGNER_WINDOW_CENTER,
+  DEFAULT_SIGNER_WINDOW_TOP_RIGHT
+} from './constants/window.constants';
 import * as relyingPartyHandlers from './handlers/relying-party.handlers';
 import {mockAccounts, mockPrincipalText} from './mocks/icrc-accounts.mocks';
 import {RelyingParty} from './relying-party';
-import type {IcrcAnyRequestedScopes} from './types/icrc-requests';
+import type {IcrcAnyRequestedScopes, IcrcCallCanisterRequestParams} from './types/icrc-requests';
 import {
   IcrcAccountsResponseSchema,
   IcrcCallCanisterResultResponseSchema,
@@ -29,9 +32,8 @@ import {
 } from './types/icrc-responses';
 import {RelyingPartyResponseError} from './types/relying-party-errors';
 import type {RelyingPartyOptions} from './types/relying-party-options';
-import type {RelyingPartyCallParams} from './types/relying-party-request';
 import {JSON_RPC_VERSION_2, RpcResponseWithResultOrErrorSchema} from './types/rpc';
-import {WALLET_WINDOW_CENTER, WALLET_WINDOW_TOP_RIGHT, windowFeatures} from './utils/window.utils';
+import {windowFeatures} from './utils/window.utils';
 
 describe('Relying Party', () => {
   const mockParameters: RelyingPartyOptions = {url: 'https://test.com'};
@@ -108,7 +110,7 @@ describe('Relying Party', () => {
           const incorrectOrigin = 'test';
 
           await expect(RelyingParty.connect({url: incorrectOrigin})).rejects.toThrow(
-            'Wallet options cannot be parsed:'
+            'Options cannot be parsed:'
           );
         });
       });
@@ -118,15 +120,15 @@ describe('Relying Party', () => {
           {
             title: 'default options',
             params: mockParameters,
-            expectedOptions: windowFeatures(WALLET_WINDOW_TOP_RIGHT)
+            expectedOptions: windowFeatures(DEFAULT_SIGNER_WINDOW_TOP_RIGHT)
           },
           {
             title: 'centered window',
             params: {
               ...mockParameters,
-              windowOptions: WALLET_WINDOW_CENTER
+              windowOptions: DEFAULT_SIGNER_WINDOW_CENTER
             },
-            expectedOptions: windowFeatures(WALLET_WINDOW_CENTER)
+            expectedOptions: windowFeatures(DEFAULT_SIGNER_WINDOW_CENTER)
           },
           {
             title: 'custom window',
@@ -1067,18 +1069,11 @@ describe('Relying Party', () => {
     describe('Call', () => {
       let relyingParty: RelyingParty;
 
-      interface MyTest {
-        hello: string;
-      }
-
-      const params: RelyingPartyCallParams<MyTest> = {
+      const params: IcrcCallCanisterRequestParams = {
         canisterId: mockPrincipalText,
         sender: mockPrincipalText,
         method: 'some_method',
-        arg: {hello: 'world'},
-        argType: IDL.Record({
-          hello: IDL.Text
-        })
+        arg: new Uint8Array([1, 2, 3, 4, 5, 6, 7])
       };
 
       const result: IcrcCallCanisterResult = {
@@ -1248,16 +1243,11 @@ describe('Relying Party', () => {
           expect(spy).toHaveBeenCalledTimes(1);
           expect(spyPostMessage).toHaveBeenCalledTimes(1);
 
-          const {arg, argType, ...rest} = params;
-
           expect(spyPostMessage).toHaveBeenCalledWith(
             expect.objectContaining({
               jsonrpc: JSON_RPC_VERSION_2,
               method: ICRC49_CALL_CANISTER,
-              params: {
-                ...rest,
-                arg: new Uint8Array(IDL.encode([argType], [arg]))
-              }
+              params
             }),
             mockParameters.url
           );
