@@ -18,11 +18,6 @@
 	let scopes = $state<IcrcScope[] | undefined>(undefined);
 	let confirm = $state<PermissionsConfirmation | undefined>(undefined);
 
-	const sortScope = (
-		{ scope: { method: methodA } }: IcrcScope,
-		{ scope: { method: methodB } }: IcrcScope
-	): number => methodA.localeCompare(methodB);
-
 	const resetPrompt = () => {
 		confirm = undefined;
 		scopes = undefined;
@@ -60,7 +55,7 @@
 				...scope,
 				state: scope.state === 'denied' ? 'granted' : 'denied'
 			} as IcrcScope
-		].sort(sortScope);
+		];
 	};
 
 	let countApproved = $derived((scopes ?? []).filter(({ state }) => state === 'granted').length);
