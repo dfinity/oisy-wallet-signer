@@ -40,7 +40,7 @@ vi.mock('@dfinity/utils', async (importOriginal) => {
 describe('icrc-21.canister.api', () => {
   const signerOptions: SignerOptions = {
     owner: Ed25519KeyIdentity.generate(),
-    host: 'http://localhost:5987'
+    host: 'http://localhost:4943'
   };
 
   let canister: Icrc21Canister;
