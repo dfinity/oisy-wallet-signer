@@ -23,7 +23,7 @@
 
 		signer = Signer.init({
 			owner: $authStore.identity,
-			host: 'http://localhost:5987'
+			host: 'http://localhost:4943'
 		});
 
 		return () => {
