@@ -7,7 +7,7 @@
 	import type {
 		PermissionsConfirmation,
 		PermissionsPromptPayload
-	} from '@dfinity/oisy-wallet-signer/types/signer-prompts';
+	} from '@dfinity/oisy-wallet-signer';
 
 	type Props = {
 		signer: Signer | undefined;
