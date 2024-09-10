@@ -5,7 +5,7 @@
 	import {
 		type ConsentMessageAnswer,
 		type ConsentMessagePromptPayload
-	} from '@dfinity/oisy-wallet-signer/types/signer-prompts';
+	} from '@dfinity/oisy-wallet-signer';
 	import type { icrc21_consent_info } from '@dfinity/oisy-wallet-signer/declarations/icrc-21';
 	import Button from '$core/components/Button.svelte';
 

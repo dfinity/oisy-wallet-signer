@@ -19,6 +19,7 @@ export type * from './types/relying-party-options';
 export type * from './types/relying-party-requests';
 export type * from './types/rpc';
 export type * from './types/signer-options';
+export type * from './types/signer-prompts';
 
 export * from './constants/icrc.constants';
 export * from './constants/window.constants';
