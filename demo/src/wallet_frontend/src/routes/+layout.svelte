@@ -1,13 +1,10 @@
 <script lang="ts">
 	import Layout from '$core/components/Layout.svelte';
 	import '$core/styles/app.scss';
-	import { WALLET_POPUP_HEIGHT, WALLET_POPUP_WIDTH } from '$core/constants/app.constants';
 	import type { Snippet } from 'svelte';
+	import { DEFAULT_SIGNER_WINDOW_SIZE } from '@dfinity/oisy-wallet-signer';
 
-	const size = {
-		width: WALLET_POPUP_WIDTH,
-		height: WALLET_POPUP_HEIGHT
-	};
+	const size = DEFAULT_SIGNER_WINDOW_SIZE;
 
 	type Props = {
 		children: Snippet;

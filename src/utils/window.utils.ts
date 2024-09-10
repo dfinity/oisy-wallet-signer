@@ -1,31 +1,9 @@
 import {isNullish} from '@dfinity/utils';
+import {DEFAULT_SIGNER_WINDOW_FEATURES} from '../constants/window.constants';
+import type {WindowOptions} from '../types/relying-party-options';
 import {isBrowser} from './env.utils';
 
-export interface WalletWindowOptions {
-  position: 'top-right' | 'center';
-  width: number;
-  height: number;
-  features?: string;
-}
-
-const WALLET_WINDOW_FEATURES =
-  'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=no, copyhistory=no';
-
-export const WALLET_WINDOW_TOP_RIGHT: WalletWindowOptions = {
-  position: 'top-right',
-  width: 350,
-  height: 600,
-  features: WALLET_WINDOW_FEATURES
-};
-
-export const WALLET_WINDOW_CENTER: WalletWindowOptions = {
-  position: 'center',
-  width: 576,
-  height: 625,
-  features: WALLET_WINDOW_FEATURES
-};
-
-export const windowFeatures = ({position, ...rest}: WalletWindowOptions): string | undefined => {
+export const windowFeatures = ({position, ...rest}: WindowOptions): string | undefined => {
   const fn = position === 'center' ? windowCenter : windowTopRight;
   return fn(rest);
 };
@@ -33,8 +11,8 @@ export const windowFeatures = ({position, ...rest}: WalletWindowOptions): string
 const windowCenter = ({
   width,
   height,
-  features = WALLET_WINDOW_FEATURES
-}: Omit<WalletWindowOptions, 'position'>): string | undefined => {
+  features = DEFAULT_SIGNER_WINDOW_FEATURES
+}: Omit<WindowOptions, 'position'>): string | undefined => {
   if (!isBrowser()) {
     return undefined;
   }
@@ -56,8 +34,8 @@ const windowCenter = ({
 const windowTopRight = ({
   width,
   height,
-  features = WALLET_WINDOW_FEATURES
-}: Omit<WalletWindowOptions, 'position'>): string | undefined => {
+  features = DEFAULT_SIGNER_WINDOW_FEATURES
+}: Omit<WindowOptions, 'position'>): string | undefined => {
   if (!isBrowser()) {
     return undefined;
   }
