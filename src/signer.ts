@@ -318,6 +318,10 @@ export class Signer {
               scope: {method},
               state: IcrcPermissionStateSchema.enum.denied
             }) as const as IcrcScope
+        )
+        .sort(
+          ({scope: {method: methodA}}: IcrcScope, {scope: {method: methodB}}: IcrcScope): number =>
+            methodA.localeCompare(methodB)
         );
 
       // TODO: Maybe validating that the list of requested scopes contains at least one scope would be cool?

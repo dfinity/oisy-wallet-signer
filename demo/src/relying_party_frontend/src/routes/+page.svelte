@@ -15,7 +15,7 @@
 
 	const onclick = async () => {
 		wallet = await IcpWallet.connect({
-			url: 'http://localhost:5174'
+			url: 'http://localhost:5174/sign'
 		});
 	};
 
