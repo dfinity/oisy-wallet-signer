@@ -14,10 +14,10 @@
   "files": [
     "README.md",
     "LICENSE",
-    "*.js",
-    "*.js.map",
-    "*.d.ts",
-    "*.d.ts.map"
+    "**/*.js",
+    "**/*.js.map",
+    "**/*.d.ts",
+    "**/*.d.ts.map"
   ],
   "keywords": [
     "internet computer",
