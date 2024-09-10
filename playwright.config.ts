@@ -21,12 +21,14 @@ export default defineConfig({
   use: {
     testIdAttribute: 'data-tid',
     trace: 'on',
-    ...(DEV && {headless: false})
+    ...(DEV && {headless: false}),
+    screenshot: 'only-on-failure'
   },
   projects: [
     {
       name: 'Google Chrome',
       use: {...devices['Desktop Chrome'], channel: 'chrome'}
     }
-  ]
+  ],
+  workers: process.env.CI ? 1 : undefined
 });
