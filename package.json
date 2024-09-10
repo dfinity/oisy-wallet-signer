@@ -65,7 +65,8 @@
     "e2e:snapshots": "NODE_ENV=development playwright test --update-snapshots --reporter=list",
     "e2e:ci": "playwright test --reporter=html",
     "e2e:ci:snapshots": "playwright test --update-snapshots --reporter=html",
-    "did": "./scripts/download-did && ./scripts/compile-idl-js"
+    "did": "./scripts/download-did && ./scripts/compile-idl-js",
+    "prepublishOnly": "if [ $(basename $PWD) != 'dist' ]; then echo 'Publishing is only allowed from the dist directory.' && exit 1; fi"
   },
   "devDependencies": {
     "@dfinity/identity": "^2.0.0",
