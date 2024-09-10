@@ -28,5 +28,6 @@ export default defineConfig({
       name: 'Google Chrome',
       use: {...devices['Desktop Chrome'], channel: 'chrome'}
     }
-  ]
+  ],
+  workers: process.env.CI ? 1 : undefined
 });
