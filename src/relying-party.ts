@@ -1,4 +1,3 @@
-import {IDL} from '@dfinity/candid';
 import {assertNonNullish, nonNullish, notEmptyString} from '@dfinity/utils';
 import {
   RELYING_PARTY_CONNECT_TIMEOUT_IN_MILLISECONDS,
@@ -9,6 +8,7 @@ import {
   RELYING_PARTY_TIMEOUT_REQUEST_PERMISSIONS,
   RELYING_PARTY_TIMEOUT_REQUEST_SUPPORTED_STANDARD
 } from './constants/relying-party.constants';
+import {DEFAULT_SIGNER_WINDOW_TOP_RIGHT} from './constants/window.constants';
 import {
   permissions,
   requestAccounts,
@@ -18,7 +18,7 @@ import {
   retryRequestStatus
 } from './handlers/relying-party.handlers';
 import type {IcrcAccounts} from './types/icrc-accounts';
-import type {IcrcAnyRequestedScopes} from './types/icrc-requests';
+import type {IcrcAnyRequestedScopes, IcrcCallCanisterRequestParams} from './types/icrc-requests';
 import {
   IcrcAccountsResponseSchema,
   IcrcCallCanisterResultResponseSchema,
@@ -34,17 +34,16 @@ import {RelyingPartyResponseError} from './types/relying-party-errors';
 import {RelyingPartyOptionsSchema, type RelyingPartyOptions} from './types/relying-party-options';
 import {
   RelyingPartyRequestOptionsSchema,
-  type RelyingPartyCallParams,
   type RelyingPartyRequestOptions,
   type RelyingPartyRequestOptionsWithTimeout
-} from './types/relying-party-request';
+} from './types/relying-party-requests';
 import {
   RpcResponseWithErrorSchema,
   RpcResponseWithResultOrErrorSchema,
   type RpcId
 } from './types/rpc';
 import type {ReadyOrError} from './utils/timeout.utils';
-import {WALLET_WINDOW_TOP_RIGHT, windowFeatures} from './utils/window.utils';
+import {windowFeatures} from './utils/window.utils';
 
 export class RelyingParty {
   readonly #origin: string;
@@ -62,17 +61,30 @@ export class RelyingParty {
   }
 
   /**
-   * Establish a connection with a relying party.
+   * Establishes a connection with a signer.
    *
    * @static
-   * @param {RelyingPartyOptions} options - The options to initialize the relying party.
-   * @returns {Promise<RelyingParty>} A promise that resolves when the signer was connected.
+   * @param {RelyingPartyOptions} options - The options to initialize the signer.
+   * @returns {Promise<RelyingParty>} A promise that resolves to an object, which can be used to interact with the signer when it is connected.
    */
   static async connect(options: RelyingPartyOptions): Promise<RelyingParty> {
+    return await this.connectSigner({
+      options,
+      init: (params: {origin: string; popup: Window}) => new RelyingParty(params)
+    });
+  }
+
+  protected static async connectSigner<T extends RelyingParty>({
+    options,
+    init
+  }: {
+    options: RelyingPartyOptions;
+    init: (params: {origin: string; popup: Window}) => T;
+  }): Promise<T> {
     const {success: optionsSuccess, error} = RelyingPartyOptionsSchema.safeParse(options);
 
     if (!optionsSuccess) {
-      throw new Error(`Wallet options cannot be parsed: ${error?.message ?? ''}`);
+      throw new Error(`Options cannot be parsed: ${error?.message ?? ''}`);
     }
 
     const {url, windowOptions, connectionOptions} = options;
@@ -80,7 +92,7 @@ export class RelyingParty {
     const popupFeatures =
       typeof windowOptions === 'string'
         ? windowOptions
-        : windowFeatures(windowOptions ?? WALLET_WINDOW_TOP_RIGHT);
+        : windowFeatures(windowOptions ?? DEFAULT_SIGNER_WINDOW_TOP_RIGHT);
 
     const popup = window.open(url, 'relyingPartyWindow', popupFeatures);
 
@@ -92,7 +104,7 @@ export class RelyingParty {
 
     class MessageError extends Error {}
 
-    let response: RelyingParty | MessageError | undefined;
+    let response: T | MessageError | undefined;
 
     const onMessage = ({origin, data: msgData}: MessageEvent): void => {
       const {success} = RpcResponseWithResultOrErrorSchema.safeParse(msgData);
@@ -125,7 +137,7 @@ export class RelyingParty {
 
       const {success: isWalletReady} = IcrcReadyResponseSchema.safeParse(msgData);
       if (isWalletReady) {
-        response = new RelyingParty({origin, popup});
+        response = init({origin, popup});
       }
     };
 
@@ -135,7 +147,7 @@ export class RelyingParty {
       window.removeEventListener('message', onMessage);
     };
 
-    const connect = async (): Promise<RelyingParty> => {
+    const connect = async (): Promise<T> => {
       const result = await retryRequestStatus({
         popup,
         isReady: (): ReadyOrError | 'pending' =>
@@ -493,17 +505,17 @@ export class RelyingParty {
    * @async
    * @template T - The type of the argument being passed to the canister call.
    * @param {Object} args - The arguments for the call.
-   * @param {RelyingPartyCallParams<T>} args.params - The parameters required to call the canister, including the canister ID, method name, and a generic argument of type `T`.
+   * @param {IcrcCallCanisterRequestParams} args.params - The parameters required to call the canister, including the canister ID, method name, and the encoded argument payload.
    * @param {RelyingPartyRequestOptions} [args.options] - The options for the signer request, which may include parameters such as timeout settings and other request-specific configurations.
    * @returns {Promise<IcrcCallCanisterResult>} A promise that resolves to the result of the canister call.
    * @see [ICRC49 Call Canister](https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_49_call_canister.md)
    */
-  call = async <T>({
+  call = async ({
     options: {timeoutInMilliseconds, ...rest} = {},
     params
   }: {
     options?: RelyingPartyRequestOptions;
-    params: RelyingPartyCallParams<T>;
+    params: IcrcCallCanisterRequestParams;
   }): Promise<IcrcCallCanisterResult> => {
     const handleMessage = async ({
       data,
@@ -524,18 +536,11 @@ export class RelyingParty {
     };
 
     const postRequest = (id: RpcId): void => {
-      const {arg: userArg, argType, ...rest} = params;
-
-      const arg = new Uint8Array(IDL.encode([argType], [userArg]));
-
       requestCallCanister({
         popup: this.#popup,
         origin: this.#origin,
         id,
-        params: {
-          ...rest,
-          arg
-        }
+        params
       });
     };
 
