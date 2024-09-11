@@ -1,5 +1,6 @@
 import type {Mock} from 'vitest';
 import {SignerErrorCode} from '../constants/signer.constants';
+import {mockErrorNotify} from '../mocks/signer-error.mocks';
 import {JSON_RPC_VERSION_2, type RpcId, type RpcResponseWithError} from '../types/rpc';
 import {
   notifyErrorActionAborted,
@@ -95,17 +96,12 @@ describe('Signer-errors.handlers', () => {
 
   describe('notifyErrorActionAborted', () => {
     it('should post an error message indicating action was aborted', () => {
-      const error = {
-        code: SignerErrorCode.ACTION_ABORTED,
-        message: 'The signer has canceled the action requested by the relying party.'
-      };
-
       notifyErrorActionAborted({id: requestId, origin: testOrigin});
 
       const expectedMessage: RpcResponseWithError = {
         jsonrpc: JSON_RPC_VERSION_2,
         id: requestId,
-        error
+        error: mockErrorNotify
       };
 
       expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, testOrigin);

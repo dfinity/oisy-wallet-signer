@@ -18,6 +18,7 @@ import {
 import * as signerHandlers from './handlers/signer.handlers';
 import {mockConsentInfo} from './mocks/consent-message.mocks';
 import {mockAccounts, mockCanisterId} from './mocks/icrc-accounts.mocks';
+import {mockErrorNotify} from './mocks/signer-error.mocks';
 import {saveSessionScopes} from './sessions/signer.sessions';
 import {Signer} from './signer';
 import type {
@@ -35,6 +36,7 @@ import {
   AccountsPromptSchema,
   CallCanisterPromptSchema,
   PermissionsPromptSchema,
+  Rejection,
   type AccountsApproval,
   type AccountsPromptPayload,
   type ConsentMessageApproval,
@@ -915,6 +917,100 @@ describe('Signer', () => {
             );
           });
         });
+
+        it('should reject for icrc27_accounts if permissions were already granted', async () => {
+          let reject: Rejection | undefined;
+
+          signer.register({
+            method: ICRC27_ACCOUNTS,
+            prompt: ({reject: confirm}: AccountsPromptPayload) => {
+              reject = confirm;
+            }
+          });
+
+          saveSessionScopes({
+            owner: signerOptions.owner.getPrincipal(),
+            origin: testOrigin,
+            scopes: [
+              {
+                scope: {method: ICRC27_ACCOUNTS},
+                state: IcrcPermissionStateSchema.enum.granted
+              }
+            ]
+          });
+
+          const messageEvent = new MessageEvent('message', requestAccountsMsg);
+          window.dispatchEvent(messageEvent);
+
+          await vi.waitFor(() => {
+            expect(reject).not.toBeUndefined();
+          });
+
+          reject?.();
+
+          await vi.waitFor(() => {
+            expect(postMessageMock).toHaveBeenNthCalledWith(
+              1,
+              {
+                jsonrpc: JSON_RPC_VERSION_2,
+                id: testId,
+                error: mockErrorNotify
+              },
+              testOrigin
+            );
+          });
+        });
+
+        it('should reject after prompt for icrc27_accounts permissions', async () => {
+          let approveScopes: PermissionsApproval | undefined;
+          let rejectAccounts: Rejection | undefined;
+
+          signer.register({
+            method: ICRC25_REQUEST_PERMISSIONS,
+            prompt: ({approve, requestedScopes: _}: PermissionsPromptPayload) => {
+              approveScopes = approve;
+            }
+          });
+
+          signer.register({
+            method: ICRC27_ACCOUNTS,
+            prompt: ({reject}: AccountsPromptPayload) => {
+              rejectAccounts = reject;
+            }
+          });
+
+          const messageEvent = new MessageEvent('message', requestAccountsMsg);
+          window.dispatchEvent(messageEvent);
+
+          await vi.waitFor(() => {
+            expect(approveScopes).not.toBeUndefined();
+          });
+
+          approveScopes?.([
+            {
+              scope: {method: ICRC27_ACCOUNTS},
+              state: IcrcPermissionStateSchema.enum.granted
+            }
+          ]);
+
+          await vi.waitFor(() => {
+            expect(rejectAccounts).not.toBeUndefined();
+          });
+
+          rejectAccounts?.();
+
+          await vi.waitFor(() => {
+            expect(postMessageMock).toHaveBeenNthCalledWith(
+              1,
+              {
+                jsonrpc: JSON_RPC_VERSION_2,
+                id: testId,
+                error: mockErrorNotify
+              },
+              testOrigin
+            );
+          });
+        });
       });
 
       describe('Consent message', () => {
@@ -1036,10 +1132,7 @@ describe('Signer', () => {
               expect(notifyErrorSpy).toHaveBeenCalledWith({
                 id: testId,
                 origin: testOrigin,
-                error: {
-                  code: SignerErrorCode.ACTION_ABORTED,
-                  message: 'The signer has canceled the action requested by the relying party.'
-                }
+                error: mockErrorNotify
               });
             });
           });

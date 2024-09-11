@@ -6,17 +6,17 @@ import {
 } from './constants/icrc.constants';
 import {SIGNER_DEFAULT_SCOPES, SignerErrorCode} from './constants/signer.constants';
 import {
+  notifyErrorActionAborted,
   notifyErrorPermissionNotGranted,
   notifyErrorRequestNotSupported,
   notifyMissingPromptError
 } from './handlers/signer-errors.handlers';
 import {
-  notifyAccounts,
+  notifyAccounts as notifyAccountsHandlers,
   notifyError,
   notifyPermissionScopes,
   notifyReady,
   notifySupportedStandards,
-  type NotifyAccounts,
   type NotifyPermissions
 } from './handlers/signer.handlers';
 import {SignerService} from './services/signer.service';
@@ -50,7 +50,6 @@ import {
   AccountsPromptSchema,
   CallCanisterPromptSchema,
   PermissionsPromptSchema,
-  Rejection,
   type AccountsApproval,
   type AccountsPrompt,
   type AccountsPromptPayload,
@@ -58,7 +57,8 @@ import {
   type PermissionsApproval,
   type PermissionsPrompt,
   type PermissionsPromptPayload,
-  type PromptMethod
+  type PromptMethod,
+  type Rejection
 } from './types/signer-prompts';
 
 export class Signer {
@@ -418,10 +418,11 @@ export class Signer {
           const {result, accounts} = await this.promptAccounts({origin});
 
           if (result === 'rejected') {
+            notifyErrorActionAborted({id: requestId, origin});
             return;
           }
 
-          this.emitAccounts({accounts, id: requestId});
+          notifyAccountsHandlers({accounts, id: requestId, origin});
         };
 
         await this.prompt({
@@ -500,15 +501,6 @@ export class Signer {
     );
 
     return await promise;
-  }
-
-  private emitAccounts(params: Omit<NotifyAccounts, 'origin'>): void {
-    assertNonNullish(this.#walletOrigin, "The relying party's origin is unknown.");
-
-    notifyAccounts({
-      origin: this.#walletOrigin,
-      ...params
-    });
   }
 
   /**
