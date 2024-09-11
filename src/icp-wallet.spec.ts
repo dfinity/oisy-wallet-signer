@@ -1,5 +1,5 @@
 import {Ed25519KeyIdentity} from '@dfinity/identity';
-import {Icrc1TransferRequest} from '@dfinity/ledger-icp';
+import type {Icrc1TransferRequest} from '@dfinity/ledger-icp';
 import {Principal} from '@dfinity/principal';
 import {toNullable} from '@dfinity/utils';
 import {IcpWallet} from './icp-wallet';
