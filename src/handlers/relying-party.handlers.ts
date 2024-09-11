@@ -17,13 +17,14 @@ import type {
   IcrcStatusRequest,
   IcrcSupportedStandardsRequest
 } from '../types/icrc-requests';
+import type {Origin} from '../types/post-message';
 import {JSON_RPC_VERSION_2, type RpcId} from '../types/rpc';
 import {retryUntilReady, type ReadyOrError} from '../utils/timeout.utils';
 
 interface Request {
   id: RpcId;
   popup: Window;
-  origin: string;
+  origin: Origin;
 }
 
 type Response<T> = {msg: T} & Pick<Request, 'origin' | 'popup'>;
