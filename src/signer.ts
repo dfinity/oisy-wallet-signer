@@ -50,6 +50,7 @@ import {
   AccountsPromptSchema,
   CallCanisterPromptSchema,
   PermissionsPromptSchema,
+  Rejection,
   type AccountsApproval,
   type AccountsPrompt,
   type AccountsPromptPayload,
@@ -354,7 +355,7 @@ export class Signer {
   }
 
   private async promptPermissions(
-    payload: Omit<PermissionsPromptPayload, 'approve'>
+    payload: Omit<PermissionsPromptPayload, 'approve' | 'reject'>
   ): Promise<IcrcScopesArray> {
     const promise = new Promise<IcrcScopesArray>((resolve, reject) => {
       const approve: PermissionsApproval = (scopes) => {
@@ -414,7 +415,11 @@ export class Signer {
 
       const notifyAccounts = async (): Promise<void> => {
         const promptFn = async (): Promise<void> => {
-          const accounts = await this.promptAccounts({origin});
+          const {result, accounts} = await this.promptAccounts({origin});
+
+          if (result === 'rejected') {
+            return;
+          }
 
           this.emitAccounts({accounts, id: requestId});
         };
@@ -472,21 +477,27 @@ export class Signer {
 
   // TODO: this can maybe be made generic. It's really similar to promptPermissions.
   private async promptAccounts(
-    payload: Omit<AccountsPromptPayload, 'approve'>
-  ): Promise<IcrcAccounts> {
-    const promise = new Promise<IcrcAccounts>((resolve, reject) => {
-      const approve: AccountsApproval = (accounts) => {
-        resolve(accounts);
-      };
+    payload: Omit<AccountsPromptPayload, 'approve' | 'reject'>
+  ): Promise<{result: 'approved' | 'rejected'; accounts: IcrcAccounts}> {
+    const promise = new Promise<{result: 'approved' | 'rejected'; accounts: IcrcAccounts}>(
+      (resolve, reject) => {
+        const userReject: Rejection = () => {
+          resolve({result: 'rejected', accounts: []});
+        };
 
-      // The consumer currently has no way to unregister the prompt, so we know that it is defined. However, to be future-proof, it's better to ensure it is defined.
-      if (isNullish(this.#accountsPrompt)) {
-        reject(new MissingPromptError());
-        return;
+        const approve: AccountsApproval = (accounts) => {
+          resolve({result: 'approved', accounts});
+        };
+
+        // The consumer currently has no way to unregister the prompt, so we know that it is defined. However, to be future-proof, it's better to ensure it is defined.
+        if (isNullish(this.#accountsPrompt)) {
+          reject(new MissingPromptError());
+          return;
+        }
+
+        this.#accountsPrompt({approve, reject: userReject, ...payload});
       }
-
-      this.#accountsPrompt({approve, ...payload});
-    });
+    );
 
     return await promise;
   }

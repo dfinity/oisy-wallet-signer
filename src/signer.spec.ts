@@ -37,7 +37,7 @@ import {
   PermissionsPromptSchema,
   type AccountsApproval,
   type AccountsPromptPayload,
-  type ConsentMessageAnswer,
+  type ConsentMessageApproval,
   type ConsentMessagePromptPayload,
   type PermissionsApproval,
   type PermissionsPromptPayload
@@ -1001,7 +1001,7 @@ describe('Signer', () => {
           });
 
           it('should notify aborted error for icrc49_call_canister if user reject consent', async () => {
-            let reject: ConsentMessageAnswer | undefined;
+            let reject: ConsentMessageApproval | undefined;
 
             const prompt = ({reject: r}: ConsentMessagePromptPayload): void => {
               reject = r;

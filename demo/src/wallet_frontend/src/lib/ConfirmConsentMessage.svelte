@@ -1,11 +1,8 @@
 <script lang="ts">
 	import type { Signer } from '@dfinity/oisy-wallet-signer/signer';
 	import { isNullish, nonNullish } from '@dfinity/utils';
-	import { ICRC49_CALL_CANISTER } from '@dfinity/oisy-wallet-signer';
-	import {
-		type ConsentMessageAnswer,
-		type ConsentMessagePromptPayload
-	} from '@dfinity/oisy-wallet-signer';
+	import {ICRC49_CALL_CANISTER, type Rejection, type ConsentMessageApproval,
+		type ConsentMessagePromptPayload} from '@dfinity/oisy-wallet-signer';
 	import type { icrc21_consent_info } from '@dfinity/oisy-wallet-signer';
 	import Button from '$core/components/Button.svelte';
 
@@ -15,8 +12,8 @@
 
 	let { signer }: Props = $props();
 
-	let approve = $state<ConsentMessageAnswer | undefined>(undefined);
-	let reject = $state<ConsentMessageAnswer | undefined>(undefined);
+	let approve = $state<ConsentMessageApproval | undefined>(undefined);
+	let reject = $state<Rejection | undefined>(undefined);
 	let consentInfo = $state<icrc21_consent_info | undefined>(undefined);
 
 	let displayMessage: string | undefined = $derived(
