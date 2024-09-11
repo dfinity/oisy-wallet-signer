@@ -21,6 +21,10 @@ const PromptPayloadSchema = z.object({
   origin: OriginSchema
 });
 
+const RejectionSchema = z.function().returns(z.void());
+
+export type Rejection = z.infer<typeof RejectionSchema>;
+
 // Prompt for permissions
 
 const PermissionsApprovalSchema = z.function().args(IcrcScopesArraySchema).returns(z.void());
@@ -59,7 +63,8 @@ const AccountsApprovalSchema = z.function().args(IcrcAccountsSchema).returns(z.v
 export type AccountsApproval = z.infer<typeof AccountsApprovalSchema>;
 
 const AccountsPromptPayloadSchema = PromptPayloadSchema.extend({
-  approve: AccountsApprovalSchema
+  approve: AccountsApprovalSchema,
+  reject: RejectionSchema
 });
 
 export type AccountsPromptPayload = z.infer<typeof AccountsPromptPayloadSchema>;
@@ -79,14 +84,14 @@ export type AccountsPrompt = z.infer<typeof AccountsPromptSchema>;
 
 // Prompt for call canister
 
-const ConsentMessageAnswerSchema = z.function().returns(z.void());
+const ConsentMessageApprovalSchema = z.function().returns(z.void());
 
-export type ConsentMessageAnswer = z.infer<typeof ConsentMessageAnswerSchema>;
+export type ConsentMessageApproval = z.infer<typeof ConsentMessageApprovalSchema>;
 
 const CallCanisterPromptPayloadSchema = PromptPayloadSchema.extend({
   consentInfo: z.custom<icrc21_consent_info>(),
-  approve: ConsentMessageAnswerSchema,
-  reject: ConsentMessageAnswerSchema
+  approve: ConsentMessageApprovalSchema,
+  reject: RejectionSchema
 });
 
 export type ConsentMessagePromptPayload = z.infer<typeof CallCanisterPromptPayloadSchema>;
