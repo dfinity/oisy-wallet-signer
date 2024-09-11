@@ -4,7 +4,10 @@
 	import { isNullish, nonNullish } from '@dfinity/utils';
 	import { ICRC25_REQUEST_PERMISSIONS, type IcrcScope } from '@dfinity/oisy-wallet-signer';
 	import Button from '$core/components/Button.svelte';
-	import type { PermissionsApproval, PermissionsPromptPayload } from '@dfinity/oisy-wallet-signer';
+	import type {
+		PermissionsConfirmation,
+		PermissionsPromptPayload
+	} from '@dfinity/oisy-wallet-signer';
 
 	type Props = {
 		signer: Signer | undefined;
@@ -13,7 +16,7 @@
 	let { signer }: Props = $props();
 
 	let scopes = $state<IcrcScope[] | undefined>(undefined);
-	let approve = $state<PermissionsApproval | undefined>(undefined);
+	let confirm = $state<PermissionsConfirmation | undefined>(undefined);
 
 	const sortScope = (
 		{ scope: { method: methodA } }: IcrcScope,
@@ -21,7 +24,7 @@
 	): number => methodA.localeCompare(methodB);
 
 	const resetPrompt = () => {
-		approve = undefined;
+		confirm = undefined;
 		scopes = undefined;
 	};
 
@@ -33,8 +36,8 @@
 
 		signer.register({
 			method: ICRC25_REQUEST_PERMISSIONS,
-			prompt: ({ approve: approveScopes, requestedScopes }: PermissionsPromptPayload) => {
-				approve = approveScopes;
+			prompt: ({ confirm: confirmScopes, requestedScopes }: PermissionsPromptPayload) => {
+				confirm = confirmScopes;
 				scopes = requestedScopes;
 			}
 		});
@@ -45,7 +48,7 @@
 
 		// TODO: alert errors
 
-		approve?.($state.snapshot(scopes)!);
+		confirm?.($state.snapshot(scopes)!);
 
 		resetPrompt();
 	};

@@ -40,7 +40,7 @@ import {
   type AccountsPromptPayload,
   type ConsentMessageApproval,
   type ConsentMessagePromptPayload,
-  type PermissionsApproval,
+  type PermissionsConfirmation,
   type PermissionsPromptPayload,
   type Rejection
 } from './types/signer-prompts';
@@ -539,7 +539,7 @@ describe('Signer', () => {
             scope: {...scope},
             state: IcrcPermissionStateSchema.enum.denied
           })),
-          approve: expect.any(Function),
+          confirm: expect.any(Function),
           origin: testOrigin
         });
 
@@ -562,7 +562,7 @@ describe('Signer', () => {
             scope: {...scope},
             state: IcrcPermissionStateSchema.enum.denied
           })),
-          approve: expect.any(Function),
+          confirm: expect.any(Function),
           origin: testOrigin
         });
 
@@ -599,7 +599,7 @@ describe('Signer', () => {
             scope: {...scope},
             state: IcrcPermissionStateSchema.enum.denied
           })),
-          approve: expect.any(Function),
+          confirm: expect.any(Function),
           origin: testOrigin
         });
 
@@ -722,7 +722,7 @@ describe('Signer', () => {
                   state: IcrcPermissionStateSchema.enum.denied
                 }
               ],
-              approve: expect.any(Function),
+              confirm: expect.any(Function),
               origin: testOrigin
             });
           });
@@ -731,12 +731,12 @@ describe('Signer', () => {
         });
 
         it('should save granted permission after prompt for permissions', async () => {
-          let approve: PermissionsApproval | undefined;
+          let confirm: PermissionsConfirmation | undefined;
 
           signer.register({
             method: ICRC25_REQUEST_PERMISSIONS,
-            prompt: ({approve: confirm, requestedScopes: _}: PermissionsPromptPayload) => {
-              approve = confirm;
+            prompt: ({confirm: confirmScopes, requestedScopes: _}: PermissionsPromptPayload) => {
+              confirm = confirmScopes;
             }
           });
 
@@ -744,10 +744,10 @@ describe('Signer', () => {
           window.dispatchEvent(messageEvent);
 
           await vi.waitFor(() => {
-            expect(approve).not.toBeUndefined();
+            expect(confirm).not.toBeUndefined();
           });
 
-          approve?.([
+          confirm?.([
             {
               scope: {method},
               state: IcrcPermissionStateSchema.enum.granted
@@ -773,12 +773,12 @@ describe('Signer', () => {
         });
 
         it('should notify error after prompt for permissions', async () => {
-          let approve: PermissionsApproval | undefined;
+          let confirm: PermissionsConfirmation | undefined;
 
           signer.register({
             method: ICRC25_REQUEST_PERMISSIONS,
-            prompt: ({approve: confirm, requestedScopes: _}: PermissionsPromptPayload) => {
-              approve = confirm;
+            prompt: ({confirm: confirmScopes, requestedScopes: _}: PermissionsPromptPayload) => {
+              confirm = confirmScopes;
             }
           });
 
@@ -786,10 +786,10 @@ describe('Signer', () => {
           window.dispatchEvent(messageEvent);
 
           await vi.waitFor(() => {
-            expect(approve).not.toBeUndefined();
+            expect(confirm).not.toBeUndefined();
           });
 
-          approve?.([
+          confirm?.([
             {
               scope: {method},
               state: IcrcPermissionStateSchema.enum.denied
@@ -866,13 +866,13 @@ describe('Signer', () => {
         });
 
         it('should notify accounts after prompt for icrc27_accounts permissions', async () => {
-          let approveScopes: PermissionsApproval | undefined;
+          let confirmScopes: PermissionsConfirmation | undefined;
           let approveAccounts: AccountsApproval | undefined;
 
           signer.register({
             method: ICRC25_REQUEST_PERMISSIONS,
-            prompt: ({approve, requestedScopes: _}: PermissionsPromptPayload) => {
-              approveScopes = approve;
+            prompt: ({confirm, requestedScopes: _}: PermissionsPromptPayload) => {
+              confirmScopes = confirm;
             }
           });
 
@@ -887,10 +887,10 @@ describe('Signer', () => {
           window.dispatchEvent(messageEvent);
 
           await vi.waitFor(() => {
-            expect(approveScopes).not.toBeUndefined();
+            expect(confirmScopes).not.toBeUndefined();
           });
 
-          approveScopes?.([
+          confirmScopes?.([
             {
               scope: {method: ICRC27_ACCOUNTS},
               state: IcrcPermissionStateSchema.enum.granted
@@ -962,13 +962,13 @@ describe('Signer', () => {
         });
 
         it('should reject after prompt for icrc27_accounts permissions', async () => {
-          let approveScopes: PermissionsApproval | undefined;
+          let confirmScopes: PermissionsConfirmation | undefined;
           let rejectAccounts: Rejection | undefined;
 
           signer.register({
             method: ICRC25_REQUEST_PERMISSIONS,
-            prompt: ({approve, requestedScopes: _}: PermissionsPromptPayload) => {
-              approveScopes = approve;
+            prompt: ({confirm, requestedScopes: _}: PermissionsPromptPayload) => {
+              confirmScopes = confirm;
             }
           });
 
@@ -983,10 +983,10 @@ describe('Signer', () => {
           window.dispatchEvent(messageEvent);
 
           await vi.waitFor(() => {
-            expect(approveScopes).not.toBeUndefined();
+            expect(confirmScopes).not.toBeUndefined();
           });
 
-          approveScopes?.([
+          confirmScopes?.([
             {
               scope: {method: ICRC27_ACCOUNTS},
               state: IcrcPermissionStateSchema.enum.granted
@@ -1062,13 +1062,13 @@ describe('Signer', () => {
           });
 
           it('should prompt consent message after prompt for icrc49_call_canister permissions', async () => {
-            let approve: PermissionsApproval | undefined;
+            let confirm: PermissionsConfirmation | undefined;
             const promptSpy = vi.fn();
 
             signer.register({
               method: ICRC25_REQUEST_PERMISSIONS,
-              prompt: ({approve: confirm, requestedScopes: _}: PermissionsPromptPayload) => {
-                approve = confirm;
+              prompt: ({confirm: confirmScopes, requestedScopes: _}: PermissionsPromptPayload) => {
+                confirm = confirmScopes;
               }
             });
 
@@ -1081,10 +1081,10 @@ describe('Signer', () => {
             window.dispatchEvent(messageEvent);
 
             await vi.waitFor(() => {
-              expect(approve).not.toBeUndefined();
+              expect(confirm).not.toBeUndefined();
             });
 
-            approve?.([
+            confirm?.([
               {
                 scope: {method: ICRC49_CALL_CANISTER},
                 state: IcrcPermissionStateSchema.enum.granted
@@ -1276,7 +1276,7 @@ describe('Signer', () => {
       });
 
       it('should notify scopes for selected permissions', async () => {
-        payload.approve(scopes);
+        payload.confirm(scopes);
 
         await vi.waitFor(() => {
           expect(postMessageMock).toHaveBeenCalledWith(
@@ -1293,7 +1293,7 @@ describe('Signer', () => {
       });
 
       it('should save permissions in storage', async () => {
-        payload.approve(scopes);
+        payload.confirm(scopes);
 
         const expectedKey = `oisy_signer_${testOrigin}_${signerOptions.owner.getPrincipal().toText()}`;
         const expectedData = {
