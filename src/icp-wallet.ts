@@ -1,6 +1,5 @@
 import {IDL} from '@dfinity/candid';
-import type {Icrc1TransferRequest} from '@dfinity/ledger-icp';
-import {toIcrc1TransferRawRequest} from '@dfinity/ledger-icp/dist/types/canisters/ledger/ledger.request.converts';
+import {toIcrc1TransferRawRequest, type Icrc1TransferRequest} from '@dfinity/ledger-icp';
 import {RelyingParty} from './relying-party';
 import type {IcrcAccount} from './types/icrc-accounts';
 import type {IcrcCallCanisterResult} from './types/icrc-responses';
