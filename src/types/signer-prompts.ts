@@ -7,6 +7,7 @@ import {
 import type {icrc21_consent_info} from '../declarations/icrc-21';
 import {IcrcAccountsSchema} from './icrc-accounts';
 import {IcrcScopesArraySchema} from './icrc-responses';
+import {OriginSchema} from './post-message';
 
 export const PromptMethodSchema = z.enum([
   ICRC25_REQUEST_PERMISSIONS,
@@ -16,13 +17,17 @@ export const PromptMethodSchema = z.enum([
 
 export type PromptMethod = z.infer<typeof PromptMethodSchema>;
 
+const PromptPayloadSchema = z.object({
+  origin: OriginSchema
+});
+
 // Prompt for permissions
 
 const PermissionsConfirmationSchema = z.function().args(IcrcScopesArraySchema).returns(z.void());
 
 export type PermissionsConfirmation = z.infer<typeof PermissionsConfirmationSchema>;
 
-const PermissionsPromptPayloadSchema = z.object({
+const PermissionsPromptPayloadSchema = PromptPayloadSchema.extend({
   requestedScopes: IcrcScopesArraySchema,
   confirmScopes: PermissionsConfirmationSchema
 });
@@ -53,7 +58,7 @@ const AccountsConfirmationSchema = z.function().args(IcrcAccountsSchema).returns
 
 export type AccountsConfirmation = z.infer<typeof AccountsConfirmationSchema>;
 
-const AccountsPromptPayloadSchema = z.object({
+const AccountsPromptPayloadSchema = PromptPayloadSchema.extend({
   confirmAccounts: AccountsConfirmationSchema
 });
 
@@ -78,7 +83,7 @@ const ConsentMessageAnswerSchema = z.function().returns(z.void());
 
 export type ConsentMessageAnswer = z.infer<typeof ConsentMessageAnswerSchema>;
 
-const CallCanisterPromptPayloadSchema = z.object({
+const CallCanisterPromptPayloadSchema = PromptPayloadSchema.extend({
   consentInfo: z.custom<icrc21_consent_info>(),
   approve: ConsentMessageAnswerSchema,
   reject: ConsentMessageAnswerSchema

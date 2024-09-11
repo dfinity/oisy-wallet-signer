@@ -537,7 +537,8 @@ describe('Signer', () => {
             scope: {...scope},
             state: IcrcPermissionStateSchema.enum.denied
           })),
-          confirmScopes: expect.any(Function)
+          confirmScopes: expect.any(Function),
+          origin: testOrigin
         });
 
         promptSpy.mockClear();
@@ -559,7 +560,8 @@ describe('Signer', () => {
             scope: {...scope},
             state: IcrcPermissionStateSchema.enum.denied
           })),
-          confirmScopes: expect.any(Function)
+          confirmScopes: expect.any(Function),
+          origin: testOrigin
         });
 
         promptSpy.mockClear();
@@ -595,7 +597,8 @@ describe('Signer', () => {
             scope: {...scope},
             state: IcrcPermissionStateSchema.enum.denied
           })),
-          confirmScopes: expect.any(Function)
+          confirmScopes: expect.any(Function),
+          origin: testOrigin
         });
 
         promptSpy.mockClear();
@@ -717,7 +720,8 @@ describe('Signer', () => {
                   state: IcrcPermissionStateSchema.enum.denied
                 }
               ],
-              confirmScopes: expect.any(Function)
+              confirmScopes: expect.any(Function),
+              origin: testOrigin
             });
           });
 
