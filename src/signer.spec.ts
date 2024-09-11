@@ -36,13 +36,13 @@ import {
   AccountsPromptSchema,
   CallCanisterPromptSchema,
   PermissionsPromptSchema,
-  Rejection,
   type AccountsApproval,
   type AccountsPromptPayload,
   type ConsentMessageApproval,
   type ConsentMessagePromptPayload,
   type PermissionsApproval,
-  type PermissionsPromptPayload
+  type PermissionsPromptPayload,
+  type Rejection
 } from './types/signer-prompts';
 import type {SessionPermissions} from './types/signer-sessions';
 import {mapIcrc21ErrorToString} from './utils/icrc-21.utils';
