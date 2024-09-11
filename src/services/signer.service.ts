@@ -13,7 +13,7 @@ import type {Notify} from '../types/signer-handlers';
 import type {SignerOptions} from '../types/signer-options';
 import type {
   CallCanisterPrompt,
-  ConsentMessageAnswer,
+  ConsentMessageApproval,
   ConsentMessagePromptPayload
 } from '../types/signer-prompts';
 import {mapIcrc21ErrorToString} from '../utils/icrc-21.utils';
@@ -122,11 +122,11 @@ export class SignerService {
     result: 'approved' | 'rejected';
   }> {
     const promise = new Promise<{result: 'approved' | 'rejected'}>((resolve) => {
-      const approve: ConsentMessageAnswer = () => {
+      const approve: ConsentMessageApproval = () => {
         resolve({result: 'approved'});
       };
 
-      const userReject: ConsentMessageAnswer = () => {
+      const userReject: ConsentMessageApproval = () => {
         resolve({result: 'rejected'});
       };
 
