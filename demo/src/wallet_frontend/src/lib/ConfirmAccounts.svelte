@@ -3,7 +3,7 @@
 	import type { Signer } from '@dfinity/oisy-wallet-signer/signer';
 	import { isNullish, nonNullish } from '@dfinity/utils';
 	import { ICRC27_ACCOUNTS } from '@dfinity/oisy-wallet-signer';
-	import type { AccountsConfirmation, AccountsPromptPayload } from '@dfinity/oisy-wallet-signer';
+	import type { AccountsApproval, AccountsPromptPayload } from '@dfinity/oisy-wallet-signer';
 	import { authStore } from '$core/stores/auth.store';
 
 	type Props = {
@@ -12,10 +12,10 @@
 
 	let { signer }: Props = $props();
 
-	let confirm = $state<AccountsConfirmation | undefined>(undefined);
+	let approve = $state<AccountsApproval | undefined>(undefined);
 
 	const resetPrompt = () => {
-		confirm = undefined;
+		approve = undefined;
 	};
 
 	$effect(() => {
@@ -26,14 +26,14 @@
 
 		signer.register({
 			method: ICRC27_ACCOUNTS,
-			prompt: ({ confirmAccounts }: AccountsPromptPayload) => {
-				confirm = confirmAccounts;
+			prompt: ({ approve: approveAccounts }: AccountsPromptPayload) => {
+				approve = approveAccounts;
 			}
 		});
 	});
 
 	$effect(() => {
-		if (isNullish(confirm)) {
+		if (isNullish(approve)) {
 			return;
 		}
 
@@ -42,7 +42,7 @@
 			return;
 		}
 
-		confirm([
+		approve([
 			{
 				owner: $authStore.identity.getPrincipal().toText()
 			}
