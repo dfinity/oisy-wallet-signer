@@ -1,4 +1,5 @@
 import {RelyingParty} from './relying-party';
+import type {Origin} from './types/post-message';
 import type {RelyingPartyOptions} from './types/relying-party-options';
 
 export class IcpWallet extends RelyingParty {
@@ -13,7 +14,7 @@ export class IcpWallet extends RelyingParty {
   static async connect(options: RelyingPartyOptions): Promise<IcpWallet> {
     return await this.connectSigner({
       options,
-      init: (params: {origin: string; popup: Window}) => new IcpWallet(params)
+      init: (params: {origin: Origin; popup: Window}) => new IcpWallet(params)
     });
   }
 }
