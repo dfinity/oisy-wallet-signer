@@ -77,7 +77,7 @@ describe('SignerPrompts', () => {
 
     it('should validate a prompt', () => {
       const prompt = (payload: PermissionsPromptPayload): void => {
-        payload.approve(scopes);
+        payload.confirm(scopes);
       };
 
       expect(() => PermissionsPromptSchema.parse(prompt)).not.toThrow();
