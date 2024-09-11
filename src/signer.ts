@@ -54,7 +54,7 @@ import {
   type AccountsPrompt,
   type AccountsPromptPayload,
   type CallCanisterPrompt,
-  type PermissionsApproval,
+  type PermissionsConfirmation,
   type PermissionsPrompt,
   type PermissionsPromptPayload,
   type PromptMethod,
@@ -355,10 +355,10 @@ export class Signer {
   }
 
   private async promptPermissions(
-    payload: Omit<PermissionsPromptPayload, 'approve' | 'reject'>
+    payload: Omit<PermissionsPromptPayload, 'confirm'>
   ): Promise<IcrcScopesArray> {
     const promise = new Promise<IcrcScopesArray>((resolve, reject) => {
-      const approve: PermissionsApproval = (scopes) => {
+      const confirm: PermissionsConfirmation = (scopes) => {
         resolve(scopes);
       };
 
@@ -368,7 +368,7 @@ export class Signer {
         return;
       }
 
-      this.#permissionsPrompt({...payload, approve});
+      this.#permissionsPrompt({...payload, confirm});
     });
 
     return await promise;
