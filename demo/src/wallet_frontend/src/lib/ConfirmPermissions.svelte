@@ -36,7 +36,7 @@
 
 		signer.register({
 			method: ICRC25_REQUEST_PERMISSIONS,
-			prompt: ({ confirmScopes, requestedScopes }: PermissionsPromptPayload) => {
+			prompt: ({ confirm: confirmScopes, requestedScopes }: PermissionsPromptPayload) => {
 				confirm = confirmScopes;
 				scopes = requestedScopes;
 			}
