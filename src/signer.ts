@@ -52,9 +52,11 @@ import {
   PermissionsPromptSchema,
   type AccountsConfirmation,
   type AccountsPrompt,
+  type AccountsPromptPayload,
   type CallCanisterPrompt,
   type PermissionsConfirmation,
   type PermissionsPrompt,
+  type PermissionsPromptPayload,
   type PromptMethod
 } from './types/signer-prompts';
 
@@ -291,7 +293,8 @@ export class Signer {
    * @returns {Object} An object with a boolean property `handled` indicating whether the request was processed as a permissions request.
    */
   private async handleRequestPermissionsRequest({
-    data
+    data,
+    origin
   }: SignerMessageEvent): Promise<{handled: boolean}> {
     const {success: isRequestPermissionsRequest, data: requestPermissionsData} =
       IcrcRequestAnyPermissionsRequestSchema.safeParse(data);
@@ -330,7 +333,10 @@ export class Signer {
       // Overall, it would be handy to enforce a minimum of one permission through types and behavior?
 
       const promptFn = async (): Promise<void> => {
-        const confirmedScopes = await this.promptPermissions(supportedRequestedScopes);
+        const confirmedScopes = await this.promptPermissions({
+          requestedScopes: supportedRequestedScopes,
+          origin
+        });
 
         this.emitPermissions({scopes: confirmedScopes, id: requestId});
         this.savePermissions({scopes: confirmedScopes});
@@ -347,7 +353,9 @@ export class Signer {
     return {handled: false};
   }
 
-  private async promptPermissions(requestedScopes: IcrcScopesArray): Promise<IcrcScopesArray> {
+  private async promptPermissions(
+    payload: Omit<PermissionsPromptPayload, 'confirmScopes'>
+  ): Promise<IcrcScopesArray> {
     const promise = new Promise<IcrcScopesArray>((resolve, reject) => {
       const confirmScopes: PermissionsConfirmation = (scopes) => {
         resolve(scopes);
@@ -359,7 +367,7 @@ export class Signer {
         return;
       }
 
-      this.#permissionsPrompt({requestedScopes, confirmScopes});
+      this.#permissionsPrompt({...payload, confirmScopes});
     });
 
     return await promise;
@@ -406,7 +414,7 @@ export class Signer {
 
       const notifyAccounts = async (): Promise<void> => {
         const promptFn = async (): Promise<void> => {
-          const accounts = await this.promptAccounts();
+          const accounts = await this.promptAccounts({origin});
 
           this.emitAccounts({accounts, id: requestId});
         };
@@ -463,7 +471,9 @@ export class Signer {
   }
 
   // TODO: this can maybe be made generic. It's really similar to promptPermissions.
-  private async promptAccounts(): Promise<IcrcAccounts> {
+  private async promptAccounts(
+    payload: Omit<AccountsPromptPayload, 'confirmAccounts'>
+  ): Promise<IcrcAccounts> {
     const promise = new Promise<IcrcAccounts>((resolve, reject) => {
       const confirmAccounts: AccountsConfirmation = (accounts) => {
         resolve(accounts);
@@ -475,7 +485,7 @@ export class Signer {
         return;
       }
 
-      this.#accountsPrompt({confirmAccounts});
+      this.#accountsPrompt({confirmAccounts, ...payload});
     });
 
     return await promise;
@@ -583,14 +593,19 @@ export class Signer {
       case 'ask_on_use': {
         const promise = new Promise<Omit<IcrcPermissionState, 'ask_on_use'>>((resolve, reject) => {
           const promptFn = async (): Promise<void> => {
-            const confirmedScopes = await this.promptPermissions([
+            const requestedScopes: IcrcScopesArray = [
               {
                 scope: {
                   method
                 },
                 state: 'denied'
               }
-            ]);
+            ];
+
+            const confirmedScopes = await this.promptPermissions({
+              requestedScopes,
+              origin
+            });
 
             this.savePermissions({scopes: confirmedScopes});
 
