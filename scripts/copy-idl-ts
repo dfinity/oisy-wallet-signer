@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+DIR=dist/declarations
+
+if [ ! -d "$DIR" ]; then
+  mkdir "$DIR"
+fi
+
+cp src/declarations/*.d.ts "$DIR"
