@@ -23,13 +23,13 @@ const PromptPayloadSchema = z.object({
 
 // Prompt for permissions
 
-const PermissionsConfirmationSchema = z.function().args(IcrcScopesArraySchema).returns(z.void());
+const PermissionsApprovalSchema = z.function().args(IcrcScopesArraySchema).returns(z.void());
 
-export type PermissionsConfirmation = z.infer<typeof PermissionsConfirmationSchema>;
+export type PermissionsApproval = z.infer<typeof PermissionsApprovalSchema>;
 
 const PermissionsPromptPayloadSchema = PromptPayloadSchema.extend({
   requestedScopes: IcrcScopesArraySchema,
-  confirmScopes: PermissionsConfirmationSchema
+  approve: PermissionsApprovalSchema
 });
 
 export type PermissionsPromptPayload = z.infer<typeof PermissionsPromptPayloadSchema>;
@@ -43,7 +43,7 @@ export type PermissionsPromptPayload = z.infer<typeof PermissionsPromptPayloadSc
  *
  * @param {PermissionsPromptPayload} params - An object containing the requested permissions and a function to confirm them.
  * @param {IcrcScopes[]} params.requestedScopes - An array of IcrcScopes representing the permissions being requested.
- * @param {PermissionsConfirmation} params.confirmScopes - A function to be called by the consumer to confirm (grant or deny) the requested permissions.
+ * @param {PermissionsApproval} params.approve - A function to be called by the consumer to confirm (grant or deny) the requested permissions.
  */
 export const PermissionsPromptSchema = z
   .function()
@@ -54,12 +54,12 @@ export type PermissionsPrompt = z.infer<typeof PermissionsPromptSchema>;
 
 // Prompt for accounts
 
-const AccountsConfirmationSchema = z.function().args(IcrcAccountsSchema).returns(z.void());
+const AccountsApprovalSchema = z.function().args(IcrcAccountsSchema).returns(z.void());
 
-export type AccountsConfirmation = z.infer<typeof AccountsConfirmationSchema>;
+export type AccountsApproval = z.infer<typeof AccountsApprovalSchema>;
 
 const AccountsPromptPayloadSchema = PromptPayloadSchema.extend({
-  confirmAccounts: AccountsConfirmationSchema
+  approve: AccountsApprovalSchema
 });
 
 export type AccountsPromptPayload = z.infer<typeof AccountsPromptPayloadSchema>;
@@ -68,7 +68,7 @@ export type AccountsPromptPayload = z.infer<typeof AccountsPromptPayloadSchema>;
  * A function that is invoked when the signer requires the user - or consumer of the library - to confirm (select or reject) accounts.
  *
  * @param {AccountsPromptPayload} params - An object containing a function to confirm the accounts.
- * @param {IcrcAccounts[]} params.confirmAccounts - A function to be called by the consumer to confirm (select or reject) the provided accounts.
+ * @param {IcrcAccounts[]} params.approve - A function to be called by the consumer to confirm (select or reject) the provided accounts.
  */
 export const AccountsPromptSchema = z
   .function()
