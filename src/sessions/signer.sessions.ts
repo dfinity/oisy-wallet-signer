@@ -4,6 +4,7 @@ import {ICRC25_PERMISSION_ASK_ON_USE} from '../constants/icrc.constants';
 import {SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS} from '../constants/signer.constants';
 import type {IcrcScopesArray} from '../types/icrc-responses';
 import type {IcrcPermissionState, IcrcScopedMethod} from '../types/icrc-standards';
+import type {Origin} from '../types/post-message';
 import type {SessionIcrcScope, SessionPermissions} from '../types/signer-sessions';
 import {get, set} from '../utils/storage.utils';
 
@@ -11,7 +12,7 @@ const KEY_PREFIX = 'oisy_signer';
 
 interface SessionIdentifier {
   owner: Principal;
-  origin: string;
+  origin: Origin;
 }
 
 const key = ({owner, origin}: SessionIdentifier): string =>

@@ -1,6 +1,9 @@
-import type {RpcId} from './rpc';
+import {z} from 'zod';
+import {RpcIdSchema} from './rpc';
 
-export interface Notify {
-  id: RpcId;
-  origin: string;
-}
+const NotifySchema = z.object({
+  id: RpcIdSchema,
+  origin: z.string()
+});
+
+export type Notify = z.infer<typeof NotifySchema>;

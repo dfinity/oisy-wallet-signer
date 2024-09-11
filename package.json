@@ -57,7 +57,7 @@
   "scripts": {
     "format": "prettier . --write",
     "format:check": "prettier --check .",
-    "ts-declaration": "tsc --emitDeclarationOnly --outDir dist",
+    "ts-declaration": "tsc --emitDeclarationOnly --outDir dist && ./scripts/copy-idl-ts",
     "build": "tsc --noEmit && node rmdir.mjs && node esbuild.mjs && npm run ts-declaration",
     "lint": "eslint --max-warnings 0 \"src/**/*\"",
     "test": "tsc --noEmit -p ./tsconfig.spec.json && vitest",

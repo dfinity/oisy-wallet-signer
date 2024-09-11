@@ -18,6 +18,11 @@
 	let scopes = $state<IcrcScope[] | undefined>(undefined);
 	let confirm = $state<PermissionsConfirmation | undefined>(undefined);
 
+	const sortScope = (
+		{ scope: { method: methodA } }: IcrcScope,
+		{ scope: { method: methodB } }: IcrcScope
+	): number => methodA.localeCompare(methodB);
+
 	const resetPrompt = () => {
 		confirm = undefined;
 		scopes = undefined;
@@ -31,7 +36,7 @@
 
 		signer.register({
 			method: ICRC25_REQUEST_PERMISSIONS,
-			prompt: ({ confirmScopes, requestedScopes }: PermissionsPromptPayload) => {
+			prompt: ({ confirm: confirmScopes, requestedScopes }: PermissionsPromptPayload) => {
 				confirm = confirmScopes;
 				scopes = requestedScopes;
 			}
@@ -55,7 +60,7 @@
 				...scope,
 				state: scope.state === 'denied' ? 'granted' : 'denied'
 			} as IcrcScope
-		];
+		].sort(sortScope);
 	};
 
 	let countApproved = $derived((scopes ?? []).filter(({ state }) => state === 'granted').length);

@@ -77,7 +77,7 @@ describe('SignerPrompts', () => {
 
     it('should validate a prompt', () => {
       const prompt = (payload: PermissionsPromptPayload): void => {
-        payload.confirmScopes(scopes);
+        payload.confirm(scopes);
       };
 
       expect(() => PermissionsPromptSchema.parse(prompt)).not.toThrow();
@@ -93,7 +93,7 @@ describe('SignerPrompts', () => {
   describe('Accounts', () => {
     it('should validate an AccountsPrompt', () => {
       const prompt = (payload: AccountsPromptPayload): void => {
-        payload.confirmAccounts(mockAccounts);
+        payload.approve(mockAccounts);
       };
 
       expect(() => AccountsPromptSchema.parse(prompt)).not.toThrow();

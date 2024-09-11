@@ -29,6 +29,7 @@ import {
   type IcrcScopesArray,
   type IcrcSupportedStandards
 } from './types/icrc-responses';
+import type {Origin} from './types/post-message';
 import type {RelyingPartyMessageEvent, RelyingPartyMessageEventData} from './types/relying-party';
 import {RelyingPartyResponseError} from './types/relying-party-errors';
 import {RelyingPartyOptionsSchema, type RelyingPartyOptions} from './types/relying-party-options';
@@ -46,7 +47,7 @@ import type {ReadyOrError} from './utils/timeout.utils';
 import {windowFeatures} from './utils/window.utils';
 
 export class RelyingParty {
-  readonly #origin: string;
+  readonly #origin: Origin;
   readonly #popup: Window;
 
   // TODO: we cannot destroy the relying party but the popup might be destroyed / closed manually
@@ -55,7 +56,7 @@ export class RelyingParty {
   //
   // PS: setInterval(() => if popup.closed {reset}, 1000)
 
-  protected constructor({origin, popup}: {origin: string; popup: Window}) {
+  protected constructor({origin, popup}: {origin: Origin; popup: Window}) {
     this.#origin = origin;
     this.#popup = popup;
   }
@@ -70,7 +71,7 @@ export class RelyingParty {
   static async connect(options: RelyingPartyOptions): Promise<RelyingParty> {
     return await this.connectSigner({
       options,
-      init: (params: {origin: string; popup: Window}) => new RelyingParty(params)
+      init: (params: {origin: Origin; popup: Window}) => new RelyingParty(params)
     });
   }
 
@@ -79,7 +80,7 @@ export class RelyingParty {
     init
   }: {
     options: RelyingPartyOptions;
-    init: (params: {origin: string; popup: Window}) => T;
+    init: (params: {origin: Origin; popup: Window}) => T;
   }): Promise<T> {
     const {success: optionsSuccess, error} = RelyingPartyOptionsSchema.safeParse(options);
 

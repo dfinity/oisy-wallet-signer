@@ -6,17 +6,17 @@ import {
 } from './constants/icrc.constants';
 import {SIGNER_DEFAULT_SCOPES, SignerErrorCode} from './constants/signer.constants';
 import {
+  notifyErrorActionAborted,
   notifyErrorPermissionNotGranted,
   notifyErrorRequestNotSupported,
   notifyMissingPromptError
 } from './handlers/signer-errors.handlers';
 import {
-  notifyAccounts,
+  notifyAccounts as notifyAccountsHandlers,
   notifyError,
   notifyPermissionScopes,
   notifyReady,
   notifySupportedStandards,
-  type NotifyAccounts,
   type NotifyPermissions
 } from './handlers/signer.handlers';
 import {SignerService} from './services/signer.service';
@@ -41,6 +41,7 @@ import {
   type IcrcPermissionState,
   type IcrcScopedMethod
 } from './types/icrc-standards';
+import type {Origin} from './types/post-message';
 import {RpcRequestSchema, type RpcId} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
 import {MissingPromptError} from './types/signer-errors';
@@ -49,12 +50,15 @@ import {
   AccountsPromptSchema,
   CallCanisterPromptSchema,
   PermissionsPromptSchema,
-  type AccountsConfirmation,
+  type AccountsApproval,
   type AccountsPrompt,
+  type AccountsPromptPayload,
   type CallCanisterPrompt,
   type PermissionsConfirmation,
   type PermissionsPrompt,
-  type PromptMethod
+  type PermissionsPromptPayload,
+  type PromptMethod,
+  type Rejection
 } from './types/signer-prompts';
 
 export class Signer {
@@ -290,7 +294,8 @@ export class Signer {
    * @returns {Object} An object with a boolean property `handled` indicating whether the request was processed as a permissions request.
    */
   private async handleRequestPermissionsRequest({
-    data
+    data,
+    origin
   }: SignerMessageEvent): Promise<{handled: boolean}> {
     const {success: isRequestPermissionsRequest, data: requestPermissionsData} =
       IcrcRequestAnyPermissionsRequestSchema.safeParse(data);
@@ -329,7 +334,10 @@ export class Signer {
       // Overall, it would be handy to enforce a minimum of one permission through types and behavior?
 
       const promptFn = async (): Promise<void> => {
-        const confirmedScopes = await this.promptPermissions(supportedRequestedScopes);
+        const confirmedScopes = await this.promptPermissions({
+          requestedScopes: supportedRequestedScopes,
+          origin
+        });
 
         this.emitPermissions({scopes: confirmedScopes, id: requestId});
         this.savePermissions({scopes: confirmedScopes});
@@ -346,9 +354,11 @@ export class Signer {
     return {handled: false};
   }
 
-  private async promptPermissions(requestedScopes: IcrcScopesArray): Promise<IcrcScopesArray> {
+  private async promptPermissions(
+    payload: Omit<PermissionsPromptPayload, 'confirm'>
+  ): Promise<IcrcScopesArray> {
     const promise = new Promise<IcrcScopesArray>((resolve, reject) => {
-      const confirmScopes: PermissionsConfirmation = (scopes) => {
+      const confirm: PermissionsConfirmation = (scopes) => {
         resolve(scopes);
       };
 
@@ -358,7 +368,7 @@ export class Signer {
         return;
       }
 
-      this.#permissionsPrompt({requestedScopes, confirmScopes});
+      this.#permissionsPrompt({...payload, confirm});
     });
 
     return await promise;
@@ -405,9 +415,14 @@ export class Signer {
 
       const notifyAccounts = async (): Promise<void> => {
         const promptFn = async (): Promise<void> => {
-          const accounts = await this.promptAccounts();
+          const {result, accounts} = await this.promptAccounts({origin});
 
-          this.emitAccounts({accounts, id: requestId});
+          if (result === 'rejected') {
+            notifyErrorActionAborted({id: requestId, origin});
+            return;
+          }
+
+          notifyAccountsHandlers({accounts, id: requestId, origin});
         };
 
         await this.prompt({
@@ -462,31 +477,30 @@ export class Signer {
   }
 
   // TODO: this can maybe be made generic. It's really similar to promptPermissions.
-  private async promptAccounts(): Promise<IcrcAccounts> {
-    const promise = new Promise<IcrcAccounts>((resolve, reject) => {
-      const confirmAccounts: AccountsConfirmation = (accounts) => {
-        resolve(accounts);
-      };
+  private async promptAccounts(
+    payload: Omit<AccountsPromptPayload, 'approve' | 'reject'>
+  ): Promise<{result: 'approved' | 'rejected'; accounts: IcrcAccounts}> {
+    const promise = new Promise<{result: 'approved' | 'rejected'; accounts: IcrcAccounts}>(
+      (resolve, reject) => {
+        const userReject: Rejection = () => {
+          resolve({result: 'rejected', accounts: []});
+        };
 
-      // The consumer currently has no way to unregister the prompt, so we know that it is defined. However, to be future-proof, it's better to ensure it is defined.
-      if (isNullish(this.#accountsPrompt)) {
-        reject(new MissingPromptError());
-        return;
+        const approve: AccountsApproval = (accounts) => {
+          resolve({result: 'approved', accounts});
+        };
+
+        // The consumer currently has no way to unregister the prompt, so we know that it is defined. However, to be future-proof, it's better to ensure it is defined.
+        if (isNullish(this.#accountsPrompt)) {
+          reject(new MissingPromptError());
+          return;
+        }
+
+        this.#accountsPrompt({approve, reject: userReject, ...payload});
       }
-
-      this.#accountsPrompt({confirmAccounts});
-    });
+    );
 
     return await promise;
-  }
-
-  private emitAccounts(params: Omit<NotifyAccounts, 'origin'>): void {
-    assertNonNullish(this.#walletOrigin, "The relying party's origin is unknown.");
-
-    notifyAccounts({
-      origin: this.#walletOrigin,
-      ...params
-    });
   }
 
   /**
@@ -569,7 +583,7 @@ export class Signer {
     requestId
   }: {
     method: IcrcScopedMethod;
-    origin: string;
+    origin: Origin;
     requestId: RpcId;
   }): Promise<Omit<IcrcPermissionState, 'ask_on_use'>> {
     const currentPermission = sessionScopeState({
@@ -582,14 +596,19 @@ export class Signer {
       case 'ask_on_use': {
         const promise = new Promise<Omit<IcrcPermissionState, 'ask_on_use'>>((resolve, reject) => {
           const promptFn = async (): Promise<void> => {
-            const confirmedScopes = await this.promptPermissions([
+            const requestedScopes: IcrcScopesArray = [
               {
                 scope: {
                   method
                 },
                 state: 'denied'
               }
-            ]);
+            ];
+
+            const confirmedScopes = await this.promptPermissions({
+              requestedScopes,
+              origin
+            });
 
             this.savePermissions({scopes: confirmedScopes});
 

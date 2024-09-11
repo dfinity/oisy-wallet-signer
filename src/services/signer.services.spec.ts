@@ -4,6 +4,7 @@ import {Icrc21Canister} from '../api/icrc21-canister.api';
 import {SignerErrorCode} from '../constants/signer.constants';
 import {mockConsentInfo} from '../mocks/consent-message.mocks';
 import {mockPrincipalText} from '../mocks/icrc-accounts.mocks';
+import {mockErrorNotify} from '../mocks/signer-error.mocks';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import {JSON_RPC_VERSION_2, type RpcId, type RpcResponseWithError} from '../types/rpc';
 import type {Notify} from '../types/signer-handlers';
@@ -128,15 +129,10 @@ describe('Signer services', () => {
         options: signerOptions
       });
 
-      const errorNotify = {
-        code: SignerErrorCode.ACTION_ABORTED,
-        message: 'The signer has canceled the action requested by the relying party.'
-      };
-
       const expectedMessage: RpcResponseWithError = {
         jsonrpc: JSON_RPC_VERSION_2,
         id: requestId,
-        error: errorNotify
+        error: mockErrorNotify
       };
 
       expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, testOrigin);

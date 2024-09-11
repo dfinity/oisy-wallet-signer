@@ -10,10 +10,12 @@ export {
   ICRC29,
   ICRC29_STATUS
 } from './constants/icrc.constants';
+export type * from './declarations/icrc-21';
 export type * from './types/icrc-accounts';
 export type * from './types/icrc-requests';
 export type * from './types/icrc-responses';
 export type * from './types/icrc-standards';
+export type * from './types/post-message';
 export type * from './types/principal';
 export type * from './types/relying-party-options';
 export type * from './types/relying-party-requests';
