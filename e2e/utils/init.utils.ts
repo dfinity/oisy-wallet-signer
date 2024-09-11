@@ -23,8 +23,6 @@ export const initTestSuite = (): (() => PartyPage) => {
     await partyPage.goto();
 
     await partyPage.signIn();
-
-    await partyPage.connect();
   });
 
   testWithII.afterAll(async () => {
