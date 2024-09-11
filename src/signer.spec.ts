@@ -27,6 +27,7 @@ import type {
 } from './types/icrc-requests';
 import type {IcrcScopesArray} from './types/icrc-responses';
 import {IcrcPermissionStateSchema, type IcrcScopedMethod} from './types/icrc-standards';
+import type {Origin} from './types/post-message';
 import {JSON_RPC_VERSION_2} from './types/rpc';
 import type {SignerMessageEventData} from './types/signer';
 import type {SignerOptions} from './types/signer-options';
@@ -116,7 +117,7 @@ describe('Signer', () => {
     it('should not process message which are not RpcRequest', () => {
       const spyAssertAndSetOrigin = vi.spyOn(
         signer as unknown as {
-          assertAndSetOrigin: (params: {origin: string; msgData: SignerMessageEventData}) => void;
+          assertAndSetOrigin: (params: {origin: Origin; msgData: SignerMessageEventData}) => void;
         },
         'assertAndSetOrigin'
       );

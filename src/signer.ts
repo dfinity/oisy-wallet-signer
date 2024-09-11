@@ -41,6 +41,7 @@ import {
   type IcrcPermissionState,
   type IcrcScopedMethod
 } from './types/icrc-standards';
+import type {Origin} from './types/post-message';
 import {RpcRequestSchema, type RpcId} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
 import {MissingPromptError} from './types/signer-errors';
@@ -569,7 +570,7 @@ export class Signer {
     requestId
   }: {
     method: IcrcScopedMethod;
-    origin: string;
+    origin: Origin;
     requestId: RpcId;
   }): Promise<Omit<IcrcPermissionState, 'ask_on_use'>> {
     const currentPermission = sessionScopeState({
