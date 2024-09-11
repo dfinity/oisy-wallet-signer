@@ -50,11 +50,11 @@ import {
   AccountsPromptSchema,
   CallCanisterPromptSchema,
   PermissionsPromptSchema,
-  type AccountsConfirmation,
+  type AccountsApproval,
   type AccountsPrompt,
   type AccountsPromptPayload,
   type CallCanisterPrompt,
-  type PermissionsConfirmation,
+  type PermissionsApproval,
   type PermissionsPrompt,
   type PermissionsPromptPayload,
   type PromptMethod
@@ -354,10 +354,10 @@ export class Signer {
   }
 
   private async promptPermissions(
-    payload: Omit<PermissionsPromptPayload, 'confirmScopes'>
+    payload: Omit<PermissionsPromptPayload, 'approve'>
   ): Promise<IcrcScopesArray> {
     const promise = new Promise<IcrcScopesArray>((resolve, reject) => {
-      const confirmScopes: PermissionsConfirmation = (scopes) => {
+      const approve: PermissionsApproval = (scopes) => {
         resolve(scopes);
       };
 
@@ -367,7 +367,7 @@ export class Signer {
         return;
       }
 
-      this.#permissionsPrompt({...payload, confirmScopes});
+      this.#permissionsPrompt({...payload, approve});
     });
 
     return await promise;
@@ -472,10 +472,10 @@ export class Signer {
 
   // TODO: this can maybe be made generic. It's really similar to promptPermissions.
   private async promptAccounts(
-    payload: Omit<AccountsPromptPayload, 'confirmAccounts'>
+    payload: Omit<AccountsPromptPayload, 'approve'>
   ): Promise<IcrcAccounts> {
     const promise = new Promise<IcrcAccounts>((resolve, reject) => {
-      const confirmAccounts: AccountsConfirmation = (accounts) => {
+      const approve: AccountsApproval = (accounts) => {
         resolve(accounts);
       };
 
@@ -485,7 +485,7 @@ export class Signer {
         return;
       }
 
-      this.#accountsPrompt({confirmAccounts, ...payload});
+      this.#accountsPrompt({approve, ...payload});
     });
 
     return await promise;
