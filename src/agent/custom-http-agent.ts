@@ -1,3 +1,4 @@
+import type {CallRequest} from '@dfinity/agent';
 import {
   Certificate,
   defaultStrategy,
@@ -26,15 +27,22 @@ export class CustomHttpAgent extends HttpAgent {
       throw new Error('Agent root key not initialized before making call');
     }
 
-    const callResponse = await this.call(canisterId, {
+    const {requestDetails, ...restResponse} = await this.call(canisterId, {
       methodName,
       arg,
       // effectiveCanisterId is optional but, actually mandatory according SDK team.
       effectiveCanisterId: canisterId
     });
 
+    this.assertRequestDetails(requestDetails);
+
+    if (isNullish(requestDetails)) {
+      // TODO proper error
+      throw new Error('Empty content map');
+    }
+
     const result = await this.readResponse({
-      callResponse,
+      callResponse: {requestDetails, ...restResponse},
       canisterId
     });
 
@@ -47,19 +55,14 @@ export class CustomHttpAgent extends HttpAgent {
 
     const {
       response: {status}
-    } = callResponse;
+    } = restResponse;
 
     // Fall back to polling if we receive an Accepted response code
     if (status === 202) {
-      const result = await this.pollForResponse({callResponse, canisterId});
-
-      const contentMap = toBase64(cbor.encode(allResponse.requestDetails));
-      const certificate = toBase64(cbor.encode(result.certificate.cert));
-
-      return {
-        contentMap,
-        certificate
-      };
+      return await this.pollForResponse({
+        callResponse: {requestDetails, ...restResponse},
+        canisterId
+      });
     }
 
     throw new Error(`Call was returned undefined, but type [${func.retTypes.join(',')}].`);
@@ -69,20 +72,16 @@ export class CustomHttpAgent extends HttpAgent {
     callResponse: {
       requestId,
       response: {body},
-      requestDetails: contentMap
+      requestDetails
     },
     canisterId
-  }: {callResponse: SubmitResponse} & Pick<IcrcCallCanisterRequestParams, 'canisterId'>): Promise<
-    IcrcCallCanisterResult | undefined
-  > {
+  }: {callResponse: Required<SubmitResponse>} & Pick<
+    IcrcCallCanisterRequestParams,
+    'canisterId'
+  >): Promise<IcrcCallCanisterResult | undefined> {
     // Certificate is only support in v3.
     if (isNullish(body) || isNullish(body.certificate)) {
       return undefined;
-    }
-
-    if (isNullish(contentMap)) {
-      // TODO proper error
-      throw new Error('Empty content map');
     }
 
     // I'm not sure why we don't check the response status, 202, before trying to search for a certificate. This seems inaccurate, but that's how Agent-js handles it.
@@ -105,13 +104,13 @@ export class CustomHttpAgent extends HttpAgent {
       throw new Error();
     }
 
-    const encodedCertificate = arrayBufferToUint8Array(encode(certificate));
-    const encodedContentMap = arrayBufferToUint8Array(encode(contentMap));
+    return this.encodeResult({certificate, requestDetails});
+  }
 
-    return {
-      certificate: encodedCertificate,
-      contentMap: encodedContentMap
-    };
+  private assertRequestDetails(
+    requestDetails?: CallRequest
+  ): requestDetails is NonNullable<CallRequest> {
+    return nonNullish(requestDetails);
   }
 
   private assertReply({
@@ -140,17 +139,34 @@ export class CustomHttpAgent extends HttpAgent {
   }
 
   private async pollForResponse({
-    callResponse: {requestId},
+    callResponse: {requestId, requestDetails},
     canisterId
-  }: {callResponse: SubmitResponse} & Pick<
+  }: {callResponse: Pick<Required<SubmitResponse>, 'requestId' | 'requestDetails'>} & Pick<
     IcrcCallCanisterRequestParams,
     'canisterId'
-  >): Promise<undefined> {
-    return await pollForResponseAgent(
+  >): Promise<IcrcCallCanisterResult> {
+    const {certificate} = await pollForResponseAgent(
       this,
       Principal.fromText(canisterId),
       requestId,
       defaultStrategy()
     );
+
+    return this.encodeResult({certificate, requestDetails});
+  }
+
+  private encodeResult({
+    requestDetails: contentMap,
+    certificate
+  }: Pick<Required<SubmitResponse>, 'requestDetails'> & {
+    certificate: Certificate;
+  }): IcrcCallCanisterResult {
+    const encodedCertificate = arrayBufferToUint8Array(encode(certificate));
+    const encodedContentMap = arrayBufferToUint8Array(encode(contentMap));
+
+    return {
+      certificate: encodedCertificate,
+      contentMap: encodedContentMap
+    };
   }
 }
