@@ -39,8 +39,13 @@ export class CustomHttpAgent extends HttpAgent {
     });
 
     // I assume that if we get a result at this point, it means we can respond to the caller. However, this is not how it's handled in Agent-js. For some reason, regardless of whether they get a result at this point, if the response has a status of 202, they overwrite the result, which seems incorrect.
-    if (nonNullish(result)) {
-      return result;
+    if (nonNullish(result) && nonNullish(result.reply)) {
+      const contentMap = toBase64(cbor.encode(allResponse.requestDetails))
+
+      return {
+        certificate: certificateFromCallResponse,
+        contentMap
+      };
     }
 
     const {
@@ -49,7 +54,15 @@ export class CustomHttpAgent extends HttpAgent {
 
     // Fall back to polling if we receive an Accepted response code
     if (status === 202) {
-      return await this.pollForResponse({callResponse, canisterId});
+      const result = await this.pollForResponse({callResponse, canisterId});
+
+      const contentMap = toBase64(cbor.encode(allResponse.requestDetails))
+      const certificate = toBase64(cbor.encode(result.certificate.cert));
+
+      return {
+        contentMap,
+        certificate
+      }
     }
 
     throw new Error(`Call was returned undefined, but type [${func.retTypes.join(',')}].`);
