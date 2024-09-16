@@ -1,8 +1,20 @@
-import {Certificate, HttpAgent, lookupResultToBuffer, SubmitResponse} from '@dfinity/agent';
+import {
+  Certificate,
+  defaultStrategy,
+  HttpAgent,
+  lookupResultToBuffer,
+  pollForResponse as pollForResponseAgent,
+  SubmitResponse
+} from '@dfinity/agent';
 import {bufFromBufLike} from '@dfinity/candid';
 import {Principal} from '@dfinity/principal';
-import {isNullish} from '@dfinity/utils';
+import {isNullish, nonNullish} from '@dfinity/utils';
 import {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
+
+interface AgentResponse {
+  certificate: Certificate;
+  reply: ArrayBuffer;
+}
 
 export class CustomHttpAgent extends HttpAgent {
   request = async ({
@@ -24,13 +36,23 @@ export class CustomHttpAgent extends HttpAgent {
     const result = await this.readResponse({
       callResponse,
       canisterId
-    })
+    });
 
     // I assume that if we get a result at this point, it means we can respond to the caller. However, this is not how it's handled in Agent-js. For some reason, regardless of whether they get a result at this point, if the response has a status of 202, they overwrite the result, which seems incorrect.
+    if (nonNullish(result)) {
+      return result;
+    }
+
+    const {
+      response: {status}
+    } = callResponse;
 
     // Fall back to polling if we receive an Accepted response code
-    if (response.status === 202) {
+    if (status === 202) {
+      return await this.pollForResponse();
     }
+
+    throw new Error(`Call was returned undefined, but type [${func.retTypes.join(',')}].`);
   };
 
   private async readResponse({
@@ -46,6 +68,8 @@ export class CustomHttpAgent extends HttpAgent {
     if (isNullish(body) || isNullish(body.certificate)) {
       return undefined;
     }
+
+    // I'm not sure why we don't check the response status, 202, before trying to search for a certificate. This seems inaccurate, but that's how Agent-js handles it.
 
     const {certificate: cert} = body;
 
@@ -71,5 +95,20 @@ export class CustomHttpAgent extends HttpAgent {
         // I'm not sure why undefined would be an acceptable result for this default implementation, but that's what Agent-js does.
         return undefined;
     }
+  }
+
+  private async pollForResponse({
+    callResponse: {requestId},
+    canisterId
+  }: {callResponse: SubmitResponse} & Pick<
+    IcrcCallCanisterRequestParams,
+    'canisterId'
+  >): Promise<undefined> {
+    return await pollForResponseAgent(
+      this,
+      Principal.fromText(canisterId),
+      requestId,
+      defaultStrategy()
+    );
   }
 }
