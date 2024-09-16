@@ -29,7 +29,7 @@ export class CustomHttpAgent extends HttpAgent {
     const callResponse = await this.call(canisterId, {
       methodName,
       arg,
-      // effectiveCanisterId optional but, actually mandatory.
+      // effectiveCanisterId is optional but, actually mandatory according SDK team.
       effectiveCanisterId: canisterId
     });
 
