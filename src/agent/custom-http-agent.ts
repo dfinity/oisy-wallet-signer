@@ -65,7 +65,8 @@ export class CustomHttpAgent extends HttpAgent {
       });
     }
 
-    throw new Error(`Call was returned undefined, but type [${func.retTypes.join(',')}].`);
+    // TODO: error
+    throw new Error();
   };
 
   private async readResponse({
