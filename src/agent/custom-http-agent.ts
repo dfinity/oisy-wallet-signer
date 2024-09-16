@@ -49,7 +49,7 @@ export class CustomHttpAgent extends HttpAgent {
 
     // Fall back to polling if we receive an Accepted response code
     if (status === 202) {
-      return await this.pollForResponse();
+      return await this.pollForResponse({callResponse, canisterId});
     }
 
     throw new Error(`Call was returned undefined, but type [${func.retTypes.join(',')}].`);
