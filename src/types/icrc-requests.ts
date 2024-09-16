@@ -89,8 +89,8 @@ export const IcrcCallCanisterRequestParamsSchema = z.object({
   sender: PrincipalTextSchema,
   method: z.string().trim().min(1),
   arg: IcrcBlob,
-  memo: IcrcBlob.optional().refine((blob) => isNullish(blob) || blob.length <= 32, {
-    message: 'Memo must be a Uint8Array with a maximum length of 32 bytes'
+  nonce: IcrcBlob.optional().refine((blob) => isNullish(blob) || blob.length <= 32, {
+    message: 'Nonce must be a Uint8Array with a maximum length of 32 bytes'
   })
 });
 
