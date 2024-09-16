@@ -295,34 +295,34 @@ describe('icrc-requests', () => {
       expect(() => IcrcCallCanisterRequestSchema.parse(invalidRequest)).toThrow();
     });
 
-    it('should pass validation when "memo" is a valid Uint8Array of length <= 32', () => {
+    it('should pass validation when "nonce" is a valid Uint8Array of length <= 32', () => {
       const validMemoRequest = {
         ...validRequest,
         params: {
           ...validRequest.params,
-          memo: new Uint8Array(20)
+          nonce: new Uint8Array(20)
         }
       };
       expect(() => IcrcCallCanisterRequestSchema.parse(validMemoRequest)).not.toThrow();
     });
 
-    it('should pass validation when "memo" is a valid Uint8Array of length = 32', () => {
+    it('should pass validation when "nonce" is a valid Uint8Array of length = 32', () => {
       const validMemoRequest = {
         ...validRequest,
         params: {
           ...validRequest.params,
-          memo: new Uint8Array(32)
+          nonce: new Uint8Array(32)
         }
       };
       expect(() => IcrcCallCanisterRequestSchema.parse(validMemoRequest)).not.toThrow();
     });
 
-    it('should fail validation when "memo" exceeds 32 bytes', () => {
+    it('should fail validation when "nonce" exceeds 32 bytes', () => {
       const invalidMemoRequest = {
         ...validRequest,
         params: {
           ...validRequest.params,
-          memo: new Uint8Array(33)
+          nonce: new Uint8Array(33)
         }
       };
       expect(() => IcrcCallCanisterRequestSchema.parse(invalidMemoRequest)).toThrow();
@@ -408,26 +408,26 @@ describe('icrc-requests', () => {
       expect(() => IcrcCallCanisterRequestParamsSchema.parse(invalidParams)).toThrow();
     });
 
-    it('should pass validation when "memo" is a valid Uint8Array of length <= 32', () => {
+    it('should pass validation when "nonce" is a valid Uint8Array of length <= 32', () => {
       const validMemoParams = {
         ...validParams,
-        memo: new Uint8Array(20)
+        nonce: new Uint8Array(20)
       };
       expect(() => IcrcCallCanisterRequestParamsSchema.parse(validMemoParams)).not.toThrow();
     });
 
-    it('should pass validation when "memo" is a valid Uint8Array of length = 32', () => {
+    it('should pass validation when "nonce" is a valid Uint8Array of length = 32', () => {
       const validMemoParams = {
         ...validParams,
-        memo: new Uint8Array(32)
+        nonce: new Uint8Array(32)
       };
       expect(() => IcrcCallCanisterRequestParamsSchema.parse(validMemoParams)).not.toThrow();
     });
 
-    it('should fail validation when "memo" exceeds 32 bytes', () => {
+    it('should fail validation when "nonce" exceeds 32 bytes', () => {
       const invalidMemoParams = {
         ...validParams,
-        memo: new Uint8Array(33)
+        nonce: new Uint8Array(33)
       };
       expect(() => IcrcCallCanisterRequestParamsSchema.parse(invalidMemoParams)).toThrow();
     });
