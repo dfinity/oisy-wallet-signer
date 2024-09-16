@@ -32,10 +32,10 @@ export class SignerApi extends Icrc21Canister {
         agent,
         Principal.fromText(canisterId),
         requestId,
-          defaultStrategy(),
+        defaultStrategy()
       );
 
-      response.certificate
+      response.certificate;
 
       console.log('RESPONSE:', response);
     }

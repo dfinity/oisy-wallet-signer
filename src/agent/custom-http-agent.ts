@@ -8,20 +8,20 @@ import {
 } from '@dfinity/agent';
 import {bufFromBufLike} from '@dfinity/candid';
 import {Principal} from '@dfinity/principal';
-import {isNullish, nonNullish} from '@dfinity/utils';
+import {arrayBufferToUint8Array, isNullish, nonNullish} from '@dfinity/utils';
 import {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
-
-interface AgentResponse {
-  certificate: Certificate;
-  reply: ArrayBuffer;
-}
+import {IcrcCallCanisterResult} from '../types/icrc-responses';
+import {encode} from './agentjs-cbor-copy';
 
 export class CustomHttpAgent extends HttpAgent {
   request = async ({
     arg,
     canisterId,
     method: methodName
-  }: Pick<IcrcCallCanisterRequestParams, 'canisterId' | 'method' | 'arg'>): Promise<void> => {
+  }: Pick<
+    IcrcCallCanisterRequestParams,
+    'canisterId' | 'method' | 'arg'
+  >): Promise<IcrcCallCanisterResult> => {
     if (isNullish(this.rootKey)) {
       throw new Error('Agent root key not initialized before making call');
     }
@@ -38,14 +38,11 @@ export class CustomHttpAgent extends HttpAgent {
       canisterId
     });
 
-    // I assume that if we get a result at this point, it means we can respond to the caller. However, this is not how it's handled in Agent-js. For some reason, regardless of whether they get a result at this point, if the response has a status of 202, they overwrite the result, which seems incorrect.
-    if (nonNullish(result) && nonNullish(result.reply)) {
-      const contentMap = toBase64(cbor.encode(allResponse.requestDetails))
-
-      return {
-        certificate: certificateFromCallResponse,
-        contentMap
-      };
+    // I assume that if we get a result at this point, it means we can respond to the caller.
+    // However, this is not how it's handled in Agent-js. For some reason, regardless of whether they get a result at this point or not, if the response has a status of 202, they overwrite the result with pollForResponse, which seems incorrect.
+    // That is why we return the result if we get one.
+    if (nonNullish(result)) {
+      return result;
     }
 
     const {
@@ -56,13 +53,13 @@ export class CustomHttpAgent extends HttpAgent {
     if (status === 202) {
       const result = await this.pollForResponse({callResponse, canisterId});
 
-      const contentMap = toBase64(cbor.encode(allResponse.requestDetails))
+      const contentMap = toBase64(cbor.encode(allResponse.requestDetails));
       const certificate = toBase64(cbor.encode(result.certificate.cert));
 
       return {
         contentMap,
         certificate
-      }
+      };
     }
 
     throw new Error(`Call was returned undefined, but type [${func.retTypes.join(',')}].`);
@@ -71,15 +68,21 @@ export class CustomHttpAgent extends HttpAgent {
   private async readResponse({
     callResponse: {
       requestId,
-      response: {body}
+      response: {body},
+      requestDetails: contentMap
     },
     canisterId
-  }: {callResponse: SubmitResponse} & Pick<
-    IcrcCallCanisterRequestParams,
-    'canisterId'
-  >): Promise<undefined> {
+  }: {callResponse: SubmitResponse} & Pick<IcrcCallCanisterRequestParams, 'canisterId'>): Promise<
+    IcrcCallCanisterResult | undefined
+  > {
+    // Certificate is only support in v3.
     if (isNullish(body) || isNullish(body.certificate)) {
       return undefined;
+    }
+
+    if (isNullish(contentMap)) {
+      // TODO proper error
+      throw new Error('Empty content map');
     }
 
     // I'm not sure why we don't check the response status, 202, before trying to search for a certificate. This seems inaccurate, but that's how Agent-js handles it.
@@ -92,6 +95,31 @@ export class CustomHttpAgent extends HttpAgent {
       canisterId: Principal.fromText(canisterId)
     });
 
+    const {result: replyCheck} = this.assertReply({
+      certificate,
+      requestId
+    });
+
+    if (replyCheck !== 'valid') {
+      // TODO: error
+      throw new Error();
+    }
+
+    const encodedCertificate = arrayBufferToUint8Array(encode(certificate));
+    const encodedContentMap = arrayBufferToUint8Array(encode(contentMap));
+
+    return {
+      certificate: encodedCertificate,
+      contentMap: encodedContentMap
+    };
+  }
+
+  private assertReply({
+    certificate,
+    requestId
+  }: {certificate: Certificate} & Pick<SubmitResponse, 'requestId'>): {
+    result: 'valid' | 'invalid' | 'rejected' | 'empty';
+  } {
     const path = [new TextEncoder().encode('request_status'), requestId];
 
     const status = new TextDecoder().decode(
@@ -100,13 +128,14 @@ export class CustomHttpAgent extends HttpAgent {
 
     switch (status) {
       case 'replied':
-        reply = lookupResultToBuffer(certificate.lookup([...path, 'reply']));
-        break;
+        const reply = lookupResultToBuffer(certificate.lookup([...path, 'reply']));
+        return {result: nonNullish(reply) ? 'valid' : 'invalid'};
       case 'rejected':
-        throw new UpdateCallRejectedError(cid, methodName, requestId, response);
+        throw {result: 'rejected'};
       default:
         // I'm not sure why undefined would be an acceptable result for this default implementation, but that's what Agent-js does.
-        return undefined;
+        // However, we consider it as not expected and we will throw an error if we get this.
+        return {result: 'empty'};
     }
   }
 

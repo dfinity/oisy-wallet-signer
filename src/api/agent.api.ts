@@ -1,7 +1,7 @@
 import type {Agent} from '@dfinity/agent';
 import {createAgent as createAgentUtils, isNullish} from '@dfinity/utils';
+import {CustomHttpAgent} from '../agent/custom-http-agent';
 import type {SignerOptions} from '../types/signer-options';
-import {CustomHttpAgent} from "../agent/custom-http-agent";
 
 export abstract class AgentApi {
   #agents: Record<string, CustomHttpAgent> | undefined = undefined;
