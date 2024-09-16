@@ -1,9 +1,10 @@
-import type {Agent, HttpAgent} from '@dfinity/agent';
+import type {Agent} from '@dfinity/agent';
 import {createAgent as createAgentUtils, isNullish} from '@dfinity/utils';
 import type {SignerOptions} from '../types/signer-options';
+import {CustomHttpAgent} from "../agent/custom-http-agent";
 
 export abstract class AgentApi {
-  #agents: Record<string, HttpAgent> | undefined = undefined;
+  #agents: Record<string, CustomHttpAgent> | undefined = undefined;
 
   protected async getAgent({owner, ...rest}: SignerOptions): Promise<Agent> {
     const key = owner.getPrincipal().toText();
@@ -22,7 +23,7 @@ export abstract class AgentApi {
     return this.#agents[key];
   }
 
-  private async createAgent({owner: identity, host}: SignerOptions): Promise<HttpAgent> {
+  private async createAgent({owner: identity, host}: SignerOptions): Promise<CustomHttpAgent> {
     const mainnetHost = 'https://icp-api.io';
 
     const {hostname} = new URL(host ?? mainnetHost);
