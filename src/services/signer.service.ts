@@ -1,7 +1,6 @@
 import {Principal} from '@dfinity/principal';
 import {isNullish} from '@dfinity/utils';
 import {SignerApi} from '../api/signer.api';
-import type {icrc21_consent_info} from '../declarations/icrc-21';
 import {
   notifyErrorActionAborted,
   notifyErrorRequestNotSupported,
@@ -12,7 +11,11 @@ import {
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import type {Notify} from '../types/signer-handlers';
 import type {SignerOptions} from '../types/signer-options';
-import type {CallCanisterPrompt, ConsentMessageAnswer} from '../types/signer-prompts';
+import type {
+  CallCanisterPrompt,
+  ConsentMessageApproval,
+  ConsentMessagePromptPayload
+} from '../types/signer-prompts';
 import {mapIcrc21ErrorToString} from '../utils/icrc-21.utils';
 
 export class SignerService {
@@ -73,7 +76,9 @@ export class SignerService {
 
       const {Ok: consentInfo} = response;
 
-      const {result} = await this.promptConsentMessage({consentInfo, prompt});
+      const {origin} = notify;
+
+      const {result} = await this.promptConsentMessage({consentInfo, prompt, origin});
 
       if (result === 'rejected') {
         notifyErrorActionAborted(notify);
@@ -126,21 +131,22 @@ export class SignerService {
 
   private async promptConsentMessage({
     prompt,
-    consentInfo
+    ...payload
   }: {
-    consentInfo: icrc21_consent_info;
     prompt: CallCanisterPrompt;
-  }): Promise<{result: 'approved' | 'rejected'}> {
+  } & Omit<ConsentMessagePromptPayload, 'approve' | 'reject'>): Promise<{
+    result: 'approved' | 'rejected';
+  }> {
     const promise = new Promise<{result: 'approved' | 'rejected'}>((resolve) => {
-      const approve: ConsentMessageAnswer = () => {
+      const approve: ConsentMessageApproval = () => {
         resolve({result: 'approved'});
       };
 
-      const userReject: ConsentMessageAnswer = () => {
+      const userReject: ConsentMessageApproval = () => {
         resolve({result: 'rejected'});
       };
 
-      prompt({approve, reject: userReject, consentInfo});
+      prompt({approve, reject: userReject, ...payload});
     });
 
     return await promise;
