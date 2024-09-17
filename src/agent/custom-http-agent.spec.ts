@@ -1,8 +1,8 @@
 import * as httpAgent from '@dfinity/agent';
-import {Certificate, fromHex, IC_ROOT_KEY, SubmitResponse} from '@dfinity/agent';
-import {CallRequest, SubmitRequestType} from '@dfinity/agent/lib/cjs/agent/http/types';
+import {Certificate, fromHex, IC_ROOT_KEY, type SubmitResponse} from '@dfinity/agent';
+import {SubmitRequestType, type CallRequest} from '@dfinity/agent/lib/cjs/agent/http/types';
 import {Principal} from '@dfinity/principal';
-import {afterEach, beforeEach, describe, MockInstance, vi} from 'vitest';
+import type {MockInstance} from 'vitest';
 import {mockLocalApplicationCertificate} from '../mocks/custom-http-agent.mocks';
 import {mockCanisterId, mockPrincipalText} from '../mocks/icrc-accounts.mocks';
 import {base64ToUint8Array, uint8ArrayToBase64} from '../utils/base64.utils';
@@ -79,6 +79,7 @@ describe('CustomHttpAgent', () => {
 
   describe('Success call', () => {
     let spyCall: MockInstance;
+    let spyPollForResponse: MockInstance;
     let agent: CustomHttpAgent;
     let certificate: Certificate;
 
@@ -96,7 +97,7 @@ describe('CustomHttpAgent', () => {
         rootKey: fromHex(IC_ROOT_KEY)
       });
 
-      vi.spyOn(httpAgent, 'pollForResponse').mockResolvedValue({
+      spyPollForResponse = vi.spyOn(httpAgent, 'pollForResponse').mockResolvedValue({
         certificate,
         reply: expect.anything()
       });
@@ -118,6 +119,12 @@ describe('CustomHttpAgent', () => {
 
       expect(response.certificate).toEqual(certificate);
       expect(response.requestDetails).toEqual(mockRequestDetails);
+    });
+
+    it('should poll for response when status is 202 and no certificate is returned by v3 call', async () => {
+      await agent.request(mockRequestPayload);
+
+      expect(spyPollForResponse).toHaveBeenCalledTimes(1);
     });
   });
 
