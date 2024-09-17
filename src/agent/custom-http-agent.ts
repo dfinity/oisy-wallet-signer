@@ -41,6 +41,9 @@ export class CustomHttpAgent {
     return new CustomHttpAgent(agent);
   }
 
+  /**
+   * We need to expose the agent to create the actor for requesting the consent message.
+   */
   get agent(): HttpAgent {
     return this.#agent;
   }
