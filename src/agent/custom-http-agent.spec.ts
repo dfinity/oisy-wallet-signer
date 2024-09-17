@@ -50,7 +50,7 @@ describe('CustomHttpAgent', () => {
         ['content-type', 'application/cbor']
       ],
       ok: true,
-      status: 200,
+      status: 202,
       statusText: 'OK'
     }
   };
