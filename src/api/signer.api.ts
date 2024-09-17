@@ -30,7 +30,9 @@ export class SignerApi extends Icrc21Canister {
     requestDetails: contentMap,
     certificate
   }: CustomHttpAgentResponse): IcrcCallCanisterResult {
-    const encodedCertificate = uint8ArrayToBase64(arrayBufferToUint8Array(encode(certificate)));
+    const encodedCertificate = uint8ArrayToBase64(
+      arrayBufferToUint8Array(encode(certificate.cert))
+    );
     const encodedContentMap = uint8ArrayToBase64(arrayBufferToUint8Array(encode(contentMap)));
 
     return {
