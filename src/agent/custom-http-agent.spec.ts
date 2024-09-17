@@ -5,7 +5,7 @@ import {Principal} from '@dfinity/principal';
 import {afterEach, beforeEach, describe, MockInstance, vi} from 'vitest';
 import {mockLocalApplicationCertificate} from '../mocks/custom-http-agent.mocks';
 import {mockCanisterId, mockPrincipalText} from '../mocks/icrc-accounts.mocks';
-import {uint8ArrayToBase64} from '../utils/base64.utils';
+import {base64ToUint8Array, uint8ArrayToBase64} from '../utils/base64.utils';
 import {CustomHttpAgent} from './custom-http-agent';
 
 vi.mock('@dfinity/agent', async (importOriginal) => {
@@ -30,6 +30,12 @@ vi.mock('@dfinity/agent', async (importOriginal) => {
 
 describe('CustomHttpAgent', () => {
   const mockMethod = 'test-method';
+
+  const mockRequestPayload = {
+    arg: uint8ArrayToBase64(new Uint8Array([1, 2, 3, 4])),
+    canisterId: mockCanisterId,
+    method: mockMethod
+  };
 
   const mockRequestDetails: CallRequest = {
     arg: new Uint8Array([68, 73, 68, 76, 6, 109, 123, 110, 0, 108]),
@@ -103,6 +109,11 @@ describe('CustomHttpAgent', () => {
       });
 
       expect(spyCall).toHaveBeenCalledTimes(1);
+      expect(spyCall).toHaveBeenCalledWith(mockCanisterId, {
+        arg: base64ToUint8Array(mockRequestPayload.arg),
+        effectiveCanisterId: mockCanisterId,
+        methodName: mockMethod
+      });
     });
 
     it.skip('should make a valid request and return a valid certificate', async () => {
