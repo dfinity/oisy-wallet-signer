@@ -3,6 +3,7 @@ services:
     image: junobuild/satellite:latest
     ports:
       - 4943:5987
+      - 5999:5999
     volumes:
       - juno_satellite:/juno/.juno
       - ./juno.dev.config.js:/juno/juno.dev.config.js
