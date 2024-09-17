@@ -9,6 +9,7 @@
 	import { authStore } from '$core/stores/auth.store';
 	import type { Icrc1TransferRequest } from '@dfinity/ledger-icp';
 	import Balance from '$core/components/Balance.svelte';
+	import {E8S_PER_ICP} from "$core/constants/app.constants";
 
 	type Props = {
 		wallet: IcpWallet | undefined;
@@ -39,7 +40,7 @@
 				owner: $authStore.identity.getPrincipal(),
 				subaccount: []
 			},
-			amount: 123n
+			amount: 1n * (E8S_PER_ICP / 2n)
 		};
 
 		result = await wallet?.icrc1Transfer({
