@@ -80,6 +80,7 @@ describe('CustomHttpAgent', () => {
   describe('Success call', () => {
     let spyCall: MockInstance;
     let agent: CustomHttpAgent;
+    let certificate: Certificate;
 
     beforeEach(async () => {
       agent = await CustomHttpAgent.create();
@@ -89,7 +90,7 @@ describe('CustomHttpAgent', () => {
         ...mockRestResponse
       });
 
-      const certificate = await Certificate.create({
+      certificate = await Certificate.create({
         certificate: fromHex(mockLocalApplicationCertificate),
         canisterId: mockRequestDetails.canister_id,
         rootKey: fromHex(IC_ROOT_KEY)
@@ -102,11 +103,7 @@ describe('CustomHttpAgent', () => {
     });
 
     it('should call agent on request', async () => {
-      await agent.request({
-        arg: uint8ArrayToBase64(new Uint8Array([1, 2, 3, 4])),
-        canisterId: mockCanisterId,
-        method: mockMethod
-      });
+      await agent.request(mockRequestPayload);
 
       expect(spyCall).toHaveBeenCalledTimes(1);
       expect(spyCall).toHaveBeenCalledWith(mockCanisterId, {
@@ -116,15 +113,11 @@ describe('CustomHttpAgent', () => {
       });
     });
 
-    it.skip('should make a valid request and return a valid certificate', async () => {
-      const response = await agent.request({
-        arg: uint8ArrayToBase64(new Uint8Array([1, 2, 3, 4])),
-        canisterId: mockCanisterId,
-        method: mockMethod
-      });
+    it('should make a request and return a certificate and request details', async () => {
+      const response = await agent.request(mockRequestPayload);
 
-      expect(response).toHaveProperty('certificate');
-      expect(response).toHaveProperty('requestDetails');
+      expect(response.certificate).toEqual(certificate);
+      expect(response.requestDetails).toEqual(mockRequestDetails);
     });
   });
 
