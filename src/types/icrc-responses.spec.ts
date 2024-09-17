@@ -5,6 +5,7 @@ import {
   ICRC27_ACCOUNTS
 } from '../constants/icrc.constants';
 import {mockAccounts, mockPrincipalText} from '../mocks/icrc-accounts.mocks';
+import {uint8ArrayToBase64} from '../utils/base64.utils';
 import {
   IcrcAccountsResponseSchema,
   IcrcCallCanisterResultResponseSchema,
@@ -18,7 +19,6 @@ import {
   type IcrcSupportedStandardsResponse
 } from './icrc-responses';
 import {JSON_RPC_VERSION_2} from './rpc';
-import {uint8ArrayToBase64} from "../utils/base64.utils";
 
 describe('icrc-responses', () => {
   const responseSchemas = [
