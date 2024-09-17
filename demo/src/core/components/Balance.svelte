@@ -34,12 +34,12 @@
 
 	$effect(() => {
 		(async () => {
-			await loadBalance($authStore.identity.getPrincipal());
+			await loadBalance($authStore.identity?.getPrincipal());
 		})();
 	});
 
 	export const onoisyDemoReloadBalance = async () => {
-		await loadBalance($authStore.identity.getPrincipal());
+		await loadBalance($authStore.identity?.getPrincipal());
 	};
 </script>
 
