@@ -2,12 +2,13 @@
 	import { notSignedIn } from '$core/derived/auth.derived';
 	import { Signer } from '@dfinity/oisy-wallet-signer/signer';
 	import UserId from '$core/components/UserId.svelte';
-    import Balance from '$core/components/Balance.svelte';
+	import Balance from '$core/components/Balance.svelte';
 	import ConfirmPermissions from '$lib/ConfirmPermissions.svelte';
 	import { authStore } from '$core/stores/auth.store';
 	import { isNullish } from '@dfinity/utils';
 	import ConfirmAccounts from '$lib/ConfirmAccounts.svelte';
 	import ConfirmConsentMessage from '$lib/ConfirmConsentMessage.svelte';
+	import GetICP from '$lib/GetICP.svelte';
 
 	let signer = $state<Signer | undefined>(undefined);
 
@@ -36,6 +37,8 @@
 <UserId />
 
 <Balance />
+
+<GetICP />
 
 <ConfirmPermissions {signer} />
 
