@@ -10,6 +10,7 @@ import {JSON_RPC_VERSION_2, type RpcId, type RpcResponseWithError} from '../type
 import type {Notify} from '../types/signer-handlers';
 import type {SignerOptions} from '../types/signer-options';
 import type {ConsentMessagePromptPayload} from '../types/signer-prompts';
+import {base64ToUint8Array, uint8ArrayToBase64} from '../utils/base64.utils';
 import {mapIcrc21ErrorToString} from '../utils/icrc-21.utils';
 import {SignerService} from './signer.service';
 
@@ -27,7 +28,7 @@ describe('Signer services', () => {
     canisterId: mockPrincipalText,
     sender: owner.getPrincipal().toText(),
     method: 'some_method',
-    arg: new Uint8Array([1, 2, 3, 4])
+    arg: uint8ArrayToBase64(new Uint8Array([1, 2, 3, 4]))
   };
 
   const signerOptions: SignerOptions = {
@@ -86,7 +87,7 @@ describe('Signer services', () => {
       canisterId: params.canisterId,
       request: {
         method: params.method,
-        arg: params.arg,
+        arg: base64ToUint8Array(params.arg),
         user_preferences: {
           metadata: {language: 'en', utc_offset_minutes: []},
           device_spec: []

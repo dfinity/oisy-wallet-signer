@@ -1,5 +1,6 @@
 import {ICRC27_ACCOUNTS} from '../constants/icrc.constants';
 import {mockPrincipalText} from '../mocks/icrc-accounts.mocks';
+import {uint8ArrayToBase64} from '../utils/base64.utils';
 import {
   IcrcAccountsRequestSchema,
   IcrcCallCanisterRequestParamsSchema,
@@ -243,7 +244,7 @@ describe('icrc-requests', () => {
         canisterId: mockPrincipalText,
         sender: mockPrincipalText,
         method: 'some_method',
-        arg: new Uint8Array([1, 2, 3, 4])
+        arg: uint8ArrayToBase64(new Uint8Array([1, 2, 3, 4]))
       }
     };
 
@@ -295,34 +296,34 @@ describe('icrc-requests', () => {
       expect(() => IcrcCallCanisterRequestSchema.parse(invalidRequest)).toThrow();
     });
 
-    it('should pass validation when "memo" is a valid Uint8Array of length <= 32', () => {
+    it('should pass validation when "nonce" is a valid Uint8Array of length <= 32', () => {
       const validMemoRequest = {
         ...validRequest,
         params: {
           ...validRequest.params,
-          memo: new Uint8Array(20)
+          nonce: uint8ArrayToBase64(new Uint8Array(20))
         }
       };
       expect(() => IcrcCallCanisterRequestSchema.parse(validMemoRequest)).not.toThrow();
     });
 
-    it('should pass validation when "memo" is a valid Uint8Array of length = 32', () => {
+    it('should pass validation when "nonce" is a valid Uint8Array of length = 32', () => {
       const validMemoRequest = {
         ...validRequest,
         params: {
           ...validRequest.params,
-          memo: new Uint8Array(32)
+          nonce: uint8ArrayToBase64(new Uint8Array(32))
         }
       };
       expect(() => IcrcCallCanisterRequestSchema.parse(validMemoRequest)).not.toThrow();
     });
 
-    it('should fail validation when "memo" exceeds 32 bytes', () => {
+    it('should fail validation when "nonce" exceeds 32 bytes', () => {
       const invalidMemoRequest = {
         ...validRequest,
         params: {
           ...validRequest.params,
-          memo: new Uint8Array(33)
+          nonce: new Uint8Array(33)
         }
       };
       expect(() => IcrcCallCanisterRequestSchema.parse(invalidMemoRequest)).toThrow();
@@ -369,7 +370,7 @@ describe('icrc-requests', () => {
       canisterId: mockPrincipalText,
       sender: mockPrincipalText,
       method: 'some_method',
-      arg: new Uint8Array([1, 2, 3, 4])
+      arg: uint8ArrayToBase64(new Uint8Array([1, 2, 3, 4]))
     };
 
     it('should validate a correct request params', () => {
@@ -408,26 +409,26 @@ describe('icrc-requests', () => {
       expect(() => IcrcCallCanisterRequestParamsSchema.parse(invalidParams)).toThrow();
     });
 
-    it('should pass validation when "memo" is a valid Uint8Array of length <= 32', () => {
+    it('should pass validation when "nonce" is a valid Uint8Array of length <= 32', () => {
       const validMemoParams = {
         ...validParams,
-        memo: new Uint8Array(20)
+        nonce: uint8ArrayToBase64(new Uint8Array(20))
       };
       expect(() => IcrcCallCanisterRequestParamsSchema.parse(validMemoParams)).not.toThrow();
     });
 
-    it('should pass validation when "memo" is a valid Uint8Array of length = 32', () => {
+    it('should pass validation when "nonce" is a valid Uint8Array of length = 32', () => {
       const validMemoParams = {
         ...validParams,
-        memo: new Uint8Array(32)
+        nonce: uint8ArrayToBase64(new Uint8Array(32))
       };
       expect(() => IcrcCallCanisterRequestParamsSchema.parse(validMemoParams)).not.toThrow();
     });
 
-    it('should fail validation when "memo" exceeds 32 bytes', () => {
+    it('should fail validation when "nonce" exceeds 32 bytes', () => {
       const invalidMemoParams = {
         ...validParams,
-        memo: new Uint8Array(33)
+        nonce: new Uint8Array(33)
       };
       expect(() => IcrcCallCanisterRequestParamsSchema.parse(invalidMemoParams)).toThrow();
     });

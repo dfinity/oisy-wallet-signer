@@ -5,6 +5,7 @@ import {
   ICRC27_ACCOUNTS
 } from '../constants/icrc.constants';
 import {mockAccounts, mockPrincipalText} from '../mocks/icrc-accounts.mocks';
+import {uint8ArrayToBase64} from '../utils/base64.utils';
 import {
   IcrcAccountsResponseSchema,
   IcrcCallCanisterResultResponseSchema,
@@ -651,8 +652,8 @@ describe('icrc-responses', () => {
       jsonrpc: JSON_RPC_VERSION_2,
       id: 1,
       result: {
-        contentMap: new Uint8Array([1, 2, 3, 4]),
-        certificate: new Uint8Array([5, 6, 7, 8])
+        contentMap: uint8ArrayToBase64(new Uint8Array([1, 2, 3, 4])),
+        certificate: uint8ArrayToBase64(new Uint8Array([5, 6, 7, 8]))
       }
     };
 
