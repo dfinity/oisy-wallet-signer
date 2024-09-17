@@ -69,7 +69,7 @@
     "prepublishOnly": "if [ $(basename $PWD) != 'dist' ]; then echo 'Publishing is only allowed from the dist directory.' && exit 1; fi"
   },
   "devDependencies": {
-    "@dfinity/identity": "^2.0.0",
+    "@dfinity/identity": "^2.1.1",
     "@dfinity/internet-identity-playwright": "^0.0.3",
     "@playwright/test": "^1.46.1",
     "@types/jest": "^29.5.12",
@@ -93,11 +93,11 @@
     "node": ">=20"
   },
   "peerDependencies": {
-    "@dfinity/agent": "^2.0.0",
-    "@dfinity/candid": "^2.0.0",
-    "@dfinity/ledger-icp": "^2.5.0-next-2024-09-11",
-    "@dfinity/principal": "^2.0.0",
-    "@dfinity/utils": "^2.5.0",
+    "@dfinity/agent": "^2.1.1",
+    "@dfinity/candid": "^2.1.1",
+    "@dfinity/ledger-icp": "^2.5.0-next-2024-09-17",
+    "@dfinity/principal": "^2.1.1",
+    "@dfinity/utils": "^2.5.0-next-2024-09-17",
     "zod": "^3.23.8"
   }
 }
