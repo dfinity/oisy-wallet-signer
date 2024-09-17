@@ -95,9 +95,9 @@
   "peerDependencies": {
     "@dfinity/agent": "^2.1.1",
     "@dfinity/candid": "^2.1.1",
-    "@dfinity/ledger-icp": "^2.5.0-next-2024-09-11",
+    "@dfinity/ledger-icp": "^2.5.0-next-2024-09-17",
     "@dfinity/principal": "^2.1.1",
-    "@dfinity/utils": "^2.5.0",
+    "@dfinity/utils": "^2.5.0-next-2024-09-17",
     "zod": "^3.23.8"
   }
 }
