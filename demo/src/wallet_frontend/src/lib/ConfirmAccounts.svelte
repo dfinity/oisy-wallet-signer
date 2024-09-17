@@ -53,6 +53,6 @@
 	});
 </script>
 
-{#if nonNullish(confirm)}
+{#if nonNullish(approve)}
 	<p transition:fade data-tid="accounts" class="mt-2"><small>Notifying accounts...</small></p>
 {/if}
