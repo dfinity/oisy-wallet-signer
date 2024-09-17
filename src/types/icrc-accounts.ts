@@ -1,17 +1,20 @@
-import {arrayOfNumberToUint8Array} from '@dfinity/utils';
 import {z} from 'zod';
+import {base64ToUint8Array} from '../utils/base64.utils';
 import {IcrcBlob} from './blob';
 import {PrincipalTextSchema} from './principal';
 
-const IcrcSubaccountSchema = z
-  .union([IcrcBlob, z.array(z.number())])
-  .refine(
-    (value) =>
-      (value instanceof Uint8Array ? value : arrayOfNumberToUint8Array(value)).length === 32,
-    {
-      message: 'Subaccount must be exactly 32 bytes long.'
+const IcrcSubaccountSchema = IcrcBlob.refine(
+  (value) => {
+    try {
+      return base64ToUint8Array(value).length === 32;
+    } catch (_err: unknown) {
+      return false;
     }
-  );
+  },
+  {
+    message: 'Subaccount must be exactly 32 bytes long.'
+  }
+);
 
 export const IcrcAccountSchema = z
   .object({

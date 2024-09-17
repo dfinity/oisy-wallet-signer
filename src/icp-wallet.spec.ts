@@ -6,6 +6,7 @@ import {IcpWallet} from './icp-wallet';
 import {mockCanisterId, mockPrincipalText} from './mocks/icrc-accounts.mocks';
 import type {RelyingPartyOptions} from './types/relying-party-options';
 import {JSON_RPC_VERSION_2} from './types/rpc';
+import {uint8ArrayToBase64} from './utils/base64.utils';
 
 vi.mock('@dfinity/candid', async (importOriginal) => {
   // eslint-disable-next-line @typescript-eslint/consistent-type-imports
@@ -84,7 +85,7 @@ describe('icp-wallet', () => {
           sender: owner,
           method: 'icrc1_transfer',
           canisterId: 'ryjl3-tyaaa-aaaaa-aaaba-cai',
-          arg: new Uint8Array([1, 2, 3, 5, 6, 9, 9, 9])
+          arg: uint8ArrayToBase64(new Uint8Array([1, 2, 3, 5, 6, 9, 9, 9]))
         }
       });
     });
@@ -103,7 +104,7 @@ describe('icp-wallet', () => {
           sender: owner,
           method: 'icrc1_transfer',
           canisterId: mockCanisterId,
-          arg: new Uint8Array([1, 2, 3, 5, 6, 9, 9, 9])
+          arg: uint8ArrayToBase64(new Uint8Array([1, 2, 3, 5, 6, 9, 9, 9]))
         }
       });
     });

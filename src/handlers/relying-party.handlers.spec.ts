@@ -9,6 +9,7 @@ import {
 import {mockPrincipalText} from '../mocks/icrc-accounts.mocks';
 import type {IcrcAnyRequestedScopes, IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import {JSON_RPC_VERSION_2} from '../types/rpc';
+import {uint8ArrayToBase64} from '../utils/base64.utils';
 import type {ReadyOrError} from '../utils/timeout.utils';
 import {
   permissions,
@@ -233,7 +234,7 @@ describe('Relying Party handlers', () => {
       canisterId: mockPrincipalText,
       sender: mockPrincipalText,
       method: 'some_method',
-      arg: new Uint8Array([1, 2, 3, 4])
+      arg: uint8ArrayToBase64(new Uint8Array([1, 2, 3, 4]))
     };
 
     it('should send the correct message to the popup', () => {

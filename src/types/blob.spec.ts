@@ -1,8 +1,9 @@
+import {uint8ArrayToBase64} from '../utils/base64.utils';
 import {IcrcBlob} from './blob';
 
 describe('IcrcBlob', () => {
-  it('should validate a Uint8Array', () => {
-    const validBlob = new Uint8Array([1, 2, 3, 4]);
+  it('should validate a Uint8Array binary data', () => {
+    const validBlob = uint8ArrayToBase64(new Uint8Array([1, 2, 3, 4]));
     const result = IcrcBlob.safeParse(validBlob);
     expect(result.success).toBe(true);
   });
@@ -12,7 +13,7 @@ describe('IcrcBlob', () => {
     const result = IcrcBlob.safeParse(invalidBlob);
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.errors[0].message).toBe('Input not instance of Uint8Array');
+      expect(result.error.errors[0].message).toBe('Expected string, received array');
     }
   });
 
@@ -21,7 +22,7 @@ describe('IcrcBlob', () => {
     const result = IcrcBlob.safeParse(invalidBlob);
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.errors[0].message).toBe('Input not instance of Uint8Array');
+      expect(result.error.errors[0].message).toBe('Invalid base64 string');
     }
   });
 
@@ -30,7 +31,7 @@ describe('IcrcBlob', () => {
     const result = IcrcBlob.safeParse(invalidBlob);
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.errors[0].message).toBe('Input not instance of Uint8Array');
+      expect(result.error.errors[0].message).toBe('Expected string, received number');
     }
   });
 
@@ -39,7 +40,22 @@ describe('IcrcBlob', () => {
     const result = IcrcBlob.safeParse(invalidBlob);
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.errors[0].message).toBe('Input not instance of Uint8Array');
+      expect(result.error.errors[0].message).toBe('Expected string, received object');
+    }
+  });
+
+  it('should accept empty base64 string', () => {
+    const emptyBlob = '';
+    const result = IcrcBlob.safeParse(emptyBlob);
+    expect(result.success).toBe(true);
+  });
+
+  it('should fail validation for an incorrectly padded base64 string', () => {
+    const invalidBlob = 'YWJjZA'; // Missing padding "=="
+    const result = IcrcBlob.safeParse(invalidBlob);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.errors[0].message).toBe('Invalid base64 string');
     }
   });
 });
