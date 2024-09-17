@@ -16,6 +16,7 @@ import type {
   ConsentMessageApproval,
   ConsentMessagePromptPayload
 } from '../types/signer-prompts';
+import {base64ToUint8Array} from '../utils/base64.utils';
 import {mapIcrc21ErrorToString} from '../utils/icrc-21.utils';
 
 export class SignerService {
@@ -51,7 +52,7 @@ export class SignerService {
         canisterId,
         request: {
           method,
-          arg,
+          arg: base64ToUint8Array(arg),
           // TODO: consumer should be able to define user_preferences
           user_preferences: {
             metadata: {

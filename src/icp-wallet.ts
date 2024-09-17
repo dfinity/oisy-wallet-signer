@@ -6,6 +6,7 @@ import type {IcrcCallCanisterResult} from './types/icrc-responses';
 import type {Origin} from './types/post-message';
 import type {PrincipalText} from './types/principal';
 import type {RelyingPartyOptions} from './types/relying-party-options';
+import {uint8ArrayToBase64} from './utils/base64.utils';
 
 const ICP_LEDGER_CANISTER_ID = 'ryjl3-tyaaa-aaaaa-aaaba-cai';
 
@@ -59,7 +60,7 @@ export class IcpWallet extends RelyingParty {
 
     const rawRequest = toIcrc1TransferRawRequest(request);
 
-    const arg = new Uint8Array(IDL.encode([TransferArg], [rawRequest]));
+    const arg = uint8ArrayToBase64(new Uint8Array(IDL.encode([TransferArg], [rawRequest])));
 
     // TODO: uncomment nonce and add TODO - not yet supported by agent-js
 

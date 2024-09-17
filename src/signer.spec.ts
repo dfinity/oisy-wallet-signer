@@ -45,6 +45,7 @@ import {
   type Rejection
 } from './types/signer-prompts';
 import type {SessionPermissions} from './types/signer-sessions';
+import {uint8ArrayToBase64} from './utils/base64.utils';
 import {mapIcrc21ErrorToString} from './utils/icrc-21.utils';
 import {del, get} from './utils/storage.utils';
 
@@ -622,7 +623,7 @@ describe('Signer', () => {
           canisterId: mockCanisterId,
           sender: owner.getPrincipal().toText(),
           method: 'some_method',
-          arg: new Uint8Array([1, 2, 3, 4])
+          arg: uint8ArrayToBase64(new Uint8Array([1, 2, 3, 4]))
         }
       };
 

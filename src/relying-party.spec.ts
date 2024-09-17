@@ -33,6 +33,7 @@ import {
 import {RelyingPartyResponseError} from './types/relying-party-errors';
 import type {RelyingPartyOptions} from './types/relying-party-options';
 import {JSON_RPC_VERSION_2, RpcResponseWithResultOrErrorSchema} from './types/rpc';
+import {uint8ArrayToBase64} from './utils/base64.utils';
 import {windowFeatures} from './utils/window.utils';
 
 describe('Relying Party', () => {
@@ -1073,12 +1074,12 @@ describe('Relying Party', () => {
         canisterId: mockPrincipalText,
         sender: mockPrincipalText,
         method: 'some_method',
-        arg: new Uint8Array([1, 2, 3, 4, 5, 6, 7])
+        arg: uint8ArrayToBase64(new Uint8Array([1, 2, 3, 4, 5, 6, 7]))
       };
 
       const result: IcrcCallCanisterResult = {
-        contentMap: new Uint8Array([1, 2, 3, 4]),
-        certificate: new Uint8Array([5, 6, 7, 8])
+        contentMap: uint8ArrayToBase64(new Uint8Array([1, 2, 3, 4])),
+        certificate: uint8ArrayToBase64(new Uint8Array([5, 6, 7, 8]))
       };
 
       beforeEach(async () => {
