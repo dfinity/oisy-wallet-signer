@@ -1,16 +1,17 @@
-import type {CallRequest, HttpAgentOptions} from '@dfinity/agent';
 import {
   Certificate,
   HttpAgent,
-  SubmitResponse,
   defaultStrategy,
   lookupResultToBuffer,
-  pollForResponse as pollForResponseAgent
+  pollForResponse as pollForResponseAgent,
+  type CallRequest,
+  type HttpAgentOptions,
+  type SubmitResponse
 } from '@dfinity/agent';
 import {bufFromBufLike} from '@dfinity/candid';
 import {Principal} from '@dfinity/principal';
 import {isNullish, nonNullish} from '@dfinity/utils';
-import {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
+import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import {base64ToUint8Array} from '../utils/base64.utils';
 
 export type CustomHttpAgentResponse = Pick<Required<SubmitResponse>, 'requestDetails'> & {
@@ -21,7 +22,7 @@ export type CustomHttpAgentResponse = Pick<Required<SubmitResponse>, 'requestDet
 // While this is possible, it would require using Object.assign to clone the HttpAgent into a CustomHttpAgent, because the super function does not accept generics.
 // Therefore, it is cleaner in my opinion to encapsulate the agent rather than extend it.
 export class CustomHttpAgent {
-  #agent: HttpAgent;
+  readonly #agent: HttpAgent;
 
   private constructor(agent: HttpAgent) {
     this.#agent = agent;
@@ -36,11 +37,16 @@ export class CustomHttpAgent {
     return new CustomHttpAgent(agent);
   }
 
+  get agent(): HttpAgent {
+    return this.#agent;
+  }
+
   request = async ({
     arg,
     canisterId,
     method: methodName
   }: Pick<
+    // This could have been made agnostic by inlining the types here, but for simplicity and because they are strongly typed, I decided to reuse the interface.
     IcrcCallCanisterRequestParams,
     'canisterId' | 'method' | 'arg'
   >): Promise<CustomHttpAgentResponse> => {
@@ -145,10 +151,12 @@ export class CustomHttpAgent {
 
     switch (status) {
       case 'replied':
+        // ESLint disabled because this code is copy/pasted without changes from agent-js.
+        // eslint-disable-next-line no-case-declarations
         const reply = lookupResultToBuffer(certificate.lookup([...path, 'reply']));
         return {result: nonNullish(reply) ? 'valid' : 'invalid'};
       case 'rejected':
-        throw {result: 'rejected'};
+        return {result: 'rejected'};
       default:
         // I'm not sure why undefined would be an acceptable result for this default implementation, but that's what Agent-js does.
         // However, we consider it as not expected and we will throw an error if we get this.

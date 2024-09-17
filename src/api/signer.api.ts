@@ -1,8 +1,8 @@
 import {arrayBufferToUint8Array} from '@dfinity/utils';
 import {encode} from '../agent/agentjs-cbor-copy';
-import {CustomHttpAgentResponse} from '../agent/custom-http-agent';
+import type {CustomHttpAgentResponse} from '../agent/custom-http-agent';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
-import {IcrcCallCanisterResult} from '../types/icrc-responses';
+import type {IcrcCallCanisterResult} from '../types/icrc-responses';
 import type {SignerOptions} from '../types/signer-options';
 import {uint8ArrayToBase64} from '../utils/base64.utils';
 import {Icrc21Canister} from './icrc21-canister.api';
