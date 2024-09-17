@@ -1,12 +1,11 @@
-import type {Agent} from '@dfinity/agent';
-import {createAgent as createAgentUtils, isNullish} from '@dfinity/utils';
+import {isNullish} from '@dfinity/utils';
 import {CustomHttpAgent} from '../agent/custom-http-agent';
 import type {SignerOptions} from '../types/signer-options';
 
 export abstract class AgentApi {
   #agents: Record<string, CustomHttpAgent> | undefined = undefined;
 
-  protected async getAgent({owner, ...rest}: SignerOptions): Promise<Agent> {
+  protected async getAgent({owner, ...rest}: SignerOptions): Promise<CustomHttpAgent> {
     const key = owner.getPrincipal().toText();
 
     if (isNullish(this.#agents) || isNullish(this.#agents[key])) {
@@ -28,12 +27,12 @@ export abstract class AgentApi {
 
     const {hostname} = new URL(host ?? mainnetHost);
 
-    const local = ['localhost', '127.0.0.1'].includes(hostname);
+    const shouldFetchRootKey = ['localhost', '127.0.0.1'].includes(hostname);
 
-    return await createAgentUtils({
+    return await CustomHttpAgent.create({
       identity,
-      ...(local && {fetchRootKey: true}),
-      host: host ?? mainnetHost
+      host: host ?? mainnetHost,
+      shouldFetchRootKey
     });
   }
 }

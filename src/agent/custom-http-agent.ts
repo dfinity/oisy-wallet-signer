@@ -1,4 +1,4 @@
-import type {CallRequest} from '@dfinity/agent';
+import type {CallRequest, HttpAgentOptions} from '@dfinity/agent';
 import {
   Certificate,
   defaultStrategy,
@@ -15,7 +15,25 @@ import {IcrcCallCanisterResult} from '../types/icrc-responses';
 import {base64ToUint8Array, uint8ArrayToBase64} from '../utils/base64.utils';
 import {encode} from './agentjs-cbor-copy';
 
-export class CustomHttpAgent extends HttpAgent {
+// To extend the HttpAgent, we would have to override the static create function.
+// While this is possible, it would require using Object.assign to clone the HttpAgent into a CustomHttpAgent, because the super function does not accept generics.
+// Therefore, it is cleaner in my opinion to encapsulate the agent rather than extend it.
+export class CustomHttpAgent {
+  #agent: HttpAgent;
+
+  private constructor(agent: HttpAgent) {
+    this.#agent = agent;
+  }
+
+  static async create(
+    options?: HttpAgentOptions & {
+      shouldFetchRootKey?: boolean;
+    }
+  ): Promise<CustomHttpAgent> {
+    const agent = await HttpAgent.create(options);
+    return new CustomHttpAgent(agent);
+  }
+
   request = async ({
     arg,
     canisterId,
@@ -24,11 +42,7 @@ export class CustomHttpAgent extends HttpAgent {
     IcrcCallCanisterRequestParams,
     'canisterId' | 'method' | 'arg'
   >): Promise<IcrcCallCanisterResult> => {
-    if (isNullish(this.rootKey)) {
-      throw new Error('Agent root key not initialized before making call');
-    }
-
-    const {requestDetails, ...restResponse} = await this.call(canisterId, {
+    const {requestDetails, ...restResponse} = await this.#agent.call(canisterId, {
       methodName,
       arg: base64ToUint8Array(arg),
       // effectiveCanisterId is optional but, actually mandatory according SDK team.
@@ -92,7 +106,7 @@ export class CustomHttpAgent extends HttpAgent {
 
     const certificate = await Certificate.create({
       certificate: bufFromBufLike(cert),
-      rootKey: this.rootKey,
+      rootKey: this.#agent.rootKey,
       canisterId: Principal.fromText(canisterId)
     });
 
@@ -148,7 +162,7 @@ export class CustomHttpAgent extends HttpAgent {
     'canisterId'
   >): Promise<IcrcCallCanisterResult> {
     const {certificate} = await pollForResponseAgent(
-      this,
+      this.#agent,
       Principal.fromText(canisterId),
       requestId,
       defaultStrategy()
