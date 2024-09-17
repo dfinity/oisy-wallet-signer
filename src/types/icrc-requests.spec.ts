@@ -1,5 +1,6 @@
 import {ICRC27_ACCOUNTS} from '../constants/icrc.constants';
 import {mockPrincipalText} from '../mocks/icrc-accounts.mocks';
+import {uint8ArrayToBase64} from '../utils/base64.utils';
 import {
   IcrcAccountsRequestSchema,
   IcrcCallCanisterRequestParamsSchema,
@@ -243,7 +244,7 @@ describe('icrc-requests', () => {
         canisterId: mockPrincipalText,
         sender: mockPrincipalText,
         method: 'some_method',
-        arg: new Uint8Array([1, 2, 3, 4])
+        arg: uint8ArrayToBase64(new Uint8Array([1, 2, 3, 4]))
       }
     };
 
