@@ -1,43 +1,41 @@
-import {defaultStrategy, pollForResponse} from '@dfinity/agent/lib/cjs/polling';
-import {Principal} from '@dfinity/principal';
+import {arrayBufferToUint8Array} from '@dfinity/utils';
+import {encode} from '../agent/agentjs-cbor-copy';
+import {CustomHttpAgentResponse} from '../agent/custom-http-agent';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
+import {IcrcCallCanisterResult} from '../types/icrc-responses';
 import type {SignerOptions} from '../types/signer-options';
+import {uint8ArrayToBase64} from '../utils/base64.utils';
 import {Icrc21Canister} from './icrc21-canister.api';
 
 export class SignerApi extends Icrc21Canister {
   async call({
     owner,
     host,
-    params: {canisterId, method: methodName, arg}
+    params: {canisterId, method, arg}
   }: {
     params: IcrcCallCanisterRequestParams;
-  } & SignerOptions): Promise<void> {
+  } & SignerOptions): Promise<IcrcCallCanisterResult> {
     const agent = await this.getAgent({host, owner});
 
-    const {
-      requestId,
-      response: callResponse,
-      requestDetails
-    } = await agent.call(canisterId, {
-      methodName,
-      arg,
-      effectiveCanisterId: canisterId
+    const result = await agent.request({
+      canisterId,
+      method,
+      arg
     });
 
-    // TODO: return result
-    console.log('RESULT:', requestId, callResponse, requestDetails);
+    return this.encodeResult(result);
+  }
 
-    if (callResponse.status === 202) {
-      const response = await pollForResponse(
-        agent,
-        Principal.fromText(canisterId),
-        requestId,
-        defaultStrategy()
-      );
+  private encodeResult({
+    requestDetails: contentMap,
+    certificate
+  }: CustomHttpAgentResponse): IcrcCallCanisterResult {
+    const encodedCertificate = uint8ArrayToBase64(arrayBufferToUint8Array(encode(certificate)));
+    const encodedContentMap = uint8ArrayToBase64(arrayBufferToUint8Array(encode(contentMap)));
 
-      response.certificate;
-
-      console.log('RESPONSE:', response);
-    }
+    return {
+      certificate: encodedCertificate,
+      contentMap: encodedContentMap
+    };
   }
 }

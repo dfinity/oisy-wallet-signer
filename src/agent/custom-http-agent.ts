@@ -1,19 +1,21 @@
 import type {CallRequest, HttpAgentOptions} from '@dfinity/agent';
 import {
   Certificate,
-  defaultStrategy,
   HttpAgent,
+  SubmitResponse,
+  defaultStrategy,
   lookupResultToBuffer,
-  pollForResponse as pollForResponseAgent,
-  SubmitResponse
+  pollForResponse as pollForResponseAgent
 } from '@dfinity/agent';
 import {bufFromBufLike} from '@dfinity/candid';
 import {Principal} from '@dfinity/principal';
-import {arrayBufferToUint8Array, isNullish, nonNullish} from '@dfinity/utils';
+import {isNullish, nonNullish} from '@dfinity/utils';
 import {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
-import {IcrcCallCanisterResult} from '../types/icrc-responses';
-import {base64ToUint8Array, uint8ArrayToBase64} from '../utils/base64.utils';
-import {encode} from './agentjs-cbor-copy';
+import {base64ToUint8Array} from '../utils/base64.utils';
+
+export type CustomHttpAgentResponse = Pick<Required<SubmitResponse>, 'requestDetails'> & {
+  certificate: Certificate;
+};
 
 // To extend the HttpAgent, we would have to override the static create function.
 // While this is possible, it would require using Object.assign to clone the HttpAgent into a CustomHttpAgent, because the super function does not accept generics.
@@ -41,7 +43,7 @@ export class CustomHttpAgent {
   }: Pick<
     IcrcCallCanisterRequestParams,
     'canisterId' | 'method' | 'arg'
-  >): Promise<IcrcCallCanisterResult> => {
+  >): Promise<CustomHttpAgentResponse> => {
     const {requestDetails, ...restResponse} = await this.#agent.call(canisterId, {
       methodName,
       arg: base64ToUint8Array(arg),
@@ -94,7 +96,7 @@ export class CustomHttpAgent {
   }: {callResponse: Required<SubmitResponse>} & Pick<
     IcrcCallCanisterRequestParams,
     'canisterId'
-  >): Promise<IcrcCallCanisterResult | undefined> {
+  >): Promise<CustomHttpAgentResponse | undefined> {
     // Certificate is only support in v3.
     if (isNullish(body) || isNullish(body.certificate)) {
       return undefined;
@@ -120,7 +122,7 @@ export class CustomHttpAgent {
       throw new Error();
     }
 
-    return this.encodeResult({certificate, requestDetails});
+    return {certificate, requestDetails};
   }
 
   private assertRequestDetails(
@@ -160,7 +162,7 @@ export class CustomHttpAgent {
   }: {callResponse: Pick<Required<SubmitResponse>, 'requestId' | 'requestDetails'>} & Pick<
     IcrcCallCanisterRequestParams,
     'canisterId'
-  >): Promise<IcrcCallCanisterResult> {
+  >): Promise<CustomHttpAgentResponse> {
     const {certificate} = await pollForResponseAgent(
       this.#agent,
       Principal.fromText(canisterId),
@@ -168,21 +170,6 @@ export class CustomHttpAgent {
       defaultStrategy()
     );
 
-    return this.encodeResult({certificate, requestDetails});
-  }
-
-  private encodeResult({
-    requestDetails: contentMap,
-    certificate
-  }: Pick<Required<SubmitResponse>, 'requestDetails'> & {
-    certificate: Certificate;
-  }): IcrcCallCanisterResult {
-    const encodedCertificate = uint8ArrayToBase64(arrayBufferToUint8Array(encode(certificate)));
-    const encodedContentMap = uint8ArrayToBase64(arrayBufferToUint8Array(encode(contentMap)));
-
-    return {
-      certificate: encodedCertificate,
-      contentMap: encodedContentMap
-    };
+    return {certificate, requestDetails};
   }
 }
