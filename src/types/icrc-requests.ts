@@ -8,6 +8,7 @@ import {
   ICRC29_STATUS,
   ICRC49_CALL_CANISTER
 } from '../constants/icrc.constants';
+import {base64ToUint8Array} from '../utils/base64.utils';
 import {IcrcBlob} from './blob';
 import {IcrcScopedMethodSchema} from './icrc-standards';
 import {PrincipalTextSchema} from './principal';
@@ -89,9 +90,18 @@ export const IcrcCallCanisterRequestParamsSchema = z.object({
   sender: PrincipalTextSchema,
   method: z.string().trim().min(1),
   arg: IcrcBlob,
-  nonce: IcrcBlob.optional().refine((blob) => isNullish(blob) || blob.length <= 32, {
-    message: 'Nonce must be a Uint8Array with a maximum length of 32 bytes'
-  })
+  nonce: IcrcBlob.optional().refine(
+    (blob) => {
+      try {
+        return isNullish(blob) || base64ToUint8Array(blob).length <= 32;
+      } catch (_err: unknown) {
+        return false;
+      }
+    },
+    {
+      message: 'Nonce must be a Uint8Array with a maximum length of 32 bytes'
+    }
+  )
 });
 
 export type IcrcCallCanisterRequestParams = z.infer<typeof IcrcCallCanisterRequestParamsSchema>;

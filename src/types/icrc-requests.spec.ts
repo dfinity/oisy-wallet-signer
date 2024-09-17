@@ -301,7 +301,7 @@ describe('icrc-requests', () => {
         ...validRequest,
         params: {
           ...validRequest.params,
-          nonce: new Uint8Array(20)
+          nonce: uint8ArrayToBase64(new Uint8Array(20))
         }
       };
       expect(() => IcrcCallCanisterRequestSchema.parse(validMemoRequest)).not.toThrow();
@@ -312,7 +312,7 @@ describe('icrc-requests', () => {
         ...validRequest,
         params: {
           ...validRequest.params,
-          nonce: new Uint8Array(32)
+          nonce: uint8ArrayToBase64(new Uint8Array(32))
         }
       };
       expect(() => IcrcCallCanisterRequestSchema.parse(validMemoRequest)).not.toThrow();
@@ -370,7 +370,7 @@ describe('icrc-requests', () => {
       canisterId: mockPrincipalText,
       sender: mockPrincipalText,
       method: 'some_method',
-      arg: new Uint8Array([1, 2, 3, 4])
+      arg: uint8ArrayToBase64(new Uint8Array([1, 2, 3, 4]))
     };
 
     it('should validate a correct request params', () => {
@@ -412,7 +412,7 @@ describe('icrc-requests', () => {
     it('should pass validation when "nonce" is a valid Uint8Array of length <= 32', () => {
       const validMemoParams = {
         ...validParams,
-        nonce: new Uint8Array(20)
+        nonce: uint8ArrayToBase64(new Uint8Array(20))
       };
       expect(() => IcrcCallCanisterRequestParamsSchema.parse(validMemoParams)).not.toThrow();
     });
@@ -420,7 +420,7 @@ describe('icrc-requests', () => {
     it('should pass validation when "nonce" is a valid Uint8Array of length = 32', () => {
       const validMemoParams = {
         ...validParams,
-        nonce: new Uint8Array(32)
+        nonce: uint8ArrayToBase64(new Uint8Array(32))
       };
       expect(() => IcrcCallCanisterRequestParamsSchema.parse(validMemoParams)).not.toThrow();
     });
