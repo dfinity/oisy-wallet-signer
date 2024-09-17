@@ -12,6 +12,7 @@ import {Principal} from '@dfinity/principal';
 import {arrayBufferToUint8Array, isNullish, nonNullish} from '@dfinity/utils';
 import {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import {IcrcCallCanisterResult} from '../types/icrc-responses';
+import {base64ToUint8Array, uint8ArrayToBase64} from '../utils/base64.utils';
 import {encode} from './agentjs-cbor-copy';
 
 export class CustomHttpAgent extends HttpAgent {
@@ -29,7 +30,7 @@ export class CustomHttpAgent extends HttpAgent {
 
     const {requestDetails, ...restResponse} = await this.call(canisterId, {
       methodName,
-      arg,
+      arg: base64ToUint8Array(arg),
       // effectiveCanisterId is optional but, actually mandatory according SDK team.
       effectiveCanisterId: canisterId
     });
@@ -162,8 +163,8 @@ export class CustomHttpAgent extends HttpAgent {
   }: Pick<Required<SubmitResponse>, 'requestDetails'> & {
     certificate: Certificate;
   }): IcrcCallCanisterResult {
-    const encodedCertificate = arrayBufferToUint8Array(encode(certificate));
-    const encodedContentMap = arrayBufferToUint8Array(encode(contentMap));
+    const encodedCertificate = uint8ArrayToBase64(arrayBufferToUint8Array(encode(certificate)));
+    const encodedContentMap = uint8ArrayToBase64(arrayBufferToUint8Array(encode(contentMap)));
 
     return {
       certificate: encodedCertificate,
