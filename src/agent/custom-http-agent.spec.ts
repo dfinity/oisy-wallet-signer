@@ -28,6 +28,7 @@ vi.mock('@dfinity/agent', async (importOriginal) => {
 
   class MockHttpAgent {
     call = vi.fn();
+    create = vi.fn();
 
     get rootKey(): ArrayBuffer {
       return mockLocalIcRootKey.buffer;
@@ -105,6 +106,17 @@ describe('CustomHttpAgent', () => {
     const agent = await CustomHttpAgent.create({});
     expect(agent.agent).toBeDefined();
     expect(agent.agent).toBeInstanceOf(httpAgent.HttpAgent);
+  });
+
+  it('should call HttpAgent.create once with the provided options', async () => {
+    const agentOptions = {shouldFetchRootKey: true};
+
+    await CustomHttpAgent.create(agentOptions);
+
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    expect(httpAgent.HttpAgent.create).toHaveBeenCalledTimes(1);
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    expect(httpAgent.HttpAgent.create).toHaveBeenCalledWith(agentOptions);
   });
 
   describe('Success call', () => {
