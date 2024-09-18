@@ -26,10 +26,10 @@
 	},
 	"devDependencies": {
 		"@junobuild/config": "^0.0.14",
-		"@junobuild/vite-plugin": "^0.0.17",
-		"@playwright/test": "^1.46.1",
-		"@sveltejs/adapter-static": "^3.0.4",
-		"@sveltejs/kit": "^2.5.26",
+		"@junobuild/vite-plugin": "^0.0.18",
+		"@playwright/test": "^1.47.1",
+		"@sveltejs/adapter-static": "^3.0.5",
+		"@sveltejs/kit": "^2.5.28",
 		"@sveltejs/vite-plugin-svelte": "^3.1.2",
 		"@types/eslint": "^8.56.0",
 		"@types/node": "^20.14.11",
@@ -39,18 +39,18 @@
 		"eslint": "^8.56.0",
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-svelte": "^2.36.0-next.4",
-		"postcss": "^8.4.45",
+		"postcss": "^8.4.47",
 		"prettier": "^3.3.3",
 		"prettier-plugin-organize-imports": "^4.0.0",
 		"prettier-plugin-svelte": "^3.2.6",
-		"sass": "^1.78.0",
+		"sass": "^1.79.1",
 		"svelte": "^5.0.0-next.243",
-		"svelte-check": "^4.0.1",
-		"tailwindcss": "^3.4.10",
+		"svelte-check": "^4.0.2",
+		"tailwindcss": "^3.4.12",
 		"tslib": "^2.7.0",
-		"typescript": "^5.5.4",
-		"vite": "^5.4.3",
-		"vitest": "^2.0.5"
+		"typescript": "^5.6.2",
+		"vite": "^5.4.6",
+		"vitest": "^2.1.1"
 	},
 	"type": "module",
 	"dependencies": {
@@ -61,6 +61,6 @@
 		"@dfinity/principal": "^2.1.1",
 		"@dfinity/utils": "^2.5.0-next-2024-09-17",
 		"buffer": "^6.0.3",
-		"zod": "^3.23.7"
+		"zod": "^3.23.8"
 	}
 }
