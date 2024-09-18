@@ -1,5 +1,5 @@
+import type {SubmitResponse} from '@dfinity/agent';
 import * as httpAgent from '@dfinity/agent';
-import {Certificate, fromHex, IC_ROOT_KEY, type SubmitResponse} from '@dfinity/agent';
 import {SubmitRequestType, type CallRequest} from '@dfinity/agent/lib/cjs/agent/http/types';
 import {Principal} from '@dfinity/principal';
 import type {MockInstance} from 'vitest';
@@ -84,87 +84,92 @@ describe('CustomHttpAgent', () => {
 
   describe('Success call', () => {
     let spyCall: MockInstance;
-    let spyPollForResponse: MockInstance;
     let agent: CustomHttpAgent;
-    let certificate: Certificate;
 
     beforeEach(async () => {
       agent = await CustomHttpAgent.create();
 
       spyCall = vi.spyOn(agent.agent, 'call').mockResolvedValue(mockResponse);
-
-      certificate = await Certificate.create({
-        certificate: fromHex(mockLocalApplicationCertificate),
-        canisterId: mockRequestDetails.canister_id,
-        rootKey: fromHex(IC_ROOT_KEY)
-      });
-
-      spyPollForResponse = vi.spyOn(httpAgent, 'pollForResponse').mockResolvedValue({
-        certificate,
-        reply: expect.anything()
-      });
     });
 
-    describe('Valid response', () => {
-      it('should call agent on request', async () => {
-        await agent.request(mockRequestPayload);
+    describe('API v2 / pollForResponse', () => {
+      let certificate: httpAgent.Certificate;
+      let spyPollForResponse: MockInstance;
 
-        expect(spyCall).toHaveBeenCalledTimes(1);
-        expect(spyCall).toHaveBeenCalledWith(mockCanisterId, {
-          arg: base64ToUint8Array(mockRequestPayload.arg),
-          effectiveCanisterId: mockCanisterId,
-          methodName: mockMethod
+      beforeEach(async () => {
+        certificate = await httpAgent.Certificate.create({
+          certificate: httpAgent.fromHex(mockLocalApplicationCertificate),
+          canisterId: mockRequestDetails.canister_id,
+          rootKey: httpAgent.fromHex(httpAgent.IC_ROOT_KEY)
+        });
+
+        spyPollForResponse = vi.spyOn(httpAgent, 'pollForResponse').mockResolvedValue({
+          certificate,
+          reply: expect.anything()
         });
       });
 
-      it('should make a request and return a certificate and request details', async () => {
-        const response = await agent.request(mockRequestPayload);
+      describe('Valid response', () => {
+        it('should call agent on request', async () => {
+          await agent.request(mockRequestPayload);
 
-        expect(response.certificate).toEqual(certificate);
-        expect(response.requestDetails).toEqual(mockRequestDetails);
-      });
-
-      it('should poll for response when status is 202 and no certificate is returned by v3 call', async () => {
-        await agent.request(mockRequestPayload);
-
-        expect(spyPollForResponse).toHaveBeenCalledTimes(1);
-      });
-    });
-
-    describe('Invalid response', () => {
-      it('should throw UndefinedRequestDetailsError if requestDetails is null', async () => {
-        spyCall.mockResolvedValue({
-          ...mockRestResponse,
-          requestDetails: null
+          expect(spyCall).toHaveBeenCalledTimes(1);
+          expect(spyCall).toHaveBeenCalledWith(mockCanisterId, {
+            arg: base64ToUint8Array(mockRequestPayload.arg),
+            effectiveCanisterId: mockCanisterId,
+            methodName: mockMethod
+          });
         });
 
-        await expect(agent.request(mockRequestPayload)).rejects.toThrow(
-          UndefinedRequestDetailsError
-        );
-      });
+        it('should make a request and return a certificate and request details', async () => {
+          const response = await agent.request(mockRequestPayload);
 
-      it('should throw RequestError if status is not 202', async () => {
-        spyCall.mockResolvedValue({
-          ...mockResponse,
-          response: {
-            ...mockRestResponse.response,
-            status: 500
-          }
+          expect(response.certificate).toEqual(certificate);
+          expect(response.requestDetails).toEqual(mockRequestDetails);
         });
 
-        await expect(agent.request(mockRequestPayload)).rejects.toThrow(RequestError);
+        it('should poll for response when status is 202 and no certificate is returned by v3 call', async () => {
+          await agent.request(mockRequestPayload);
+
+          expect(spyPollForResponse).toHaveBeenCalledTimes(1);
+        });
       });
 
-      it('should throw RequestError even if status is 200', async () => {
-        spyCall.mockResolvedValue({
-          ...mockResponse,
-          response: {
-            ...mockRestResponse.response,
-            status: 200
-          }
+      describe('Invalid response', () => {
+        it('should throw UndefinedRequestDetailsError if requestDetails is null', async () => {
+          spyCall.mockResolvedValue({
+            ...mockRestResponse,
+            requestDetails: null
+          });
+
+          await expect(agent.request(mockRequestPayload)).rejects.toThrow(
+            UndefinedRequestDetailsError
+          );
         });
 
-        await expect(agent.request(mockRequestPayload)).rejects.toThrow(RequestError);
+        it('should throw RequestError if status is not 202', async () => {
+          spyCall.mockResolvedValue({
+            ...mockResponse,
+            response: {
+              ...mockRestResponse.response,
+              status: 500
+            }
+          });
+
+          await expect(agent.request(mockRequestPayload)).rejects.toThrow(RequestError);
+        });
+
+        it('should throw RequestError even if status is 200', async () => {
+          spyCall.mockResolvedValue({
+            ...mockResponse,
+            response: {
+              ...mockRestResponse.response,
+              status: 200
+            }
+          });
+
+          await expect(agent.request(mockRequestPayload)).rejects.toThrow(RequestError);
+        });
       });
     });
   });
