@@ -228,7 +228,7 @@ describe('CustomHttpAgent', () => {
           status: 'rejected'
         };
 
-        let mockCallSubmitResponse: Omit<SubmitResponse, 'requestId'> = {
+        const mockCallSubmitResponse: Omit<SubmitResponse, 'requestId'> = {
           requestDetails: mockRequestDetails,
           ...mockSubmitRestResponse,
           response: {
