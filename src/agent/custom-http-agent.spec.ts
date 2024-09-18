@@ -283,6 +283,29 @@ describe('CustomHttpAgent', () => {
         });
       });
 
+      describe('Success but invalid response', () => {
+        beforeEach(async () => {
+          spyPollForResponse = vi.spyOn(httpAgent, 'pollForResponse').mockResolvedValue({
+            // @ts-expect-error: we are testing this on purpose
+            certificate: null,
+            // @ts-expect-error: we are testing this on purpose
+            reply: null
+          });
+        });
+
+        it('should bubble the error if pollForResponse returns an invalid certificate', async () => {
+          spyCall.mockResolvedValue({
+            ...mockSubmitRestResponse,
+            response: {
+              ...mockResponse,
+              status: 202
+            }
+          });
+
+          await expect(agent.request(mockRequestPayload)).rejects.toThrow();
+        });
+      });
+
       describe('Error', () => {
         beforeEach(async () => {
           spyPollForResponse = vi
