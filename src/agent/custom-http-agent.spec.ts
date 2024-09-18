@@ -145,6 +145,26 @@ describe('CustomHttpAgent', () => {
           expect(response.requestDetails).toEqual(mockRequestDetails);
         });
       });
+
+      describe('Invalid response', () => {
+        beforeEach(() => {
+          const mockBody = {
+            certificate: httpAgent.fromHex(mockLocalCertificate),
+            status: 'replied'
+          };
+
+          spyCall = vi.spyOn(agent.agent, 'call').mockResolvedValue({
+            requestDetails: mockRequestDetails,
+            ...mockSubmitRestResponse,
+            response: {
+              ...mockResponse,
+              // @ts-expect-error: Agent-js is not typed correctly.
+              body: mockBody
+            },
+            requestId: mockLocalRequestId.buffer as RequestId
+          });
+        });
+      })
     });
 
     describe('API v2 / pollForResponse', () => {
