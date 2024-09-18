@@ -1,6 +1,7 @@
 import {Actor} from '@dfinity/agent';
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {Principal} from '@dfinity/principal';
+import {CustomHttpAgent} from '../agent/custom-http-agent';
 import type {
   _SERVICE as Icrc21Actor,
   icrc21_consent_message_request,
@@ -27,13 +28,21 @@ vi.mock('@dfinity/agent', async (importOriginal) => {
   };
 });
 
-vi.mock('@dfinity/utils', async (importOriginal) => {
+vi.mock('../agent/custom-http-agent', async (importOriginal) => {
   const mockAgent = {test: 456};
+
+  const mockCustomAgent = {
+    get agent() {
+      return mockAgent;
+    }
+  };
 
   return {
     // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-    ...(await importOriginal<typeof import('@dfinity/utils')>()),
-    createAgent: vi.fn().mockResolvedValue(mockAgent)
+    ...(await importOriginal<typeof import('../agent/custom-http-agent')>()),
+    CustomHttpAgent: {
+      create: vi.fn().mockResolvedValue(mockCustomAgent)
+    }
   };
 });
 
@@ -136,6 +145,14 @@ describe('icrc-21.canister.api', () => {
         ...signerOptions
       });
 
+      // Assert that the CustomHttpAgent is created and passed to createActor
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(CustomHttpAgent.create).toHaveBeenCalledWith({
+        identity: signerOptions.owner,
+        host: signerOptions.host,
+        shouldFetchRootKey: true
+      });
+
       // TODO: spyOn nor function does work with vitest and Actor.createActor. Not against a better idea than disabling eslint for next line.
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(Actor.createActor).toHaveBeenCalledWith(idlFactory, {
@@ -160,6 +177,11 @@ describe('icrc-21.canister.api', () => {
       });
 
       expect(resultAgain).toBe(result);
+
+      // Ensure that the `CustomHttpAgent.create` is only called once
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(CustomHttpAgent.create).toHaveBeenCalledTimes(1);
+
       // TODO: spyOn nor function does work with vitest and Actor.createActor. Not against a better idea than disabling eslint for next line.
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(Actor.createActor).toHaveBeenCalledTimes(1);

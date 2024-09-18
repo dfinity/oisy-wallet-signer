@@ -1,21 +1,22 @@
-import type {Agent} from '@dfinity/agent';
 import {Ed25519KeyIdentity} from '@dfinity/identity';
-import {createAgent} from '@dfinity/utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+import {CustomHttpAgent} from '../agent/custom-http-agent';
 import type {SignerOptions} from '../types/signer-options';
 import {AgentApi} from './agent.api';
 
-vi.mock('@dfinity/utils', async (importOriginal) => {
+vi.mock('../agent/custom-http-agent', async (importOriginal) => {
   // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-  const originalModule = await importOriginal<typeof import('@dfinity/utils')>();
+  const originalModule = await importOriginal<typeof import('../agent/custom-http-agent')>();
   return {
     ...originalModule,
-    createAgent: vi.fn().mockResolvedValue({test: 'mockAgent'})
+    CustomHttpAgent: {
+      create: vi.fn().mockResolvedValue({test: 'mockCustomAgent'})
+    }
   };
 });
 
 class TestAgent extends AgentApi {
-  async getAgentTest(params: SignerOptions): Promise<Agent> {
+  async getAgentTest(params: SignerOptions): Promise<CustomHttpAgent> {
     return await this.getAgent(params);
   }
 }
@@ -45,17 +46,19 @@ describe('AgentApi', () => {
     it('should call createAgent and cache the result for the first call', async () => {
       const agent = await agentApi.getAgentTest(signerOptions);
 
-      expect(createAgent).toHaveBeenCalledWith({
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(CustomHttpAgent.create).toHaveBeenCalledWith({
         identity,
-        fetchRootKey: true,
+        shouldFetchRootKey: true,
         host: 'http://localhost:8080'
       });
 
-      expect(agent).toEqual({test: 'mockAgent'});
+      expect(agent).toEqual({test: 'mockCustomAgent'});
 
       await agentApi.getAgentTest(signerOptions);
 
-      expect(createAgent).toHaveBeenCalledTimes(1);
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(CustomHttpAgent.create).toHaveBeenCalledTimes(1);
     });
 
     it('should create and cache a new agent for a different identity', async () => {
@@ -68,9 +71,10 @@ describe('AgentApi', () => {
 
       const newAgent = await agentApi.getAgentTest(differentSignerOptions);
 
-      expect(createAgent).toHaveBeenCalledTimes(2);
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(CustomHttpAgent.create).toHaveBeenCalledTimes(2);
 
-      expect(newAgent).toEqual({test: 'mockAgent'});
+      expect(newAgent).toEqual({test: 'mockCustomAgent'});
     });
 
     it('should not call createAgent if the agent is already cached for the same identity', async () => {
@@ -78,7 +82,8 @@ describe('AgentApi', () => {
 
       await agentApi.getAgentTest(signerOptions);
 
-      expect(createAgent).toHaveBeenCalledTimes(1);
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(CustomHttpAgent.create).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -86,9 +91,10 @@ describe('AgentApi', () => {
     it('should call createAgent with fetchRootKey for local development (localhost)', async () => {
       await agentApi.getAgentTest(signerOptions);
 
-      expect(createAgent).toHaveBeenCalledWith({
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(CustomHttpAgent.create).toHaveBeenCalledWith({
         identity,
-        fetchRootKey: true,
+        shouldFetchRootKey: true,
         host: 'http://localhost:8080'
       });
     });
@@ -101,9 +107,11 @@ describe('AgentApi', () => {
 
       await agentApi.getAgentTest(nonLocalSignerOptions);
 
-      expect(createAgent).toHaveBeenCalledWith({
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(CustomHttpAgent.create).toHaveBeenCalledWith({
         identity,
-        host: 'https://icp-api.io'
+        host: 'https://icp-api.io',
+        shouldFetchRootKey: false
       });
     });
 
@@ -114,9 +122,11 @@ describe('AgentApi', () => {
 
       await agentApi.getAgentTest(optionsWithoutHost);
 
-      expect(createAgent).toHaveBeenCalledWith({
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(CustomHttpAgent.create).toHaveBeenCalledWith({
         identity,
-        host: 'https://icp-api.io'
+        host: 'https://icp-api.io',
+        shouldFetchRootKey: false
       });
     });
 
@@ -128,9 +138,10 @@ describe('AgentApi', () => {
 
       await agentApi.getAgentTest(localSignerOptions);
 
-      expect(createAgent).toHaveBeenCalledWith({
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(CustomHttpAgent.create).toHaveBeenCalledWith({
         identity,
-        fetchRootKey: true,
+        shouldFetchRootKey: true,
         host: 'http://127.0.0.1:8000'
       });
     });
