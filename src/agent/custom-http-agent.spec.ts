@@ -47,23 +47,25 @@ describe('CustomHttpAgent', () => {
     sender: Principal.fromText(mockPrincipalText)
   };
 
-  const mockRestResponse: Omit<SubmitResponse, 'requestDetails'> = {
-    requestId: expect.anything(),
-    response: {
-      body: null,
-      headers: [
-        ['content-length', '599'],
-        ['content-type', 'application/cbor']
-      ],
-      ok: true,
-      status: 202,
-      statusText: 'OK'
-    }
+  const mockResponse: SubmitResponse['response'] = {
+    body: null,
+    headers: [
+      ['content-length', '599'],
+      ['content-type', 'application/cbor']
+    ],
+    ok: true,
+    status: 202,
+    statusText: 'OK'
   };
 
-  const mockResponse: SubmitResponse = {
+  const mockSubmitRestResponse: Omit<SubmitResponse, 'requestDetails'> = {
+    requestId: expect.anything(),
+    response: mockResponse
+  };
+
+  const mockSubmitResponse: SubmitResponse = {
     requestDetails: mockRequestDetails,
-    ...mockRestResponse
+    ...mockSubmitRestResponse
   };
 
   beforeEach(() => {
@@ -88,22 +90,39 @@ describe('CustomHttpAgent', () => {
 
     beforeEach(async () => {
       agent = await CustomHttpAgent.create();
+    });
 
-      spyCall = vi.spyOn(agent.agent, 'call').mockResolvedValue(mockResponse);
+    describe('API v3 / certificate is defined', () => {
+      beforeEach(() => {
+        spyCall = vi.spyOn(agent.agent, 'call').mockResolvedValue({
+          requestDetails: mockRequestDetails,
+          ...mockSubmitRestResponse,
+          response: {
+            ...mockResponse,
+            body: {
+              certificate: httpAgent.fromHex(mockLocalApplicationCertificate)
+            }
+          }
+        });
+      });
     });
 
     describe('API v2 / pollForResponse', () => {
-      let certificate: httpAgent.Certificate;
       let spyPollForResponse: MockInstance;
+      let certificate: httpAgent.Certificate;
+
+      beforeEach(async () => {
+        spyCall = vi.spyOn(agent.agent, 'call').mockResolvedValue(mockSubmitResponse);
+
+        certificate = await httpAgent.Certificate.create({
+          certificate: httpAgent.fromHex(mockLocalApplicationCertificate),
+          canisterId: mockRequestDetails.canister_id,
+          rootKey: httpAgent.fromHex(httpAgent.IC_ROOT_KEY)
+        });
+      });
 
       describe('Success', () => {
         beforeEach(async () => {
-          certificate = await httpAgent.Certificate.create({
-            certificate: httpAgent.fromHex(mockLocalApplicationCertificate),
-            canisterId: mockRequestDetails.canister_id,
-            rootKey: httpAgent.fromHex(httpAgent.IC_ROOT_KEY)
-          });
-
           spyPollForResponse = vi.spyOn(httpAgent, 'pollForResponse').mockResolvedValue({
             certificate,
             reply: expect.anything()
@@ -139,7 +158,7 @@ describe('CustomHttpAgent', () => {
         describe('Invalid response', () => {
           it('should throw UndefinedRequestDetailsError if requestDetails is null', async () => {
             spyCall.mockResolvedValue({
-              ...mockRestResponse,
+              ...mockSubmitRestResponse,
               requestDetails: null
             });
 
@@ -150,9 +169,9 @@ describe('CustomHttpAgent', () => {
 
           it('should throw RequestError if status is not 202', async () => {
             spyCall.mockResolvedValue({
-              ...mockResponse,
+              ...mockSubmitResponse,
               response: {
-                ...mockRestResponse.response,
+                ...mockSubmitRestResponse.response,
                 status: 500
               }
             });
@@ -162,9 +181,9 @@ describe('CustomHttpAgent', () => {
 
           it('should throw RequestError even if status is 200', async () => {
             spyCall.mockResolvedValue({
-              ...mockResponse,
+              ...mockSubmitResponse,
               response: {
-                ...mockRestResponse.response,
+                ...mockSubmitRestResponse.response,
                 status: 200
               }
             });
@@ -176,19 +195,13 @@ describe('CustomHttpAgent', () => {
 
       describe('Error', () => {
         beforeEach(async () => {
-          certificate = await httpAgent.Certificate.create({
-            certificate: httpAgent.fromHex(mockLocalApplicationCertificate),
-            canisterId: mockRequestDetails.canister_id,
-            rootKey: httpAgent.fromHex(httpAgent.IC_ROOT_KEY)
-          });
-
           spyPollForResponse = vi
             .spyOn(httpAgent, 'pollForResponse')
             .mockRejectedValue(new Error('Polling error'));
         });
 
         it('should bubble error if pollForResponse rejects', async () => {
-          spyCall.mockResolvedValue(mockResponse);
+          spyCall.mockResolvedValue(mockSubmitResponse);
 
           await expect(agent.request(mockRequestPayload)).rejects.toThrow('Polling error');
         });
