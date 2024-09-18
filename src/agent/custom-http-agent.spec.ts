@@ -186,6 +186,19 @@ describe('CustomHttpAgent', () => {
 
           await expect(agent.request(mockRequestPayload)).rejects.toThrow();
         });
+
+        it('should bubble error if body does not contain certificate in readResponse', async () => {
+          spyCall.mockResolvedValue({
+            ...mockSubmitRestResponse,
+            requestDetails: mockRequestDetails,
+            response: {
+              ...mockResponse,
+              body: {}
+            }
+          });
+
+          await expect(agent.request(mockRequestPayload)).rejects.toThrow();
+        });
       });
 
       describe('Rejected response', () => {
