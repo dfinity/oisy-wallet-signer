@@ -71,8 +71,8 @@
   "devDependencies": {
     "@dfinity/identity": "^2.1.1",
     "@dfinity/internet-identity-playwright": "^0.0.3",
-    "@playwright/test": "^1.46.1",
-    "@types/jest": "^29.5.12",
+    "@playwright/test": "^1.47.1",
+    "@types/jest": "^29.5.13",
     "@types/node": "^20.12.7",
     "@typescript-eslint/eslint-plugin": "^6.20.0",
     "esbuild": "^0.23.1",
@@ -87,7 +87,7 @@
     "prettier": "^3.3.3",
     "prettier-plugin-organize-imports": "^4.0.0",
     "typescript": "^5.3.3",
-    "vitest": "^2.0.5"
+    "vitest": "^2.1.1"
   },
   "engines": {
     "node": ">=20"
