@@ -4,7 +4,6 @@ import {SubmitRequestType, type CallRequest} from '@dfinity/agent/lib/cjs/agent/
 import {Principal} from '@dfinity/principal';
 import type {MockInstance} from 'vitest';
 import {
-  mockLocalApplicationCertificate,
   mockLocalCertificate,
   mockLocalIcRootKey,
   mockLocalRequestId
@@ -68,7 +67,7 @@ describe('CustomHttpAgent', () => {
   };
 
   const mockSubmitRestResponse: Omit<SubmitResponse, 'requestDetails'> = {
-    requestId: expect.anything(),
+    requestId: mockLocalRequestId.buffer as RequestId,
     response: mockResponse
   };
 
@@ -121,7 +120,7 @@ describe('CustomHttpAgent', () => {
           });
         });
 
-        it.only('should call agent on request', async () => {
+        it('should call agent on request', async () => {
           await agent.request(mockRequestPayload);
 
           expect(spyCall).toHaveBeenCalledTimes(1);
@@ -142,9 +141,9 @@ describe('CustomHttpAgent', () => {
         spyCall = vi.spyOn(agent.agent, 'call').mockResolvedValue(mockSubmitResponse);
 
         certificate = await httpAgent.Certificate.create({
-          certificate: httpAgent.fromHex(mockLocalApplicationCertificate),
+          certificate: httpAgent.fromHex(mockLocalCertificate),
           canisterId: mockRequestDetails.canister_id,
-          rootKey: httpAgent.fromHex(httpAgent.IC_ROOT_KEY)
+          rootKey: mockLocalIcRootKey.buffer
         });
       });
 
