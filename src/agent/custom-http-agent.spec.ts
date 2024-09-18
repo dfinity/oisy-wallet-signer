@@ -161,33 +161,46 @@ describe('CustomHttpAgent', () => {
       });
 
       describe('Rejected response', () => {
+        const mockBody = {
+          certificate: httpAgent.fromHex(mockRejectedLocalCertificate),
+          status: 'rejected'
+        };
+
+        let mockCallSubmitResponse: Omit<SubmitResponse, 'requestId'> = {
+          requestDetails: mockRequestDetails,
+          ...mockSubmitRestResponse,
+          response: {
+            ...mockResponse,
+            // @ts-expect-error: Agent-js is not typed correctly.
+            body: mockBody
+          }
+        };
+
         beforeEach(() => {
           vi.setSystemTime(mockRejectedLocalCallTime);
-
-          const mockBody = {
-            certificate: httpAgent.fromHex(mockRejectedLocalCertificate),
-            status: 'rejected'
-          };
-
-          spyCall = vi.spyOn(agent.agent, 'call').mockResolvedValue({
-            requestDetails: mockRequestDetails,
-            ...mockSubmitRestResponse,
-            response: {
-              ...mockResponse,
-              // @ts-expect-error: Agent-js is not typed correctly.
-              body: mockBody
-            },
-            requestId: mockRejectedLocalRequestId.buffer as RequestId
-          });
         });
 
         it('should throw an error if the certificate is rejected', async () => {
+          spyCall = vi.spyOn(agent.agent, 'call').mockResolvedValue({
+            ...mockCallSubmitResponse,
+            requestId: mockRejectedLocalRequestId.buffer as RequestId
+          });
+
           await expect(agent.request(mockRequestPayload)).rejects.toThrow(
             InvalidCertificateReplyError
           );
         });
 
         // TODO: we need a test that assert InvalidCertificateReplyError is throw when the certificate matches an unknown status
+
+        it('should throw an InvalidCertificateReplyError if no request ID is present in response', async () => {
+          // @ts-expect-error: we are testing this on purpose
+          spyCall = vi.spyOn(agent.agent, 'call').mockResolvedValue(mockCallSubmitResponse);
+
+          await expect(agent.request(mockRequestPayload)).rejects.toThrow(
+            InvalidCertificateReplyError
+          );
+        });
       });
     });
 
