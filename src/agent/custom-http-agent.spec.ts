@@ -199,6 +199,27 @@ describe('CustomHttpAgent', () => {
 
           await expect(agent.request(mockRequestPayload)).rejects.toThrow();
         });
+
+        it('should throw InvalidCertificateReplyError if Certificate.create throws an error', async () => {
+          spyCall.mockResolvedValue({
+            ...mockSubmitRestResponse,
+            requestDetails: mockRequestDetails,
+            response: {
+              ...mockResponse,
+              body: {
+                certificate: httpAgent.fromHex(mockRepliedLocalCertificate)
+              }
+            }
+          });
+
+          const spy = vi
+            .spyOn(httpAgent.Certificate, 'create')
+            .mockRejectedValue(new Error('Invalid certificate'));
+
+          await expect(agent.request(mockRequestPayload)).rejects.toThrow('Invalid certificate');
+
+          spy.mockRestore();
+        });
       });
 
       describe('Rejected response', () => {
