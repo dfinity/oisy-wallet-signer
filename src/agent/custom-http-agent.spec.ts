@@ -1,9 +1,13 @@
-import type {SubmitResponse} from '@dfinity/agent';
+import type {RequestId, SubmitResponse} from '@dfinity/agent';
 import * as httpAgent from '@dfinity/agent';
 import {SubmitRequestType, type CallRequest} from '@dfinity/agent/lib/cjs/agent/http/types';
 import {Principal} from '@dfinity/principal';
 import type {MockInstance} from 'vitest';
-import {mockLocalApplicationCertificate} from '../mocks/custom-http-agent.mocks';
+import {
+  mockLocalApplicationCertificate,
+  mockLocalCertificate,
+  mockLocalRequestId
+} from '../mocks/custom-http-agent.mocks';
 import {mockCanisterId, mockPrincipalText} from '../mocks/icrc-accounts.mocks';
 import {base64ToUint8Array, uint8ArrayToBase64} from '../utils/base64.utils';
 import {CustomHttpAgent, RequestError, UndefinedRequestDetailsError} from './custom-http-agent';
@@ -73,7 +77,7 @@ describe('CustomHttpAgent', () => {
   };
 
   beforeEach(() => {
-    vi.setSystemTime(new Date(Date.parse('2023-09-27T20:14:59.406Z')));
+    vi.setSystemTime(new Date(Date.parse('2024-09-18T08:35:00.000Z')));
   });
 
   afterEach(() => {
@@ -100,7 +104,7 @@ describe('CustomHttpAgent', () => {
       describe('Valid response', () => {
         beforeEach(() => {
           const mockBody = {
-            certificate: httpAgent.fromHex(mockLocalApplicationCertificate),
+            certificate: httpAgent.fromHex(mockLocalCertificate),
             status: 'replied'
           };
 
@@ -111,7 +115,8 @@ describe('CustomHttpAgent', () => {
               ...mockResponse,
               // @ts-ignore: Agent-js is not typed correctly.
               body: mockBody
-            }
+            },
+            requestId: mockLocalRequestId.buffer as RequestId
           });
         });
 
