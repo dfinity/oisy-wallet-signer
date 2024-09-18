@@ -14,6 +14,6 @@
 <button
 	{type}
 	{onclick}
-	class="flex gap-2 items-center bg-white border border-blue px-4 py-2 rounded-xl my-2"
+	class="flex gap-2 items-center bg-white border border-blue px-4 py-2 rounded-xl my-2 text-sm"
 	data-tid={testId}>{@render children()}</button
 >

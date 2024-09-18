@@ -69,10 +69,10 @@
     "prepublishOnly": "if [ $(basename $PWD) != 'dist' ]; then echo 'Publishing is only allowed from the dist directory.' && exit 1; fi"
   },
   "devDependencies": {
-    "@dfinity/identity": "^2.0.0",
+    "@dfinity/identity": "^2.1.1",
     "@dfinity/internet-identity-playwright": "^0.0.3",
-    "@playwright/test": "^1.46.1",
-    "@types/jest": "^29.5.12",
+    "@playwright/test": "^1.47.1",
+    "@types/jest": "^29.5.13",
     "@types/node": "^20.12.7",
     "@typescript-eslint/eslint-plugin": "^6.20.0",
     "esbuild": "^0.23.1",
@@ -87,17 +87,17 @@
     "prettier": "^3.3.3",
     "prettier-plugin-organize-imports": "^4.0.0",
     "typescript": "^5.3.3",
-    "vitest": "^2.0.5"
+    "vitest": "^2.1.1"
   },
   "engines": {
     "node": ">=20"
   },
   "peerDependencies": {
-    "@dfinity/agent": "^2.0.0",
-    "@dfinity/candid": "^2.0.0",
-    "@dfinity/ledger-icp": "^2.5.0-next-2024-09-11",
-    "@dfinity/principal": "^2.0.0",
-    "@dfinity/utils": "^2.5.0",
+    "@dfinity/agent": "^2.1.1",
+    "@dfinity/candid": "^2.1.1",
+    "@dfinity/ledger-icp": "^2.5.0-next-2024-09-17",
+    "@dfinity/principal": "^2.1.1",
+    "@dfinity/utils": "^2.5.0-next-2024-09-17",
     "zod": "^3.23.8"
   }
 }

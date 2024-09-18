@@ -10,6 +10,7 @@
 	import Permissions from '$lib/components/Permissions.svelte';
 	import Accounts from '$lib/components/Accounts.svelte';
 	import CallCanister from '$lib/components/CallCanister.svelte';
+	import Balance from '$core/components/Balance.svelte';
 
 	let wallet = $state<IcpWallet | undefined>(undefined);
 
@@ -27,6 +28,8 @@
 </script>
 
 <UserId />
+
+<Balance />
 
 {#if isNullish(wallet)}
 	<div class="pt-6">
