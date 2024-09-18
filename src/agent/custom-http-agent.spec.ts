@@ -98,6 +98,11 @@ describe('CustomHttpAgent', () => {
     const agentOptions = {shouldFetchRootKey: true};
     const agent = await CustomHttpAgent.create(agentOptions);
     expect(agent).toBeInstanceOf(CustomHttpAgent);
+  });
+
+  it('should expose the wrapped agent', async () => {
+    const agent = await CustomHttpAgent.create({});
+    expect(agent.agent).toBeDefined();
     expect(agent.agent).toBeInstanceOf(httpAgent.HttpAgent);
   });
 
