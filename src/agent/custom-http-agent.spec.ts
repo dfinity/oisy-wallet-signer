@@ -6,7 +6,7 @@ import type {MockInstance} from 'vitest';
 import {mockLocalApplicationCertificate} from '../mocks/custom-http-agent.mocks';
 import {mockCanisterId, mockPrincipalText} from '../mocks/icrc-accounts.mocks';
 import {base64ToUint8Array, uint8ArrayToBase64} from '../utils/base64.utils';
-import {CustomHttpAgent} from './custom-http-agent';
+import {CustomHttpAgent, RequestError, UndefinedRequestDetailsError} from './custom-http-agent';
 
 vi.mock('@dfinity/agent', async (importOriginal) => {
   // eslint-disable-next-line @typescript-eslint/consistent-type-imports
@@ -61,6 +61,11 @@ describe('CustomHttpAgent', () => {
     }
   };
 
+  const mockResponse: SubmitResponse = {
+    requestDetails: mockRequestDetails,
+    ...mockRestResponse
+  };
+
   beforeEach(() => {
     vi.setSystemTime(new Date(Date.parse('2023-09-27T20:14:59.406Z')));
   });
@@ -86,10 +91,7 @@ describe('CustomHttpAgent', () => {
     beforeEach(async () => {
       agent = await CustomHttpAgent.create();
 
-      spyCall = vi.spyOn(agent.agent, 'call').mockResolvedValue({
-        requestDetails: mockRequestDetails,
-        ...mockRestResponse
-      });
+      spyCall = vi.spyOn(agent.agent, 'call').mockResolvedValue(mockResponse);
 
       certificate = await Certificate.create({
         certificate: fromHex(mockLocalApplicationCertificate),
@@ -103,28 +105,67 @@ describe('CustomHttpAgent', () => {
       });
     });
 
-    it('should call agent on request', async () => {
-      await agent.request(mockRequestPayload);
+    describe('Valid response', () => {
+      it('should call agent on request', async () => {
+        await agent.request(mockRequestPayload);
 
-      expect(spyCall).toHaveBeenCalledTimes(1);
-      expect(spyCall).toHaveBeenCalledWith(mockCanisterId, {
-        arg: base64ToUint8Array(mockRequestPayload.arg),
-        effectiveCanisterId: mockCanisterId,
-        methodName: mockMethod
+        expect(spyCall).toHaveBeenCalledTimes(1);
+        expect(spyCall).toHaveBeenCalledWith(mockCanisterId, {
+          arg: base64ToUint8Array(mockRequestPayload.arg),
+          effectiveCanisterId: mockCanisterId,
+          methodName: mockMethod
+        });
+      });
+
+      it('should make a request and return a certificate and request details', async () => {
+        const response = await agent.request(mockRequestPayload);
+
+        expect(response.certificate).toEqual(certificate);
+        expect(response.requestDetails).toEqual(mockRequestDetails);
+      });
+
+      it('should poll for response when status is 202 and no certificate is returned by v3 call', async () => {
+        await agent.request(mockRequestPayload);
+
+        expect(spyPollForResponse).toHaveBeenCalledTimes(1);
       });
     });
 
-    it('should make a request and return a certificate and request details', async () => {
-      const response = await agent.request(mockRequestPayload);
+    describe('Invalid response', () => {
+      it('should throw UndefinedRequestDetailsError if requestDetails is null', async () => {
+        spyCall.mockResolvedValue({
+          ...mockRestResponse,
+          requestDetails: null
+        });
 
-      expect(response.certificate).toEqual(certificate);
-      expect(response.requestDetails).toEqual(mockRequestDetails);
-    });
+        await expect(agent.request(mockRequestPayload)).rejects.toThrow(
+          UndefinedRequestDetailsError
+        );
+      });
 
-    it('should poll for response when status is 202 and no certificate is returned by v3 call', async () => {
-      await agent.request(mockRequestPayload);
+      it('should throw RequestError if status is not 202', async () => {
+        spyCall.mockResolvedValue({
+          ...mockResponse,
+          response: {
+            ...mockRestResponse.response,
+            status: 500
+          }
+        });
 
-      expect(spyPollForResponse).toHaveBeenCalledTimes(1);
+        await expect(agent.request(mockRequestPayload)).rejects.toThrow(RequestError);
+      });
+
+      it('should throw RequestError even if status is 200', async () => {
+        spyCall.mockResolvedValue({
+          ...mockResponse,
+          response: {
+            ...mockRestResponse.response,
+            status: 200
+          }
+        });
+
+        await expect(agent.request(mockRequestPayload)).rejects.toThrow(RequestError);
+      });
     });
   });
 
