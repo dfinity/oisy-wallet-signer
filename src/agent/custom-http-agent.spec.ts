@@ -17,6 +17,7 @@ import {base64ToUint8Array, uint8ArrayToBase64} from '../utils/base64.utils';
 import {
   CustomHttpAgent,
   InvalidCertificateReplyError,
+  InvalidCertificateStatusError,
   RequestError,
   UndefinedRequestDetailsError
 } from './custom-http-agent';
@@ -71,7 +72,7 @@ describe('CustomHttpAgent', () => {
       ['content-type', 'application/cbor']
     ],
     ok: true,
-    status: 202,
+    status: 200,
     statusText: 'OK'
   };
 
@@ -122,23 +123,25 @@ describe('CustomHttpAgent', () => {
     });
 
     describe('API v3 / certificate is defined', () => {
+      const mockRepliedBody = {
+        certificate: httpAgent.fromHex(mockRepliedLocalCertificate),
+        status: 'replied'
+      };
+
+      const mockRepliedSubmitResponse: SubmitResponse = {
+        requestDetails: mockRequestDetails,
+        ...mockSubmitRestResponse,
+        response: {
+          ...mockResponse,
+          // @ts-expect-error: Agent-js is not typed correctly.
+          body: mockRepliedBody
+        },
+        requestId: mockRepliedLocalRequestId.buffer as RequestId
+      };
+
       describe('Replied (success) response', () => {
         beforeEach(() => {
-          const mockBody = {
-            certificate: httpAgent.fromHex(mockRepliedLocalCertificate),
-            status: 'replied'
-          };
-
-          spyCall = vi.spyOn(agent.agent, 'call').mockResolvedValue({
-            requestDetails: mockRequestDetails,
-            ...mockSubmitRestResponse,
-            response: {
-              ...mockResponse,
-              // @ts-expect-error: Agent-js is not typed correctly.
-              body: mockBody
-            },
-            requestId: mockRepliedLocalRequestId.buffer as RequestId
-          });
+          spyCall = vi.spyOn(agent.agent, 'call').mockResolvedValue(mockRepliedSubmitResponse);
         });
 
         it('should call agent on request', async () => {
@@ -220,6 +223,23 @@ describe('CustomHttpAgent', () => {
 
           spy.mockRestore();
         });
+
+        it.each([202, 400, 500])(
+          'should throw InvalidCertificateStatusError if certificate is provided with a status %s',
+          async (code) => {
+            spyCall.mockResolvedValue({
+              ...mockRepliedSubmitResponse,
+              response: {
+                ...mockRepliedSubmitResponse.response,
+                status: code
+              }
+            });
+
+            await expect(agent.request(mockRequestPayload)).rejects.toThrow(
+              InvalidCertificateStatusError
+            );
+          }
+        );
       });
 
       describe('Rejected response', () => {
@@ -269,8 +289,16 @@ describe('CustomHttpAgent', () => {
     describe('API v2 / pollForResponse', () => {
       let spyPollForResponse: MockInstance;
 
+      const mockPollSubmitResponse = {
+        ...mockSubmitResponse,
+        response: {
+          ...mockResponse,
+          status: 202
+        }
+      };
+
       beforeEach(async () => {
-        spyCall = vi.spyOn(agent.agent, 'call').mockResolvedValue(mockSubmitResponse);
+        spyCall = vi.spyOn(agent.agent, 'call').mockResolvedValue(mockPollSubmitResponse);
       });
 
       describe('Success', () => {
@@ -376,7 +404,7 @@ describe('CustomHttpAgent', () => {
         });
 
         it('should bubble error if pollForResponse rejects', async () => {
-          spyCall.mockResolvedValue(mockSubmitResponse);
+          spyCall.mockResolvedValue(mockPollSubmitResponse);
 
           await expect(agent.request(mockRequestPayload)).rejects.toThrow('Polling error');
         });
