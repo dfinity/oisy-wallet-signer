@@ -160,6 +160,34 @@ describe('CustomHttpAgent', () => {
         });
       });
 
+      describe('Invalid response', () => {
+        it('should throw UndefinedRequestDetailsError if requestDetails is null', async () => {
+          spyCall.mockResolvedValue({
+            ...mockSubmitRestResponse,
+            requestDetails: null
+          });
+
+          await expect(agent.request(mockRequestPayload)).rejects.toThrow(
+            UndefinedRequestDetailsError
+          );
+        });
+
+        it('should bubble error if bufFromBufLike returns invalid buffer', async () => {
+          spyCall.mockResolvedValue({
+            ...mockSubmitRestResponse,
+            requestDetails: mockRequestDetails,
+            response: {
+              ...mockResponse,
+              body: {
+                certificate: 'invalid-certificate'
+              }
+            }
+          });
+
+          await expect(agent.request(mockRequestPayload)).rejects.toThrow();
+        });
+      });
+
       describe('Rejected response', () => {
         const mockBody = {
           certificate: httpAgent.fromHex(mockRejectedLocalCertificate),
