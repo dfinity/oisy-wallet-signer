@@ -18,6 +18,10 @@ export type CustomHttpAgentResponse = Pick<Required<SubmitResponse>, 'requestDet
   certificate: Certificate;
 };
 
+export class UndefinedRequestDetailsError extends Error {}
+export class RequestError extends Error {}
+export class InvalidCertificateReplyError extends Error {}
+
 // To extend the HttpAgent, we would have to override the static create function.
 // While this is possible, it would require using Object.assign to clone the HttpAgent into a CustomHttpAgent, because the super function does not accept generics.
 // Therefore, it is cleaner in my opinion to encapsulate the agent rather than extend it.
@@ -37,6 +41,9 @@ export class CustomHttpAgent {
     return new CustomHttpAgent(agent);
   }
 
+  /**
+   * We need to expose the agent to create the actor for requesting the consent message.
+   */
   get agent(): HttpAgent {
     return this.#agent;
   }
@@ -60,8 +67,7 @@ export class CustomHttpAgent {
     this.assertRequestDetails(requestDetails);
 
     if (isNullish(requestDetails)) {
-      // TODO proper error
-      throw new Error('Empty content map');
+      throw new UndefinedRequestDetailsError();
     }
 
     const result = await this.readResponse({
@@ -88,8 +94,7 @@ export class CustomHttpAgent {
       });
     }
 
-    // TODO: error
-    throw new Error();
+    throw new RequestError();
   };
 
   private async readResponse({
@@ -124,8 +129,7 @@ export class CustomHttpAgent {
     });
 
     if (replyCheck !== 'valid') {
-      // TODO: error
-      throw new Error();
+      throw new InvalidCertificateReplyError();
     }
 
     return {certificate, requestDetails};
