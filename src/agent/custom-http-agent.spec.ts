@@ -4,13 +4,22 @@ import {SubmitRequestType, type CallRequest} from '@dfinity/agent/lib/cjs/agent/
 import {Principal} from '@dfinity/principal';
 import type {MockInstance} from 'vitest';
 import {
-  mockLocalCertificate,
   mockLocalIcRootKey,
-  mockLocalRequestId
+  mockRejectedLocalCallTime,
+  mockRejectedLocalCertificate,
+  mockRejectedLocalRequestId,
+  mockRepliedLocalCallTime,
+  mockRepliedLocalCertificate,
+  mockRepliedLocalRequestId
 } from '../mocks/custom-http-agent.mocks';
 import {mockCanisterId, mockPrincipalText} from '../mocks/icrc-accounts.mocks';
 import {base64ToUint8Array, uint8ArrayToBase64} from '../utils/base64.utils';
-import {CustomHttpAgent, RequestError, UndefinedRequestDetailsError} from './custom-http-agent';
+import {
+  CustomHttpAgent,
+  InvalidCertificateReplyError,
+  RequestError,
+  UndefinedRequestDetailsError
+} from './custom-http-agent';
 
 vi.mock('@dfinity/agent', async (importOriginal) => {
   // eslint-disable-next-line @typescript-eslint/consistent-type-imports
@@ -67,7 +76,7 @@ describe('CustomHttpAgent', () => {
   };
 
   const mockSubmitRestResponse: Omit<SubmitResponse, 'requestDetails'> = {
-    requestId: mockLocalRequestId.buffer as RequestId,
+    requestId: mockRepliedLocalRequestId.buffer as RequestId,
     response: mockResponse
   };
 
@@ -77,7 +86,7 @@ describe('CustomHttpAgent', () => {
   };
 
   beforeEach(() => {
-    vi.setSystemTime(new Date(Date.parse('2024-09-18T10:20:00.000Z')));
+    vi.setSystemTime(mockRepliedLocalCallTime);
   });
 
   afterEach(() => {
@@ -101,17 +110,17 @@ describe('CustomHttpAgent', () => {
       agent = await CustomHttpAgent.create();
 
       certificate = await httpAgent.Certificate.create({
-        certificate: httpAgent.fromHex(mockLocalCertificate),
+        certificate: httpAgent.fromHex(mockRepliedLocalCertificate),
         canisterId: mockRequestDetails.canister_id,
         rootKey: mockLocalIcRootKey.buffer
       });
     });
 
     describe('API v3 / certificate is defined', () => {
-      describe('Valid response', () => {
+      describe('Replied (success) response', () => {
         beforeEach(() => {
           const mockBody = {
-            certificate: httpAgent.fromHex(mockLocalCertificate),
+            certificate: httpAgent.fromHex(mockRepliedLocalCertificate),
             status: 'replied'
           };
 
@@ -123,7 +132,7 @@ describe('CustomHttpAgent', () => {
               // @ts-expect-error: Agent-js is not typed correctly.
               body: mockBody
             },
-            requestId: mockLocalRequestId.buffer as RequestId
+            requestId: mockRepliedLocalRequestId.buffer as RequestId
           });
         });
 
@@ -146,11 +155,13 @@ describe('CustomHttpAgent', () => {
         });
       });
 
-      describe('Invalid response', () => {
+      describe('Rejected response', () => {
         beforeEach(() => {
+          vi.setSystemTime(mockRejectedLocalCallTime);
+
           const mockBody = {
-            certificate: httpAgent.fromHex(mockLocalCertificate),
-            status: 'replied'
+            certificate: httpAgent.fromHex(mockRejectedLocalCertificate),
+            status: 'rejected'
           };
 
           spyCall = vi.spyOn(agent.agent, 'call').mockResolvedValue({
@@ -161,10 +172,18 @@ describe('CustomHttpAgent', () => {
               // @ts-expect-error: Agent-js is not typed correctly.
               body: mockBody
             },
-            requestId: mockLocalRequestId.buffer as RequestId
+            requestId: mockRejectedLocalRequestId.buffer as RequestId
           });
         });
-      })
+
+        it('should throw an error if the certificate is rejected', async () => {
+          await expect(agent.request(mockRequestPayload)).rejects.toThrow(
+            InvalidCertificateReplyError
+          );
+        });
+
+        // TODO: we need a test that assert InvalidCertificateReplyError is throw when the certificate matches an unknown status
+      });
     });
 
     describe('API v2 / pollForResponse', () => {
