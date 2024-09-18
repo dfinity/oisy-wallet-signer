@@ -95,9 +95,16 @@ describe('CustomHttpAgent', () => {
   describe('Success call', () => {
     let spyCall: MockInstance;
     let agent: CustomHttpAgent;
+    let certificate: httpAgent.Certificate;
 
     beforeEach(async () => {
       agent = await CustomHttpAgent.create();
+
+      certificate = await httpAgent.Certificate.create({
+        certificate: httpAgent.fromHex(mockLocalCertificate),
+        canisterId: mockRequestDetails.canister_id,
+        rootKey: mockLocalIcRootKey.buffer
+      });
     });
 
     describe('API v3 / certificate is defined', () => {
@@ -130,21 +137,21 @@ describe('CustomHttpAgent', () => {
             methodName: mockMethod
           });
         });
+
+        it('should make a request and return a certificate and request details', async () => {
+          const response = await agent.request(mockRequestPayload);
+
+          expect(response.certificate).toEqual(certificate);
+          expect(response.requestDetails).toEqual(mockRequestDetails);
+        });
       });
     });
 
     describe('API v2 / pollForResponse', () => {
       let spyPollForResponse: MockInstance;
-      let certificate: httpAgent.Certificate;
 
       beforeEach(async () => {
         spyCall = vi.spyOn(agent.agent, 'call').mockResolvedValue(mockSubmitResponse);
-
-        certificate = await httpAgent.Certificate.create({
-          certificate: httpAgent.fromHex(mockLocalCertificate),
-          canisterId: mockRequestDetails.canister_id,
-          rootKey: mockLocalIcRootKey.buffer
-        });
       });
 
       describe('Success', () => {
