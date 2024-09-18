@@ -6,6 +6,7 @@ import type {MockInstance} from 'vitest';
 import {
   mockLocalApplicationCertificate,
   mockLocalCertificate,
+  mockLocalIcRootKey,
   mockLocalRequestId
 } from '../mocks/custom-http-agent.mocks';
 import {mockCanisterId, mockPrincipalText} from '../mocks/icrc-accounts.mocks';
@@ -20,7 +21,7 @@ vi.mock('@dfinity/agent', async (importOriginal) => {
     call = vi.fn();
 
     get rootKey(): ArrayBuffer {
-      return httpAgent.fromHex(httpAgent.IC_ROOT_KEY);
+      return mockLocalIcRootKey.buffer;
     }
   }
 
@@ -77,7 +78,7 @@ describe('CustomHttpAgent', () => {
   };
 
   beforeEach(() => {
-    vi.setSystemTime(new Date(Date.parse('2024-09-18T08:35:00.000Z')));
+    vi.setSystemTime(new Date(Date.parse('2024-09-18T10:20:00.000Z')));
   });
 
   afterEach(() => {
