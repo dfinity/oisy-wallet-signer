@@ -14,6 +14,10 @@ vi.mock('@dfinity/agent', async (importOriginal) => {
 
   class MockHttpAgent {
     call = vi.fn();
+
+    get rootKey(): ArrayBuffer {
+      return httpAgent.fromHex(httpAgent.IC_ROOT_KEY);
+    }
   }
 
   Object.defineProperty(MockHttpAgent, 'create', {
@@ -93,16 +97,33 @@ describe('CustomHttpAgent', () => {
     });
 
     describe('API v3 / certificate is defined', () => {
-      beforeEach(() => {
-        spyCall = vi.spyOn(agent.agent, 'call').mockResolvedValue({
-          requestDetails: mockRequestDetails,
-          ...mockSubmitRestResponse,
-          response: {
-            ...mockResponse,
-            body: {
-              certificate: httpAgent.fromHex(mockLocalApplicationCertificate)
+      describe('Valid response', () => {
+        beforeEach(() => {
+          const mockBody = {
+            certificate: httpAgent.fromHex(mockLocalApplicationCertificate),
+            status: 'replied'
+          };
+
+          spyCall = vi.spyOn(agent.agent, 'call').mockResolvedValue({
+            requestDetails: mockRequestDetails,
+            ...mockSubmitRestResponse,
+            response: {
+              ...mockResponse,
+              // @ts-ignore: Agent-js is not typed correctly.
+              body: mockBody
             }
-          }
+          });
+        });
+
+        it.only('should call agent on request', async () => {
+          await agent.request(mockRequestPayload);
+
+          expect(spyCall).toHaveBeenCalledTimes(1);
+          expect(spyCall).toHaveBeenCalledWith(mockCanisterId, {
+            arg: base64ToUint8Array(mockRequestPayload.arg),
+            effectiveCanisterId: mockCanisterId,
+            methodName: mockMethod
+          });
         });
       });
     });
