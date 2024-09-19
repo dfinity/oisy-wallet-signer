@@ -1,6 +1,7 @@
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import type {MockInstance} from 'vitest';
 import {Icrc21Canister} from './api/icrc21-canister.api';
+import {SignerApi} from './api/signer.api';
 import {
   ICRC25_PERMISSIONS,
   ICRC25_PERMISSION_GRANTED,
@@ -627,6 +628,11 @@ describe('Signer', () => {
         }
       };
 
+      const requestCallCanisterMsg = {
+        data: requestCallCanisterData,
+        origin: testOrigin
+      };
+
       const testParams = [
         {method: 'icrc27_accounts' as IcrcScopedMethod, requestData: requestAccountsData},
         {method: 'icrc49_call_canister' as IcrcScopedMethod, requestData: requestCallCanisterData}
@@ -1014,175 +1020,270 @@ describe('Signer', () => {
         });
       });
 
-      describe('Consent message', () => {
-        let spy: MockInstance;
-        let notifyErrorSpy: MockInstance;
-
-        const requestCallCanisterMsg = {
-          data: requestCallCanisterData,
-          origin: testOrigin
-        };
+      describe('Call canister', () => {
+        let spyConsentMessage: MockInstance;
 
         beforeEach(() => {
-          spy = vi.spyOn(Icrc21Canister.prototype, 'consentMessage');
-          notifyErrorSpy = vi.spyOn(signerHandlers, 'notifyError');
+          spyConsentMessage = vi.spyOn(Icrc21Canister.prototype, 'consentMessage');
         });
 
-        describe('Call canister success', () => {
-          beforeEach(() => {
-            spy.mockResolvedValue({
-              Ok: mockConsentInfo
-            });
-          });
-
-          it('should prompt consent message for icrc49_call_canister if permissions were already granted', async () => {
-            const promptSpy = vi.fn();
-
-            signer.register({
-              method: ICRC49_CALL_CANISTER,
-              prompt: promptSpy
-            });
-
-            saveSessionScopes({
-              owner: signerOptions.owner.getPrincipal(),
-              origin: testOrigin,
-              scopes: [
-                {
-                  scope: {method: ICRC49_CALL_CANISTER},
-                  state: IcrcPermissionStateSchema.enum.granted
-                }
-              ]
-            });
-
-            const messageEvent = new MessageEvent('message', requestCallCanisterMsg);
-            window.dispatchEvent(messageEvent);
-
-            await vi.waitFor(() => {
-              expect(promptSpy).toHaveBeenCalledTimes(1);
-            });
-          });
-
-          it('should prompt consent message after prompt for icrc49_call_canister permissions', async () => {
-            let confirm: PermissionsConfirmation | undefined;
-            const promptSpy = vi.fn();
-
-            signer.register({
-              method: ICRC25_REQUEST_PERMISSIONS,
-              prompt: ({confirm: confirmScopes, requestedScopes: _}: PermissionsPromptPayload) => {
-                confirm = confirmScopes;
-              }
-            });
-
-            signer.register({
-              method: ICRC49_CALL_CANISTER,
-              prompt: promptSpy
-            });
-
-            const messageEvent = new MessageEvent('message', requestCallCanisterMsg);
-            window.dispatchEvent(messageEvent);
-
-            await vi.waitFor(() => {
-              expect(confirm).not.toBeUndefined();
-            });
-
-            confirm?.([
-              {
-                scope: {method: ICRC49_CALL_CANISTER},
-                state: IcrcPermissionStateSchema.enum.granted
-              }
-            ]);
-
-            await vi.waitFor(() => {
-              expect(promptSpy).toHaveBeenCalledTimes(1);
-            });
-          });
-
-          it('should notify aborted error for icrc49_call_canister if user reject consent', async () => {
-            let reject: ConsentMessageApproval | undefined;
-
-            const prompt = ({reject: r}: ConsentMessagePromptPayload): void => {
-              reject = r;
-            };
-
-            signer.register({
-              method: ICRC49_CALL_CANISTER,
-              prompt
-            });
-
-            saveSessionScopes({
-              owner: signerOptions.owner.getPrincipal(),
-              origin: testOrigin,
-              scopes: [
-                {
-                  scope: {method: ICRC49_CALL_CANISTER},
-                  state: IcrcPermissionStateSchema.enum.granted
-                }
-              ]
-            });
-
-            const messageEvent = new MessageEvent('message', requestCallCanisterMsg);
-            window.dispatchEvent(messageEvent);
-
-            await vi.waitFor(() => {
-              expect(reject).not.toBeUndefined();
-            });
-
-            reject?.();
-
-            await vi.waitFor(() => {
-              expect(notifyErrorSpy).toHaveBeenCalledWith({
-                id: testId,
-                origin: testOrigin,
-                error: mockErrorNotify
-              });
-            });
-          });
-        });
-
-        describe('Call canister error', () => {
-          const error = {GenericError: {description: 'Error', error_code: 1n}};
+        describe('Consent message', () => {
+          let notifyErrorSpy: MockInstance;
 
           beforeEach(() => {
-            spy.mockResolvedValue({
-              Err: error
-            });
+            notifyErrorSpy = vi.spyOn(signerHandlers, 'notifyError');
           });
 
-          it('should not prompt consent message for icrc49_call_canister if getting message throws an error', async () => {
-            const promptSpy = vi.fn();
-
-            signer.register({
-              method: ICRC49_CALL_CANISTER,
-              prompt: promptSpy
-            });
-
-            saveSessionScopes({
-              owner: signerOptions.owner.getPrincipal(),
-              origin: testOrigin,
-              scopes: [
-                {
-                  scope: {method: ICRC49_CALL_CANISTER},
-                  state: IcrcPermissionStateSchema.enum.granted
-                }
-              ]
-            });
-
-            const messageEvent = new MessageEvent('message', requestCallCanisterMsg);
-            window.dispatchEvent(messageEvent);
-
-            await vi.waitFor(() => {
-              expect(notifyErrorSpy).toHaveBeenCalledWith({
-                id: testId,
-                origin: testOrigin,
-                error: {
-                  code: SignerErrorCode.REQUEST_NOT_SUPPORTED,
-                  message: mapIcrc21ErrorToString(error)
-                }
+          describe('Call canister success', () => {
+            beforeEach(() => {
+              spyConsentMessage.mockResolvedValue({
+                Ok: mockConsentInfo
               });
             });
 
-            expect(promptSpy).not.toHaveBeenCalledTimes(1);
+            it('should prompt consent message for icrc49_call_canister if permissions were already granted', async () => {
+              const promptSpy = vi.fn();
+
+              signer.register({
+                method: ICRC49_CALL_CANISTER,
+                prompt: promptSpy
+              });
+
+              saveSessionScopes({
+                owner: signerOptions.owner.getPrincipal(),
+                origin: testOrigin,
+                scopes: [
+                  {
+                    scope: {method: ICRC49_CALL_CANISTER},
+                    state: IcrcPermissionStateSchema.enum.granted
+                  }
+                ]
+              });
+
+              const messageEvent = new MessageEvent('message', requestCallCanisterMsg);
+              window.dispatchEvent(messageEvent);
+
+              await vi.waitFor(() => {
+                expect(promptSpy).toHaveBeenCalledTimes(1);
+              });
+            });
+
+            it('should prompt consent message after prompt for icrc49_call_canister permissions', async () => {
+              let confirm: PermissionsConfirmation | undefined;
+              const promptSpy = vi.fn();
+
+              signer.register({
+                method: ICRC25_REQUEST_PERMISSIONS,
+                prompt: ({
+                  confirm: confirmScopes,
+                  requestedScopes: _
+                }: PermissionsPromptPayload) => {
+                  confirm = confirmScopes;
+                }
+              });
+
+              signer.register({
+                method: ICRC49_CALL_CANISTER,
+                prompt: promptSpy
+              });
+
+              const messageEvent = new MessageEvent('message', requestCallCanisterMsg);
+              window.dispatchEvent(messageEvent);
+
+              await vi.waitFor(() => {
+                expect(confirm).not.toBeUndefined();
+              });
+
+              confirm?.([
+                {
+                  scope: {method: ICRC49_CALL_CANISTER},
+                  state: IcrcPermissionStateSchema.enum.granted
+                }
+              ]);
+
+              await vi.waitFor(() => {
+                expect(promptSpy).toHaveBeenCalledTimes(1);
+              });
+            });
+
+            it('should notify aborted error for icrc49_call_canister if user reject consent', async () => {
+              let reject: ConsentMessageApproval | undefined;
+
+              const prompt = ({reject: r}: ConsentMessagePromptPayload): void => {
+                reject = r;
+              };
+
+              signer.register({
+                method: ICRC49_CALL_CANISTER,
+                prompt
+              });
+
+              saveSessionScopes({
+                owner: signerOptions.owner.getPrincipal(),
+                origin: testOrigin,
+                scopes: [
+                  {
+                    scope: {method: ICRC49_CALL_CANISTER},
+                    state: IcrcPermissionStateSchema.enum.granted
+                  }
+                ]
+              });
+
+              const messageEvent = new MessageEvent('message', requestCallCanisterMsg);
+              window.dispatchEvent(messageEvent);
+
+              await vi.waitFor(() => {
+                expect(reject).not.toBeUndefined();
+              });
+
+              reject?.();
+
+              await vi.waitFor(() => {
+                expect(notifyErrorSpy).toHaveBeenCalledWith({
+                  id: testId,
+                  origin: testOrigin,
+                  error: mockErrorNotify
+                });
+              });
+            });
           });
+
+          describe('Call canister error', () => {
+            const error = {GenericError: {description: 'Error', error_code: 1n}};
+
+            beforeEach(() => {
+              spyConsentMessage.mockResolvedValue({
+                Err: error
+              });
+            });
+
+            it('should not prompt consent message for icrc49_call_canister if getting message throws an error', async () => {
+              const promptSpy = vi.fn();
+
+              signer.register({
+                method: ICRC49_CALL_CANISTER,
+                prompt: promptSpy
+              });
+
+              saveSessionScopes({
+                owner: signerOptions.owner.getPrincipal(),
+                origin: testOrigin,
+                scopes: [
+                  {
+                    scope: {method: ICRC49_CALL_CANISTER},
+                    state: IcrcPermissionStateSchema.enum.granted
+                  }
+                ]
+              });
+
+              const messageEvent = new MessageEvent('message', requestCallCanisterMsg);
+              window.dispatchEvent(messageEvent);
+
+              await vi.waitFor(() => {
+                expect(notifyErrorSpy).toHaveBeenCalledWith({
+                  id: testId,
+                  origin: testOrigin,
+                  error: {
+                    code: SignerErrorCode.REQUEST_NOT_SUPPORTED,
+                    message: mapIcrc21ErrorToString(error)
+                  }
+                });
+              });
+
+              expect(promptSpy).not.toHaveBeenCalledTimes(1);
+            });
+          });
+        });
+
+        describe('Execute call', () => {
+          let spyCanisterCall: MockInstance;
+          // TODO: we do not notify yet
+          // let notifyErrorSpy: MockInstance;
+
+          beforeEach(() => {
+            spyCanisterCall = vi.spyOn(SignerApi.prototype, 'call');
+          });
+
+          describe('No call without consent message first', () => {
+            beforeEach(() => {
+              spyConsentMessage.mockResolvedValue({
+                Ok: mockConsentInfo
+              });
+            });
+
+            it('should not call if consent message is pending even if permissions were already granted', async () => {
+              const promptSpy = vi.fn();
+
+              signer.register({
+                method: ICRC49_CALL_CANISTER,
+                prompt: promptSpy
+              });
+
+              saveSessionScopes({
+                owner: signerOptions.owner.getPrincipal(),
+                origin: testOrigin,
+                scopes: [
+                  {
+                    scope: {method: ICRC49_CALL_CANISTER},
+                    state: IcrcPermissionStateSchema.enum.granted
+                  }
+                ]
+              });
+
+              const messageEvent = new MessageEvent('message', requestCallCanisterMsg);
+              window.dispatchEvent(messageEvent);
+
+              await vi.waitFor(() => {
+                expect(promptSpy).toHaveBeenCalledTimes(1);
+              });
+
+              expect(spyCanisterCall).not.toHaveBeenCalled();
+            });
+
+            it('should not call if consent message is pending even if permissions were literally approved', async () => {
+              let confirm: PermissionsConfirmation | undefined;
+              const promptSpy = vi.fn();
+
+              signer.register({
+                method: ICRC25_REQUEST_PERMISSIONS,
+                prompt: ({
+                  confirm: confirmScopes,
+                  requestedScopes: _
+                }: PermissionsPromptPayload) => {
+                  confirm = confirmScopes;
+                }
+              });
+
+              signer.register({
+                method: ICRC49_CALL_CANISTER,
+                prompt: promptSpy
+              });
+
+              const messageEvent = new MessageEvent('message', requestCallCanisterMsg);
+              window.dispatchEvent(messageEvent);
+
+              await vi.waitFor(() => {
+                expect(confirm).not.toBeUndefined();
+              });
+
+              confirm?.([
+                {
+                  scope: {method: ICRC49_CALL_CANISTER},
+                  state: IcrcPermissionStateSchema.enum.granted
+                }
+              ]);
+
+              await vi.waitFor(() => {
+                expect(promptSpy).toHaveBeenCalledTimes(1);
+              });
+
+              expect(spyCanisterCall).not.toHaveBeenCalled();
+            });
+          });
+
+          // TODO: call canister success
+
+          // TODO: call canister error
         });
       });
     });
