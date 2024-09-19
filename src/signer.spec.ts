@@ -17,7 +17,7 @@ import {
   SignerErrorCode
 } from './constants/signer.constants';
 import * as signerHandlers from './handlers/signer.handlers';
-import {mockCallCanisterParams} from './mocks/call-canister.mocks';
+import {mockCallCanisterParams, mockCallCanisterSuccess} from './mocks/call-canister.mocks';
 import {mockConsentInfo} from './mocks/consent-message.mocks';
 import {mockAccounts} from './mocks/icrc-accounts.mocks';
 import {mockErrorNotify} from './mocks/signer-error.mocks';
@@ -1352,19 +1352,41 @@ describe('Signer', () => {
               approve?.();
             });
 
-            it("should call canister and notify success", async () => {
-              expect(spyCanisterCall).toHaveBeenNthCalledWith(1, {
-                ...signerOptions,
-                params: {
-                  ...mockCallCanisterParams,
-                  sender: owner.getPrincipal().toText()
-                }
+            describe('Call success', () => {
+              beforeEach(() => {
+                spyCanisterCall.mockResolvedValue(mockCallCanisterSuccess);
               });
 
-              // TODO: test notify which is not yet implemented
-            })
+              it('should call canister and notify success', async () => {
+                expect(spyCanisterCall).toHaveBeenNthCalledWith(1, {
+                  ...signerOptions,
+                  params: {
+                    ...mockCallCanisterParams,
+                    sender: owner.getPrincipal().toText()
+                  }
+                });
 
-            // TODO: call canister error
+                // TODO: test notify which is not yet implemented
+              });
+            });
+
+            describe('Call error', () => {
+              beforeEach(() => {
+                spyCanisterCall.mockResolvedValue(new Error('Test error'));
+              });
+
+              it('should call canister and notify success', async () => {
+                expect(spyCanisterCall).toHaveBeenNthCalledWith(1, {
+                  ...signerOptions,
+                  params: {
+                    ...mockCallCanisterParams,
+                    sender: owner.getPrincipal().toText()
+                  }
+                });
+
+                // TODO: test notify error which is not yet implemented
+              });
+            });
           });
         });
       });
