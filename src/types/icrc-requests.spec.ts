@@ -1,5 +1,5 @@
 import {ICRC27_ACCOUNTS} from '../constants/icrc.constants';
-import {mockPrincipalText} from '../mocks/icrc-accounts.mocks';
+import {mockCallCanisterParams} from '../mocks/call-canister.mocks';
 import {uint8ArrayToBase64} from '../utils/base64.utils';
 import {
   IcrcAccountsRequestSchema,
@@ -240,12 +240,7 @@ describe('icrc-requests', () => {
       jsonrpc: JSON_RPC_VERSION_2,
       id: 1,
       method: 'icrc49_call_canister',
-      params: {
-        canisterId: mockPrincipalText,
-        sender: mockPrincipalText,
-        method: 'some_method',
-        arg: uint8ArrayToBase64(new Uint8Array([1, 2, 3, 4]))
-      }
+      params: mockCallCanisterParams
     };
 
     it('should validate a correct request', () => {
@@ -366,20 +361,13 @@ describe('icrc-requests', () => {
   });
 
   describe('IcrcCallCanisterRequestParamsSchema', () => {
-    const validParams = {
-      canisterId: mockPrincipalText,
-      sender: mockPrincipalText,
-      method: 'some_method',
-      arg: uint8ArrayToBase64(new Uint8Array([1, 2, 3, 4]))
-    };
-
     it('should validate a correct request params', () => {
-      expect(() => IcrcCallCanisterRequestParamsSchema.parse(validParams)).not.toThrow();
+      expect(() => IcrcCallCanisterRequestParamsSchema.parse(mockCallCanisterParams)).not.toThrow();
     });
 
     it('should fail validation when "canisterId" is invalid', () => {
       const invalidParams = {
-        ...validParams,
+        ...mockCallCanisterParams,
         canisterId: 'invalid-principal'
       };
       expect(() => IcrcCallCanisterRequestParamsSchema.parse(invalidParams)).toThrow();
@@ -387,7 +375,7 @@ describe('icrc-requests', () => {
 
     it('should fail validation when "sender" is invalid', () => {
       const invalidParams = {
-        ...validParams,
+        ...mockCallCanisterParams,
         sender: 'invalid-principal'
       };
       expect(() => IcrcCallCanisterRequestParamsSchema.parse(invalidParams)).toThrow();
@@ -395,7 +383,7 @@ describe('icrc-requests', () => {
 
     it('should fail validation when "method" is an empty string', () => {
       const invalidParams = {
-        ...validParams,
+        ...mockCallCanisterParams,
         method: ''
       };
       expect(() => IcrcCallCanisterRequestParamsSchema.parse(invalidParams)).toThrow();
@@ -403,7 +391,7 @@ describe('icrc-requests', () => {
 
     it('should fail validation when "arg" is not a Uint8Array', () => {
       const invalidParams = {
-        ...validParams,
+        ...mockCallCanisterParams,
         arg: 'not-a-Uint8Array'
       };
       expect(() => IcrcCallCanisterRequestParamsSchema.parse(invalidParams)).toThrow();
@@ -411,7 +399,7 @@ describe('icrc-requests', () => {
 
     it('should pass validation when "nonce" is a valid Uint8Array of length <= 32', () => {
       const validMemoParams = {
-        ...validParams,
+        ...mockCallCanisterParams,
         nonce: uint8ArrayToBase64(new Uint8Array(20))
       };
       expect(() => IcrcCallCanisterRequestParamsSchema.parse(validMemoParams)).not.toThrow();
@@ -419,7 +407,7 @@ describe('icrc-requests', () => {
 
     it('should pass validation when "nonce" is a valid Uint8Array of length = 32', () => {
       const validMemoParams = {
-        ...validParams,
+        ...mockCallCanisterParams,
         nonce: uint8ArrayToBase64(new Uint8Array(32))
       };
       expect(() => IcrcCallCanisterRequestParamsSchema.parse(validMemoParams)).not.toThrow();
@@ -427,32 +415,32 @@ describe('icrc-requests', () => {
 
     it('should fail validation when "nonce" exceeds 32 bytes', () => {
       const invalidMemoParams = {
-        ...validParams,
+        ...mockCallCanisterParams,
         nonce: new Uint8Array(33)
       };
       expect(() => IcrcCallCanisterRequestParamsSchema.parse(invalidMemoParams)).toThrow();
     });
 
     it('should fail validation when "canisterId" is missing', () => {
-      const {canisterId: _, ...rest} = validParams;
+      const {canisterId: _, ...rest} = mockCallCanisterParams;
 
       expect(() => IcrcCallCanisterRequestParamsSchema.parse(rest)).toThrow();
     });
 
     it('should fail validation when "sender" is missing', () => {
-      const {sender: _, ...rest} = validParams;
+      const {sender: _, ...rest} = mockCallCanisterParams;
 
       expect(() => IcrcCallCanisterRequestParamsSchema.parse(rest)).toThrow();
     });
 
     it('should fail validation when "method" is missing', () => {
-      const {method: _, ...rest} = validParams;
+      const {method: _, ...rest} = mockCallCanisterParams;
 
       expect(() => IcrcCallCanisterRequestParamsSchema.parse(rest)).toThrow();
     });
 
     it('should fail validation when "arg" is missing', () => {
-      const {arg: _, ...rest} = validParams;
+      const {arg: _, ...rest} = mockCallCanisterParams;
 
       expect(() => IcrcCallCanisterRequestParamsSchema.parse(rest)).toThrow();
     });

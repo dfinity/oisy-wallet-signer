@@ -16,8 +16,9 @@ import {
   SignerErrorCode
 } from './constants/signer.constants';
 import * as signerHandlers from './handlers/signer.handlers';
+import {mockCallCanisterParams} from './mocks/call-canister.mocks';
 import {mockConsentInfo} from './mocks/consent-message.mocks';
-import {mockAccounts, mockCanisterId} from './mocks/icrc-accounts.mocks';
+import {mockAccounts} from './mocks/icrc-accounts.mocks';
 import {mockErrorNotify} from './mocks/signer-error.mocks';
 import {saveSessionScopes} from './sessions/signer.sessions';
 import {Signer} from './signer';
@@ -45,7 +46,6 @@ import {
   type Rejection
 } from './types/signer-prompts';
 import type {SessionPermissions} from './types/signer-sessions';
-import {uint8ArrayToBase64} from './utils/base64.utils';
 import {mapIcrc21ErrorToString} from './utils/icrc-21.utils';
 import {del, get} from './utils/storage.utils';
 
@@ -619,12 +619,7 @@ describe('Signer', () => {
         id: testId,
         jsonrpc: JSON_RPC_VERSION_2,
         method: ICRC49_CALL_CANISTER,
-        params: {
-          canisterId: mockCanisterId,
-          sender: owner.getPrincipal().toText(),
-          method: 'some_method',
-          arg: uint8ArrayToBase64(new Uint8Array([1, 2, 3, 4]))
-        }
+        params: mockCallCanisterParams
       };
 
       const testParams = [
