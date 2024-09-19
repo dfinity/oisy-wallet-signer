@@ -1,6 +1,6 @@
 import {Principal} from '@dfinity/principal';
 import {isNullish} from '@dfinity/utils';
-import {Icrc21Canister} from '../api/icrc21-canister.api';
+import {SignerApi} from '../api/signer.api';
 import {
   notifyErrorActionAborted,
   notifyErrorRequestNotSupported,
@@ -20,7 +20,7 @@ import {base64ToUint8Array} from '../utils/base64.utils';
 import {mapIcrc21ErrorToString} from '../utils/icrc-21.utils';
 
 export class SignerService {
-  readonly #icrc21Canister = new Icrc21Canister();
+  readonly #signerApi = new SignerApi();
 
   async assertAndPromptConsentMessage({
     params: {canisterId, method, arg, sender},
@@ -46,7 +46,7 @@ export class SignerService {
     }
 
     try {
-      const response = await this.#icrc21Canister.consentMessage({
+      const response = await this.#signerApi.consentMessage({
         owner,
         host,
         canisterId,
@@ -97,6 +97,22 @@ export class SignerService {
 
       return {result: 'error'};
     }
+  }
+
+  // TODO: return, error, notify, result, etc.
+  async callCanister({
+    params,
+    notify: _TODO,
+    options
+  }: {
+    params: IcrcCallCanisterRequestParams;
+    notify: Notify;
+    options: SignerOptions;
+  }): Promise<void> {
+    await this.#signerApi.call({
+      ...options,
+      params
+    });
   }
 
   private assertSender({
