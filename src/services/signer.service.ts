@@ -102,7 +102,7 @@ export class SignerService {
   // TODO: return, error, notify, result, etc.
   async callCanister({
     params,
-    notify,
+    notify: _TODO,
     options
   }: {
     params: IcrcCallCanisterRequestParams;
