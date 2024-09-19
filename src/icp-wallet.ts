@@ -62,6 +62,25 @@ export class IcpWallet extends RelyingParty {
 
     const arg = uint8ArrayToBase64(new Uint8Array(IDL.encode([TransferArg], [rawRequest])));
 
+    // TODO: uncomment nonce and add TODO - not yet supported by agent-js
+
+    // TODO: decode contentMap cbor to CallRequest
+    // TODO: requestIdOf(contentMap) => requestId
+    // TODO: contentMap (which is a CallRequest) contains arg and method and canister and sender
+    // TODO: const certificate = await Certificate.create({
+    //       certificate: bufFromBufLike(cert),
+    //       rootKey: this.rootKey,
+    //       canisterId: Principal.fromText(canisterId)
+    //     });
+    //
+    //     const path = [new TextEncoder().encode('request_status'), requestId];
+    //
+    //     const status = new TextDecoder().decode(
+    //       lookupResultToBuffer(certificate.lookup([...path, 'status']))
+    //     );
+    // reply = lookupResultToBuffer(certificate.lookup([...path, 'reply']));
+    // TODO: decode reply with Candid
+
     return await this.call({
       params: {
         sender: owner,
