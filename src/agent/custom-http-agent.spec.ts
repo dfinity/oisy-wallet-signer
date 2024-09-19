@@ -1,7 +1,5 @@
 import type {RequestId, SubmitResponse} from '@dfinity/agent';
 import * as httpAgent from '@dfinity/agent';
-import {SubmitRequestType, type CallRequest} from '@dfinity/agent/lib/cjs/agent/http/types';
-import {Principal} from '@dfinity/principal';
 import type {MockInstance} from 'vitest';
 import {
   mockLocalIcRootKey,
@@ -11,9 +9,14 @@ import {
   mockRepliedLocalCallTime,
   mockRepliedLocalCertificate,
   mockRepliedLocalRequestId
+} from '../mocks/custom-http-agent-responses.mocks';
+import {
+  mockRequestDetails,
+  mockRequestMethod,
+  mockRequestPayload
 } from '../mocks/custom-http-agent.mocks';
-import {mockCanisterId, mockPrincipalText} from '../mocks/icrc-accounts.mocks';
-import {base64ToUint8Array, uint8ArrayToBase64} from '../utils/base64.utils';
+import {mockCanisterId} from '../mocks/icrc-accounts.mocks';
+import {base64ToUint8Array} from '../utils/base64.utils';
 import {
   CustomHttpAgent,
   InvalidCertificateReplyError,
@@ -48,24 +51,6 @@ vi.mock('@dfinity/agent', async (importOriginal) => {
 });
 
 describe('CustomHttpAgent', () => {
-  const mockMethod = 'test-method';
-
-  const mockRequestPayload = {
-    arg: uint8ArrayToBase64(new Uint8Array([1, 2, 3, 4])),
-    canisterId: mockCanisterId,
-    method: mockMethod
-  };
-
-  const mockRequestDetails: CallRequest = {
-    arg: new Uint8Array([68, 73, 68, 76, 6, 109, 123, 110, 0, 108]),
-    canister_id: Principal.fromText(mockCanisterId),
-    ingress_expiry: expect.anything(),
-    method_name: mockMethod,
-    nonce: expect.anything(),
-    request_type: SubmitRequestType.Call,
-    sender: Principal.fromText(mockPrincipalText)
-  };
-
   const mockResponse: SubmitResponse['response'] = {
     body: null,
     headers: [
@@ -163,7 +148,7 @@ describe('CustomHttpAgent', () => {
           expect(spyCall).toHaveBeenCalledWith(mockCanisterId, {
             arg: base64ToUint8Array(mockRequestPayload.arg),
             effectiveCanisterId: mockCanisterId,
-            methodName: mockMethod
+            methodName: mockRequestMethod
           });
         });
 
@@ -329,7 +314,7 @@ describe('CustomHttpAgent', () => {
             expect(spyCall).toHaveBeenCalledWith(mockCanisterId, {
               arg: base64ToUint8Array(mockRequestPayload.arg),
               effectiveCanisterId: mockCanisterId,
-              methodName: mockMethod
+              methodName: mockRequestMethod
             });
           });
 
@@ -430,7 +415,7 @@ describe('CustomHttpAgent', () => {
       agent.request({
         arg: 'base64-encoded-argument',
         canisterId: mockCanisterId,
-        method: mockMethod
+        method: mockRequestMethod
       })
     ).rejects.toThrow('Invalid character');
   });
