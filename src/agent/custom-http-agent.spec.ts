@@ -11,7 +11,7 @@ import {
   mockRepliedLocalCallTime,
   mockRepliedLocalCertificate,
   mockRepliedLocalRequestId
-} from '../mocks/custom-http-agent.mocks';
+} from '../mocks/custom-http-agent-responses.mocks';
 import {mockCanisterId, mockPrincipalText} from '../mocks/icrc-accounts.mocks';
 import {base64ToUint8Array, uint8ArrayToBase64} from '../utils/base64.utils';
 import {
