@@ -6,10 +6,9 @@ import {
   ICRC27_ACCOUNTS,
   ICRC49_CALL_CANISTER
 } from '../constants/icrc.constants';
-import {mockPrincipalText} from '../mocks/icrc-accounts.mocks';
-import type {IcrcAnyRequestedScopes, IcrcCallCanisterRequestParams} from '../types/icrc-requests';
+import {mockCallCanisterParams} from '../mocks/call-canister.mocks';
+import type {IcrcAnyRequestedScopes} from '../types/icrc-requests';
 import {JSON_RPC_VERSION_2} from '../types/rpc';
-import {uint8ArrayToBase64} from '../utils/base64.utils';
 import type {ReadyOrError} from '../utils/timeout.utils';
 import {
   permissions,
@@ -230,29 +229,22 @@ describe('Relying Party handlers', () => {
   });
 
   describe('Request accounts', () => {
-    const params: IcrcCallCanisterRequestParams = {
-      canisterId: mockPrincipalText,
-      sender: mockPrincipalText,
-      method: 'some_method',
-      arg: uint8ArrayToBase64(new Uint8Array([1, 2, 3, 4]))
-    };
-
     it('should send the correct message to the popup', () => {
-      requestCallCanister({id: testId, popup, origin: testOrigin, params});
+      requestCallCanister({id: testId, popup, origin: testOrigin, params: mockCallCanisterParams});
 
       expect(postMessageMock).toHaveBeenCalledWith(
         {
           jsonrpc: JSON_RPC_VERSION_2,
           id: testId,
           method: ICRC49_CALL_CANISTER,
-          params
+          params: mockCallCanisterParams
         },
         testOrigin
       );
     });
 
     it('should bring the popup in front with focus', () => {
-      requestCallCanister({id: testId, popup, origin: testOrigin, params});
+      requestCallCanister({id: testId, popup, origin: testOrigin, params: mockCallCanisterParams});
 
       expect(focusMock).toHaveBeenCalledTimes(1);
     });
