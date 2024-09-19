@@ -20,9 +20,10 @@ import {
   DEFAULT_SIGNER_WINDOW_TOP_RIGHT
 } from './constants/window.constants';
 import * as relyingPartyHandlers from './handlers/relying-party.handlers';
-import {mockAccounts, mockPrincipalText} from './mocks/icrc-accounts.mocks';
+import {mockCallCanisterParams} from './mocks/call-canister.mocks';
+import {mockAccounts} from './mocks/icrc-accounts.mocks';
 import {RelyingParty} from './relying-party';
-import type {IcrcAnyRequestedScopes, IcrcCallCanisterRequestParams} from './types/icrc-requests';
+import type {IcrcAnyRequestedScopes} from './types/icrc-requests';
 import {
   IcrcAccountsResponseSchema,
   IcrcCallCanisterResultResponseSchema,
@@ -1070,13 +1071,6 @@ describe('Relying Party', () => {
     describe('Call', () => {
       let relyingParty: RelyingParty;
 
-      const params: IcrcCallCanisterRequestParams = {
-        canisterId: mockPrincipalText,
-        sender: mockPrincipalText,
-        method: 'some_method',
-        arg: uint8ArrayToBase64(new Uint8Array([1, 2, 3, 4, 5, 6, 7]))
-      };
-
       const result: IcrcCallCanisterResult = {
         contentMap: uint8ArrayToBase64(new Uint8Array([1, 2, 3, 4])),
         certificate: uint8ArrayToBase64(new Uint8Array([5, 6, 7, 8]))
@@ -1121,7 +1115,7 @@ describe('Relying Party', () => {
 
               const timeout = options?.timeoutInMilliseconds ?? RELYING_PARTY_TIMEOUT_CALL_CANISTER;
 
-              relyingParty.call({options, params}).catch((err: Error) => {
+              relyingParty.call({options, params: mockCallCanisterParams}).catch((err: Error) => {
                 expect(err.message).toBe(
                   `Request to signer timed out after ${timeout} milliseconds.`
                 );
@@ -1142,7 +1136,7 @@ describe('Relying Party', () => {
 
             const spy = vi.spyOn(IcrcCallCanisterResultResponseSchema, 'safeParse');
 
-            relyingParty.call({params}).catch((err: Error) => {
+            relyingParty.call({params: mockCallCanisterParams}).catch((err: Error) => {
               expect(err.message).toBe(
                 `Request to signer timed out after ${RELYING_PARTY_TIMEOUT_CALL_CANISTER} milliseconds.`
               );
@@ -1171,7 +1165,7 @@ describe('Relying Party', () => {
         it('should throw error if the message received comes from another origin', async () => {
           const hackerOrigin = 'https://hacker.com';
 
-          const promise = relyingParty.call({params});
+          const promise = relyingParty.call({params: mockCallCanisterParams});
 
           const messageEvent = new MessageEvent('message', {
             origin: hackerOrigin,
@@ -1192,7 +1186,10 @@ describe('Relying Party', () => {
         it('should throw a response error if the signer notify an error', async () => {
           const testId = crypto.randomUUID();
 
-          const promise = relyingParty.call({options: {requestId: testId}, params});
+          const promise = relyingParty.call({
+            options: {requestId: testId},
+            params: mockCallCanisterParams
+          });
 
           const errorMsg = 'This is a test error.';
 
@@ -1235,7 +1232,7 @@ describe('Relying Party', () => {
           const spy = vi.spyOn(relyingPartyHandlers, 'requestCallCanister');
           const spyPostMessage = vi.spyOn(window, 'postMessage');
 
-          const promise = relyingParty.call({options: {requestId}, params});
+          const promise = relyingParty.call({options: {requestId}, params: mockCallCanisterParams});
 
           window.dispatchEvent(messageEventScopes);
 
@@ -1248,14 +1245,14 @@ describe('Relying Party', () => {
             expect.objectContaining({
               jsonrpc: JSON_RPC_VERSION_2,
               method: ICRC49_CALL_CANISTER,
-              params
+              params: mockCallCanisterParams
             }),
             mockParameters.url
           );
         });
 
         it('should respond with the result', async () => {
-          const promise = relyingParty.call({options: {requestId}, params});
+          const promise = relyingParty.call({options: {requestId}, params: mockCallCanisterParams});
 
           window.dispatchEvent(messageEventScopes);
 
