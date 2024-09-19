@@ -9,7 +9,7 @@
 	import { authStore } from '$core/stores/auth.store';
 	import type { Icrc1TransferRequest } from '@dfinity/ledger-icp';
 	import Balance from '$core/components/Balance.svelte';
-	import {E8S_PER_ICP} from "$core/constants/app.constants";
+	import { E8S_PER_ICP } from '$core/constants/app.constants';
 
 	type Props = {
 		wallet: IcpWallet | undefined;
