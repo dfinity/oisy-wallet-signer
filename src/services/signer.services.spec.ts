@@ -3,6 +3,7 @@ import type {Mock, MockInstance} from 'vitest';
 import {Icrc21Canister} from '../api/icrc21-canister.api';
 import {SignerApi} from '../api/signer.api';
 import {SignerErrorCode} from '../constants/signer.constants';
+import {mockCallCanisterParams} from '../mocks/call-canister.mocks';
 import {mockCanisterCallSuccess, mockConsentInfo} from '../mocks/consent-message.mocks';
 import {mockPrincipalText} from '../mocks/icrc-accounts.mocks';
 import {mockErrorNotify} from '../mocks/signer-error.mocks';
@@ -11,7 +12,7 @@ import {JSON_RPC_VERSION_2, type RpcId, type RpcResponseWithError} from '../type
 import type {Notify} from '../types/signer-handlers';
 import type {SignerOptions} from '../types/signer-options';
 import type {ConsentMessagePromptPayload} from '../types/signer-prompts';
-import {base64ToUint8Array, uint8ArrayToBase64} from '../utils/base64.utils';
+import {base64ToUint8Array} from '../utils/base64.utils';
 import {mapIcrc21ErrorToString} from '../utils/icrc-21.utils';
 import {SignerService} from './signer.service';
 
@@ -25,10 +26,8 @@ describe('Signer services', () => {
   const owner = Ed25519KeyIdentity.generate();
 
   const params: IcrcCallCanisterRequestParams = {
-    canisterId: mockPrincipalText,
-    sender: owner.getPrincipal().toText(),
-    method: 'some_method',
-    arg: uint8ArrayToBase64(new Uint8Array([1, 2, 3, 4]))
+    ...mockCallCanisterParams,
+    sender: owner.getPrincipal().toText()
   };
 
   const signerOptions: SignerOptions = {
