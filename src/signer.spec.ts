@@ -1353,9 +1353,13 @@ describe('Signer', () => {
             });
 
             it("should call canister and notify success", async () => {
-
-
-              expect(spyCanisterCall).toHaveBeenNthCalledWith(1, {});
+              expect(spyCanisterCall).toHaveBeenNthCalledWith(1, {
+                ...signerOptions,
+                params: {
+                  ...mockCallCanisterParams,
+                  sender: owner.getPrincipal().toText()
+                }
+              });
 
               // TODO: test notify which is not yet implemented
             })
