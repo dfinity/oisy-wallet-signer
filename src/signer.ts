@@ -45,6 +45,7 @@ import type {Origin} from './types/post-message';
 import {RpcRequestSchema, type RpcId} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
 import {MissingPromptError} from './types/signer-errors';
+import type {Notify} from './types/signer-handlers';
 import type {IdentityNotAnonymous, SignerHost, SignerOptions} from './types/signer-options';
 import {
   AccountsPromptSchema,
@@ -535,24 +536,33 @@ export class Signer {
         return {handled: true};
       }
 
+      const notify: Notify = {
+        id: requestId,
+        origin
+      };
+
+      // TODO: instead of splitting the options in the constructor should we just hold #signerOptions as class member?
+      const options: SignerOptions = {
+        host: this.#host,
+        owner: this.#owner
+      };
+
       const {result: userConsent} = await this.#signerService.assertAndPromptConsentMessage({
-        notify: {
-          id: requestId,
-          origin
-        },
+        notify,
         params,
         prompt: this.#consentMessagePrompt,
-        options: {
-          host: this.#host,
-          owner: this.#owner
-        }
+        options
       });
 
       if (userConsent !== 'approved') {
         return {handled: true};
       }
 
-      // TODO: call canister
+      await this.#signerService.callCanister({
+        notify,
+        params,
+        options
+      });
 
       return {handled: true};
     }
