@@ -619,7 +619,10 @@ describe('Signer', () => {
         id: testId,
         jsonrpc: JSON_RPC_VERSION_2,
         method: ICRC49_CALL_CANISTER,
-        params: mockCallCanisterParams
+        params: {
+          ...mockCallCanisterParams,
+          sender: owner.getPrincipal().toText()
+        }
       };
 
       const testParams = [
