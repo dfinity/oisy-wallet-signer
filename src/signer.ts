@@ -99,6 +99,10 @@ export class Signer {
     this.#walletOrigin = null;
   };
 
+  // TODO: onbeforeupload, the signer should notify an error 4001 if and only if there is a pending request at the same time.
+  // This means that the signer will have to keep track of its activity.
+  // See https://dfinity.slack.com/archives/D033WHSRZLH/p1726830103487179
+
   private readonly onMessageListener = (message: SignerMessageEvent): void => {
     void this.onMessage(message);
   };
