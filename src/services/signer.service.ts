@@ -1,5 +1,5 @@
 import {Principal} from '@dfinity/principal';
-import {isNullish} from '@dfinity/utils';
+import {isNullish, notEmptyString} from '@dfinity/utils';
 import {SignerApi} from '../api/signer.api';
 import {
   notifyErrorActionAborted,
@@ -8,6 +8,7 @@ import {
   notifyNetworkError,
   notifySenderNotAllowedError
 } from '../handlers/signer-errors.handlers';
+import {notifyCallCanister} from '../handlers/signer-success.handlers';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import type {Notify} from '../types/signer-handlers';
 import type {SignerOptions} from '../types/signer-options';
@@ -94,27 +95,48 @@ export class SignerService {
 
       notifyNetworkError({
         ...notify,
-        message: err instanceof Error ? err.message : 'An unknown error occurred'
+        message:
+          err instanceof Error && notEmptyString(err.message)
+            ? err.message
+            : 'An unknown error occurred'
       });
 
       return {result: 'error'};
     }
   }
 
-  // TODO: return, error, notify, result, etc.
   async callCanister({
     params,
-    notify: _TODO,
+    notify,
     options
   }: {
     params: IcrcCallCanisterRequestParams;
     notify: Notify;
     options: SignerOptions;
-  }): Promise<void> {
-    await this.#signerApi.call({
-      ...options,
-      params
-    });
+  }): Promise<{result: 'success' | 'error'}> {
+    try {
+      const result = await this.#signerApi.call({
+        ...options,
+        params
+      });
+
+      notifyCallCanister({
+        ...notify,
+        result
+      });
+
+      return {result: 'success'};
+    } catch (err: unknown) {
+      notifyNetworkError({
+        ...notify,
+        message:
+          err instanceof Error && notEmptyString(err.message)
+            ? err.message
+            : 'An unknown error occurred'
+      });
+
+      return {result: 'error'};
+    }
   }
 
   private assertSender({
