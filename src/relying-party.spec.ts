@@ -26,7 +26,7 @@ import {RelyingParty} from './relying-party';
 import type {IcrcAnyRequestedScopes} from './types/icrc-requests';
 import {
   IcrcAccountsResponseSchema,
-  IcrcCallCanisterResultResponseSchema,
+  IcrcCallCanisterResponseSchema,
   IcrcScopesResponseSchema,
   IcrcSupportedStandardsResponseSchema,
   type IcrcCallCanisterResult
@@ -1134,7 +1134,7 @@ describe('Relying Party', () => {
           new Promise<void>(async (resolve) => {
             vi.useFakeTimers();
 
-            const spy = vi.spyOn(IcrcCallCanisterResultResponseSchema, 'safeParse');
+            const spy = vi.spyOn(IcrcCallCanisterResponseSchema, 'safeParse');
 
             relyingParty.call({params: mockCallCanisterParams}).catch((err: Error) => {
               expect(err.message).toBe(
