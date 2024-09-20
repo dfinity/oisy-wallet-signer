@@ -21,6 +21,7 @@ export type CustomHttpAgentResponse = Pick<Required<SubmitResponse>, 'requestDet
 export class UndefinedRequestDetailsError extends Error {}
 export class RequestError extends Error {}
 export class InvalidCertificateReplyError extends Error {}
+export class InvalidCertificateStatusError extends Error {}
 
 // To extend the HttpAgent, we would have to override the static create function.
 // While this is possible, it would require using Object.assign to clone the HttpAgent into a CustomHttpAgent, because the super function does not accept generics.
@@ -78,6 +79,7 @@ export class CustomHttpAgent {
     // I assume that if we get a result at this point, it means we can respond to the caller.
     // However, this is not how it's handled in Agent-js. For some reason, regardless of whether they get a result at this point or not, if the response has a status of 202, they overwrite the result with pollForResponse, which seems incorrect.
     // That is why we return the result if we get one.
+    // @see agent-js: https://github.com/dfinity/agent-js/blob/21cf4700eff1de7f6f15304b758a16e5881afca3/packages/agent/src/actor.ts#L567
     if (nonNullish(result)) {
       return result;
     }
@@ -100,7 +102,7 @@ export class CustomHttpAgent {
   private async readResponse({
     callResponse: {
       requestId,
-      response: {body},
+      response: {body, status},
       requestDetails
     },
     canisterId
@@ -113,7 +115,14 @@ export class CustomHttpAgent {
       return undefined;
     }
 
+    // A response with a body.certificate is valid only for status 200 according specification
+    // https://github.com/dfinity/interface-spec/pull/265
+    if (status !== 200) {
+      throw new InvalidCertificateStatusError();
+    }
+
     // I'm not sure why we don't check the response status, 202, before trying to search for a certificate. This seems inaccurate, but that's how Agent-js handles it.
+    // @see agent-js: https://github.com/dfinity/agent-js/blob/21cf4700eff1de7f6f15304b758a16e5881afca3/packages/agent/src/actor.ts#L545
 
     const {certificate: cert} = body;
 
