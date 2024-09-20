@@ -20,6 +20,7 @@ export const notifyReady = ({id, origin}: Notify): void => {
 
   notify({msg, origin});
 };
+
 export const notifySupportedStandards = ({id, origin}: Notify): void => {
   const msg: IcrcSupportedStandardsResponse = {
     jsonrpc: JSON_RPC_VERSION_2,
@@ -31,7 +32,9 @@ export const notifySupportedStandards = ({id, origin}: Notify): void => {
 
   notify({msg, origin});
 };
+
 export type NotifyPermissions = Notify & {scopes: IcrcScopesArray};
+
 export const notifyPermissionScopes = ({id, origin, scopes}: NotifyPermissions): void => {
   const msg: IcrcScopesResponse = {
     jsonrpc: JSON_RPC_VERSION_2,
@@ -41,7 +44,9 @@ export const notifyPermissionScopes = ({id, origin, scopes}: NotifyPermissions):
 
   notify({msg, origin});
 };
+
 export type NotifyAccounts = Notify & {accounts: IcrcAccounts};
+
 export const notifyAccounts = ({id, origin, accounts}: NotifyAccounts): void => {
   const msg: IcrcAccountsResponse = {
     jsonrpc: JSON_RPC_VERSION_2,
