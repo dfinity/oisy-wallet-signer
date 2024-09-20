@@ -3,8 +3,8 @@ import type {MockInstance} from 'vitest';
 import {Icrc21Canister} from './api/icrc21-canister.api';
 import {SignerApi} from './api/signer.api';
 import {
-  ICRC25_PERMISSIONS,
   ICRC25_PERMISSION_GRANTED,
+  ICRC25_PERMISSIONS,
   ICRC25_REQUEST_PERMISSIONS,
   ICRC25_SUPPORTED_STANDARDS,
   ICRC27_ACCOUNTS,
@@ -1196,15 +1196,15 @@ describe('Signer', () => {
 
         describe('Execute call', () => {
           let spyCanisterCall: MockInstance;
-          // TODO: we do not notify yet
-          // let notifyErrorSpy: MockInstance;
 
           beforeEach(() => {
-            spyCanisterCall = vi.spyOn(SignerApi.prototype, 'call');
+            vi.resetModules();
           });
 
           describe('No call without consent message first', () => {
             beforeEach(() => {
+              spyCanisterCall = vi.spyOn(SignerApi.prototype, 'call').mockImplementation(vi.fn());
+
               spyConsentMessage.mockResolvedValue({
                 Ok: mockConsentInfo
               });
@@ -1316,7 +1316,7 @@ describe('Signer', () => {
           });
 
           describe('Consent approved', () => {
-            beforeEach(async () => {
+            const approveAndCall = async (): Promise<void> => {
               let approve: ConsentMessageApproval | undefined;
 
               const prompt = ({approve: a}: ConsentMessagePromptPayload): void => {
@@ -1351,11 +1351,19 @@ describe('Signer', () => {
               });
 
               approve?.();
-            });
+            };
 
             describe('Call success', () => {
-              beforeEach(() => {
-                spyCanisterCall.mockResolvedValue(mockCallCanisterSuccess);
+              let notifyCallCanisterSpy: MockInstance;
+
+              beforeEach(async () => {
+                spyCanisterCall = vi
+                  .spyOn(SignerApi.prototype, 'call')
+                  .mockResolvedValue(mockCallCanisterSuccess);
+
+                notifyCallCanisterSpy = vi.spyOn(signerSuccessHandlers, 'notifyCallCanister');
+
+                await approveAndCall();
               });
 
               it('should call canister and notify success', async () => {
@@ -1367,16 +1375,29 @@ describe('Signer', () => {
                   }
                 });
 
-                // TODO: test notify which is not yet implemented
+                expect(notifyCallCanisterSpy).toHaveBeenCalledWith({
+                  id: testId,
+                  origin: testOrigin,
+                  result: mockCallCanisterSuccess
+                });
               });
             });
 
             describe('Call error', () => {
-              beforeEach(() => {
-                spyCanisterCall.mockResolvedValue(new Error('Test error'));
+              let notifyErrorSpy: MockInstance;
+              const errorMsg = 'Test error';
+
+              beforeEach(async () => {
+                spyCanisterCall = vi
+                  .spyOn(SignerApi.prototype, 'call')
+                  .mockRejectedValue(new Error(errorMsg));
+
+                notifyErrorSpy = vi.spyOn(signerHandlers, 'notifyError');
+
+                await approveAndCall();
               });
 
-              it('should call canister and notify success', async () => {
+              it('should call canister and notify error', async () => {
                 expect(spyCanisterCall).toHaveBeenNthCalledWith(1, {
                   ...signerOptions,
                   params: {
@@ -1385,7 +1406,14 @@ describe('Signer', () => {
                   }
                 });
 
-                // TODO: test notify error which is not yet implemented
+                expect(notifyErrorSpy).toHaveBeenCalledWith({
+                  id: testId,
+                  origin: testOrigin,
+                  error: {
+                    code: SignerErrorCode.NETWORK_ERROR,
+                    message: errorMsg
+                  }
+                });
               });
             });
           });
