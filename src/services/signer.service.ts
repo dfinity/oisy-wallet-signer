@@ -1,5 +1,5 @@
 import {Principal} from '@dfinity/principal';
-import {isNullish} from '@dfinity/utils';
+import {isNullish, notEmptyString} from '@dfinity/utils';
 import {SignerApi} from '../api/signer.api';
 import {
   notifyErrorActionAborted,
@@ -95,7 +95,10 @@ export class SignerService {
 
       notifyNetworkError({
         ...notify,
-        message: err instanceof Error ? err.message : 'An unknown error occurred'
+        message:
+          err instanceof Error && notEmptyString(err.message)
+            ? err.message
+            : 'An unknown error occurred'
       });
 
       return {result: 'error'};
@@ -126,7 +129,10 @@ export class SignerService {
     } catch (err: unknown) {
       notifyNetworkError({
         ...notify,
-        message: err instanceof Error ? err.message : 'An unknown error occurred'
+        message:
+          err instanceof Error && notEmptyString(err.message)
+            ? err.message
+            : 'An unknown error occurred'
       });
 
       return {result: 'error'};

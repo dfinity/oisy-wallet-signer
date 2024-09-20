@@ -15,6 +15,8 @@ import type {ConsentMessagePromptPayload} from '../types/signer-prompts';
 import {base64ToUint8Array} from '../utils/base64.utils';
 import {mapIcrc21ErrorToString} from '../utils/icrc-21.utils';
 import {SignerService} from './signer.service';
+import * as signerSuccessHandlers from '../handlers/signer-success.handlers';
+import * as signerHandlers from '../handlers/signer.handlers';
 
 describe('Signer services', () => {
   let requestId: RpcId;
@@ -353,9 +355,13 @@ describe('Signer services', () => {
 
   describe('Call canister', () => {
     let spySignerApiCall: MockInstance;
+    let notifyCallCanisterSpy: MockInstance;
+    let notifyErrorSpy: MockInstance;
 
     beforeEach(() => {
       spySignerApiCall = vi.spyOn(SignerApi.prototype, 'call');
+      notifyCallCanisterSpy = vi.spyOn(signerSuccessHandlers, 'notifyCallCanister');
+      notifyErrorSpy = vi.spyOn(signerHandlers, 'notifyError');
     });
 
     it('should call the signer API with the correct parameters', async () => {
@@ -371,18 +377,52 @@ describe('Signer services', () => {
         ...signerOptions,
         params
       });
+
+      expect(notifyCallCanisterSpy).toHaveBeenCalledWith({
+        id: requestId,
+        origin: testOrigin,
+        result: mockCanisterCallSuccess
+      });
     });
 
     it('should throw an error if API call fails', async () => {
-      spySignerApiCall.mockRejectedValue(new Error('Test Error'));
+      const errorMsg = 'Test Error';
 
-      await expect(
-        signerService.callCanister({
-          params,
-          notify,
-          options: signerOptions
-        })
-      ).rejects.toThrow(new Error('Test Error'));
+      spySignerApiCall.mockRejectedValue(new Error(errorMsg));
+
+      await signerService.callCanister({
+        params,
+        notify,
+        options: signerOptions
+      });
+
+      expect(notifyErrorSpy).toHaveBeenCalledWith({
+        id: requestId,
+        origin: testOrigin,
+        error: {
+          code: SignerErrorCode.NETWORK_ERROR,
+          message: errorMsg
+        }
+      });
+    });
+
+    it('should throw an unknown error if API call fails', async () => {
+      spySignerApiCall.mockRejectedValue(new Error());
+
+      await signerService.callCanister({
+        params,
+        notify,
+        options: signerOptions
+      });
+
+      expect(notifyErrorSpy).toHaveBeenCalledWith({
+        id: requestId,
+        origin: testOrigin,
+        error: {
+          code: SignerErrorCode.NETWORK_ERROR,
+          message: 'An unknown error occurred'
+        }
+      });
     });
   });
 });
