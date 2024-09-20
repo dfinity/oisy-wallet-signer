@@ -1,21 +1,8 @@
 import {beforeEach, type Mock} from 'vitest';
-import {ICRC27_ACCOUNTS} from '../constants/icrc.constants';
-import {SIGNER_SUPPORTED_STANDARDS, SignerErrorCode} from '../constants/signer.constants';
-import {mockAccounts} from '../mocks/icrc-accounts.mocks';
-import type {
-  IcrcReadyResponse,
-  IcrcScopesArray,
-  IcrcScopesResponse,
-  IcrcSupportedStandardsResponse
-} from '../types/icrc-responses';
+import {SignerErrorCode} from '../constants/signer.constants';
+import type {IcrcReadyResponse} from '../types/icrc-responses';
 import {JSON_RPC_VERSION_2, type RpcId, type RpcResponseWithError} from '../types/rpc';
-import {
-  notifyAccounts,
-  notifyError,
-  notifyPermissionScopes,
-  notifyReady,
-  notifySupportedStandards
-} from './signer.handlers';
+import {notify, notifyError} from './signer.handlers';
 
 describe('Signer handlers', () => {
   let id: RpcId;
@@ -40,20 +27,6 @@ describe('Signer handlers', () => {
     vi.restoreAllMocks();
   });
 
-  describe('notifyReady', () => {
-    it('should post a message with the msg', () => {
-      notifyReady({id, origin});
-
-      const expectedMessage: IcrcReadyResponse = {
-        jsonrpc: JSON_RPC_VERSION_2,
-        id,
-        result: 'ready'
-      };
-
-      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
-    });
-  });
-
   describe('notifyError', () => {
     it('should post the error', () => {
       const error = {
@@ -73,58 +46,17 @@ describe('Signer handlers', () => {
     });
   });
 
-  describe('notifySupportedStandards', () => {
-    it('should post a message with the msg', () => {
-      notifySupportedStandards({id, origin});
-
-      const expectedMessage: IcrcSupportedStandardsResponse = {
+  describe('notify', () => {
+    it('should post a message with the correct msg and origin', () => {
+      const msg: IcrcReadyResponse = {
         jsonrpc: JSON_RPC_VERSION_2,
         id,
-        result: {
-          supportedStandards: SIGNER_SUPPORTED_STANDARDS
-        }
+        result: 'ready'
       };
 
-      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
-    });
-  });
+      notify({msg, origin});
 
-  describe('notifyPermissionScopes', () => {
-    it('should post a message with the msg', () => {
-      const scopes: IcrcScopesArray = [
-        {
-          scope: {
-            method: ICRC27_ACCOUNTS
-          },
-          state: 'granted'
-        }
-      ];
-
-      notifyPermissionScopes({id, origin, scopes});
-
-      const expectedMessage: IcrcScopesResponse = {
-        jsonrpc: JSON_RPC_VERSION_2,
-        id,
-        result: {
-          scopes
-        }
-      };
-
-      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
-    });
-  });
-
-  describe('notifyAccounts', () => {
-    it('should post a message with the accounts', () => {
-      notifyAccounts({id, origin, accounts: mockAccounts});
-
-      const expectedMessage = {
-        jsonrpc: JSON_RPC_VERSION_2,
-        id,
-        result: {accounts: mockAccounts}
-      };
-
-      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
+      expect(postMessageMock).toHaveBeenCalledWith(msg, origin);
     });
   });
 });

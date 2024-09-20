@@ -13,12 +13,12 @@ import {
 } from './handlers/signer-errors.handlers';
 import {
   notifyAccounts as notifyAccountsHandlers,
-  notifyError,
   notifyPermissionScopes,
   notifyReady,
   notifySupportedStandards,
   type NotifyPermissions
-} from './handlers/signer.handlers';
+} from './handlers/signer-success.handlers';
+import {notifyError} from './handlers/signer.handlers';
 import {SignerService} from './services/signer.service';
 import {
   readSessionValidScopes,
