@@ -3,6 +3,8 @@ import type {Mock, MockInstance} from 'vitest';
 import {Icrc21Canister} from '../api/icrc21-canister.api';
 import {SignerApi} from '../api/signer.api';
 import {SignerErrorCode} from '../constants/signer.constants';
+import * as signerSuccessHandlers from '../handlers/signer-success.handlers';
+import * as signerHandlers from '../handlers/signer.handlers';
 import {mockCallCanisterParams} from '../mocks/call-canister.mocks';
 import {mockCanisterCallSuccess, mockConsentInfo} from '../mocks/consent-message.mocks';
 import {mockPrincipalText} from '../mocks/icrc-accounts.mocks';
@@ -15,8 +17,6 @@ import type {ConsentMessagePromptPayload} from '../types/signer-prompts';
 import {base64ToUint8Array} from '../utils/base64.utils';
 import {mapIcrc21ErrorToString} from '../utils/icrc-21.utils';
 import {SignerService} from './signer.service';
-import * as signerSuccessHandlers from '../handlers/signer-success.handlers';
-import * as signerHandlers from '../handlers/signer.handlers';
 
 describe('Signer services', () => {
   let requestId: RpcId;
