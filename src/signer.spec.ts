@@ -16,6 +16,7 @@ import {
   SIGNER_SUPPORTED_STANDARDS,
   SignerErrorCode
 } from './constants/signer.constants';
+import * as signerSuccessHandlers from './handlers/signer-success.handlers';
 import * as signerHandlers from './handlers/signer.handlers';
 import {mockCallCanisterParams, mockCallCanisterSuccess} from './mocks/call-canister.mocks';
 import {mockConsentInfo} from './mocks/consent-message.mocks';
@@ -152,7 +153,7 @@ describe('Signer', () => {
 
     beforeEach(() => {
       signer = Signer.init(signerOptions);
-      notifyReadySpy = vi.spyOn(signerHandlers, 'notifyReady');
+      notifyReadySpy = vi.spyOn(signerSuccessHandlers, 'notifyReady');
       postMessageMock = vi.fn();
       vi.stubGlobal('opener', {postMessage: postMessageMock});
     });
@@ -304,8 +305,8 @@ describe('Signer', () => {
       let notifyErrorSpy: MockInstance;
 
       beforeEach(() => {
-        notifySupportedStandardsSpy = vi.spyOn(signerHandlers, 'notifySupportedStandards');
-        notifyPermissionsSpy = vi.spyOn(signerHandlers, 'notifyPermissionScopes');
+        notifySupportedStandardsSpy = vi.spyOn(signerSuccessHandlers, 'notifySupportedStandards');
+        notifyPermissionsSpy = vi.spyOn(signerSuccessHandlers, 'notifyPermissionScopes');
         notifyErrorSpy = vi.spyOn(signerHandlers, 'notifyError');
       });
 
@@ -348,8 +349,8 @@ describe('Signer', () => {
       let notifyErrorSpy: MockInstance;
 
       beforeEach(() => {
-        notifyReadySpy = vi.spyOn(signerHandlers, 'notifyReady');
-        notifyPermissionsSpy = vi.spyOn(signerHandlers, 'notifyPermissionScopes');
+        notifyReadySpy = vi.spyOn(signerSuccessHandlers, 'notifyReady');
+        notifyPermissionsSpy = vi.spyOn(signerSuccessHandlers, 'notifyPermissionScopes');
         notifyErrorSpy = vi.spyOn(signerHandlers, 'notifyError');
       });
 
@@ -394,8 +395,8 @@ describe('Signer', () => {
       let notifyErrorSpy: MockInstance;
 
       beforeEach(() => {
-        notifyReadySpy = vi.spyOn(signerHandlers, 'notifyReady');
-        notifySupportedStandardsSpy = vi.spyOn(signerHandlers, 'notifySupportedStandards');
+        notifyReadySpy = vi.spyOn(signerSuccessHandlers, 'notifyReady');
+        notifySupportedStandardsSpy = vi.spyOn(signerSuccessHandlers, 'notifySupportedStandards');
         notifyErrorSpy = vi.spyOn(signerHandlers, 'notifyError');
       });
 
@@ -1454,7 +1455,7 @@ describe('Signer', () => {
       let payload: PermissionsPromptPayload;
 
       beforeEach(() => {
-        notifyReadySpy = vi.spyOn(signerHandlers, 'notifyReady');
+        notifyReadySpy = vi.spyOn(signerSuccessHandlers, 'notifyReady');
 
         const messageEvent = new MessageEvent('message', {
           data: {

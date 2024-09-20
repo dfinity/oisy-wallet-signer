@@ -87,7 +87,9 @@ export class SignerService {
 
       return {result};
     } catch (err: unknown) {
-      // TODO: 2000 for not supported consent message - i.e. method is not implemented.
+      // TODO: 2001 for not supported consent message - i.e. method is not implemented.
+      // see https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_49_call_canister.md#errors
+
       // TODO: Likewise for example if canister is out of cycles or stopped etc. it should not throw 4000.
 
       notifyNetworkError({
