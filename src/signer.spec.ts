@@ -42,7 +42,7 @@ import {
   type AccountsApproval,
   type AccountsPromptPayload,
   type ConsentMessageApproval,
-  type ConsentMessagePromptPayload,
+  type CallCanisterPromptPayload,
   type PermissionsConfirmation,
   type PermissionsPromptPayload,
   type Rejection
@@ -1108,7 +1108,7 @@ describe('Signer', () => {
             it('should notify aborted error for icrc49_call_canister if user reject consent', async () => {
               let reject: Rejection | undefined;
 
-              const prompt = ({reject: r}: ConsentMessagePromptPayload): void => {
+              const prompt = ({reject: r}: CallCanisterPromptPayload): void => {
                 reject = r;
               };
 
@@ -1282,7 +1282,7 @@ describe('Signer', () => {
             it('should not call if consent message is rejected', async () => {
               let reject: Rejection | undefined;
 
-              const prompt = ({reject: r}: ConsentMessagePromptPayload): void => {
+              const prompt = ({reject: r}: CallCanisterPromptPayload): void => {
                 reject = r;
               };
 
@@ -1319,7 +1319,7 @@ describe('Signer', () => {
             const approveAndCall = async (): Promise<void> => {
               let approve: ConsentMessageApproval | undefined;
 
-              const prompt = ({approve: a}: ConsentMessagePromptPayload): void => {
+              const prompt = ({approve: a}: CallCanisterPromptPayload): void => {
                 approve = a;
               };
 

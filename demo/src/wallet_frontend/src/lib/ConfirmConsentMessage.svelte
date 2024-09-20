@@ -5,7 +5,7 @@
 		ICRC49_CALL_CANISTER,
 		type Rejection,
 		type ConsentMessageApproval,
-		type ConsentMessagePromptPayload
+		type CallCanisterPromptPayload
 	} from '@dfinity/oisy-wallet-signer';
 	import type { icrc21_consent_info } from '@dfinity/oisy-wallet-signer';
 	import Button from '$core/components/Button.svelte';
@@ -44,7 +44,7 @@
 				approve: approveConsent,
 				reject: rejectConsent,
 				consentInfo: info
-			}: ConsentMessagePromptPayload) => {
+			}: CallCanisterPromptPayload) => {
 				approve = approveConsent;
 				reject = rejectConsent;
 				consentInfo = info;

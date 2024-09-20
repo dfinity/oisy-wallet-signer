@@ -13,7 +13,7 @@ import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import {JSON_RPC_VERSION_2, type RpcId, type RpcResponseWithError} from '../types/rpc';
 import type {Notify} from '../types/signer-handlers';
 import type {SignerOptions} from '../types/signer-options';
-import type {ConsentMessagePromptPayload} from '../types/signer-prompts';
+import type {CallCanisterPromptPayload} from '../types/signer-prompts';
 import {base64ToUint8Array} from '../utils/base64.utils';
 import {mapIcrc21ErrorToString} from '../utils/icrc-21.utils';
 import {SignerService} from './signer.service';
@@ -76,7 +76,7 @@ describe('Signer services', () => {
         Ok: mockConsentInfo
       });
 
-      const prompt = ({approve}: ConsentMessagePromptPayload): void => {
+      const prompt = ({approve}: CallCanisterPromptPayload): void => {
         approve();
       };
 
@@ -111,7 +111,7 @@ describe('Signer services', () => {
       });
 
       it('should return rejected when user rejects the consent message', async () => {
-        const prompt = ({reject}: ConsentMessagePromptPayload): void => {
+        const prompt = ({reject}: CallCanisterPromptPayload): void => {
           reject();
         };
 
@@ -126,7 +126,7 @@ describe('Signer services', () => {
       });
 
       it('should call notifyErrorActionAborted when user rejects consent message', async () => {
-        const prompt = ({reject}: ConsentMessagePromptPayload): void => {
+        const prompt = ({reject}: CallCanisterPromptPayload): void => {
           reject();
         };
 
