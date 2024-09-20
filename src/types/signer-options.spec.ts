@@ -1,6 +1,5 @@
 import {AnonymousIdentity} from '@dfinity/agent';
 import {Ed25519KeyIdentity} from '@dfinity/identity';
-import {describe} from 'vitest';
 import {SignerOptionsSchema} from './signer-options';
 
 describe('SignerOptions', () => {

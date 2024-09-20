@@ -1,5 +1,4 @@
 import {Ed25519KeyIdentity} from '@dfinity/identity';
-import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import {CustomHttpAgent} from '../agent/custom-http-agent';
 import type {SignerOptions} from '../types/signer-options';
 import {AgentApi} from './agent.api';

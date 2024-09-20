@@ -7,7 +7,7 @@ export const mockConsentMessage = ({
 }): string => `# Approve the transfer of funds
 
 **Amount:**
-0.00000123 ICP
+0.5 ICP
 
 **From:**
 ${walletUserId}
