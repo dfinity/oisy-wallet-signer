@@ -8,7 +8,7 @@ import {mockAccounts, mockPrincipalText} from '../mocks/icrc-accounts.mocks';
 import {uint8ArrayToBase64} from '../utils/base64.utils';
 import {
   IcrcAccountsResponseSchema,
-  IcrcCallCanisterResultResponseSchema,
+  IcrcCallCanisterResponseSchema,
   IcrcReadyResponseSchema,
   IcrcScopeSchema,
   IcrcScopesResponseSchema,
@@ -658,7 +658,7 @@ describe('icrc-responses', () => {
     };
 
     it('should validate a correct response', () => {
-      expect(() => IcrcCallCanisterResultResponseSchema.parse(validResponse)).not.toThrow();
+      expect(() => IcrcCallCanisterResponseSchema.parse(validResponse)).not.toThrow();
     });
 
     it('should throw if response has invalid contentMap (not Uint8Array)', () => {
@@ -669,7 +669,7 @@ describe('icrc-responses', () => {
           contentMap: 'invalid-content' // Not a Uint8Array
         }
       };
-      expect(() => IcrcCallCanisterResultResponseSchema.parse(invalidResponse)).toThrow();
+      expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
     });
 
     it('should throw if response has invalid certificate (not Uint8Array)', () => {
@@ -680,7 +680,7 @@ describe('icrc-responses', () => {
           certificate: 'invalid-certificate' // Not a Uint8Array
         }
       };
-      expect(() => IcrcCallCanisterResultResponseSchema.parse(invalidResponse)).toThrow();
+      expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
     });
 
     it('should throw if response has missing contentMap', () => {
@@ -690,7 +690,7 @@ describe('icrc-responses', () => {
         ...validResponse,
         result: rest
       };
-      expect(() => IcrcCallCanisterResultResponseSchema.parse(invalidResponse)).toThrow();
+      expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
     });
 
     it('should throw if response has missing certificate', () => {
@@ -700,7 +700,7 @@ describe('icrc-responses', () => {
         ...validResponse,
         result: rest
       };
-      expect(() => IcrcCallCanisterResultResponseSchema.parse(invalidResponse)).toThrow();
+      expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
     });
 
     it('should throw if response has extra fields in result', () => {
@@ -711,28 +711,28 @@ describe('icrc-responses', () => {
           extraField: 'unexpected'
         }
       };
-      expect(() => IcrcCallCanisterResultResponseSchema.parse(invalidResponse)).toThrow();
+      expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
     });
 
     it('should throw if response has no result field', () => {
       const {result: _, ...rest} = validResponse;
 
       const invalidResponse = rest;
-      expect(() => IcrcCallCanisterResultResponseSchema.parse(invalidResponse)).toThrow();
+      expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
     });
 
     it('should throw if response has no id', () => {
       const {id: _, ...rest} = validResponse;
 
       const invalidResponse = rest;
-      expect(() => IcrcCallCanisterResultResponseSchema.parse(invalidResponse)).toThrow();
+      expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
     });
 
     it('should throw if response has no jsonrpc field', () => {
       const {jsonrpc: _, ...rest} = validResponse;
 
       const invalidResponse = rest;
-      expect(() => IcrcCallCanisterResultResponseSchema.parse(invalidResponse)).toThrow();
+      expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
     });
   });
 });
