@@ -101,20 +101,32 @@ export class SignerService {
     }
   }
 
-  // TODO: return, error, notify, result, etc.
   async callCanister({
     params,
-    notify: _TODO,
+    notify,
     options
   }: {
     params: IcrcCallCanisterRequestParams;
     notify: Notify;
     options: SignerOptions;
-  }): Promise<void> {
-    await this.#signerApi.call({
-      ...options,
-      params
-    });
+  }): Promise<{result: 'success' | 'error'}> {
+    try {
+      await this.#signerApi.call({
+        ...options,
+        params
+      });
+
+      // TODO notify success
+
+      return {result: 'success'};
+    } catch (err: unknown) {
+      notifyNetworkError({
+        ...notify,
+        message: err instanceof Error ? err.message : 'An unknown error occurred'
+      });
+
+      return {result: 'error'};
+    }
   }
 
   private assertSender({
