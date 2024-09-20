@@ -21,7 +21,7 @@ import type {IcrcAccounts} from './types/icrc-accounts';
 import type {IcrcAnyRequestedScopes, IcrcCallCanisterRequestParams} from './types/icrc-requests';
 import {
   IcrcAccountsResponseSchema,
-  IcrcCallCanisterResultResponseSchema,
+  IcrcCallCanisterResponseSchema,
   IcrcReadyResponseSchema,
   IcrcScopesResponseSchema,
   IcrcSupportedStandardsResponseSchema,
@@ -526,7 +526,7 @@ export class RelyingParty {
       id: RpcId;
     }): Promise<{handled: boolean; result?: IcrcCallCanisterResult}> => {
       const {success: isAccounts, data: resultData} =
-        IcrcCallCanisterResultResponseSchema.safeParse(data);
+        IcrcCallCanisterResponseSchema.safeParse(data);
 
       if (isAccounts && id === resultData?.id && nonNullish(resultData?.result)) {
         const {result} = resultData;

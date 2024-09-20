@@ -1,6 +1,7 @@
 import type {Mock} from 'vitest';
 import {ICRC27_ACCOUNTS} from '../constants/icrc.constants';
 import {SIGNER_SUPPORTED_STANDARDS} from '../constants/signer.constants';
+import {mockCallCanisterSuccess} from '../mocks/call-canister.mocks';
 import {mockAccounts} from '../mocks/icrc-accounts.mocks';
 import type {
   IcrcReadyResponse,
@@ -11,6 +12,7 @@ import type {
 import {JSON_RPC_VERSION_2, type RpcId} from '../types/rpc';
 import {
   notifyAccounts,
+  notifyCallCanister,
   notifyPermissionScopes,
   notifyReady,
   notifySupportedStandards
@@ -102,6 +104,20 @@ describe('Signer-success.handlers', () => {
         jsonrpc: JSON_RPC_VERSION_2,
         id,
         result: {accounts: mockAccounts}
+      };
+
+      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
+    });
+  });
+
+  describe('notifyCallCanister', () => {
+    it('should post a message with the call canister result', () => {
+      notifyCallCanister({id, origin, result: mockCallCanisterSuccess});
+
+      const expectedMessage = {
+        jsonrpc: JSON_RPC_VERSION_2,
+        id,
+        result: mockCallCanisterSuccess
       };
 
       expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);

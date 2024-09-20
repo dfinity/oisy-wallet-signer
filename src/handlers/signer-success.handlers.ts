@@ -2,6 +2,8 @@ import {SIGNER_SUPPORTED_STANDARDS} from '../constants/signer.constants';
 import type {IcrcAccounts} from '../types/icrc-accounts';
 import type {
   IcrcAccountsResponse,
+  IcrcCallCanisterResponse,
+  IcrcCallCanisterResult,
   IcrcReadyResponse,
   IcrcScopesArray,
   IcrcScopesResponse,
@@ -52,6 +54,18 @@ export const notifyAccounts = ({id, origin, accounts}: NotifyAccounts): void => 
     jsonrpc: JSON_RPC_VERSION_2,
     id,
     result: {accounts}
+  };
+
+  notify({msg, origin});
+};
+
+export type NotifyCallCanister = Notify & {result: IcrcCallCanisterResult};
+
+export const notifyCallCanister = ({id, origin, result}: NotifyCallCanister): void => {
+  const msg: IcrcCallCanisterResponse = {
+    jsonrpc: JSON_RPC_VERSION_2,
+    id,
+    result
   };
 
   notify({msg, origin});

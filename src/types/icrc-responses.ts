@@ -115,8 +115,8 @@ const IcrcCallCanisterResultSchema = z.object({
 
 export type IcrcCallCanisterResult = z.infer<typeof IcrcCallCanisterResultSchema>;
 
-export const IcrcCallCanisterResultResponseSchema = inferRpcResponseSchema(
+export const IcrcCallCanisterResponseSchema = inferRpcResponseSchema(
   IcrcCallCanisterResultSchema.strict()
 );
 
-export type IcrcCallCanisterResultResponse = z.infer<typeof IcrcCallCanisterResultResponseSchema>;
+export type IcrcCallCanisterResponse = z.infer<typeof IcrcCallCanisterResponseSchema>;
