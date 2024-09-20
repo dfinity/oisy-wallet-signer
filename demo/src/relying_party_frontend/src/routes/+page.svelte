@@ -18,7 +18,7 @@
 		wallet = await IcpWallet.connect({
 			url: 'http://localhost:5174/sign',
 			connectionOptions: {
-				timeoutInMilliseconds: 60 * 60 * 1000,
+				timeoutInMilliseconds: 60 * 60 * 1000
 			}
 		});
 	};
