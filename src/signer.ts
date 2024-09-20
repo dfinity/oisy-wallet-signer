@@ -46,7 +46,7 @@ import {RpcRequestSchema, type RpcId} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
 import {MissingPromptError} from './types/signer-errors';
 import type {Notify} from './types/signer-handlers';
-import type {IdentityNotAnonymous, SignerHost, SignerOptions} from './types/signer-options';
+import type {SignerOptions} from './types/signer-options';
 import {
   AccountsPromptSchema,
   CallCanisterPromptSchema,
@@ -63,8 +63,7 @@ import {
 } from './types/signer-prompts';
 
 export class Signer {
-  readonly #owner: IdentityNotAnonymous;
-  readonly #host: SignerHost;
+  readonly #signerOptions: SignerOptions;
 
   #walletOrigin: string | undefined | null;
 
@@ -74,9 +73,8 @@ export class Signer {
 
   readonly #signerService = new SignerService();
 
-  private constructor({owner, host}: SignerOptions) {
-    this.#owner = owner;
-    this.#host = host;
+  private constructor(options: SignerOptions) {
+    this.#signerOptions = options;
 
     window.addEventListener('message', this.onMessageListener);
   }
@@ -270,8 +268,9 @@ export class Signer {
 
     if (isPermissionsRequestRequest) {
       const {id} = permissionsRequestData;
+      const {owner} = this.#signerOptions;
 
-      const scopes = readSessionValidScopes({owner: this.#owner.getPrincipal(), origin});
+      const scopes = readSessionValidScopes({owner: owner.getPrincipal(), origin});
 
       notifyPermissionScopes({
         id,
@@ -396,7 +395,9 @@ export class Signer {
   private savePermissions({scopes}: {scopes: IcrcScopesArray}): void {
     assertNonNullish(this.#walletOrigin, "The relying party's origin is unknown.");
 
-    saveSessionScopes({owner: this.#owner.getPrincipal(), origin: this.#walletOrigin, scopes});
+    const {owner} = this.#signerOptions;
+
+    saveSessionScopes({owner: owner.getPrincipal(), origin: this.#walletOrigin, scopes});
   }
 
   /**
@@ -541,17 +542,11 @@ export class Signer {
         origin
       };
 
-      // TODO: instead of splitting the options in the constructor should we just hold #signerOptions as class member?
-      const options: SignerOptions = {
-        host: this.#host,
-        owner: this.#owner
-      };
-
       const {result: userConsent} = await this.#signerService.assertAndPromptConsentMessage({
         notify,
         params,
         prompt: this.#consentMessagePrompt,
-        options
+        options: this.#signerOptions
       });
 
       if (userConsent !== 'approved') {
@@ -561,7 +556,7 @@ export class Signer {
       await this.#signerService.callCanister({
         notify,
         params,
-        options
+        options: this.#signerOptions
       });
 
       return {handled: true};
@@ -596,8 +591,10 @@ export class Signer {
     origin: Origin;
     requestId: RpcId;
   }): Promise<Omit<IcrcPermissionState, 'ask_on_use'>> {
+    const {owner} = this.#signerOptions;
+
     const currentPermission = sessionScopeState({
-      owner: this.#owner.getPrincipal(),
+      owner: owner.getPrincipal(),
       origin,
       method
     });
