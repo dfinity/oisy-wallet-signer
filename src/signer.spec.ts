@@ -41,8 +41,8 @@ import {
   PermissionsPromptSchema,
   type AccountsApproval,
   type AccountsPromptPayload,
-  type ConsentMessageApproval,
   type CallCanisterPromptPayload,
+  type ConsentMessageApproval,
   type PermissionsConfirmation,
   type PermissionsPromptPayload,
   type Rejection
@@ -1108,8 +1108,10 @@ describe('Signer', () => {
             it('should notify aborted error for icrc49_call_canister if user reject consent', async () => {
               let reject: Rejection | undefined;
 
-              const prompt = ({reject: r}: CallCanisterPromptPayload): void => {
-                reject = r;
+              const prompt = ({type, ...rest}: CallCanisterPromptPayload): void => {
+                if (type === 'consentMessage' && 'reject' in rest) {
+                  reject = rest.reject;
+                }
               };
 
               signer.register({
@@ -1282,8 +1284,10 @@ describe('Signer', () => {
             it('should not call if consent message is rejected', async () => {
               let reject: Rejection | undefined;
 
-              const prompt = ({reject: r}: CallCanisterPromptPayload): void => {
-                reject = r;
+              const prompt = ({type, ...rest}: CallCanisterPromptPayload): void => {
+                if (type === 'consentMessage' && 'reject' in rest) {
+                  reject = rest.reject;
+                }
               };
 
               signer.register({
@@ -1319,8 +1323,10 @@ describe('Signer', () => {
             const approveAndCall = async (): Promise<void> => {
               let approve: ConsentMessageApproval | undefined;
 
-              const prompt = ({approve: a}: CallCanisterPromptPayload): void => {
-                approve = a;
+              const prompt = ({type, ...rest}: CallCanisterPromptPayload): void => {
+                if (type === 'consentMessage' && 'approve' in rest) {
+                  approve = rest.approve;
+                }
               };
 
               signer.register({

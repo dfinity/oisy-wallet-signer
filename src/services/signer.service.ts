@@ -15,7 +15,7 @@ import type {SignerOptions} from '../types/signer-options';
 import type {
   CallCanisterPrompt,
   ConsentMessageApproval,
-  CallCanisterPromptPayload
+  ConsentMessagePrompt
 } from '../types/signer-prompts';
 import {base64ToUint8Array} from '../utils/base64.utils';
 import {mapIcrc21ErrorToString} from '../utils/icrc-21.utils';
@@ -159,7 +159,7 @@ export class SignerService {
     ...payload
   }: {
     prompt: CallCanisterPrompt;
-  } & Omit<CallCanisterPromptPayload, 'approve' | 'reject'>): Promise<{
+  } & Pick<ConsentMessagePrompt, 'consentInfo' | 'origin'>): Promise<{
     result: 'approved' | 'rejected';
   }> {
     const promise = new Promise<{result: 'approved' | 'rejected'}>((resolve) => {
@@ -171,7 +171,7 @@ export class SignerService {
         resolve({result: 'rejected'});
       };
 
-      prompt({approve, reject: userReject, ...payload});
+      prompt({type: 'consentMessage', approve, reject: userReject, ...payload});
     });
 
     return await promise;

@@ -97,6 +97,8 @@ const ConsentMessagePromptSchema = PromptPayloadSchema.extend({
   reject: RejectionSchema
 });
 
+export type ConsentMessagePrompt = z.infer<typeof ConsentMessagePromptSchema>;
+
 const ProcessingPromptSchema = PromptPayloadSchema.extend({
   type: z.literal(CallCanisterPromptTypeSchema.enum.processing),
   step: z.enum([

@@ -6,8 +6,8 @@ import {
   ICRC29_STATUS,
   ICRC49_CALL_CANISTER
 } from '../constants/icrc.constants';
-import { mockAccounts } from '../mocks/icrc-accounts.mocks';
-import type { IcrcScopesArray } from './icrc-responses';
+import {mockAccounts} from '../mocks/icrc-accounts.mocks';
+import type {IcrcScopesArray} from './icrc-responses';
 import {
   AccountsPromptSchema,
   CallCanisterPromptSchema,
@@ -23,45 +23,42 @@ describe('SignerPrompts', () => {
     const approveEnums = [
       {
         title: 'ICRC25_REQUEST_PERMISSIONS',
-        validEnum: ICRC25_REQUEST_PERMISSIONS,
+        validEnum: ICRC25_REQUEST_PERMISSIONS
       },
       {
         title: 'ICRC27_ACCOUNTS',
-        validEnum: ICRC27_ACCOUNTS,
+        validEnum: ICRC27_ACCOUNTS
       },
       {
         title: 'ICRC49_CALL_CANISTER',
-        validEnum: ICRC49_CALL_CANISTER,
-      },
+        validEnum: ICRC49_CALL_CANISTER
+      }
     ];
 
     const invalidApproveEnums = [
       {
         title: 'ICRC25_PERMISSIONS',
-        validEnum: ICRC25_PERMISSIONS,
+        validEnum: ICRC25_PERMISSIONS
       },
       {
         title: 'ICRC25_SUPPORTED_STANDARDS',
-        validEnum: ICRC25_SUPPORTED_STANDARDS,
+        validEnum: ICRC25_SUPPORTED_STANDARDS
       },
       {
         title: 'ICRC29_STATUS',
-        validEnum: ICRC29_STATUS,
-      },
+        validEnum: ICRC29_STATUS
+      }
     ];
 
-    it.each(approveEnums)(
-        'should validate $title with PromptMethodSchema',
-        async ({ validEnum }) => {
-          expect(PromptMethodSchema.safeParse(validEnum).success).toBe(true);
-        }
-    );
+    it.each(approveEnums)('should validate $title with PromptMethodSchema', async ({validEnum}) => {
+      expect(PromptMethodSchema.safeParse(validEnum).success).toBe(true);
+    });
 
     it.each(invalidApproveEnums)(
-        'should not validate $title with PromptMethodSchema',
-        async ({ validEnum }) => {
-          expect(PromptMethodSchema.safeParse(validEnum).success).toBe(false);
-        }
+      'should not validate $title with PromptMethodSchema',
+      async ({validEnum}) => {
+        expect(PromptMethodSchema.safeParse(validEnum).success).toBe(false);
+      }
     );
   });
 
@@ -69,10 +66,10 @@ describe('SignerPrompts', () => {
     const scopes: IcrcScopesArray = [
       {
         scope: {
-          method: ICRC27_ACCOUNTS,
+          method: ICRC27_ACCOUNTS
         },
-        state: 'denied',
-      },
+        state: 'denied'
+      }
     ];
 
     it('should validate a PermissionsPrompt', () => {
@@ -92,7 +89,7 @@ describe('SignerPrompts', () => {
     it('should fail if confirm is missing in PermissionsPrompt', () => {
       const invalidPrompt = {
         requestedScopes: scopes,
-        origin: 'example.com',
+        origin: 'example.com'
       }; // confirm is missing
 
       expect(() => PermissionsPromptSchema.parse(invalidPrompt)).toThrow();
@@ -116,7 +113,7 @@ describe('SignerPrompts', () => {
 
     it('should fail if approve or reject is missing in AccountsPrompt', () => {
       const invalidPrompt = {
-        origin: 'example.com',
+        origin: 'example.com'
       };
 
       expect(() => AccountsPromptSchema.parse(invalidPrompt)).toThrow();
@@ -163,7 +160,7 @@ describe('SignerPrompts', () => {
     it('should fail if result is missing in CallCanisterResultPrompt', () => {
       const invalidPrompt = {
         type: 'callCanister',
-        payload: {},
+        payload: {}
       };
 
       expect(() => CallCanisterPromptSchema.parse(invalidPrompt)).toThrow();
