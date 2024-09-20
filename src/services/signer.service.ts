@@ -8,6 +8,7 @@ import {
   notifyNetworkError,
   notifySenderNotAllowedError
 } from '../handlers/signer-errors.handlers';
+import {notifyCallCanister} from '../handlers/signer-success.handlers';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import type {Notify} from '../types/signer-handlers';
 import type {SignerOptions} from '../types/signer-options';
@@ -111,12 +112,15 @@ export class SignerService {
     options: SignerOptions;
   }): Promise<{result: 'success' | 'error'}> {
     try {
-      await this.#signerApi.call({
+      const result = await this.#signerApi.call({
         ...options,
         params
       });
 
-      // TODO notify success
+      notifyCallCanister({
+        ...notify,
+        result
+      });
 
       return {result: 'success'};
     } catch (err: unknown) {
