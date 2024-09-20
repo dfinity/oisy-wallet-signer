@@ -1,4 +1,4 @@
-import {beforeEach, type Mock} from 'vitest';
+import type {Mock} from 'vitest';
 import {SignerErrorCode} from '../constants/signer.constants';
 import type {IcrcReadyResponse} from '../types/icrc-responses';
 import {JSON_RPC_VERSION_2, type RpcId, type RpcResponseWithError} from '../types/rpc';
