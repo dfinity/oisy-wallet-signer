@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { createAgent, isNullish } from '@dfinity/utils';
 	import { AccountIdentifier, LedgerCanister } from '@dfinity/ledger-icp';
-	import { ICP_LEDGER_CANISTER_ID } from '../constants/app.constants';
 	import { formatE8sICP } from '../utils/icp.utils';
 	import { AnonymousIdentity } from '@dfinity/agent';
 	import type { Principal } from '@dfinity/principal';
@@ -22,8 +21,7 @@
 		});
 
 		const { accountBalance } = LedgerCanister.create({
-			agent,
-			canisterId: ICP_LEDGER_CANISTER_ID
+			agent
 		});
 
 		balance = await accountBalance({
