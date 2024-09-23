@@ -1,4 +1,6 @@
 import {
+  ICRC21,
+  ICRC21_CALL_CONSENT_MESSAGE,
   ICRC25,
   ICRC25_PERMISSIONS,
   ICRC25_REQUEST_PERMISSIONS,
@@ -12,6 +14,10 @@ import {IcrcMethodSchema, IcrcScopedMethodSchema, IcrcStandardSchema} from './ic
 
 describe('ICRC standards', () => {
   const methodEnums = [
+    {
+      title: 'ICRC21_CALL_CONSENT_MESSAGE',
+      validEnum: ICRC21_CALL_CONSENT_MESSAGE
+    },
     {
       title: 'ICRC25_REQUEST_PERMISSIONS',
       validEnum: ICRC25_REQUEST_PERMISSIONS
@@ -80,6 +86,10 @@ describe('ICRC standards', () => {
   );
 
   const standardEnums = [
+    {
+      title: 'ICRC21',
+      validEnum: ICRC21
+    },
     {
       title: 'ICRC25',
       validEnum: ICRC25
