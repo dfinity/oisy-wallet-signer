@@ -29,6 +29,8 @@ export type Rejection = z.infer<typeof RejectionSchema>;
 
 export const StatusSchema = z.enum(['loading', 'result', 'error']);
 
+export type Status = z.infer<typeof StatusSchema>;
+
 const LoadingSchema = PayloadOriginSchema.extend({
   status: z.literal(StatusSchema.enum.loading)
 });
