@@ -96,8 +96,12 @@
 			</p>
 
 			<div class="flex">
-				<Button type="button" onclick={onReject} testId="reject-consent-message">Reject</Button>
-				<Button type="button" onclick={onApprove} testId="approve-consent-message">Approve</Button>
+				<Button type="button" onclick={onReject} testId="reject-consent-message-button"
+					>Reject</Button
+				>
+				<Button type="button" onclick={onApprove} testId="approve-consent-message-button"
+					>Approve</Button
+				>
 			</div>
 		{/if}
 	</div>

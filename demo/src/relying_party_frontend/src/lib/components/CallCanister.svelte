@@ -8,7 +8,6 @@
 	import { accountsStore } from '$lib/stores/accounts.store';
 	import { authStore } from '$core/stores/auth.store';
 	import type { Icrc1TransferRequest } from '@dfinity/ledger-icp';
-	import Balance from '$core/components/Balance.svelte';
 	import { E8S_PER_ICP } from '$core/constants/app.constants';
 	import { emit } from '$core/utils/events.utils';
 
@@ -63,8 +62,6 @@
 
 {#if nonNullish(wallet) && nonNullish($accountsStore)}
 	<div in:fade>
-		<Balance />
-
 		<Value id="call-canister" testId="call-canister" title="Call Canister">
 			{#if nonNullish(result)}
 				<Button onclick={onreset} testId="reset-call-canister-button">Reset result</Button>
