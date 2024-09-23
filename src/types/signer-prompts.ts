@@ -1,8 +1,8 @@
 import {z} from 'zod';
 import {
+  ICRC21_CALL_CONSENT_MESSAGE,
   ICRC25_REQUEST_PERMISSIONS,
-  ICRC27_ACCOUNTS,
-  ICRC49_CALL_CANISTER
+  ICRC27_ACCOUNTS
 } from '../constants/icrc.constants';
 import type {icrc21_consent_info} from '../declarations/icrc-21';
 import {IcrcAccountsSchema} from './icrc-accounts';
@@ -12,7 +12,7 @@ import {OriginSchema} from './post-message';
 export const PromptMethodSchema = z.enum([
   ICRC25_REQUEST_PERMISSIONS,
   ICRC27_ACCOUNTS,
-  ICRC49_CALL_CANISTER
+  ICRC21_CALL_CONSENT_MESSAGE
 ]);
 
 export type PromptMethod = z.infer<typeof PromptMethodSchema>;
@@ -24,6 +24,10 @@ const PromptPayloadSchema = z.object({
 const RejectionSchema = z.function().returns(z.void());
 
 export type Rejection = z.infer<typeof RejectionSchema>;
+
+export const StatusSchema = z.enum(['loading', 'result', 'error']);
+
+export type Status = z.infer<typeof StatusSchema>;
 
 // Prompt for permissions
 
@@ -82,19 +86,37 @@ export const AccountsPromptSchema = z
 
 export type AccountsPrompt = z.infer<typeof AccountsPromptSchema>;
 
-// Prompt for call canister
+// Prompt for consent message
+
+const ConsentMessageLoadingSchema = PromptPayloadSchema.extend({
+  status: z.literal(StatusSchema.enum.loading)
+});
 
 const ConsentMessageApprovalSchema = z.function().returns(z.void());
 
 export type ConsentMessageApproval = z.infer<typeof ConsentMessageApprovalSchema>;
 
-const CallCanisterPromptPayloadSchema = PromptPayloadSchema.extend({
+const ConsentMessageResultSchema = PromptPayloadSchema.extend({
+  status: z.literal(StatusSchema.enum.result),
   consentInfo: z.custom<icrc21_consent_info>(),
   approve: ConsentMessageApprovalSchema,
   reject: RejectionSchema
 });
 
-export type ConsentMessagePromptPayload = z.infer<typeof CallCanisterPromptPayloadSchema>;
+export type ConsentMessageResult = z.infer<typeof ConsentMessageResultSchema>;
+
+const ConsentMessageErrorSchema = PromptPayloadSchema.extend({
+  status: z.literal(StatusSchema.enum.error),
+  details: z.unknown().optional()
+});
+
+const ConsentMessagePromptPayloadSchema = z.union([
+  ConsentMessageLoadingSchema,
+  ConsentMessageResultSchema,
+  ConsentMessageErrorSchema
+]);
+
+export type ConsentMessagePromptPayload = z.infer<typeof ConsentMessagePromptPayloadSchema>;
 
 /**
  * A function that is invoked when the signer requires the user - or consumer of the library - to approve or reject a consent message.
@@ -104,9 +126,9 @@ export type ConsentMessagePromptPayload = z.infer<typeof CallCanisterPromptPaylo
  * @param {() => void} params.approve - A function to be called by the consumer to approve the consent message.
  * @param {() => void} params.reject - A function to be called by the consumer to reject the consent message.
  */
-export const CallCanisterPromptSchema = z
+export const ConsentMessagePromptSchema = z
   .function()
-  .args(CallCanisterPromptPayloadSchema)
+  .args(ConsentMessagePromptPayloadSchema)
   .returns(z.void());
 
-export type CallCanisterPrompt = z.infer<typeof CallCanisterPromptSchema>;
+export type ConsentMessagePrompt = z.infer<typeof ConsentMessagePromptSchema>;

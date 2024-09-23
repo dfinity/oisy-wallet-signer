@@ -154,6 +154,8 @@ export class PartyPage extends IdentityPage {
 
     await this.#walletPage?.approveCallCanisterPermission();
 
+    await this.#walletPage?.assertConsentMessageLoading();
+
     await this.#walletPage?.assertConsentMessage(partyUserId);
   }
 }

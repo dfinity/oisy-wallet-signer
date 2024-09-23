@@ -13,9 +13,9 @@ import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import type {Notify} from '../types/signer-handlers';
 import type {SignerOptions} from '../types/signer-options';
 import type {
-  CallCanisterPrompt,
   ConsentMessageApproval,
-  ConsentMessagePromptPayload
+  ConsentMessagePrompt,
+  ConsentMessageResult
 } from '../types/signer-prompts';
 import {base64ToUint8Array} from '../utils/base64.utils';
 import {mapIcrc21ErrorToString} from '../utils/icrc-21.utils';
@@ -30,7 +30,7 @@ export class SignerService {
     options: {owner, host}
   }: {
     params: IcrcCallCanisterRequestParams;
-    prompt: CallCanisterPrompt | undefined;
+    prompt: ConsentMessagePrompt | undefined;
     notify: Notify;
     options: SignerOptions;
   }): Promise<{result: 'approved' | 'rejected' | 'error'}> {
@@ -45,6 +45,10 @@ export class SignerService {
       notifyMissingPromptError(notify);
       return {result: 'error'};
     }
+
+    const {origin} = notify;
+
+    prompt({origin, status: 'loading'});
 
     try {
       const response = await this.#signerApi.consentMessage({
@@ -68,6 +72,8 @@ export class SignerService {
       if ('Err' in response) {
         const {Err} = response;
 
+        prompt({origin, status: 'error', details: Err});
+
         notifyErrorRequestNotSupported({
           ...notify,
           message: mapIcrc21ErrorToString(Err)
@@ -77,8 +83,6 @@ export class SignerService {
       }
 
       const {Ok: consentInfo} = response;
-
-      const {origin} = notify;
 
       const {result} = await this.promptConsentMessage({consentInfo, prompt, origin});
 
@@ -92,6 +96,8 @@ export class SignerService {
       // see https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_49_call_canister.md#errors
 
       // TODO: Likewise for example if canister is out of cycles or stopped etc. it should not throw 4000.
+
+      prompt({origin, status: 'error', details: err});
 
       notifyNetworkError({
         ...notify,
@@ -158,8 +164,8 @@ export class SignerService {
     prompt,
     ...payload
   }: {
-    prompt: CallCanisterPrompt;
-  } & Omit<ConsentMessagePromptPayload, 'approve' | 'reject'>): Promise<{
+    prompt: ConsentMessagePrompt;
+  } & Pick<ConsentMessageResult, 'consentInfo' | 'origin'>): Promise<{
     result: 'approved' | 'rejected';
   }> {
     const promise = new Promise<{result: 'approved' | 'rejected'}>((resolve) => {
@@ -171,7 +177,7 @@ export class SignerService {
         resolve({result: 'rejected'});
       };
 
-      prompt({approve, reject: userReject, ...payload});
+      prompt({status: 'result', approve, reject: userReject, ...payload});
     });
 
     return await promise;

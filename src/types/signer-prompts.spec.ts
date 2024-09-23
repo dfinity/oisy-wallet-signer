@@ -1,20 +1,20 @@
 import {
+  ICRC21_CALL_CONSENT_MESSAGE,
   ICRC25_PERMISSIONS,
   ICRC25_REQUEST_PERMISSIONS,
   ICRC25_SUPPORTED_STANDARDS,
   ICRC27_ACCOUNTS,
-  ICRC29_STATUS,
-  ICRC49_CALL_CANISTER
+  ICRC29_STATUS
 } from '../constants/icrc.constants';
 import {mockAccounts} from '../mocks/icrc-accounts.mocks';
 import type {IcrcScopesArray} from './icrc-responses';
 import {
   AccountsPromptSchema,
-  CallCanisterPromptSchema,
+  ConsentMessagePromptSchema,
   PermissionsPromptSchema,
   PromptMethodSchema,
   type AccountsPromptPayload,
-  type ConsentMessagePromptPayload,
+  type ConsentMessagePrompt,
   type PermissionsPromptPayload
 } from './signer-prompts';
 
@@ -30,8 +30,8 @@ describe('SignerPrompts', () => {
         validEnum: ICRC27_ACCOUNTS
       },
       {
-        title: 'ICRC49_CALL_CANISTER',
-        validEnum: ICRC49_CALL_CANISTER
+        title: 'ICRC21_CALL_CONSENT_MESSAGE',
+        validEnum: ICRC21_CALL_CONSENT_MESSAGE
       }
     ];
 
@@ -107,18 +107,34 @@ describe('SignerPrompts', () => {
   });
 
   describe('Consent message', () => {
-    it('should validate a ConsentMessagePrompt', () => {
-      const prompt = (payload: ConsentMessagePromptPayload): void => {
-        payload.approve();
+    it('should validate a ConsentMessagePrompt with status "load"', () => {
+      const prompt: ConsentMessagePrompt = (payload) => {
+        if (payload.status === 'loading') {
+          // Do nothing
+        }
       };
 
-      expect(() => CallCanisterPromptSchema.parse(prompt)).not.toThrow();
+      expect(() => ConsentMessagePromptSchema.parse(prompt)).not.toThrow();
     });
 
-    it('should fail with an invalid ConsentMessagePrompt', () => {
-      const invalidPrompt = 123;
+    it('should validate a ConsentMessagePrompt with status "result"', () => {
+      const prompt: ConsentMessagePrompt = (payload) => {
+        if (payload.status === 'result') {
+          payload.approve();
+        }
+      };
 
-      expect(() => CallCanisterPromptSchema.parse(invalidPrompt)).toThrow();
+      expect(() => ConsentMessagePromptSchema.parse(prompt)).not.toThrow();
+    });
+
+    it('should validate a ConsentMessagePrompt with status "error"', () => {
+      const prompt: ConsentMessagePrompt = (payload) => {
+        if (payload.status === 'error') {
+          // Do nothing
+        }
+      };
+
+      expect(() => ConsentMessagePromptSchema.parse(prompt)).not.toThrow();
     });
   });
 });

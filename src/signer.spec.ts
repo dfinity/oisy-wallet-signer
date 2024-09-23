@@ -3,6 +3,7 @@ import type {MockInstance} from 'vitest';
 import {Icrc21Canister} from './api/icrc21-canister.api';
 import {SignerApi} from './api/signer.api';
 import {
+  ICRC21_CALL_CONSENT_MESSAGE,
   ICRC25_PERMISSION_GRANTED,
   ICRC25_PERMISSIONS,
   ICRC25_REQUEST_PERMISSIONS,
@@ -37,7 +38,7 @@ import type {SignerMessageEventData} from './types/signer';
 import type {SignerOptions} from './types/signer-options';
 import {
   AccountsPromptSchema,
-  CallCanisterPromptSchema,
+  ConsentMessagePromptSchema,
   PermissionsPromptSchema,
   type AccountsApproval,
   type AccountsPromptPayload,
@@ -1044,7 +1045,7 @@ describe('Signer', () => {
               const promptSpy = vi.fn();
 
               signer.register({
-                method: ICRC49_CALL_CANISTER,
+                method: ICRC21_CALL_CONSENT_MESSAGE,
                 prompt: promptSpy
               });
 
@@ -1063,7 +1064,8 @@ describe('Signer', () => {
               window.dispatchEvent(messageEvent);
 
               await vi.waitFor(() => {
-                expect(promptSpy).toHaveBeenCalledTimes(1);
+                // Loading + result
+                expect(promptSpy).toHaveBeenCalledTimes(2);
               });
             });
 
@@ -1082,7 +1084,7 @@ describe('Signer', () => {
               });
 
               signer.register({
-                method: ICRC49_CALL_CANISTER,
+                method: ICRC21_CALL_CONSENT_MESSAGE,
                 prompt: promptSpy
               });
 
@@ -1101,19 +1103,22 @@ describe('Signer', () => {
               ]);
 
               await vi.waitFor(() => {
-                expect(promptSpy).toHaveBeenCalledTimes(1);
+                // Loading + result
+                expect(promptSpy).toHaveBeenCalledTimes(2);
               });
             });
 
             it('should notify aborted error for icrc49_call_canister if user reject consent', async () => {
               let reject: Rejection | undefined;
 
-              const prompt = ({reject: r}: ConsentMessagePromptPayload): void => {
-                reject = r;
+              const prompt = ({status, ...rest}: ConsentMessagePromptPayload): void => {
+                if (status === 'result' && 'reject' in rest) {
+                  reject = rest.reject;
+                }
               };
 
               signer.register({
-                method: ICRC49_CALL_CANISTER,
+                method: ICRC21_CALL_CONSENT_MESSAGE,
                 prompt
               });
 
@@ -1160,7 +1165,7 @@ describe('Signer', () => {
               const promptSpy = vi.fn();
 
               signer.register({
-                method: ICRC49_CALL_CANISTER,
+                method: ICRC21_CALL_CONSENT_MESSAGE,
                 prompt: promptSpy
               });
 
@@ -1214,7 +1219,7 @@ describe('Signer', () => {
               const promptSpy = vi.fn();
 
               signer.register({
-                method: ICRC49_CALL_CANISTER,
+                method: ICRC21_CALL_CONSENT_MESSAGE,
                 prompt: promptSpy
               });
 
@@ -1233,7 +1238,8 @@ describe('Signer', () => {
               window.dispatchEvent(messageEvent);
 
               await vi.waitFor(() => {
-                expect(promptSpy).toHaveBeenCalledTimes(1);
+                // Loading + result
+                expect(promptSpy).toHaveBeenCalledTimes(2);
               });
 
               expect(spyCanisterCall).not.toHaveBeenCalled();
@@ -1254,7 +1260,7 @@ describe('Signer', () => {
               });
 
               signer.register({
-                method: ICRC49_CALL_CANISTER,
+                method: ICRC21_CALL_CONSENT_MESSAGE,
                 prompt: promptSpy
               });
 
@@ -1273,7 +1279,8 @@ describe('Signer', () => {
               ]);
 
               await vi.waitFor(() => {
-                expect(promptSpy).toHaveBeenCalledTimes(1);
+                // Loading + result
+                expect(promptSpy).toHaveBeenCalledTimes(2);
               });
 
               expect(spyCanisterCall).not.toHaveBeenCalled();
@@ -1282,12 +1289,14 @@ describe('Signer', () => {
             it('should not call if consent message is rejected', async () => {
               let reject: Rejection | undefined;
 
-              const prompt = ({reject: r}: ConsentMessagePromptPayload): void => {
-                reject = r;
+              const prompt = ({status, ...rest}: ConsentMessagePromptPayload): void => {
+                if (status === 'result' && 'reject' in rest) {
+                  reject = rest.reject;
+                }
               };
 
               signer.register({
-                method: ICRC49_CALL_CANISTER,
+                method: ICRC21_CALL_CONSENT_MESSAGE,
                 prompt
               });
 
@@ -1319,12 +1328,14 @@ describe('Signer', () => {
             const approveAndCall = async (): Promise<void> => {
               let approve: ConsentMessageApproval | undefined;
 
-              const prompt = ({approve: a}: ConsentMessagePromptPayload): void => {
-                approve = a;
+              const prompt = ({status, ...rest}: ConsentMessagePromptPayload): void => {
+                if (status === 'result' && 'reject' in rest) {
+                  approve = rest.approve;
+                }
               };
 
               signer.register({
-                method: ICRC49_CALL_CANISTER,
+                method: ICRC21_CALL_CONSENT_MESSAGE,
                 prompt
               });
 
@@ -1597,11 +1608,11 @@ describe('Signer', () => {
     it('should validate a consent message prompt on register', () => {
       const mockConsentMessagePrompt = vi.fn();
 
-      const spy = vi.spyOn(CallCanisterPromptSchema, 'parse');
+      const spy = vi.spyOn(ConsentMessagePromptSchema, 'parse');
 
       expect(() => {
         signer.register({
-          method: ICRC49_CALL_CANISTER,
+          method: ICRC21_CALL_CONSENT_MESSAGE,
           prompt: mockConsentMessagePrompt
         });
       }).not.toThrow();

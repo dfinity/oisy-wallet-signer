@@ -1,5 +1,6 @@
 import {assertNonNullish, isNullish, nonNullish} from '@dfinity/utils';
 import {
+  ICRC21_CALL_CONSENT_MESSAGE,
   ICRC25_REQUEST_PERMISSIONS,
   ICRC27_ACCOUNTS,
   ICRC49_CALL_CANISTER
@@ -49,12 +50,12 @@ import type {Notify} from './types/signer-handlers';
 import type {SignerOptions} from './types/signer-options';
 import {
   AccountsPromptSchema,
-  CallCanisterPromptSchema,
+  ConsentMessagePromptSchema,
   PermissionsPromptSchema,
   type AccountsApproval,
   type AccountsPrompt,
   type AccountsPromptPayload,
-  type CallCanisterPrompt,
+  type ConsentMessagePrompt,
   type PermissionsConfirmation,
   type PermissionsPrompt,
   type PermissionsPromptPayload,
@@ -69,7 +70,7 @@ export class Signer {
 
   #permissionsPrompt: PermissionsPrompt | undefined;
   #accountsPrompt: AccountsPrompt | undefined;
-  #consentMessagePrompt: CallCanisterPrompt | undefined;
+  #consentMessagePrompt: ConsentMessagePrompt | undefined;
 
   readonly #signerService = new SignerService();
 
@@ -98,6 +99,10 @@ export class Signer {
     window.removeEventListener('message', this.onMessageListener);
     this.#walletOrigin = null;
   };
+
+  // TODO: onbeforeunload, the signer should notify an error 4001 if and only if there is a pending request at the same time.
+  // This means that the signer will have to keep track of its activity.
+  // See https://github.com/dfinity/wg-identity-authentication/pull/212
 
   private readonly onMessageListener = (message: SignerMessageEvent): void => {
     void this.onMessage(message);
@@ -186,7 +191,7 @@ export class Signer {
     prompt
   }: {
     method: PromptMethod;
-    prompt: PermissionsPrompt | AccountsPrompt | CallCanisterPrompt;
+    prompt: PermissionsPrompt | AccountsPrompt | ConsentMessagePrompt;
   }): void => {
     // TODO: maybe we should replace method here with another custom enum or type, that would be maybe a bit more comprehensive?
     // TODO: is there a way to avoid casting?
@@ -201,9 +206,9 @@ export class Signer {
         this.#accountsPrompt = prompt as AccountsPrompt;
         return;
       }
-      case ICRC49_CALL_CANISTER: {
-        CallCanisterPromptSchema.parse(prompt);
-        this.#consentMessagePrompt = prompt as CallCanisterPrompt;
+      case ICRC21_CALL_CONSENT_MESSAGE: {
+        ConsentMessagePromptSchema.parse(prompt);
+        this.#consentMessagePrompt = prompt as ConsentMessagePrompt;
         return;
       }
     }
