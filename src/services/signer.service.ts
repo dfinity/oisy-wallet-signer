@@ -46,6 +46,10 @@ export class SignerService {
       return {result: 'error'};
     }
 
+    const {origin} = notify;
+
+    prompt({origin, status: 'loading'});
+
     try {
       const response = await this.#signerApi.consentMessage({
         owner,
@@ -68,6 +72,8 @@ export class SignerService {
       if ('Err' in response) {
         const {Err} = response;
 
+        prompt({origin, status: 'error', details: Err});
+
         notifyErrorRequestNotSupported({
           ...notify,
           message: mapIcrc21ErrorToString(Err)
@@ -77,8 +83,6 @@ export class SignerService {
       }
 
       const {Ok: consentInfo} = response;
-
-      const {origin} = notify;
 
       const {result} = await this.promptConsentMessage({consentInfo, prompt, origin});
 
@@ -92,6 +96,8 @@ export class SignerService {
       // see https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_49_call_canister.md#errors
 
       // TODO: Likewise for example if canister is out of cycles or stopped etc. it should not throw 4000.
+
+      prompt({origin, status: 'error', details: err});
 
       notifyNetworkError({
         ...notify,
