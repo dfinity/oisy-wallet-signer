@@ -1,5 +1,7 @@
 import {z} from 'zod';
 import {
+  ICRC21,
+  ICRC21_CALL_CONSENT_MESSAGE,
   ICRC25,
   ICRC25_PERMISSION_ASK_ON_USE,
   ICRC25_PERMISSION_DENIED,
@@ -16,6 +18,7 @@ import {
 } from '../constants/icrc.constants';
 
 export const IcrcMethodSchema = z.enum([
+  ICRC21_CALL_CONSENT_MESSAGE,
   ICRC25_REQUEST_PERMISSIONS,
   ICRC25_PERMISSIONS,
   ICRC25_SUPPORTED_STANDARDS,
@@ -39,4 +42,4 @@ export const IcrcPermissionStateSchema = z.enum([
 
 export type IcrcPermissionState = z.infer<typeof IcrcPermissionStateSchema>;
 
-export const IcrcStandardSchema = z.enum([ICRC25, ICRC27, ICRC29, ICRC49]);
+export const IcrcStandardSchema = z.enum([ICRC21, ICRC25, ICRC27, ICRC29, ICRC49]);
