@@ -194,7 +194,7 @@ export class Signer {
     prompt
   }: {
     method: PromptMethod;
-    prompt: PermissionsPrompt | AccountsPrompt | ConsentMessagePrompt;
+    prompt: PermissionsPrompt | AccountsPrompt | ConsentMessagePrompt | CallCanisterPrompt;
   }): void => {
     // TODO: maybe we should replace method here with another custom enum or type, that would be maybe a bit more comprehensive?
     // TODO: is there a way to avoid casting?
