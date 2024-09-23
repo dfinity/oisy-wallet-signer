@@ -1,5 +1,6 @@
 import {assertNonNullish, isNullish, nonNullish} from '@dfinity/utils';
 import {
+  ICRC21_CALL_CONSENT_MESSAGE,
   ICRC25_REQUEST_PERMISSIONS,
   ICRC27_ACCOUNTS,
   ICRC49_CALL_CANISTER
@@ -205,7 +206,7 @@ export class Signer {
         this.#accountsPrompt = prompt as AccountsPrompt;
         return;
       }
-      case ICRC49_CALL_CANISTER: {
+      case ICRC21_CALL_CONSENT_MESSAGE: {
         ConsentMessagePromptSchema.parse(prompt);
         this.#consentMessagePrompt = prompt as ConsentMessagePrompt;
         return;

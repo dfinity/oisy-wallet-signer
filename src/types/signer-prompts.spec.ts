@@ -1,10 +1,10 @@
 import {
+  ICRC21_CALL_CONSENT_MESSAGE,
   ICRC25_PERMISSIONS,
   ICRC25_REQUEST_PERMISSIONS,
   ICRC25_SUPPORTED_STANDARDS,
   ICRC27_ACCOUNTS,
-  ICRC29_STATUS,
-  ICRC49_CALL_CANISTER
+  ICRC29_STATUS
 } from '../constants/icrc.constants';
 import {mockAccounts} from '../mocks/icrc-accounts.mocks';
 import type {IcrcScopesArray} from './icrc-responses';
@@ -30,8 +30,8 @@ describe('SignerPrompts', () => {
         validEnum: ICRC27_ACCOUNTS
       },
       {
-        title: 'ICRC49_CALL_CANISTER',
-        validEnum: ICRC49_CALL_CANISTER
+        title: 'ICRC21_CALL_CONSENT_MESSAGE',
+        validEnum: ICRC21_CALL_CONSENT_MESSAGE
       }
     ];
 
