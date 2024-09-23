@@ -10,12 +10,15 @@
 	} from '@dfinity/oisy-wallet-signer';
 	import type { icrc21_consent_info } from '@dfinity/oisy-wallet-signer';
 	import Button from '$core/components/Button.svelte';
+	import { fade } from 'svelte/transition';
 
 	type Props = {
 		signer: Signer | undefined;
 	};
 
 	let { signer }: Props = $props();
+
+	let loading = $state<boolean>(false);
 
 	let approve = $state<ConsentMessageApproval | undefined>(undefined);
 	let reject = $state<Rejection | undefined>(undefined);
@@ -47,12 +50,18 @@
 						approve = (rest as ConsentMessageResult).approve;
 						reject = (rest as ConsentMessageResult).reject;
 						consentInfo = (rest as ConsentMessageResult).consentInfo;
+						loading = false;
+						break;
+					}
+					case 'loading': {
+						loading = true;
 						break;
 					}
 					default: {
 						approve = undefined;
 						reject = undefined;
 						consentInfo = undefined;
+						loading = false;
 					}
 				}
 			}
@@ -69,6 +78,12 @@
 		resetPrompt();
 	};
 </script>
+
+{#if loading}
+	<p transition:fade data-tid="loading-consent-message" class="mt-2">
+		<small>Loading consent message...</small>
+	</p>
+{/if}
 
 {#if nonNullish(displayMessage)}
 	<p class="font-bold">Consent Message</p>
