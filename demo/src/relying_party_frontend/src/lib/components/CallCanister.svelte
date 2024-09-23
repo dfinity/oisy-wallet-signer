@@ -10,6 +10,7 @@
 	import type { Icrc1TransferRequest } from '@dfinity/ledger-icp';
 	import Balance from '$core/components/Balance.svelte';
 	import { E8S_PER_ICP } from '$core/constants/app.constants';
+	import { emit } from '$core/utils/events.utils';
 
 	type Props = {
 		wallet: IcpWallet | undefined;
@@ -47,6 +48,12 @@
 			owner: account.owner,
 			request
 		});
+
+		setTimeout(() => {
+			emit({
+				message: 'oisyDemoReloadBalance'
+			});
+		}, 2000);
 	};
 
 	const onreset = async () => {

@@ -9,6 +9,7 @@
 	import ConfirmAccounts from '$lib/ConfirmAccounts.svelte';
 	import ConsentMessage from '$lib/ConsentMessage.svelte';
 	import GetICP from '$lib/GetICP.svelte';
+	import CallCanister from '$lib/CallCanister.svelte';
 
 	let signer = $state<Signer | undefined>(undefined);
 
@@ -45,3 +46,5 @@
 <ConfirmAccounts {signer} />
 
 <ConsentMessage {signer} />
+
+<CallCanister {signer} />
