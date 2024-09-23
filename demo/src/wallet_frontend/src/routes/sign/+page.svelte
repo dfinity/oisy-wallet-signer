@@ -7,7 +7,7 @@
 	import { authStore } from '$core/stores/auth.store';
 	import { isNullish } from '@dfinity/utils';
 	import ConfirmAccounts from '$lib/ConfirmAccounts.svelte';
-	import ConfirmConsentMessage from '$lib/ConfirmConsentMessage.svelte';
+	import ConsentMessage from '$lib/ConsentMessage.svelte';
 	import GetICP from '$lib/GetICP.svelte';
 
 	let signer = $state<Signer | undefined>(undefined);
@@ -44,4 +44,4 @@
 
 <ConfirmAccounts {signer} />
 
-<ConfirmConsentMessage {signer} />
+<ConsentMessage {signer} />

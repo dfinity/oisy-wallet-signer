@@ -34,6 +34,7 @@
 		approve = undefined;
 		reject = undefined;
 		consentInfo = undefined;
+		loading = false;
 	};
 
 	$effect(() => {
