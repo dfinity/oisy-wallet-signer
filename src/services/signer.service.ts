@@ -13,7 +13,7 @@ import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import type {Notify} from '../types/signer-handlers';
 import type {SignerOptions} from '../types/signer-options';
 import type {
-  CallCanisterPrompt,
+  ConsentMessagePrompt,
   ConsentMessageApproval,
   ConsentMessagePromptPayload
 } from '../types/signer-prompts';
@@ -30,7 +30,7 @@ export class SignerService {
     options: {owner, host}
   }: {
     params: IcrcCallCanisterRequestParams;
-    prompt: CallCanisterPrompt | undefined;
+    prompt: ConsentMessagePrompt | undefined;
     notify: Notify;
     options: SignerOptions;
   }): Promise<{result: 'approved' | 'rejected' | 'error'}> {
@@ -158,7 +158,7 @@ export class SignerService {
     prompt,
     ...payload
   }: {
-    prompt: CallCanisterPrompt;
+    prompt: ConsentMessagePrompt;
   } & Omit<ConsentMessagePromptPayload, 'approve' | 'reject'>): Promise<{
     result: 'approved' | 'rejected';
   }> {

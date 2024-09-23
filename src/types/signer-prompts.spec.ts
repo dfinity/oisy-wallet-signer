@@ -10,12 +10,12 @@ import {mockAccounts} from '../mocks/icrc-accounts.mocks';
 import type {IcrcScopesArray} from './icrc-responses';
 import {
   AccountsPromptSchema,
-  CallCanisterPromptSchema,
+  ConsentMessagePromptSchema,
   PermissionsPromptSchema,
   PromptMethodSchema,
   type AccountsPromptPayload,
   type ConsentMessagePromptPayload,
-  type PermissionsPromptPayload
+  type PermissionsPromptPayload, ConsentMessagePrompt
 } from './signer-prompts';
 
 describe('SignerPrompts', () => {
@@ -107,18 +107,42 @@ describe('SignerPrompts', () => {
   });
 
   describe('Consent message', () => {
-    it('should validate a ConsentMessagePrompt', () => {
-      const prompt = (payload: ConsentMessagePromptPayload): void => {
-        payload.approve();
+    const testOrigin = 'https://hello.com';
+
+    it('should validate a ConsentMessagePrompt with status "load"', () => {
+      const prompt: ConsentMessagePrompt = (payload) => {
+        if (payload.status === 'load') {
+          // Do nothing
+        }
       };
 
-      expect(() => CallCanisterPromptSchema.parse(prompt)).not.toThrow();
+      expect(() => ConsentMessagePromptSchema.parse(prompt)).not.toThrow();
+    });
+
+    it('should validate a ConsentMessagePrompt with status "result"', () => {
+      const prompt: ConsentMessagePrompt = (payload) => {
+        if (payload.status === 'result') {
+          payload.approve();
+        }
+      };
+
+      expect(() => ConsentMessagePromptSchema.parse(prompt)).not.toThrow();
+    });
+
+    it('should validate a ConsentMessagePrompt with status "error"', () => {
+      const prompt: ConsentMessagePrompt = (payload) => {
+        if (payload.status === 'error') {
+          // Do nothing
+        }
+      };
+
+      expect(() => ConsentMessagePromptSchema.parse(prompt)).not.toThrow();
     });
 
     it('should fail with an invalid ConsentMessagePrompt', () => {
-      const invalidPrompt = 123;
-
-      expect(() => CallCanisterPromptSchema.parse(invalidPrompt)).toThrow();
+      const invalidPrompt: ConsentMessagePrompt = () => {};
+      expect(() => ConsentMessagePromptSchema.parse(invalidPrompt)).toThrow();
     });
   });
+
 });

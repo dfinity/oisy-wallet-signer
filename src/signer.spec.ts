@@ -37,7 +37,7 @@ import type {SignerMessageEventData} from './types/signer';
 import type {SignerOptions} from './types/signer-options';
 import {
   AccountsPromptSchema,
-  CallCanisterPromptSchema,
+  ConsentMessagePromptSchema,
   PermissionsPromptSchema,
   type AccountsApproval,
   type AccountsPromptPayload,
@@ -1597,7 +1597,7 @@ describe('Signer', () => {
     it('should validate a consent message prompt on register', () => {
       const mockConsentMessagePrompt = vi.fn();
 
-      const spy = vi.spyOn(CallCanisterPromptSchema, 'parse');
+      const spy = vi.spyOn(ConsentMessagePromptSchema, 'parse');
 
       expect(() => {
         signer.register({
