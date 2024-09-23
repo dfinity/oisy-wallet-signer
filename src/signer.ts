@@ -569,7 +569,8 @@ export class Signer {
       await this.#signerService.callCanister({
         notify,
         params,
-        options: this.#signerOptions
+        options: this.#signerOptions,
+        prompt: this.#callCanisterPrompt
       });
 
       return {handled: true};

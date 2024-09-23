@@ -13,6 +13,7 @@ import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import type {Notify} from '../types/signer-handlers';
 import type {SignerOptions} from '../types/signer-options';
 import type {
+  CallCanisterPrompt,
   ConsentMessageApproval,
   ConsentMessagePrompt,
   ResultConsentMessage
@@ -113,13 +114,19 @@ export class SignerService {
 
   async callCanister({
     params,
+    prompt,
     notify,
     options
   }: {
     params: IcrcCallCanisterRequestParams;
+    prompt: CallCanisterPrompt | undefined;
     notify: Notify;
     options: SignerOptions;
   }): Promise<{result: 'success' | 'error'}> {
+    const {origin} = notify;
+
+    prompt?.({origin, status: 'loading'});
+
     try {
       const result = await this.#signerApi.call({
         ...options,
@@ -131,8 +138,12 @@ export class SignerService {
         result
       });
 
+      prompt?.({origin, status: 'result', ...result});
+
       return {result: 'success'};
     } catch (err: unknown) {
+      prompt?.({origin, status: 'error', details: err});
+
       notifyNetworkError({
         ...notify,
         message:
