@@ -38,6 +38,7 @@ import type {SignerMessageEventData} from './types/signer';
 import type {SignerOptions} from './types/signer-options';
 import {
   AccountsPromptSchema,
+  CallCanisterPromptSchema,
   ConsentMessagePromptSchema,
   PermissionsPromptSchema,
   type AccountsApproval,
@@ -1618,6 +1619,21 @@ describe('Signer', () => {
       }).not.toThrow();
 
       expect(spy).toHaveBeenCalledWith(mockConsentMessagePrompt);
+    });
+
+    it('should validate a call canister prompt on register', () => {
+      const mockCallCanisterPrompt = vi.fn();
+
+      const spy = vi.spyOn(CallCanisterPromptSchema, 'parse');
+
+      expect(() => {
+        signer.register({
+          method: ICRC49_CALL_CANISTER,
+          prompt: mockCallCanisterPrompt
+        });
+      }).not.toThrow();
+
+      expect(spy).toHaveBeenCalledWith(mockCallCanisterPrompt);
     });
 
     it('should throw on register if prompt not supported', () => {

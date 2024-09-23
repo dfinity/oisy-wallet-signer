@@ -108,10 +108,12 @@ export type IcrcAccountsResponse = z.infer<typeof IcrcAccountsResponseSchema>;
 // icrc49_call_canister
 // https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_49_call_canister.md
 
-const IcrcCallCanisterResultSchema = z.object({
-  contentMap: IcrcBlob,
-  certificate: IcrcBlob
-});
+export const IcrcCallCanisterResultSchema = z
+  .object({
+    contentMap: IcrcBlob,
+    certificate: IcrcBlob
+  })
+  .strict();
 
 export type IcrcCallCanisterResult = z.infer<typeof IcrcCallCanisterResultSchema>;
 

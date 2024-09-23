@@ -50,11 +50,13 @@ import type {Notify} from './types/signer-handlers';
 import type {SignerOptions} from './types/signer-options';
 import {
   AccountsPromptSchema,
+  CallCanisterPromptSchema,
   ConsentMessagePromptSchema,
   PermissionsPromptSchema,
   type AccountsApproval,
   type AccountsPrompt,
   type AccountsPromptPayload,
+  type CallCanisterPrompt,
   type ConsentMessagePrompt,
   type PermissionsConfirmation,
   type PermissionsPrompt,
@@ -71,6 +73,7 @@ export class Signer {
   #permissionsPrompt: PermissionsPrompt | undefined;
   #accountsPrompt: AccountsPrompt | undefined;
   #consentMessagePrompt: ConsentMessagePrompt | undefined;
+  #callCanisterPrompt: CallCanisterPrompt | undefined;
 
   readonly #signerService = new SignerService();
 
@@ -196,6 +199,11 @@ export class Signer {
     // TODO: maybe we should replace method here with another custom enum or type, that would be maybe a bit more comprehensive?
     // TODO: is there a way to avoid casting?
     switch (method) {
+      case ICRC21_CALL_CONSENT_MESSAGE: {
+        ConsentMessagePromptSchema.parse(prompt);
+        this.#consentMessagePrompt = prompt as ConsentMessagePrompt;
+        return;
+      }
       case ICRC25_REQUEST_PERMISSIONS: {
         PermissionsPromptSchema.parse(prompt);
         this.#permissionsPrompt = prompt as PermissionsPrompt;
@@ -206,9 +214,9 @@ export class Signer {
         this.#accountsPrompt = prompt as AccountsPrompt;
         return;
       }
-      case ICRC21_CALL_CONSENT_MESSAGE: {
-        ConsentMessagePromptSchema.parse(prompt);
-        this.#consentMessagePrompt = prompt as ConsentMessagePrompt;
+      case ICRC49_CALL_CANISTER: {
+        CallCanisterPromptSchema.parse(prompt);
+        this.#callCanisterPrompt = prompt as CallCanisterPrompt;
         return;
       }
     }

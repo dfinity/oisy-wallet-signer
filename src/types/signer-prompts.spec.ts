@@ -4,16 +4,19 @@ import {
   ICRC25_REQUEST_PERMISSIONS,
   ICRC25_SUPPORTED_STANDARDS,
   ICRC27_ACCOUNTS,
-  ICRC29_STATUS
+  ICRC29_STATUS,
+  ICRC49_CALL_CANISTER
 } from '../constants/icrc.constants';
 import {mockAccounts} from '../mocks/icrc-accounts.mocks';
 import type {IcrcScopesArray} from './icrc-responses';
 import {
   AccountsPromptSchema,
+  CallCanisterPromptSchema,
   ConsentMessagePromptSchema,
   PermissionsPromptSchema,
   PromptMethodSchema,
   type AccountsPromptPayload,
+  type CallCanisterPromptPayload,
   type ConsentMessagePrompt,
   type PermissionsPromptPayload
 } from './signer-prompts';
@@ -21,6 +24,10 @@ import {
 describe('SignerPrompts', () => {
   describe('Prompts', () => {
     const approveEnums = [
+      {
+        title: 'ICRC21_CALL_CONSENT_MESSAGE',
+        validEnum: ICRC21_CALL_CONSENT_MESSAGE
+      },
       {
         title: 'ICRC25_REQUEST_PERMISSIONS',
         validEnum: ICRC25_REQUEST_PERMISSIONS
@@ -30,8 +37,8 @@ describe('SignerPrompts', () => {
         validEnum: ICRC27_ACCOUNTS
       },
       {
-        title: 'ICRC21_CALL_CONSENT_MESSAGE',
-        validEnum: ICRC21_CALL_CONSENT_MESSAGE
+        title: 'ICRC49_CALL_CANISTER',
+        validEnum: ICRC49_CALL_CANISTER
       }
     ];
 
@@ -135,6 +142,44 @@ describe('SignerPrompts', () => {
       };
 
       expect(() => ConsentMessagePromptSchema.parse(prompt)).not.toThrow();
+    });
+  });
+
+  describe('CallCanister prompt', () => {
+    it('should validate a CallCanisterPrompt with status "loading"', () => {
+      const prompt = (payload: CallCanisterPromptPayload): void => {
+        if (payload.status === 'loading') {
+          // Do nothing
+        }
+      };
+
+      expect(() => CallCanisterPromptSchema.parse(prompt)).not.toThrow();
+    });
+
+    it('should validate a CallCanisterPrompt with status "result"', () => {
+      const prompt = (payload: CallCanisterPromptPayload): void => {
+        if (payload.status === 'result') {
+          // Do nothing
+        }
+      };
+
+      expect(() => CallCanisterPromptSchema.parse(prompt)).not.toThrow();
+    });
+
+    it('should validate a CallCanisterPrompt with status "error"', () => {
+      const prompt = (payload: CallCanisterPromptPayload): void => {
+        if (payload.status === 'error') {
+          // Do nothing
+        }
+      };
+
+      expect(() => CallCanisterPromptSchema.parse(prompt)).not.toThrow();
+    });
+
+    it('should fail with an invalid CallCanisterPrompt', () => {
+      const invalidPrompt = 123;
+
+      expect(() => CallCanisterPromptSchema.parse(invalidPrompt)).toThrow();
     });
   });
 });
