@@ -109,7 +109,7 @@ describe('SignerPrompts', () => {
   describe('Consent message', () => {
     it('should validate a ConsentMessagePrompt with status "load"', () => {
       const prompt: ConsentMessagePrompt = (payload) => {
-        if (payload.status === 'load') {
+        if (payload.status === 'loading') {
           // Do nothing
         }
       };

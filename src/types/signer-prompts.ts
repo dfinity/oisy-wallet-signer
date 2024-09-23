@@ -25,7 +25,7 @@ const RejectionSchema = z.function().returns(z.void());
 
 export type Rejection = z.infer<typeof RejectionSchema>;
 
-export const StatusSchema = z.enum(['load', 'result', 'error']);
+export const StatusSchema = z.enum(['loading', 'result', 'error']);
 
 export type Status = z.infer<typeof StatusSchema>;
 
@@ -89,7 +89,7 @@ export type AccountsPrompt = z.infer<typeof AccountsPromptSchema>;
 // Prompt for consent message
 
 const ConsentMessageLoadingSchema = PromptPayloadSchema.extend({
-  status: z.literal(StatusSchema.enum.load)
+  status: z.literal(StatusSchema.enum.loading)
 });
 
 const ConsentMessageApprovalSchema = z.function().returns(z.void());
