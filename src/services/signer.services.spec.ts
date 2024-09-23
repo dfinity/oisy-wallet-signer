@@ -76,8 +76,10 @@ describe('Signer services', () => {
         Ok: mockConsentInfo
       });
 
-      const prompt = ({approve}: ConsentMessagePromptPayload): void => {
-        approve();
+      const prompt = ({status, ...rest}: ConsentMessagePromptPayload): void => {
+        if (status === 'result' && 'approve' in rest) {
+          rest.approve();
+        }
       };
 
       const result = await signerService.assertAndPromptConsentMessage({
@@ -111,8 +113,10 @@ describe('Signer services', () => {
       });
 
       it('should return rejected when user rejects the consent message', async () => {
-        const prompt = ({reject}: ConsentMessagePromptPayload): void => {
-          reject();
+        const prompt = ({status, ...rest}: ConsentMessagePromptPayload): void => {
+          if (status === 'result' && 'reject' in rest) {
+            rest.reject();
+          }
         };
 
         const result = await signerService.assertAndPromptConsentMessage({
@@ -126,8 +130,10 @@ describe('Signer services', () => {
       });
 
       it('should call notifyErrorActionAborted when user rejects consent message', async () => {
-        const prompt = ({reject}: ConsentMessagePromptPayload): void => {
-          reject();
+        const prompt = ({status, ...rest}: ConsentMessagePromptPayload): void => {
+          if (status === 'result' && 'reject' in rest) {
+            rest.reject();
+          }
         };
 
         await signerService.assertAndPromptConsentMessage({

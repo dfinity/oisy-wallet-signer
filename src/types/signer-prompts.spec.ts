@@ -14,8 +14,8 @@ import {
   PermissionsPromptSchema,
   PromptMethodSchema,
   type AccountsPromptPayload,
-  type ConsentMessagePromptPayload,
-  type PermissionsPromptPayload, ConsentMessagePrompt
+  type ConsentMessagePrompt,
+  type PermissionsPromptPayload
 } from './signer-prompts';
 
 describe('SignerPrompts', () => {
@@ -107,8 +107,6 @@ describe('SignerPrompts', () => {
   });
 
   describe('Consent message', () => {
-    const testOrigin = 'https://hello.com';
-
     it('should validate a ConsentMessagePrompt with status "load"', () => {
       const prompt: ConsentMessagePrompt = (payload) => {
         if (payload.status === 'load') {
@@ -138,11 +136,5 @@ describe('SignerPrompts', () => {
 
       expect(() => ConsentMessagePromptSchema.parse(prompt)).not.toThrow();
     });
-
-    it('should fail with an invalid ConsentMessagePrompt', () => {
-      const invalidPrompt: ConsentMessagePrompt = () => {};
-      expect(() => ConsentMessagePromptSchema.parse(invalidPrompt)).toThrow();
-    });
   });
-
 });

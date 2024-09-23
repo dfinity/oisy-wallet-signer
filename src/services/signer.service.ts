@@ -13,9 +13,9 @@ import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import type {Notify} from '../types/signer-handlers';
 import type {SignerOptions} from '../types/signer-options';
 import type {
-  ConsentMessagePrompt,
   ConsentMessageApproval,
-  ConsentMessagePromptPayload
+  ConsentMessagePrompt,
+  ConsentMessageResult
 } from '../types/signer-prompts';
 import {base64ToUint8Array} from '../utils/base64.utils';
 import {mapIcrc21ErrorToString} from '../utils/icrc-21.utils';
@@ -159,7 +159,7 @@ export class SignerService {
     ...payload
   }: {
     prompt: ConsentMessagePrompt;
-  } & Omit<ConsentMessagePromptPayload, 'approve' | 'reject'>): Promise<{
+  } & Pick<ConsentMessageResult, 'consentInfo' | 'origin'>): Promise<{
     result: 'approved' | 'rejected';
   }> {
     const promise = new Promise<{result: 'approved' | 'rejected'}>((resolve) => {
@@ -171,7 +171,7 @@ export class SignerService {
         resolve({result: 'rejected'});
       };
 
-      prompt({approve, reject: userReject, ...payload});
+      prompt({status: 'result', approve, reject: userReject, ...payload});
     });
 
     return await promise;

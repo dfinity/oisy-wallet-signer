@@ -103,6 +103,8 @@ const ConsentMessageResultSchema = PromptPayloadSchema.extend({
   reject: RejectionSchema
 });
 
+export type ConsentMessageResult = z.infer<typeof ConsentMessageResultSchema>;
+
 const ConsentMessageErrorSchema = PromptPayloadSchema.extend({
   status: z.literal(StatusSchema.enum.error),
   details: z.unknown().optional()
