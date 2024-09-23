@@ -1063,7 +1063,8 @@ describe('Signer', () => {
               window.dispatchEvent(messageEvent);
 
               await vi.waitFor(() => {
-                expect(promptSpy).toHaveBeenCalledTimes(1);
+                // Loading + result
+                expect(promptSpy).toHaveBeenCalledTimes(2);
               });
             });
 
@@ -1101,7 +1102,8 @@ describe('Signer', () => {
               ]);
 
               await vi.waitFor(() => {
-                expect(promptSpy).toHaveBeenCalledTimes(1);
+                // Loading + result
+                expect(promptSpy).toHaveBeenCalledTimes(2);
               });
             });
 
@@ -1235,7 +1237,8 @@ describe('Signer', () => {
               window.dispatchEvent(messageEvent);
 
               await vi.waitFor(() => {
-                expect(promptSpy).toHaveBeenCalledTimes(1);
+                // Loading + result
+                expect(promptSpy).toHaveBeenCalledTimes(2);
               });
 
               expect(spyCanisterCall).not.toHaveBeenCalled();
@@ -1275,7 +1278,8 @@ describe('Signer', () => {
               ]);
 
               await vi.waitFor(() => {
-                expect(promptSpy).toHaveBeenCalledTimes(1);
+                // Loading + result
+                expect(promptSpy).toHaveBeenCalledTimes(2);
               });
 
               expect(spyCanisterCall).not.toHaveBeenCalled();
