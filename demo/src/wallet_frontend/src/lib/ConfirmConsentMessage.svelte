@@ -5,7 +5,7 @@
 	import {
 		type ConsentMessageApproval,
 		type ConsentMessagePromptPayload,
-		type ConsentMessageResult,
+		type ResultConsentMessage,
 		ICRC21_CALL_CONSENT_MESSAGE,
 		type Rejection
 	} from '@dfinity/oisy-wallet-signer';
@@ -47,9 +47,9 @@
 			prompt: ({ status, ...rest }: ConsentMessagePromptPayload) => {
 				switch (status) {
 					case 'result': {
-						approve = (rest as ConsentMessageResult).approve;
-						reject = (rest as ConsentMessageResult).reject;
-						consentInfo = (rest as ConsentMessageResult).consentInfo;
+						approve = (rest as ResultConsentMessage).approve;
+						reject = (rest as ResultConsentMessage).reject;
+						consentInfo = (rest as ResultConsentMessage).consentInfo;
 						loading = false;
 						break;
 					}
