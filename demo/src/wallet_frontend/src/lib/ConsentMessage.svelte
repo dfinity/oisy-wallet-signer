@@ -5,7 +5,7 @@
 	import {
 		type ConsentMessageApproval,
 		type ConsentMessagePromptPayload,
-		type ConsentMessageResult,
+		type ResultConsentMessage,
 		ICRC21_CALL_CONSENT_MESSAGE,
 		type Rejection
 	} from '@dfinity/oisy-wallet-signer';
@@ -34,6 +34,7 @@
 		approve = undefined;
 		reject = undefined;
 		consentInfo = undefined;
+		loading = false;
 	};
 
 	$effect(() => {
@@ -47,9 +48,9 @@
 			prompt: ({ status, ...rest }: ConsentMessagePromptPayload) => {
 				switch (status) {
 					case 'result': {
-						approve = (rest as ConsentMessageResult).approve;
-						reject = (rest as ConsentMessageResult).reject;
-						consentInfo = (rest as ConsentMessageResult).consentInfo;
+						approve = (rest as ResultConsentMessage).approve;
+						reject = (rest as ResultConsentMessage).reject;
+						consentInfo = (rest as ResultConsentMessage).consentInfo;
 						loading = false;
 						break;
 					}
@@ -79,21 +80,29 @@
 	};
 </script>
 
-{#if loading}
-	<p in:fade data-tid="loading-consent-message" class="mt-2">
-		<small>Loading consent message...</small>
-	</p>
-{/if}
+{#if loading || nonNullish(displayMessage)}
+	<div in:fade>
+		<p class="font-bold text-sm mt-3">Consent Message:</p>
 
-{#if nonNullish(displayMessage)}
-	<p class="font-bold">Consent Message</p>
+		{#if loading}
+			<p data-tid="loading-consent-message" class="text-sm mb-2 break-words">
+				Loading consent message...
+			</p>
+		{/if}
 
-	<p class="mt-2 mb-4 text-sm" data-tid="consent-message">
-		{displayMessage}
-	</p>
+		{#if nonNullish(displayMessage)}
+			<p class="text-sm mb-2 break-words" data-tid="consent-message">
+				{displayMessage}
+			</p>
 
-	<div class="flex">
-		<Button type="button" onclick={onReject} testId="reject-consent-message">Reject</Button>
-		<Button type="button" onclick={onApprove} testId="approve-consent-message">Approve</Button>
+			<div class="flex">
+				<Button type="button" onclick={onReject} testId="reject-consent-message-button"
+					>Reject</Button
+				>
+				<Button type="button" onclick={onApprove} testId="approve-consent-message-button"
+					>Approve</Button
+				>
+			</div>
+		{/if}
 	</div>
 {/if}

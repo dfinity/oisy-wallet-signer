@@ -44,4 +44,6 @@
 <svelte:window {onoisyDemoReloadBalance} />
 
 <p class="font-bold text-sm mt-3">Current balance:</p>
-<p class="text-sm mb-2 break-words"><output>{formatE8sICP(balance)} ICP</output></p>
+<p class="text-sm mb-2 break-words">
+	<output data-tid="icp-balance">{formatE8sICP(balance)} ICP</output>
+</p>

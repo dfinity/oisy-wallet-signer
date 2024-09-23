@@ -2,22 +2,24 @@ import {z} from 'zod';
 import {
   ICRC21_CALL_CONSENT_MESSAGE,
   ICRC25_REQUEST_PERMISSIONS,
-  ICRC27_ACCOUNTS
+  ICRC27_ACCOUNTS,
+  ICRC49_CALL_CANISTER
 } from '../constants/icrc.constants';
 import type {icrc21_consent_info} from '../declarations/icrc-21';
 import {IcrcAccountsSchema} from './icrc-accounts';
-import {IcrcScopesArraySchema} from './icrc-responses';
+import {IcrcCallCanisterResultSchema, IcrcScopesArraySchema} from './icrc-responses';
 import {OriginSchema} from './post-message';
 
 export const PromptMethodSchema = z.enum([
+  ICRC21_CALL_CONSENT_MESSAGE,
   ICRC25_REQUEST_PERMISSIONS,
   ICRC27_ACCOUNTS,
-  ICRC21_CALL_CONSENT_MESSAGE
+  ICRC49_CALL_CANISTER
 ]);
 
 export type PromptMethod = z.infer<typeof PromptMethodSchema>;
 
-const PromptPayloadSchema = z.object({
+const PayloadOriginSchema = z.object({
   origin: OriginSchema
 });
 
@@ -29,13 +31,22 @@ export const StatusSchema = z.enum(['loading', 'result', 'error']);
 
 export type Status = z.infer<typeof StatusSchema>;
 
+const LoadingSchema = PayloadOriginSchema.extend({
+  status: z.literal(StatusSchema.enum.loading)
+});
+
+const ErrorSchema = PayloadOriginSchema.extend({
+  status: z.literal(StatusSchema.enum.error),
+  details: z.unknown().optional()
+});
+
 // Prompt for permissions
 
 const PermissionsConfirmationSchema = z.function().args(IcrcScopesArraySchema).returns(z.void());
 
 export type PermissionsConfirmation = z.infer<typeof PermissionsConfirmationSchema>;
 
-const PermissionsPromptPayloadSchema = PromptPayloadSchema.extend({
+const PermissionsPromptPayloadSchema = PayloadOriginSchema.extend({
   requestedScopes: IcrcScopesArraySchema,
   confirm: PermissionsConfirmationSchema
 });
@@ -66,7 +77,7 @@ const AccountsApprovalSchema = z.function().args(IcrcAccountsSchema).returns(z.v
 
 export type AccountsApproval = z.infer<typeof AccountsApprovalSchema>;
 
-const AccountsPromptPayloadSchema = PromptPayloadSchema.extend({
+const AccountsPromptPayloadSchema = PayloadOriginSchema.extend({
   approve: AccountsApprovalSchema,
   reject: RejectionSchema
 });
@@ -88,32 +99,23 @@ export type AccountsPrompt = z.infer<typeof AccountsPromptSchema>;
 
 // Prompt for consent message
 
-const ConsentMessageLoadingSchema = PromptPayloadSchema.extend({
-  status: z.literal(StatusSchema.enum.loading)
-});
-
 const ConsentMessageApprovalSchema = z.function().returns(z.void());
 
 export type ConsentMessageApproval = z.infer<typeof ConsentMessageApprovalSchema>;
 
-const ConsentMessageResultSchema = PromptPayloadSchema.extend({
+const ResultConsentMessageSchema = PayloadOriginSchema.extend({
   status: z.literal(StatusSchema.enum.result),
   consentInfo: z.custom<icrc21_consent_info>(),
   approve: ConsentMessageApprovalSchema,
   reject: RejectionSchema
 });
 
-export type ConsentMessageResult = z.infer<typeof ConsentMessageResultSchema>;
-
-const ConsentMessageErrorSchema = PromptPayloadSchema.extend({
-  status: z.literal(StatusSchema.enum.error),
-  details: z.unknown().optional()
-});
+export type ResultConsentMessage = z.infer<typeof ResultConsentMessageSchema>;
 
 const ConsentMessagePromptPayloadSchema = z.union([
-  ConsentMessageLoadingSchema,
-  ConsentMessageResultSchema,
-  ConsentMessageErrorSchema
+  LoadingSchema,
+  ResultConsentMessageSchema,
+  ErrorSchema
 ]);
 
 export type ConsentMessagePromptPayload = z.infer<typeof ConsentMessagePromptPayloadSchema>;
@@ -132,3 +134,27 @@ export const ConsentMessagePromptSchema = z
   .returns(z.void());
 
 export type ConsentMessagePrompt = z.infer<typeof ConsentMessagePromptSchema>;
+
+// Prompt for call canister
+
+const ResultCallCanisterSchema = z.intersection(
+  PayloadOriginSchema.extend({
+    status: z.literal(StatusSchema.enum.result)
+  }),
+  IcrcCallCanisterResultSchema
+);
+
+const CallCanisterPromptPayloadSchema = z.union([
+  LoadingSchema,
+  ResultCallCanisterSchema,
+  ErrorSchema
+]);
+
+export type CallCanisterPromptPayload = z.infer<typeof CallCanisterPromptPayloadSchema>;
+
+export const CallCanisterPromptSchema = z
+  .function()
+  .args(CallCanisterPromptPayloadSchema)
+  .returns(z.void());
+
+export type CallCanisterPrompt = z.infer<typeof CallCanisterPromptSchema>;

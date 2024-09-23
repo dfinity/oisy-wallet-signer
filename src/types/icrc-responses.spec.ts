@@ -9,6 +9,7 @@ import {uint8ArrayToBase64} from '../utils/base64.utils';
 import {
   IcrcAccountsResponseSchema,
   IcrcCallCanisterResponseSchema,
+  IcrcCallCanisterResultSchema,
   IcrcReadyResponseSchema,
   IcrcScopeSchema,
   IcrcScopesResponseSchema,
@@ -657,82 +658,124 @@ describe('icrc-responses', () => {
       }
     };
 
-    it('should validate a correct response', () => {
-      expect(() => IcrcCallCanisterResponseSchema.parse(validResponse)).not.toThrow();
-    });
+    describe('Result', () => {
+      it('should validate a correct result payload', () => {
+        expect(() => IcrcCallCanisterResultSchema.parse(validResponse.result)).not.toThrow();
+      });
 
-    it('should throw if response has invalid contentMap (not Uint8Array)', () => {
-      const invalidResponse = {
-        ...validResponse,
-        result: {
+      it('should throw if contentMap is invalid (not Base64 string)', () => {
+        const invalidPayload = {
           ...validResponse.result,
-          contentMap: 'invalid-content' // Not a Uint8Array
-        }
-      };
-      expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
-    });
+          contentMap: 'invalid-content'
+        };
+        expect(() => IcrcCallCanisterResultSchema.parse(invalidPayload)).toThrow();
+      });
 
-    it('should throw if response has invalid certificate (not Uint8Array)', () => {
-      const invalidResponse = {
-        ...validResponse,
-        result: {
+      it('should throw if certificate is invalid (not Base64 string)', () => {
+        const invalidPayload = {
           ...validResponse.result,
-          certificate: 'invalid-certificate' // Not a Uint8Array
-        }
-      };
-      expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
-    });
+          certificate: 'invalid-certificate'
+        };
+        expect(() => IcrcCallCanisterResultSchema.parse(invalidPayload)).toThrow();
+      });
 
-    it('should throw if response has missing contentMap', () => {
-      const {contentMap: _, ...rest} = validResponse.result;
+      it('should throw if contentMap is missing', () => {
+        const {contentMap: _, ...rest} = validResponse.result;
+        expect(() => IcrcCallCanisterResultSchema.parse(rest)).toThrow();
+      });
 
-      const invalidResponse = {
-        ...validResponse,
-        result: rest
-      };
-      expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
-    });
+      it('should throw if certificate is missing', () => {
+        const {certificate: _, ...rest} = validResponse.result;
+        expect(() => IcrcCallCanisterResultSchema.parse(rest)).toThrow();
+      });
 
-    it('should throw if response has missing certificate', () => {
-      const {certificate: _, ...rest} = validResponse.result;
-
-      const invalidResponse = {
-        ...validResponse,
-        result: rest
-      };
-      expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
-    });
-
-    it('should throw if response has extra fields in result', () => {
-      const invalidResponse = {
-        ...validResponse,
-        result: {
+      it('should throw if there are extra fields in the payload', () => {
+        const invalidPayload = {
           ...validResponse.result,
           extraField: 'unexpected'
-        }
-      };
-      expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
+        };
+        expect(() => IcrcCallCanisterResultSchema.parse(invalidPayload)).toThrow();
+      });
     });
 
-    it('should throw if response has no result field', () => {
-      const {result: _, ...rest} = validResponse;
+    describe('Response', () => {
+      it('should validate a correct response', () => {
+        expect(() => IcrcCallCanisterResponseSchema.parse(validResponse)).not.toThrow();
+      });
 
-      const invalidResponse = rest;
-      expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
-    });
+      it('should throw if response has invalid contentMap (not Base64 string)', () => {
+        const invalidResponse = {
+          ...validResponse,
+          result: {
+            ...validResponse.result,
+            contentMap: 'invalid-content'
+          }
+        };
+        expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
+      });
 
-    it('should throw if response has no id', () => {
-      const {id: _, ...rest} = validResponse;
+      it('should throw if response has invalid certificate (not Base64 string)', () => {
+        const invalidResponse = {
+          ...validResponse,
+          result: {
+            ...validResponse.result,
+            certificate: 'invalid-certificate'
+          }
+        };
+        expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
+      });
 
-      const invalidResponse = rest;
-      expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
-    });
+      it('should throw if response has missing contentMap', () => {
+        const {contentMap: _, ...rest} = validResponse.result;
 
-    it('should throw if response has no jsonrpc field', () => {
-      const {jsonrpc: _, ...rest} = validResponse;
+        const invalidResponse = {
+          ...validResponse,
+          result: rest
+        };
+        expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
+      });
 
-      const invalidResponse = rest;
-      expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
+      it('should throw if response has missing certificate', () => {
+        const {certificate: _, ...rest} = validResponse.result;
+
+        const invalidResponse = {
+          ...validResponse,
+          result: rest
+        };
+        expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
+      });
+
+      it('should throw if response has extra fields in result', () => {
+        const invalidResponse = {
+          ...validResponse,
+          result: {
+            ...validResponse.result,
+            extraField: 'unexpected'
+          }
+        };
+        expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
+      });
+
+      it('should throw if response has no result field', () => {
+        const {result: _, ...rest} = validResponse;
+
+        const invalidResponse = rest;
+        expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
+      });
+
+      it('should throw if response has no id', () => {
+        const {id: _, ...rest} = validResponse;
+
+        const invalidResponse = rest;
+        expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
+      });
+
+      it('should throw if response has no jsonrpc field', () => {
+        const {jsonrpc: _, ...rest} = validResponse;
+
+        const invalidResponse = rest;
+        expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
+      });
     });
   });
 });
