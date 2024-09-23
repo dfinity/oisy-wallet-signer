@@ -75,4 +75,18 @@ export class WalletPage extends IdentityPage {
       })
     );
   }
+
+  async getICP(): Promise<void> {
+    await expect(this.page.getByTestId('get-icp-button')).toBeVisible();
+
+    await this.page.getByTestId('get-icp-button').click();
+  }
+
+  async approveConsentMessage(): Promise<void> {
+    await expect(this.page.getByTestId('approve-consent-message-button')).toBeVisible();
+
+    await this.page.getByTestId('approve-consent-message-button').click();
+
+    await expect(this.page.getByTestId('result-call-canister')).toBeVisible();
+  }
 }

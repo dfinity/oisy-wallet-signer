@@ -34,4 +34,12 @@ export abstract class IdentityPage {
 
     return await output.innerText();
   }
+
+  async assertBalance(balance: string): Promise<void> {
+    await expect(this.page.getByTestId('icp-balance')).toBeVisible();
+
+    const output = this.page.getByTestId('icp-balance');
+
+    await expect(output).toContainText(`${balance} ICP`);
+  }
 }

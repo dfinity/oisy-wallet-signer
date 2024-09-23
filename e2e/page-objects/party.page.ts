@@ -158,4 +158,16 @@ export class PartyPage extends IdentityPage {
 
     await this.#walletPage?.assertConsentMessage(partyUserId);
   }
+
+  async callCanister(): Promise<void> {
+    await this.#walletPage?.getICP();
+
+    await this.#walletPage?.assertBalance('55.0001');
+
+    await this.#walletPage?.approveConsentMessage();
+
+    await this.#walletPage?.assertBalance('54.5000');
+
+    await this.assertBalance('0.5000');
+  }
 }
