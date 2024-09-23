@@ -5,7 +5,8 @@
 		ICRC49_CALL_CANISTER,
 		type Rejection,
 		type ConsentMessageApproval,
-		type ConsentMessagePromptPayload
+		type ConsentMessagePromptPayload,
+		type ConsentMessageResult
 	} from '@dfinity/oisy-wallet-signer';
 	import type { icrc21_consent_info } from '@dfinity/oisy-wallet-signer';
 	import Button from '$core/components/Button.svelte';
@@ -40,14 +41,20 @@
 
 		signer.register({
 			method: ICRC49_CALL_CANISTER,
-			prompt: ({
-				approve: approveConsent,
-				reject: rejectConsent,
-				consentInfo: info
-			}: ConsentMessagePromptPayload) => {
-				approve = approveConsent;
-				reject = rejectConsent;
-				consentInfo = info;
+			prompt: ({ status, ...rest }: ConsentMessagePromptPayload) => {
+				switch (status) {
+					case 'result': {
+						approve = (rest as ConsentMessageResult).approve;
+						reject = (rest as ConsentMessageResult).reject;
+						consentInfo = (rest as ConsentMessageResult).consentInfo;
+						break;
+					}
+					default: {
+						approve = undefined;
+						reject = undefined;
+						consentInfo = undefined;
+					}
+				}
 			}
 		});
 	});
