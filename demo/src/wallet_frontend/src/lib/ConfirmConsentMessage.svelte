@@ -80,7 +80,7 @@
 </script>
 
 {#if loading}
-	<p transition:fade data-tid="loading-consent-message" class="mt-2">
+	<p in:fade data-tid="loading-consent-message" class="mt-2">
 		<small>Loading consent message...</small>
 	</p>
 {/if}
