@@ -3,6 +3,7 @@ import type {MockInstance} from 'vitest';
 import {Icrc21Canister} from './api/icrc21-canister.api';
 import {SignerApi} from './api/signer.api';
 import {
+  ICRC21_CALL_CONSENT_MESSAGE,
   ICRC25_PERMISSION_GRANTED,
   ICRC25_PERMISSIONS,
   ICRC25_REQUEST_PERMISSIONS,
@@ -1044,7 +1045,7 @@ describe('Signer', () => {
               const promptSpy = vi.fn();
 
               signer.register({
-                method: ICRC49_CALL_CANISTER,
+                method: ICRC21_CALL_CONSENT_MESSAGE,
                 prompt: promptSpy
               });
 
@@ -1083,7 +1084,7 @@ describe('Signer', () => {
               });
 
               signer.register({
-                method: ICRC49_CALL_CANISTER,
+                method: ICRC21_CALL_CONSENT_MESSAGE,
                 prompt: promptSpy
               });
 
@@ -1117,7 +1118,7 @@ describe('Signer', () => {
               };
 
               signer.register({
-                method: ICRC49_CALL_CANISTER,
+                method: ICRC21_CALL_CONSENT_MESSAGE,
                 prompt
               });
 
@@ -1164,7 +1165,7 @@ describe('Signer', () => {
               const promptSpy = vi.fn();
 
               signer.register({
-                method: ICRC49_CALL_CANISTER,
+                method: ICRC21_CALL_CONSENT_MESSAGE,
                 prompt: promptSpy
               });
 
@@ -1218,7 +1219,7 @@ describe('Signer', () => {
               const promptSpy = vi.fn();
 
               signer.register({
-                method: ICRC49_CALL_CANISTER,
+                method: ICRC21_CALL_CONSENT_MESSAGE,
                 prompt: promptSpy
               });
 
@@ -1259,7 +1260,7 @@ describe('Signer', () => {
               });
 
               signer.register({
-                method: ICRC49_CALL_CANISTER,
+                method: ICRC21_CALL_CONSENT_MESSAGE,
                 prompt: promptSpy
               });
 
@@ -1295,7 +1296,7 @@ describe('Signer', () => {
               };
 
               signer.register({
-                method: ICRC49_CALL_CANISTER,
+                method: ICRC21_CALL_CONSENT_MESSAGE,
                 prompt
               });
 
@@ -1334,7 +1335,7 @@ describe('Signer', () => {
               };
 
               signer.register({
-                method: ICRC49_CALL_CANISTER,
+                method: ICRC21_CALL_CONSENT_MESSAGE,
                 prompt
               });
 
@@ -1611,7 +1612,7 @@ describe('Signer', () => {
 
       expect(() => {
         signer.register({
-          method: ICRC49_CALL_CANISTER,
+          method: ICRC21_CALL_CONSENT_MESSAGE,
           prompt: mockConsentMessagePrompt
         });
       }).not.toThrow();

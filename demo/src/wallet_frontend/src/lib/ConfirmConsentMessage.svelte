@@ -1,14 +1,14 @@
 <script lang="ts">
 	import type { Signer } from '@dfinity/oisy-wallet-signer/signer';
 	import { isNullish, nonNullish } from '@dfinity/utils';
+	import type { icrc21_consent_info } from '@dfinity/oisy-wallet-signer';
 	import {
-		ICRC49_CALL_CANISTER,
-		type Rejection,
 		type ConsentMessageApproval,
 		type ConsentMessagePromptPayload,
-		type ConsentMessageResult
+		type ConsentMessageResult,
+		ICRC21_CALL_CONSENT_MESSAGE,
+		type Rejection
 	} from '@dfinity/oisy-wallet-signer';
-	import type { icrc21_consent_info } from '@dfinity/oisy-wallet-signer';
 	import Button from '$core/components/Button.svelte';
 	import { fade } from 'svelte/transition';
 
@@ -43,7 +43,7 @@
 		}
 
 		signer.register({
-			method: ICRC49_CALL_CANISTER,
+			method: ICRC21_CALL_CONSENT_MESSAGE,
 			prompt: ({ status, ...rest }: ConsentMessagePromptPayload) => {
 				switch (status) {
 					case 'result': {
