@@ -187,7 +187,22 @@ export class Signer {
   }
 
   /**
-   * TODO: to be documented when fully implemented.
+   * Registers a prompt handler for a specified method in the signer service.
+   *
+   * @param {Object} options - An object containing the method and corresponding prompt handler.
+   * @param {PromptMethod} options.method - The method for which the prompt handler is being registered. Supported methods include ICRC standards.
+   * @param {PermissionsPrompt | AccountsPrompt | ConsentMessagePrompt | CallCanisterPrompt} options.prompt - The prompt handler that should be registered. The prompt type depends on the method being registered.
+   *
+   * @throws {Error} Throws an error if the method is not supported.
+   *
+   * @example
+   * // Register a permissions prompt
+   * register({
+   *   method: ICRC25_REQUEST_PERMISSIONS,
+   *   prompt: (payload) => {
+   *     payload.confirm(requestedScopes);
+   *   }
+   * });
    */
   register = ({
     method,
