@@ -418,10 +418,14 @@ describe('Signer services', () => {
     let notifyCallCanisterSpy: MockInstance;
     let notifyErrorSpy: MockInstance;
 
+    let prompt: Mock;
+
     beforeEach(() => {
       spySignerApiCall = vi.spyOn(SignerApi.prototype, 'call');
       notifyCallCanisterSpy = vi.spyOn(signerSuccessHandlers, 'notifyCallCanister');
       notifyErrorSpy = vi.spyOn(signerHandlers, 'notifyError');
+
+      prompt = vi.fn();
     });
 
     it('should call the signer API with the correct parameters', async () => {
@@ -430,7 +434,8 @@ describe('Signer services', () => {
       await signerService.callCanister({
         params,
         notify,
-        options: signerOptions
+        options: signerOptions,
+        prompt
       });
 
       expect(spySignerApiCall).toHaveBeenNthCalledWith(1, {
@@ -453,7 +458,8 @@ describe('Signer services', () => {
       await signerService.callCanister({
         params,
         notify,
-        options: signerOptions
+        options: signerOptions,
+        prompt
       });
 
       expect(notifyErrorSpy).toHaveBeenCalledWith({
@@ -472,7 +478,8 @@ describe('Signer services', () => {
       await signerService.callCanister({
         params,
         notify,
-        options: signerOptions
+        options: signerOptions,
+        prompt
       });
 
       expect(notifyErrorSpy).toHaveBeenCalledWith({
@@ -482,6 +489,58 @@ describe('Signer services', () => {
           code: SignerErrorCode.NETWORK_ERROR,
           message: 'An unknown error occurred'
         }
+      });
+    });
+
+    it('should trigger prompt "loading" before the call canister if a prompt is provided', async () => {
+      spySignerApiCall.mockResolvedValue(mockCanisterCallSuccess);
+
+      await signerService.callCanister({
+        params,
+        notify,
+        options: signerOptions,
+        prompt
+      });
+
+      expect(prompt).toHaveBeenCalledWith({
+        origin: testOrigin,
+        status: 'loading'
+      });
+    });
+
+    it('should trigger prompt "result" with the call canister results if a prompt is provided', async () => {
+      spySignerApiCall.mockResolvedValue(mockCanisterCallSuccess);
+
+      await signerService.callCanister({
+        params,
+        notify,
+        options: signerOptions,
+        prompt
+      });
+
+      expect(prompt).toHaveBeenCalledWith({
+        origin: testOrigin,
+        status: 'result',
+        ...mockCanisterCallSuccess
+      });
+    });
+
+    it('should trigger prompt "error" if the call canister throws', async () => {
+      const error = new Error('Test Error');
+
+      spySignerApiCall.mockRejectedValue(error);
+
+      await signerService.callCanister({
+        params,
+        notify,
+        options: signerOptions,
+        prompt
+      });
+
+      expect(prompt).toHaveBeenCalledWith({
+        origin: testOrigin,
+        status: 'error',
+        details: error
       });
     });
   });
