@@ -65,10 +65,32 @@ describe('Signer services', () => {
   });
 
   describe('Consent message', () => {
+    const error = {GenericError: {description: 'Error', error_code: 1n}};
+
     let spyIcrc21CanisterConsentMessage: MockInstance;
 
     beforeEach(() => {
       spyIcrc21CanisterConsentMessage = vi.spyOn(Icrc21Canister.prototype, 'consentMessage');
+    });
+
+    it('should trigger prompt "loading" before the consent message is processed', async () => {
+      const prompt = vi.fn();
+
+      spyIcrc21CanisterConsentMessage.mockResolvedValue({
+        Err: error
+      });
+
+      await signerService.assertAndPromptConsentMessage({
+        notify,
+        params,
+        prompt,
+        options: signerOptions
+      });
+
+      expect(prompt).toHaveBeenCalledWith({
+        origin: testOrigin,
+        status: 'loading'
+      });
     });
 
     it('should return approved when user approves the consent message', async () => {
@@ -76,8 +98,10 @@ describe('Signer services', () => {
         Ok: mockConsentInfo
       });
 
-      const prompt = ({approve}: ConsentMessagePromptPayload): void => {
-        approve();
+      const prompt = ({status, ...rest}: ConsentMessagePromptPayload): void => {
+        if (status === 'result' && 'approve' in rest) {
+          rest.approve();
+        }
       };
 
       const result = await signerService.assertAndPromptConsentMessage({
@@ -111,8 +135,10 @@ describe('Signer services', () => {
       });
 
       it('should return rejected when user rejects the consent message', async () => {
-        const prompt = ({reject}: ConsentMessagePromptPayload): void => {
-          reject();
+        const prompt = ({status, ...rest}: ConsentMessagePromptPayload): void => {
+          if (status === 'result' && 'reject' in rest) {
+            rest.reject();
+          }
         };
 
         const result = await signerService.assertAndPromptConsentMessage({
@@ -126,8 +152,10 @@ describe('Signer services', () => {
       });
 
       it('should call notifyErrorActionAborted when user rejects consent message', async () => {
-        const prompt = ({reject}: ConsentMessagePromptPayload): void => {
-          reject();
+        const prompt = ({status, ...rest}: ConsentMessagePromptPayload): void => {
+          if (status === 'result' && 'reject' in rest) {
+            rest.reject();
+          }
         };
 
         await signerService.assertAndPromptConsentMessage({
@@ -148,8 +176,6 @@ describe('Signer services', () => {
     });
 
     describe('Call consent message responds with an error', () => {
-      const error = {GenericError: {description: 'Error', error_code: 1n}};
-
       beforeEach(() => {
         spyIcrc21CanisterConsentMessage.mockResolvedValue({
           Err: error
@@ -167,7 +193,6 @@ describe('Signer services', () => {
         });
 
         expect(result).toEqual({result: 'error'});
-        expect(prompt).not.toHaveBeenCalled();
       });
 
       it('should call notifyErrorRequestNotSupported when consentMessage returns error', async () => {
@@ -191,6 +216,23 @@ describe('Signer services', () => {
 
         expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, testOrigin);
       });
+
+      it('should trigger prompt "error" with the error', async () => {
+        const prompt = vi.fn();
+
+        await signerService.assertAndPromptConsentMessage({
+          notify,
+          params,
+          prompt,
+          options: signerOptions
+        });
+
+        expect(prompt).toHaveBeenCalledWith({
+          origin: testOrigin,
+          status: 'error',
+          details: error
+        });
+      });
     });
 
     describe('Call consent message throws an error', () => {
@@ -200,17 +242,16 @@ describe('Signer services', () => {
           throw 'Test';
         });
 
-        const mockSpy = vi.fn();
+        const prompt = vi.fn();
 
         const result = await signerService.assertAndPromptConsentMessage({
           notify,
           params,
-          prompt: mockSpy,
+          prompt,
           options: signerOptions
         });
 
         expect(result).toEqual({result: 'error'});
-        expect(mockSpy).not.toHaveBeenCalled();
       });
 
       it('should call notifyNetworkError with an unknown error message when consentMessage throws some error', async () => {
@@ -304,8 +345,27 @@ describe('Signer services', () => {
       });
 
       expect(result).toEqual({result: 'error'});
+    });
 
-      expect(prompt).not.toHaveBeenCalled();
+    it('should trigger prompt "error" if consentMessage throws', async () => {
+      const error = new Error('Test Error');
+
+      spyIcrc21CanisterConsentMessage.mockRejectedValue(error);
+
+      const prompt = vi.fn();
+
+      await signerService.assertAndPromptConsentMessage({
+        notify,
+        params,
+        prompt,
+        options: signerOptions
+      });
+
+      expect(prompt).toHaveBeenCalledWith({
+        origin: testOrigin,
+        status: 'error',
+        details: error
+      });
     });
 
     describe('Assert sender', () => {

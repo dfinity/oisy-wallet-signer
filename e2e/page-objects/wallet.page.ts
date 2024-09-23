@@ -57,6 +57,10 @@ export class WalletPage extends IdentityPage {
     await this.page.getByTestId('submit-permissions-button').click();
   }
 
+  async assertConsentMessageLoading(): Promise<void> {
+    await expect(this.page.getByTestId('loading-consent-message')).toBeVisible();
+  }
+
   async assertConsentMessage(partyUserId: string): Promise<void> {
     const walletUserId = await this.getUserId();
 
