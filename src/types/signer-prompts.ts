@@ -23,6 +23,8 @@ const PayloadOriginSchema = z.object({
   origin: OriginSchema
 });
 
+export type PayloadOrigin = z.infer<typeof PayloadOriginSchema>;
+
 const RejectionSchema = z.function().returns(z.void());
 
 export type Rejection = z.infer<typeof RejectionSchema>;
