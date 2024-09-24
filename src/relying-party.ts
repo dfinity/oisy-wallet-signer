@@ -528,11 +528,10 @@ export class RelyingParty {
       data: RelyingPartyMessageEventData;
       id: RpcId;
     }): Promise<{handled: boolean; result?: IcrcCallCanisterResult}> => {
-      const {success: isAccounts, data: resultData} =
+      const {success: isCallCanister, data: resultData} =
         IcrcCallCanisterResponseSchema.safeParse(data);
 
-      // TODO: typo copy/paste => isCallCanister
-      if (isAccounts && id === resultData?.id && nonNullish(resultData?.result)) {
+      if (isCallCanister && id === resultData?.id && nonNullish(resultData?.result)) {
         const {result} = resultData;
         return {handled: true, result};
       }
