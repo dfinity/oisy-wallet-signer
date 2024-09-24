@@ -16,7 +16,10 @@
 
 	const onclick = async () => {
 		wallet = await IcpWallet.connect({
-			url: 'http://localhost:5174/sign'
+			url: 'http://localhost:5174/sign',
+			connectionOptions: {
+				timeoutInMilliseconds: 60 * 60 * 1000
+			}
 		});
 	};
 
