@@ -121,6 +121,7 @@ export class Signer {
       return;
     }
 
+    // TODO: the this.#walletOrigin should actually be set when/after "ready" is notified
     this.assertAndSetOrigin(message);
 
     // TODO: wrap a try catch around all handler and notify "Unexpected exception" in case if issues
@@ -300,6 +301,9 @@ export class Signer {
 
       const scopes = readSessionValidScopes({owner: owner.getPrincipal(), origin});
 
+      // TODO: extend scopes with delta of SIGNER_DEFAULT_SCOPES
+      //  i.e. relying party should always get the all list of permissions and those that have never been request should be set to ask_on_use
+
       notifyPermissionScopes({
         id,
         origin,
@@ -367,6 +371,8 @@ export class Signer {
           origin
         });
 
+        // TODO: the emitted permissions should not emit just those that have been validated by the user but actually the overall state of the permissions - i.e. all permissions (active)
+        // This means that emitPermissions should be done after savePermissions and should return the same response as listing permissions
         this.emitPermissions({scopes: confirmedScopes, id: requestId});
         this.savePermissions({scopes: confirmedScopes});
       };
@@ -641,6 +647,7 @@ export class Signer {
               }
             ];
 
+            // TODO: double check that promptPermissions here should not notify to be RPC compliant
             const confirmedScopes = await this.promptPermissions({
               requestedScopes,
               origin

@@ -56,6 +56,9 @@ export class RelyingParty {
   //
   // PS: setInterval(() => if popup.closed {reset}, 1000)
 
+  // TODO: maybe we also want to make the relying party a bit more opiniated in the sense that on connect or each time a request is sent, we can first check if the desired standards is supported.
+  // e.g. I'm the client and I ask for "accounts" but actually the signer does not support accounts.
+
   protected constructor({origin, popup}: {origin: Origin; popup: Window}) {
     this.#origin = origin;
     this.#popup = popup;
@@ -528,6 +531,7 @@ export class RelyingParty {
       const {success: isAccounts, data: resultData} =
         IcrcCallCanisterResponseSchema.safeParse(data);
 
+      // TODO: typo copy/paste => isCallCanister
       if (isAccounts && id === resultData?.id && nonNullish(resultData?.result)) {
         const {result} = resultData;
         return {handled: true, result};
