@@ -299,8 +299,9 @@ export class Signer {
       // The relying party should always receive the full list of permissions, and those that have never been requested or have expired should be provided as "ask_on_use".
       const allScopes = [
         ...(scopes ?? []),
-        ...SIGNER_DEFAULT_SCOPES.filter(({scope: {method: defaultMethod}}) =>
-          isNullish((scopes ?? []).find(({scope: {method}}) => method === defaultMethod))
+        ...SIGNER_DEFAULT_SCOPES.filter(
+          ({scope: {method: defaultMethod}}) =>
+            (scopes ?? []).find(({scope: {method}}) => method === defaultMethod) === undefined
         )
       ];
 
