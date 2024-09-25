@@ -149,6 +149,8 @@ export class RelyingParty {
 
     const disconnect = (): void => {
       window.removeEventListener('message', onMessage);
+
+      // TODO: it should maybe also automatically close the window on disconnect?
     };
 
     const connect = async (): Promise<T> => {
