@@ -48,6 +48,11 @@
       "import": "./icp-wallet.js",
       "require": "./icp-wallet.mjs"
     },
+    "./icrc-wallet": {
+      "types": "./icrc-wallet.d.ts",
+      "import": "./icrc-wallet.js",
+      "require": "./icrc-wallet.mjs"
+    },
     "./signer": {
       "types": "./signer.d.ts",
       "import": "./signer.js",
