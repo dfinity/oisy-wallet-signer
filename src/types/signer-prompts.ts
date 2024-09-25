@@ -10,6 +10,7 @@ import {IcrcAccountsSchema} from './icrc-accounts';
 import {IcrcCallCanisterResultSchema, IcrcScopesArraySchema} from './icrc-responses';
 import {OriginSchema} from './post-message';
 
+// Exposed for testing purposes
 export const PromptMethodSchema = z.enum([
   ICRC21_CALL_CONSENT_MESSAGE,
   ICRC25_REQUEST_PERMISSIONS,
@@ -17,7 +18,17 @@ export const PromptMethodSchema = z.enum([
   ICRC49_CALL_CANISTER
 ]);
 
-export type PromptMethod = z.infer<typeof PromptMethodSchema>;
+export interface Prompts {
+  [PromptMethodSchema.enum.icrc21_call_consent_message]: ConsentMessagePrompt;
+  [PromptMethodSchema.enum.icrc25_request_permissions]: PermissionsPrompt;
+  [PromptMethodSchema.enum.icrc27_accounts]: AccountsPrompt;
+  [PromptMethodSchema.enum.icrc49_call_canister]: CallCanisterPrompt;
+}
+
+export interface RegisterPrompts<T extends keyof Prompts> {
+  method: T;
+  prompt: Prompts[T];
+}
 
 const PayloadOriginSchema = z.object({
   origin: OriginSchema
