@@ -61,7 +61,8 @@ import {
   type PermissionsConfirmation,
   type PermissionsPrompt,
   type PermissionsPromptPayload,
-  type PromptMethod,
+  type Prompts,
+  type RegisterPrompts,
   type Rejection
 } from './types/signer-prompts';
 
@@ -190,29 +191,23 @@ export class Signer {
   /**
    * Registers a prompt handler for a specified method in the signer service.
    *
-   * @param {Object} options - An object containing the method and corresponding prompt handler.
-   * @param {PromptMethod} options.method - The method for which the prompt handler is being registered. Supported methods include ICRC standards.
-   * @param {PermissionsPrompt | AccountsPrompt | ConsentMessagePrompt | CallCanisterPrompt} options.prompt - The prompt handler that should be registered. The prompt type depends on the method being registered.
+   * @template T
+   * @param {RegisterPrompts<T>} options - An object containing the method and corresponding prompt handler.
+   * @param {T} options.method - The method for which the prompt handler is being registered. Supported methods include ICRC standards.
+   * @param {Prompts[T]} options.prompt - The prompt handler that should be registered. The prompt type depends on the method being registered.
    *
-   * @throws {Error} Throws an error if the method is not supported.
+   * @throws {Error} Throws an error if the method is not supported or the prompt type does not match the expected type for the given method.
    *
    * @example
    * // Register a permissions prompt
    * register({
-   *   method: ICRC25_REQUEST_PERMISSIONS,
+   *   method: 'icrc25_request_permissions', // or alternatively using related constant ICRC25_REQUEST_PERMISSIONS
    *   prompt: (payload) => {
    *     payload.confirm(requestedScopes);
    *   }
    * });
    */
-  register = ({
-    method,
-    prompt
-  }: {
-    method: PromptMethod;
-    prompt: PermissionsPrompt | AccountsPrompt | ConsentMessagePrompt | CallCanisterPrompt;
-  }): void => {
-    // TODO: maybe we should replace method here with another custom enum or type, that would be maybe a bit more comprehensive?
+  register = <T extends keyof Prompts>({method, prompt}: RegisterPrompts<T>): void => {
     // TODO: is there a way to avoid casting?
     switch (method) {
       case ICRC21_CALL_CONSENT_MESSAGE: {
@@ -301,13 +296,19 @@ export class Signer {
 
       const scopes = readSessionValidScopes({owner: owner.getPrincipal(), origin});
 
-      // TODO: extend scopes with delta of SIGNER_DEFAULT_SCOPES
-      //  i.e. relying party should always get the all list of permissions and those that have never been request should be set to ask_on_use
+      // The relying party should always receive the full list of permissions, and those that have never been requested or have expired should be provided as "ask_on_use".
+      const allScopes = [
+        ...(scopes ?? []),
+        ...SIGNER_DEFAULT_SCOPES.filter(
+          ({scope: {method: defaultMethod}}) =>
+            (scopes ?? []).find(({scope: {method}}) => method === defaultMethod) === undefined
+        )
+      ];
 
       notifyPermissionScopes({
         id,
         origin,
-        scopes: scopes ?? SIGNER_DEFAULT_SCOPES
+        scopes: allScopes
       });
       return {handled: true};
     }
