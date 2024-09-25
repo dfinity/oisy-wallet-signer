@@ -4,6 +4,7 @@ import {Icrc21Canister} from './api/icrc21-canister.api';
 import {SignerApi} from './api/signer.api';
 import {
   ICRC21_CALL_CONSENT_MESSAGE,
+  ICRC25_PERMISSION_ASK_ON_USE,
   ICRC25_PERMISSION_GRANTED,
   ICRC25_PERMISSIONS,
   ICRC25_REQUEST_PERMISSIONS,
@@ -14,6 +15,7 @@ import {
 } from './constants/icrc.constants';
 import {
   SIGNER_DEFAULT_SCOPES,
+  SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS,
   SIGNER_SUPPORTED_STANDARDS,
   SignerErrorCode
 } from './constants/signer.constants';
@@ -400,6 +402,12 @@ describe('Signer', () => {
         notifyReadySpy = vi.spyOn(signerSuccessHandlers, 'notifyReady');
         notifySupportedStandardsSpy = vi.spyOn(signerSuccessHandlers, 'notifySupportedStandards');
         notifyErrorSpy = vi.spyOn(signerHandlers, 'notifyError');
+
+        vi.useFakeTimers();
+      });
+
+      afterEach(() => {
+        vi.useRealTimers();
       });
 
       it('should notify default permissions for icrc25_permissions', () => {
@@ -418,8 +426,8 @@ describe('Signer', () => {
         );
       });
 
-      it('should notify permissions already confirmed and saved in local storage for icrc25_permissions', () => {
-        const owner = Ed25519KeyIdentity.generate().getPrincipal();
+      it('should notify permissions already confirmed and saved in local storage for icrc25_permissions plus default permissions with ask_on_use', () => {
+        const owner = signerOptions.owner.getPrincipal();
 
         const scopes: IcrcScopesArray = [
           {
@@ -444,7 +452,53 @@ describe('Signer', () => {
             jsonrpc: JSON_RPC_VERSION_2,
             id: testId,
             result: {
-              scopes: SIGNER_DEFAULT_SCOPES
+              scopes: [
+                ...scopes,
+                ...SIGNER_DEFAULT_SCOPES.filter(({scope: {method}}) => method !== ICRC27_ACCOUNTS)
+              ]
+            }
+          },
+          testOrigin
+        );
+
+        del({key: `oisy_signer_${testOrigin}_${owner.toText()}`});
+      });
+
+      it('should notify permissions as ask_on_use if expired plus default permissions with ask_on_use as well', () => {
+        const owner = signerOptions.owner.getPrincipal();
+
+        const scopes: IcrcScopesArray = [
+          {
+            scope: {
+              method: ICRC27_ACCOUNTS
+            },
+            state: ICRC25_PERMISSION_GRANTED
+          }
+        ];
+
+        saveSessionScopes({
+          owner,
+          origin: testOrigin,
+          scopes
+        });
+
+        vi.advanceTimersByTime(SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS + 1);
+
+        const messageEvent = new MessageEvent('message', msg);
+        window.dispatchEvent(messageEvent);
+
+        expect(postMessageMock).toHaveBeenCalledWith(
+          {
+            jsonrpc: JSON_RPC_VERSION_2,
+            id: testId,
+            result: {
+              scopes: [
+                ...scopes.map(({state: _, ...rest}) => ({
+                  ...rest,
+                  state: ICRC25_PERMISSION_ASK_ON_USE
+                })),
+                ...SIGNER_DEFAULT_SCOPES.filter(({scope: {method}}) => method !== ICRC27_ACCOUNTS)
+              ]
             }
           },
           testOrigin

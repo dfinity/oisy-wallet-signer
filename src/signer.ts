@@ -296,13 +296,18 @@ export class Signer {
 
       const scopes = readSessionValidScopes({owner: owner.getPrincipal(), origin});
 
-      // TODO: extend scopes with delta of SIGNER_DEFAULT_SCOPES
-      //  i.e. relying party should always get the all list of permissions and those that have never been request should be set to ask_on_use
+      // The relying party should always receive the full list of permissions, and those that have never been requested or have expired should be provided as "ask_on_use".
+      const allScopes = [
+        ...(scopes ?? []),
+        ...SIGNER_DEFAULT_SCOPES.filter(({scope: {method: defaultMethod}}) =>
+          isNullish((scopes ?? []).find(({scope: {method}}) => method === defaultMethod))
+        )
+      ];
 
       notifyPermissionScopes({
         id,
         origin,
-        scopes: scopes ?? SIGNER_DEFAULT_SCOPES
+        scopes: allScopes
       });
       return {handled: true};
     }
