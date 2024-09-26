@@ -648,7 +648,6 @@ export class Signer {
               }
             ];
 
-            // TODO: double check that promptPermissions here should not notify to be RPC compliant
             const confirmedScopes = await this.promptPermissions({
               requestedScopes,
               origin
