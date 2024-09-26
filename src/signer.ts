@@ -286,30 +286,15 @@ export class Signer {
    * @param {SignerMessageEvent} message - The incoming message event containing the data and origin.
    * @returns {Object} An object with a boolean property `handled` indicating whether the request was handled.
    */
-  private handlePermissionsRequest({data, origin}: SignerMessageEvent): {handled: boolean} {
+  private handlePermissionsRequest({data}: SignerMessageEvent): {handled: boolean} {
     const {success: isPermissionsRequestRequest, data: permissionsRequestData} =
       IcrcPermissionsRequestSchema.safeParse(data);
 
     if (isPermissionsRequestRequest) {
       const {id} = permissionsRequestData;
-      const {owner} = this.#signerOptions;
 
-      const scopes = readSessionValidScopes({owner: owner.getPrincipal(), origin});
+      this.emitPermissions({id});
 
-      // The relying party should always receive the full list of permissions, and those that have never been requested or have expired should be provided as "ask_on_use".
-      const allScopes = [
-        ...(scopes ?? []),
-        ...SIGNER_DEFAULT_SCOPES.filter(
-          ({scope: {method: defaultMethod}}) =>
-            (scopes ?? []).find(({scope: {method}}) => method === defaultMethod) === undefined
-        )
-      ];
-
-      notifyPermissionScopes({
-        id,
-        origin,
-        scopes: allScopes
-      });
       return {handled: true};
     }
 
@@ -372,10 +357,8 @@ export class Signer {
           origin
         });
 
-        // TODO: the emitted permissions should not emit just those that have been validated by the user but actually the overall state of the permissions - i.e. all permissions (active)
-        // This means that emitPermissions should be done after savePermissions and should return the same response as listing permissions
-        this.emitPermissions({scopes: confirmedScopes, id: requestId});
         this.savePermissions({scopes: confirmedScopes});
+        this.emitPermissions({id: requestId});
       };
 
       await this.prompt({
@@ -409,12 +392,29 @@ export class Signer {
     return await promise;
   }
 
-  private emitPermissions(params: Omit<NotifyPermissions, 'origin'>): void {
+  private emitPermissions({id}: Pick<NotifyPermissions, 'id'>): void {
     assertNonNullish(this.#walletOrigin, "The relying party's origin is unknown.");
 
-    notifyPermissionScopes({
-      ...params,
+    const {owner} = this.#signerOptions;
+
+    const scopes = readSessionValidScopes({
+      owner: owner.getPrincipal(),
       origin: this.#walletOrigin
+    });
+
+    // The relying party should always receive the full list of permissions, and those that have never been requested or have expired should be provided as "ask_on_use".
+    const allScopes = [
+      ...(scopes ?? []),
+      ...SIGNER_DEFAULT_SCOPES.filter(
+        ({scope: {method: defaultMethod}}) =>
+          (scopes ?? []).find(({scope: {method}}) => method === defaultMethod) === undefined
+      )
+    ];
+
+    notifyPermissionScopes({
+      id,
+      origin: this.#walletOrigin,
+      scopes: allScopes
     });
   }
 
