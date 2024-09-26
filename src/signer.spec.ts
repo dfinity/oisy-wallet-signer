@@ -518,6 +518,14 @@ describe('Signer', () => {
     });
 
     describe('Request permissions', () => {
+      beforeEach(() => {
+        vi.useFakeTimers();
+      });
+
+      afterEach(() => {
+        vi.useRealTimers();
+      });
+
       it('should notify REQUEST_NOT_SUPPORTED for invalid request permissions', async () => {
         const testOrigin = 'https://hello.com';
 
@@ -663,6 +671,190 @@ describe('Signer', () => {
         });
 
         promptSpy.mockClear();
+      });
+
+      it('should notify all permissions', async () => {
+        let confirm: PermissionsConfirmation | undefined;
+
+        signer.register({
+          method: ICRC25_REQUEST_PERMISSIONS,
+          prompt: ({confirm: confirmScopes, requestedScopes: _}: PermissionsPromptPayload) => {
+            confirm = confirmScopes;
+          }
+        });
+
+        const messageEvent = new MessageEvent('message', requestPermissionsMsg);
+        window.dispatchEvent(messageEvent);
+
+        await vi.waitFor(() => {
+          expect(confirm).not.toBeUndefined();
+        });
+
+        confirm?.([
+          {
+            scope: {method: ICRC49_CALL_CANISTER},
+            state: IcrcPermissionStateSchema.enum.granted
+          }
+        ]);
+
+        await vi.waitFor(() => {
+          expect(postMessageMock).toHaveBeenCalledWith(
+            {
+              jsonrpc: JSON_RPC_VERSION_2,
+              id: testId,
+              result: {
+                scopes: [
+                  {
+                    scope: {method: ICRC49_CALL_CANISTER},
+                    state: IcrcPermissionStateSchema.enum.granted
+                  },
+                  ...SIGNER_DEFAULT_SCOPES.filter(
+                    ({scope: {method}}) => method !== ICRC49_CALL_CANISTER
+                  )
+                ]
+              }
+            },
+            testOrigin
+          );
+        });
+      });
+
+      it('should notify all permissions with those in sessions', async () => {
+        let confirm: PermissionsConfirmation | undefined;
+
+        signer.register({
+          method: ICRC25_REQUEST_PERMISSIONS,
+          prompt: ({confirm: confirmScopes, requestedScopes: _}: PermissionsPromptPayload) => {
+            confirm = confirmScopes;
+          }
+        });
+
+        const scopes: IcrcScopesArray = [
+          {
+            scope: {
+              method: ICRC27_ACCOUNTS
+            },
+            state: ICRC25_PERMISSION_GRANTED
+          }
+        ];
+
+        saveSessionScopes({
+          owner: signerOptions.owner.getPrincipal(),
+          origin: testOrigin,
+          scopes
+        });
+
+        const messageEvent = new MessageEvent('message', requestPermissionsMsg);
+        window.dispatchEvent(messageEvent);
+
+        await vi.waitFor(() => {
+          expect(confirm).not.toBeUndefined();
+        });
+
+        confirm?.([
+          {
+            scope: {method: ICRC49_CALL_CANISTER},
+            state: IcrcPermissionStateSchema.enum.granted
+          }
+        ]);
+
+        await vi.waitFor(() => {
+          expect(postMessageMock).toHaveBeenCalledWith(
+            {
+              jsonrpc: JSON_RPC_VERSION_2,
+              id: testId,
+              result: {
+                scopes: [
+                  ...scopes,
+                  {
+                    scope: {method: ICRC49_CALL_CANISTER},
+                    state: IcrcPermissionStateSchema.enum.granted
+                  },
+                  // Make the test future prone in case we add more scopes to the library
+                  ...SIGNER_DEFAULT_SCOPES.filter(
+                    ({scope: {method}}) =>
+                      method !== ICRC27_ACCOUNTS && method !== ICRC49_CALL_CANISTER
+                  )
+                ]
+              }
+            },
+            testOrigin
+          );
+        });
+
+        del({key: `oisy_signer_${testOrigin}_${owner.getPrincipal().toText()}`});
+      });
+
+      it('should notify all permissions with those still active and the rest with ask_on_use', async () => {
+        let confirm: PermissionsConfirmation | undefined;
+
+        signer.register({
+          method: ICRC25_REQUEST_PERMISSIONS,
+          prompt: ({confirm: confirmScopes, requestedScopes: _}: PermissionsPromptPayload) => {
+            confirm = confirmScopes;
+          }
+        });
+
+        const scopes: IcrcScopesArray = [
+          {
+            scope: {
+              method: ICRC27_ACCOUNTS
+            },
+            state: ICRC25_PERMISSION_GRANTED
+          }
+        ];
+
+        saveSessionScopes({
+          owner: signerOptions.owner.getPrincipal(),
+          origin: testOrigin,
+          scopes
+        });
+
+        vi.advanceTimersByTime(SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS + 1);
+
+        const messageEvent = new MessageEvent('message', requestPermissionsMsg);
+        window.dispatchEvent(messageEvent);
+
+        await vi.waitFor(() => {
+          expect(confirm).not.toBeUndefined();
+        });
+
+        confirm?.([
+          {
+            scope: {method: ICRC49_CALL_CANISTER},
+            state: IcrcPermissionStateSchema.enum.granted
+          }
+        ]);
+
+        await vi.waitFor(() => {
+          expect(postMessageMock).toHaveBeenCalledWith(
+            {
+              jsonrpc: JSON_RPC_VERSION_2,
+              id: testId,
+              result: {
+                scopes: [
+                  {
+                    scope: {method: ICRC49_CALL_CANISTER},
+                    state: IcrcPermissionStateSchema.enum.granted
+                  },
+                  // Session scopes are outdated therefore provided as ask_on_use
+                  ...scopes.map(({state: _, ...rest}) => ({
+                    ...rest,
+                    state: ICRC25_PERMISSION_ASK_ON_USE
+                  })),
+                  // Make the test future prone in case we add more scopes to the library
+                  ...SIGNER_DEFAULT_SCOPES.filter(
+                    ({scope: {method}}) =>
+                      method !== ICRC27_ACCOUNTS && method !== ICRC49_CALL_CANISTER
+                  )
+                ]
+              }
+            },
+            testOrigin
+          );
+        });
+
+        del({key: `oisy_signer_${testOrigin}_${owner.getPrincipal().toText()}`});
       });
     });
 
