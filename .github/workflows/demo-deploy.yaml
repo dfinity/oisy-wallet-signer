@@ -25,6 +25,6 @@ jobs:
         uses: junobuild/juno-action@main
         with:
           args: deploy
-          folder: 'demo'
         env:
           JUNO_TOKEN: ${{ secrets.JUNO_TOKEN }}
+          PROJECT_PATH: demo
