@@ -11,9 +11,14 @@
 </script>
 
 {#snippet title()}
-	Relying Party 🥳
+	Relying Party
 {/snippet}
 
-<Layout {title}>
+{#snippet description()}
+	This sample app demonstrates how a relying party can interact with the Oisy Wallet, enabling
+	secure message signing on the Internet Computer.
+{/snippet}
+
+<Layout {title} {description}>
 	{@render children()}
 </Layout>

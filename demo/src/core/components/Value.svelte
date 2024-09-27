@@ -11,7 +11,7 @@
 	let { children, id, title, testId }: Props = $props();
 </script>
 
-<div data-tid={testId}>
-	<label class="font-bold text-sm" for={id}>{title}:</label>
-	<div class="text-sm mb-2" {id}>{@render children()}</div>
+<div data-tid={testId} class="dark:text-white">
+	<label class="font-bold" for={id}>{title}:</label>
+	<div class="mb-2" {id}>{@render children()}</div>
 </div>

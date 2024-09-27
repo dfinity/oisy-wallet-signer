@@ -5,6 +5,7 @@
 	import { AnonymousIdentity } from '@dfinity/agent';
 	import type { Principal } from '@dfinity/principal';
 	import { authStore } from '../stores/auth.store';
+	import Value from '$core/components/Value.svelte';
 
 	let balance = $state(0n);
 
@@ -43,7 +44,6 @@
 
 <svelte:window {onoisyDemoReloadBalance} />
 
-<p class="font-bold text-sm mt-3">Current balance:</p>
-<p class="text-sm mb-2 break-words">
+<Value id="icp-balance-section" title="Balance">
 	<output data-tid="icp-balance">{formatE8sICP(balance)} ICP</output>
-</p>
+</Value>

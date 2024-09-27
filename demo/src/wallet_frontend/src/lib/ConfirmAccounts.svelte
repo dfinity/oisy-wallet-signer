@@ -54,5 +54,5 @@
 </script>
 
 {#if nonNullish(approve)}
-	<p transition:fade data-tid="accounts" class="mt-2"><small>Notifying accounts...</small></p>
+	<p transition:fade data-tid="accounts" class="mt-4 dark:text-white">Notifying accounts...</p>
 {/if}

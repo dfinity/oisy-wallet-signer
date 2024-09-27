@@ -61,7 +61,7 @@
 </script>
 
 {#if nonNullish(wallet) && nonNullish($accountsStore)}
-	<div in:fade>
+	<div in:fade class="mt-4">
 		<Value id="call-canister" testId="call-canister" title="Call Canister">
 			{#if nonNullish(result)}
 				<Button onclick={onreset} testId="reset-call-canister-button">Reset result</Button>

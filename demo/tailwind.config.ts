@@ -6,25 +6,39 @@ export const tailwindConfig: Partial<Config> = {
 		fontFamily: {
 			sans: ['CircularXX', 'sans-serif', ...fontFamily.sans]
 		},
+		extend: {
+			screens: {
+				tall: { raw: '(min-height: 800px)' }
+			},
+			animation: {
+				fade: 'fadeIn .25s ease-in-out'
+			},
+
+			keyframes: {
+				fadeIn: {
+					from: { opacity: '0' },
+					to: { opacity: '1' }
+				}
+			}
+		},
 		colors: {
 			inherit: 'inherit',
 			transparent: 'transparent',
 			current: 'currentColor',
 			black: 'rgb(0 0 0)',
 			white: 'rgb(255 255 255)',
-			'off-white': '#fcfaf6',
-			dust: '#dbd9d6',
-			grey: '#c0bbc4',
-			'light-blue': '#ede7fb',
-			blue: '#3b00b9',
-			dark: '#0e002d',
-			'dark-blue': '#321469',
-			'misty-rose': '#937993',
-			goldenrod: '#dfa81b',
-			cyclamen: '#ea6c99',
-			'medium-purple': '#8969d5',
-			platinum: '#e4e4e4',
-			'mountain-meadow': '#30af91'
+			['lavender-blue']: {
+				50: '#f2f3ff',
+				100: '#e4e7ff',
+				200: '#c9cfff',
+				300: '#aeb8ff',
+				400: '#93a0ff',
+				500: '#7888ff',
+				600: '#606dcc',
+				700: '#485299',
+				800: '#303666',
+				900: '#181b33'
+			}
 		}
 	},
 	plugins: []

@@ -4,6 +4,7 @@
 	import { isNullish, nonNullish } from '@dfinity/utils';
 	import { ICRC25_REQUEST_PERMISSIONS, type IcrcScope } from '@dfinity/oisy-wallet-signer';
 	import Button from '$core/components/Button.svelte';
+	import Article from '$core/components/Article.svelte';
 	import type {
 		PermissionsConfirmation,
 		PermissionsPromptPayload
@@ -67,26 +68,22 @@
 </script>
 
 {#if nonNullish(scopes)}
-	<form
-		{onsubmit}
-		method="POST"
-		class="bg-grey rounded-md px-4 py-6 mt-4 max-w-xl"
-		in:fade
-		data-tid="requested-permissions"
-	>
-		<p class="font-bold">Requested Permissions</p>
+	<Article>
+		<form {onsubmit} method="POST" in:fade data-tid="requested-permissions">
+			<p class="font-bold dark:text-white">Requested Permissions</p>
 
-		<ul class="mt-2 mb-4 text-sm" data-tid="requested-permissions-list">
-			{#each scopes as scope}
-				<li>
-					<input type="checkbox" onchange={() => onToggle(scope)} class="mr-1" />
-					{scope.scope.method}
-				</li>
-			{/each}
-		</ul>
+			<ul class="mt-2 mb-4 dark:text-white" data-tid="requested-permissions-list">
+				{#each scopes as scope}
+					<li>
+						<input type="checkbox" onchange={() => onToggle(scope)} class="mr-1" />
+						{scope.scope.method}
+					</li>
+				{/each}
+			</ul>
 
-		<Button type="submit" testId="submit-permissions-button">Submit</Button>
+			<Button type="submit" testId="submit-permissions-button">Submit</Button>
 
-		<p><small>{countApproved} permissions approved</small></p>
-	</form>
+			<p class="mt-4"><small>{countApproved} permissions approved</small></p>
+		</form>
+	</Article>
 {/if}
