@@ -1,55 +1,20 @@
 <script lang="ts">
-	import { fade } from 'svelte/transition';
-	import { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
-	import { isNullish } from '@dfinity/utils';
-	import Button from '$core/components/Button.svelte';
 	import UserId from '$core/components/UserId.svelte';
-	import Value from '$core/components/Value.svelte';
-	import SupportedStandards from '$lib/components/SupportedStandards.svelte';
-	import RequestPermissions from '$lib/components/RequestPermissions.svelte';
-	import Permissions from '$lib/components/Permissions.svelte';
-	import Accounts from '$lib/components/Accounts.svelte';
-	import CallCanister from '$lib/components/CallCanister.svelte';
 	import Balance from '$core/components/Balance.svelte';
-
-	let wallet = $state<IcpWallet | undefined>(undefined);
-
-	const onclick = async () => {
-		wallet = await IcpWallet.connect({
-			url: 'http://localhost:5174/sign',
-			connectionOptions: {
-				timeoutInMilliseconds: 60 * 60 * 1000
-			}
-		});
-	};
-
-	$effect(() => {
-		return () => {
-			wallet?.disconnect();
-		};
-	});
+	import GetICP from '$lib/components/GetICP.svelte';
+	import SendICP from '$lib/components/SendICP.svelte';
 </script>
 
-<UserId />
+<p class="dark:text-white mb-4">
+	Get and send 0.05 ICP (minus fees) to your Oisy Wallet using the signer standards.
+</p>
+
+<UserId shorten />
 
 <Balance />
 
-{#if isNullish(wallet)}
-	<div class="pt-6">
-		<Button {onclick} testId="connect-wallet-button">Connect Wallet</Button>
-	</div>
-{:else}
-	<div in:fade>
-		<Value id="wallet-connected" testId="wallet-connected" title="Wallet status">Connected</Value>
-	</div>
-{/if}
+<div class="flex mt-4 gap-4">
+	<GetICP />
 
-<SupportedStandards {wallet} />
-
-<Permissions {wallet} />
-
-<RequestPermissions {wallet} />
-
-<Accounts {wallet} />
-
-<CallCanister {wallet} />
+	<SendICP />
+</div>

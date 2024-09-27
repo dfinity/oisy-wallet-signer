@@ -26,7 +26,7 @@
 </script>
 
 {#if nonNullish(wallet)}
-	<div in:fade>
+	<div in:fade class="mb-4">
 		<Value id="request-permissions" testId="request-permissions" title="Permissions requests">
 			{#if nonNullish(scopes)}
 				<PermissionsScopes {scopes} />

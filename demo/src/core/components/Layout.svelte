@@ -7,6 +7,7 @@
 	import { fade } from 'svelte/transition';
 	import type { Snippet } from 'svelte';
 	import Footer from '$core/components/Footer.svelte';
+	import Alert from '$core/components/Alert.svelte';
 
 	type Props = {
 		size?: {
@@ -65,4 +66,6 @@
 	</main>
 
 	<Footer />
+
+	<Alert />
 </div>

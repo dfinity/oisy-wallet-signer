@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { authStore } from '$core/stores/auth.store';
-	import IconSignOut from '$core/components/IconSignOut.svelte';
 
 	const onclick = async () => {
 		await authStore.signOut();
