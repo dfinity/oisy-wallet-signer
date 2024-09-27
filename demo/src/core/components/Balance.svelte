@@ -6,6 +6,7 @@
 	import type { Principal } from '@dfinity/principal';
 	import { authStore } from '../stores/auth.store';
 	import Value from '$core/components/Value.svelte';
+	import { DEV, LOCAL_REPLICA_URL } from '$core/constants/app.constants';
 
 	let balance = $state(0n);
 
@@ -17,8 +18,7 @@
 
 		const agent = await createAgent({
 			identity: new AnonymousIdentity(),
-			host: 'http://localhost:4943',
-			fetchRootKey: true
+			...(DEV && { host: LOCAL_REPLICA_URL, fetchRootKey: true })
 		});
 
 		const { accountBalance } = LedgerCanister.create({
