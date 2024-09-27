@@ -27,4 +27,4 @@ jobs:
           args: deploy
         env:
           JUNO_TOKEN: ${{ secrets.JUNO_TOKEN }}
-          PROJECT_PATH: demo
+          PROJECT_PATH: demo/src/relying_party_frontend
