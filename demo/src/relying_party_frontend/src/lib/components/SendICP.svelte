@@ -2,11 +2,12 @@
 	import { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
 	import Button from '$core/components/Button.svelte';
 	import { authStore } from '$core/stores/auth.store';
-	import { isNullish } from '@dfinity/utils';
-	import type { Icrc1TransferRequest } from '@dfinity/ledger-icp';
+	import { createAgent, isNullish } from '@dfinity/utils';
+	import { type Icrc1TransferRequest, LedgerCanister } from '@dfinity/ledger-icp';
 	import { alertStore } from '$core/stores/alert.store';
 	import { emit } from '$core/utils/events.utils';
 	import { getTransferRequest } from '$lib/utils/transfer.utils';
+	import { Principal } from '@dfinity/principal';
 
 	let wallet = $state<IcpWallet | undefined>(undefined);
 
@@ -29,6 +30,8 @@
 			const account = accounts?.[0];
 
 			if (isNullish(account)) {
+				await wallet?.disconnect();
+
 				alertStore.set({
 					type: 'error',
 					message: 'The wallet did not provide any account.'
@@ -36,15 +39,26 @@
 				return;
 			}
 
-			const request = getTransferRequest({
-				owner: $authStore.identity.getPrincipal(),
-				minusFees: false
+			await wallet?.disconnect();
+
+			const agent = await createAgent({
+				host: 'http://localhost:4943',
+				identity: $authStore.identity,
+				fetchRootKey: true
 			});
 
-			await wallet?.icrc1Transfer({
-				owner: account.owner,
-				request
+			const { icrc1Transfer } = LedgerCanister.create({
+				agent
 			});
+
+			const { owner } = account;
+
+			const request = getTransferRequest({
+				owner: Principal.fromText(owner),
+				minusFees: true
+			});
+
+			await icrc1Transfer(request);
 
 			emit({
 				message: 'oisyDemoReloadBalance'
@@ -52,7 +66,7 @@
 
 			alertStore.set({
 				type: 'success',
-				message: 'Funds received 🥳',
+				message: 'Funds sent 🥳',
 				duration: 3000
 			});
 		} catch (err: unknown) {
@@ -62,10 +76,8 @@
 			});
 
 			console.error(err);
-		} finally {
-			await wallet?.disconnect();
 		}
 	};
 </script>
 
-<Button {onclick} testId="connect-wallet-button">Get ICP</Button>
+<Button {onclick} testId="connect-wallet-button">Send ICP</Button>
