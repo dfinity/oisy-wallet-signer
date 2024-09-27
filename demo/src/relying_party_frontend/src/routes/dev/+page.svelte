@@ -26,7 +26,7 @@
 <Balance />
 
 {#if isNullish(wallet)}
-	<div class="pt-6">
+	<div class="pt-6" in:fade>
 		<Connect bind:wallet />
 	</div>
 {:else}

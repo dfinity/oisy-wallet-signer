@@ -35,7 +35,7 @@
 	});
 </script>
 
-<UserId />
+<UserId user={$authStore?.identity?.getPrincipal()} />
 
 <Balance />
 

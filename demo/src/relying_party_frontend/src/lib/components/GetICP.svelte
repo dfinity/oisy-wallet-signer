@@ -62,7 +62,7 @@
 		} catch (err: unknown) {
 			alertStore.set({
 				type: 'error',
-				message: 'Unexpected error.'
+				message: 'message' in (err as Error) ? (err as Error).message : 'Unexpected error.'
 			});
 
 			console.error(err);
