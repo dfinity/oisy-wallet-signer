@@ -11,7 +11,7 @@
 </script>
 
 {#snippet title()}
-	Relying Party
+	Give me my ICP
 {/snippet}
 
 {#snippet description()}
