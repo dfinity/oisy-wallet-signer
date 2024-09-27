@@ -237,6 +237,8 @@ export class Signer {
     );
   };
 
+  // TODO: maybe provide a prompt for the developer to get to know when status "ready" was exchanged?
+
   /**
    * Handles incoming status requests.
    *
@@ -300,6 +302,9 @@ export class Signer {
 
     return {handled: false};
   }
+
+  // TODO: user can answer to permissions prompts with ask_on_use?
+  // Maybe it's possible to resolve it without modifying the lib. To be double checked.
 
   /**
    * Handles incoming messages to request permissions.

@@ -10,6 +10,9 @@
 
 	let wallet = $state<IcpWallet | undefined>(undefined);
 
+	// TODO: display error on timeout
+	// TODO: connect button first that ask for accounts
+
 	const onclick = async () => {
 		try {
 			if (isNullish($authStore.identity)) {
