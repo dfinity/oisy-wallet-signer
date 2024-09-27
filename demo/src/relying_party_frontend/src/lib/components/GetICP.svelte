@@ -50,19 +50,27 @@
 				request
 			});
 
-			emit({
-				message: 'oisyDemoReloadBalance'
-			});
+			const reload = () =>
+				emit({
+					message: 'oisyDemoReloadBalance'
+				});
+
+			reload();
+
+			// Just in case it takes few seconds on mainnet
+			setTimeout(() => {
+				reload();
+			}, 3000);
 
 			alertStore.set({
 				type: 'success',
-				message: 'Funds received 🥳',
+				message: 'ICP received 🥳',
 				duration: 3000
 			});
 		} catch (err: unknown) {
 			alertStore.set({
 				type: 'error',
-				message: 'Unexpected error.'
+				message: 'message' in (err as Error) ? (err as Error).message : 'Unexpected error.'
 			});
 
 			console.error(err);

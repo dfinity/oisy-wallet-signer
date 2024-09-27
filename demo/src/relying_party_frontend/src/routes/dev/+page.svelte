@@ -11,6 +11,7 @@
 	import CallCanister from '$lib/components/CallCanister.svelte';
 	import Balance from '$core/components/Balance.svelte';
 	import Connect from '$lib/components/Connect.svelte';
+	import { authStore } from '$core/stores/auth.store';
 
 	let wallet = $state<IcpWallet | undefined>(undefined);
 
@@ -21,12 +22,12 @@
 	});
 </script>
 
-<UserId />
+<UserId user={$authStore?.identity?.getPrincipal()} />
 
-<Balance />
+<Balance owner={$authStore.identity?.getPrincipal()} />
 
 {#if isNullish(wallet)}
-	<div class="pt-6">
+	<div class="pt-6" in:fade>
 		<Connect bind:wallet />
 	</div>
 {:else}
