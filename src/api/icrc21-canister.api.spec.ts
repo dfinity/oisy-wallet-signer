@@ -96,6 +96,7 @@ describe('icrc-21.canister.api', () => {
         icrc21_canister_call_consent_message: vi.fn().mockResolvedValue(consentMessageResponse)
       };
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const spy = vi.spyOn(canister as any, 'getIcrc21Actor').mockResolvedValue(mockIcrc21Actor);
 
       const result = await canister.consentMessage({
@@ -119,6 +120,7 @@ describe('icrc-21.canister.api', () => {
     it('should throw an error if the consentMessage throws', async () => {
       const mockError = new Error('Test error');
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       vi.spyOn(canister as any, 'getIcrc21Actor').mockResolvedValue({
         icrc21_canister_call_consent_message: vi
           .fn()
