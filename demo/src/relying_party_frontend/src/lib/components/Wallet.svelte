@@ -5,7 +5,6 @@
 	import Article from '$core/components/Article.svelte';
 	import UserId from '$core/components/UserId.svelte';
 	import GetICP from '$lib/components/GetICP.svelte';
-	import SendICP from '$lib/components/SendICP.svelte';
 	import Balance from '$core/components/Balance.svelte';
 	import { fade } from 'svelte/transition';
 
@@ -48,10 +47,8 @@
 	{/if}
 </Article>
 
-<div class="flex mt-4 gap-4">
-	{#if nonNullish(owner)}
+{#if nonNullish(owner)}
+	<div class="in:fade">
 		<GetICP />
-
-		<SendICP />
-	{/if}
-</div>
+	</div>
+{/if}

@@ -8,6 +8,7 @@
 	import { fade } from 'svelte/transition';
 	import { authStore } from '$core/stores/auth.store';
 	import Wallet from '$lib/components/Wallet.svelte';
+	import SendICP from '$lib/components/SendICP.svelte';
 
 	let wallet = $state<IcpWallet | undefined>(undefined);
 
@@ -32,6 +33,10 @@
 			{#if isNullish(wallet)}
 				<div in:fade>
 					<Connect bind:wallet />
+				</div>
+			{:else}
+				<div in:fade>
+					<SendICP />
 				</div>
 			{/if}
 		</div>
