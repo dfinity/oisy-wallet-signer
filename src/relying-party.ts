@@ -64,6 +64,10 @@ export class RelyingParty {
     this.#popup = popup;
   }
 
+  // TODO: create an opinionated extends of RelyingParty which does connect + request accounts in one short
+  // According Pete during UX review, this is the standard wallet UX people are expecting.
+  // IcpWallet extends SomethingNew extends RelyingParty
+
   /**
    * Establishes a connection with a signer.
    *
