@@ -23,8 +23,8 @@ jobs:
 
       - name: Deploy to Juno
         uses: junobuild/juno-action@main
-        working-directory: 'demo'
         with:
           args: deploy
+          folder: 'demo'
         env:
           JUNO_TOKEN: ${{ secrets.JUNO_TOKEN }}
