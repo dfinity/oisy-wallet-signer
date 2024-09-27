@@ -1,7 +1,7 @@
 import juno from '@junobuild/vite-plugin';
+import inject from '@rollup/plugin-inject';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { type UserConfig } from 'vite';
-import inject from '@rollup/plugin-inject';
 
 export const defineConfig = ({ port }: { port?: number } = {}): UserConfig => {
 	return {
@@ -12,7 +12,7 @@ export const defineConfig = ({ port }: { port?: number } = {}): UserConfig => {
 					inject({
 						modules: { Buffer: ['buffer', 'Buffer'] }
 					})
-				],
+				]
 			}
 		},
 		plugins: [sveltekit(), juno({ container: true })],

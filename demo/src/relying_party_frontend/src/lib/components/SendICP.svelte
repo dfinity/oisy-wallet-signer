@@ -8,7 +8,7 @@
 	import { emit } from '$core/utils/events.utils';
 	import { getTransferRequest } from '$lib/utils/transfer.utils';
 	import { Principal } from '@dfinity/principal';
-	import { DEV, LOCAL_REPLICA_URL, WALLET_URL } from '$lib/constants/app.constants';
+	import { DEV, LOCAL_REPLICA_URL, WALLET_URL } from '$core/constants/app.constants';
 
 	let wallet = $state<IcpWallet | undefined>(undefined);
 
@@ -43,9 +43,8 @@
 			await wallet?.disconnect();
 
 			const agent = await createAgent({
-				...(DEV && { host: LOCAL_REPLICA_URL }),
-				identity: $authStore.identity,
-				fetchRootKey: true
+				...(DEV && { host: LOCAL_REPLICA_URL, fetchRootKey: true }),
+				identity: $authStore.identity
 			});
 
 			const { icrc1Transfer } = LedgerCanister.create({

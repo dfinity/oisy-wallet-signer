@@ -6,7 +6,7 @@
 	import { alertStore } from '$core/stores/alert.store';
 	import { emit } from '$core/utils/events.utils';
 	import { getTransferRequest } from '$lib/utils/transfer.utils';
-	import { WALLET_URL } from '$lib/constants/app.constants';
+	import { WALLET_URL } from '$core/constants/app.constants';
 
 	let wallet = $state<IcpWallet | undefined>(undefined);
 
