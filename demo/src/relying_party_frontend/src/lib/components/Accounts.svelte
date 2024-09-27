@@ -23,7 +23,7 @@
 </script>
 
 {#if nonNullish(wallet)}
-	<div in:fade class="mt-4">
+	<div in:fade class="mt-2">
 		<Value id="accounts" testId="accounts" title="Accounts">
 			{#if nonNullish($accountsStore)}
 				<ul in:fade data-tid="accounts-list">
