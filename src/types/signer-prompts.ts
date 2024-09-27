@@ -75,7 +75,7 @@ export type PermissionsPromptPayload = z.infer<typeof PermissionsPromptPayloadSc
  *
  * @param {PermissionsPromptPayload} params - An object containing the requested permissions and a function to confirm them.
  * @param {IcrcScopes[]} params.requestedScopes - An array of IcrcScopes representing the permissions being requested.
- * @param {PermissionsConfirmation} params.confirm - A function to be called by the consumer to confirm (grant or deny) the requested permissions.
+ * @param {PermissionsConfirmation} params.confirm - A function to be called by the consumer to confirm (grant or deny) the requested, a subset, or none of the permissions. Skipping a permission is equivalent to preserving its current state.
  */
 export const PermissionsPromptSchema = z
   .function()
