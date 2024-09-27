@@ -6,7 +6,8 @@
 	import UserId from '$core/components/UserId.svelte';
 	import GetICP from '$lib/components/GetICP.svelte';
 	import SendICP from '$lib/components/SendICP.svelte';
-    import { fade } from 'svelte/transition';
+	import Balance from '$core/components/Balance.svelte';
+	import { fade } from 'svelte/transition';
 
 	type Props = {
 		wallet: IcpWallet | undefined;
@@ -38,8 +39,10 @@
 <Article>
 	{#if nonNullish(owner)}
 		<div in:fade>
-            <UserId shorten user={owner} title="Your Wallet ID" />
-        </div>
+			<UserId shorten user={owner} title="Your Wallet ID" />
+
+			<Balance {owner} />
+		</div>
 	{:else}
 		<p class="dark:text-white animate-pulse">Connecting...</p>
 	{/if}

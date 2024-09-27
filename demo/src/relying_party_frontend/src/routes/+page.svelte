@@ -25,7 +25,7 @@
 		<Article>
 			<UserId shorten user={$authStore?.identity?.getPrincipal()} />
 
-			<Balance />
+			<Balance owner={$authStore.identity?.getPrincipal()} />
 		</Article>
 
 		<div class="md:min-h-20">

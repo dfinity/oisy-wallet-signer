@@ -50,13 +50,21 @@
 				request
 			});
 
-			emit({
-				message: 'oisyDemoReloadBalance'
-			});
+			const reload = () =>
+				emit({
+					message: 'oisyDemoReloadBalance'
+				});
+
+			reload();
+
+			// Just in case it takes few seconds on mainnet
+			setTimeout(() => {
+				reload();
+			}, 3000);
 
 			alertStore.set({
 				type: 'success',
-				message: 'Funds received 🥳',
+				message: 'ICP received 🥳',
 				duration: 3000
 			});
 		} catch (err: unknown) {

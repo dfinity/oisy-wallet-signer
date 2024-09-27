@@ -4,9 +4,14 @@
 	import { formatE8sICP } from '../utils/icp.utils';
 	import { AnonymousIdentity } from '@dfinity/agent';
 	import type { Principal } from '@dfinity/principal';
-	import { authStore } from '../stores/auth.store';
 	import Value from '$core/components/Value.svelte';
 	import { DEV, LOCAL_REPLICA_URL } from '$core/constants/app.constants';
+
+	type Props = {
+		owner: Principal | undefined | null;
+	};
+
+	let { owner }: Props = $props();
 
 	let balance = $state(0n);
 
@@ -33,12 +38,12 @@
 
 	$effect(() => {
 		(async () => {
-			await loadBalance($authStore.identity?.getPrincipal());
+			await loadBalance(owner);
 		})();
 	});
 
 	export const onoisyDemoReloadBalance = async () => {
-		await loadBalance($authStore.identity?.getPrincipal());
+		await loadBalance(owner);
 	};
 </script>
 
