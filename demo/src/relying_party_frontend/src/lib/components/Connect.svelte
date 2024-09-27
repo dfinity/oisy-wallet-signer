@@ -14,12 +14,6 @@
 	};
 
 	$effect(() => {
-		return () => {
-			walletState?.disconnect();
-		};
-	});
-
-	$effect(() => {
 		wallet = walletState;
 	});
 </script>

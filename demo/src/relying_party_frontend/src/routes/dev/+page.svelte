@@ -13,6 +13,12 @@
 	import Connect from '$lib/components/Connect.svelte';
 
 	let wallet = $state<IcpWallet | undefined>(undefined);
+
+	$effect(() => {
+		return () => {
+			wallet?.disconnect();
+		};
+	});
 </script>
 
 <UserId />
