@@ -39,9 +39,9 @@
 </script>
 
 {#if nonNullish(status)}
-	<div in:fade>
-		<p class="font-bold text-sm mt-3">Call canister:</p>
-		<p class="text-sm mb-2 break-words">
+	<div class="dark:text-white" in:fade>
+		<p class="font-bold mt-6">Call canister:</p>
+		<p class="mb-2 break-words">
 			{#if status === 'loading'}
 				<output data-tid="loading-call-canister">Loading call canister...</output>
 			{:else if status === 'result'}

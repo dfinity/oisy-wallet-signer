@@ -14,9 +14,13 @@
 </script>
 
 {#snippet title()}
-	Wallet 👛
+	Wallet
 {/snippet}
 
-<Layout {title} {size}>
+{#snippet description()}
+	A demo wallet that uses the Oisy Wallet Signer library to sign messages.
+{/snippet}
+
+<Layout {title} {description} {size}>
 	{@render children()}
 </Layout>

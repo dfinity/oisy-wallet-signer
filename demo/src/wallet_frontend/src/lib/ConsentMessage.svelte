@@ -10,6 +10,7 @@
 		type Rejection
 	} from '@dfinity/oisy-wallet-signer';
 	import Button from '$core/components/Button.svelte';
+	import Article from '$core/components/Article.svelte';
 	import { fade } from 'svelte/transition';
 
 	type Props = {
@@ -82,27 +83,29 @@
 
 {#if loading || nonNullish(displayMessage)}
 	<div in:fade>
-		<p class="font-bold text-sm mt-3">Consent Message:</p>
+		<Article>
+			<p class="font-bold">Consent Message:</p>
 
-		{#if loading}
-			<p data-tid="loading-consent-message" class="text-sm mb-2 break-words">
-				Loading consent message...
-			</p>
-		{/if}
+			{#if loading}
+				<p data-tid="loading-consent-message" class="mb-2 break-words">
+					Loading consent message...
+				</p>
+			{/if}
 
-		{#if nonNullish(displayMessage)}
-			<p class="text-sm mb-2 break-words" data-tid="consent-message">
-				{displayMessage}
-			</p>
+			{#if nonNullish(displayMessage)}
+				<p class="mb-2 break-words" data-tid="consent-message">
+					{displayMessage}
+				</p>
 
-			<div class="flex">
-				<Button type="button" onclick={onReject} testId="reject-consent-message-button"
+				<div class="flex gap-4">
+					<Button type="button" onclick={onReject} testId="reject-consent-message-button"
 					>Reject</Button
-				>
-				<Button type="button" onclick={onApprove} testId="approve-consent-message-button"
+					>
+					<Button type="button" onclick={onApprove} testId="approve-consent-message-button"
 					>Approve</Button
-				>
-			</div>
-		{/if}
+					>
+				</div>
+			{/if}
+		</Article>
 	</div>
 {/if}
