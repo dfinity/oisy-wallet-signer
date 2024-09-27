@@ -22,7 +22,7 @@ jobs:
         working-directory: 'demo'
 
       - name: Deploy to Juno
-        uses: buildwithjuno/juno-action@main
+        uses: junobuild/juno-action@main
         working-directory: 'demo'
         with:
           args: deploy
