@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Button from '$core/components/Button.svelte';
 	import { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
+	import { WALLET_URL } from '$lib/constants/app.constants';
 
 	let { wallet = $bindable() } = $props();
 
@@ -8,7 +9,7 @@
 
 	const onclick = async () => {
 		walletState = await IcpWallet.connect({
-			url: 'http://localhost:5174/sign'
+			url: WALLET_URL
 		});
 	};
 

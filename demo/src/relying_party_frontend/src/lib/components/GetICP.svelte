@@ -3,10 +3,10 @@
 	import Button from '$core/components/Button.svelte';
 	import { authStore } from '$core/stores/auth.store';
 	import { isNullish } from '@dfinity/utils';
-	import type { Icrc1TransferRequest } from '@dfinity/ledger-icp';
 	import { alertStore } from '$core/stores/alert.store';
 	import { emit } from '$core/utils/events.utils';
 	import { getTransferRequest } from '$lib/utils/transfer.utils';
+	import { WALLET_URL } from '$lib/constants/app.constants';
 
 	let wallet = $state<IcpWallet | undefined>(undefined);
 
@@ -21,7 +21,7 @@
 			}
 
 			wallet = await IcpWallet.connect({
-				url: 'http://localhost:5174/sign'
+				url: WALLET_URL
 			});
 
 			const accounts = await wallet?.accounts();

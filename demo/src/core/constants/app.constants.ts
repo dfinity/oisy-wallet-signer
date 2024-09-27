@@ -1,8 +1,3 @@
-export const MODE = import.meta.env.DFX_NETWORK;
-export const LOCAL = MODE === 'local';
-export const STAGING = MODE === 'staging';
-export const PROD = MODE === 'ic';
-
 // How long the delegation identity should remain valid?
 // e.g. BigInt(60 * 60 * 1000 * 1000 * 1000) = 1 hour in nanoseconds
 export const AUTH_MAX_TIME_TO_LIVE = BigInt(60 * 60 * 1000 * 1000 * 1000);

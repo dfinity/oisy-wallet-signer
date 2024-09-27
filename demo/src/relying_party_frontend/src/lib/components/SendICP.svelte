@@ -3,11 +3,12 @@
 	import Button from '$core/components/Button.svelte';
 	import { authStore } from '$core/stores/auth.store';
 	import { createAgent, isNullish } from '@dfinity/utils';
-	import { type Icrc1TransferRequest, LedgerCanister } from '@dfinity/ledger-icp';
+	import { LedgerCanister } from '@dfinity/ledger-icp';
 	import { alertStore } from '$core/stores/alert.store';
 	import { emit } from '$core/utils/events.utils';
 	import { getTransferRequest } from '$lib/utils/transfer.utils';
 	import { Principal } from '@dfinity/principal';
+	import { DEV, LOCAL_REPLICA_URL, WALLET_URL } from '$lib/constants/app.constants';
 
 	let wallet = $state<IcpWallet | undefined>(undefined);
 
@@ -22,7 +23,7 @@
 			}
 
 			wallet = await IcpWallet.connect({
-				url: 'http://localhost:5174/sign'
+				url: WALLET_URL
 			});
 
 			const accounts = await wallet?.accounts();
@@ -42,7 +43,7 @@
 			await wallet?.disconnect();
 
 			const agent = await createAgent({
-				host: 'http://localhost:4943',
+				...(DEV && { host: LOCAL_REPLICA_URL }),
 				identity: $authStore.identity,
 				fetchRootKey: true
 			});
