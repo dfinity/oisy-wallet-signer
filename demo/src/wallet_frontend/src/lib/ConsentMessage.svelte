@@ -99,10 +99,10 @@
 
 				<div class="flex gap-4">
 					<Button type="button" onclick={onReject} testId="reject-consent-message-button"
-					>Reject</Button
+						>Reject</Button
 					>
 					<Button type="button" onclick={onApprove} testId="approve-consent-message-button"
-					>Approve</Button
+						>Approve</Button
 					>
 				</div>
 			{/if}

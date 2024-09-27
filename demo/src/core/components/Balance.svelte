@@ -5,7 +5,7 @@
 	import { AnonymousIdentity } from '@dfinity/agent';
 	import type { Principal } from '@dfinity/principal';
 	import { authStore } from '../stores/auth.store';
-	import Value from "$core/components/Value.svelte";
+	import Value from '$core/components/Value.svelte';
 
 	let balance = $state(0n);
 

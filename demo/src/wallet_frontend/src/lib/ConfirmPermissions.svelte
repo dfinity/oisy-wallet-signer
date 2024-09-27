@@ -69,12 +69,7 @@
 
 {#if nonNullish(scopes)}
 	<Article>
-		<form
-				{onsubmit}
-				method="POST"
-				in:fade
-				data-tid="requested-permissions"
-		>
+		<form {onsubmit} method="POST" in:fade data-tid="requested-permissions">
 			<p class="font-bold dark:text-white">Requested Permissions</p>
 
 			<ul class="mt-2 mb-4 dark:text-white" data-tid="requested-permissions-list">

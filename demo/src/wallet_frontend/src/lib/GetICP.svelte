@@ -15,5 +15,5 @@
 </script>
 
 <div class="mt-4">
-    <Button type="button" onclick={onClick} testId="get-icp-button">Get ICP</Button>
+	<Button type="button" onclick={onClick} testId="get-icp-button">Get ICP</Button>
 </div>

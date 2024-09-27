@@ -8,7 +8,7 @@ export const tailwindConfig: Partial<Config> = {
 		},
 		extend: {
 			screens: {
-				tall: {raw: '(min-height: 800px)'}
+				tall: { raw: '(min-height: 800px)' }
 			},
 			animation: {
 				fade: 'fadeIn .25s ease-in-out'
@@ -16,8 +16,8 @@ export const tailwindConfig: Partial<Config> = {
 
 			keyframes: {
 				fadeIn: {
-					from: {opacity: '0'},
-					to: {opacity: '1'}
+					from: { opacity: '0' },
+					to: { opacity: '1' }
 				}
 			}
 		},

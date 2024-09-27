@@ -6,7 +6,7 @@
 	import SignOut from '$core/components/SignOut.svelte';
 	import { fade } from 'svelte/transition';
 	import type { Snippet } from 'svelte';
-	import Footer from "$core/components/Footer.svelte";
+	import Footer from '$core/components/Footer.svelte';
 
 	type Props = {
 		size?: {
