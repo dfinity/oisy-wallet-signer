@@ -2,25 +2,25 @@
 	import Button from '$core/components/Button.svelte';
 	import { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
 
-    let { wallet = $bindable() } = $props();
+	let { wallet = $bindable() } = $props();
 
 	let walletState = $state<IcpWallet | undefined>(undefined);
 
 	const onclick = async () => {
-        walletState = await IcpWallet.connect({
+		walletState = await IcpWallet.connect({
 			url: 'http://localhost:5174/sign'
 		});
 	};
 
 	$effect(() => {
 		return () => {
-            walletState?.disconnect();
+			walletState?.disconnect();
 		};
 	});
 
-    $effect(() => {
-        wallet = walletState;
-    });
+	$effect(() => {
+		wallet = walletState;
+	});
 </script>
 
 <Button {onclick} testId="connect-wallet-button">Connect Wallet</Button>
