@@ -1066,6 +1066,42 @@ describe('Signer', () => {
             );
           });
         });
+
+        it('should also notify error after prompt if no scopes is confirmed', async () => {
+          let confirm: PermissionsConfirmation | undefined;
+
+          signer.register({
+            method: ICRC25_REQUEST_PERMISSIONS,
+            prompt: ({confirm: confirmScopes, requestedScopes: _}: PermissionsPromptPayload) => {
+              confirm = confirmScopes;
+            }
+          });
+
+          const messageEvent = new MessageEvent('message', requestMsg);
+          window.dispatchEvent(messageEvent);
+
+          await vi.waitFor(() => {
+            expect(confirm).not.toBeUndefined();
+          });
+
+          confirm?.([]);
+
+          await vi.waitFor(() => {
+            expect(postMessageMock).toHaveBeenNthCalledWith(
+              1,
+              {
+                jsonrpc: JSON_RPC_VERSION_2,
+                id: testId,
+                error: {
+                  code: SignerErrorCode.PERMISSION_NOT_GRANTED,
+                  message:
+                    'The signer has not granted the necessary permissions to process the request from the relying party.'
+                }
+              },
+              testOrigin
+            );
+          });
+        });
       });
 
       describe('Accounts', () => {
