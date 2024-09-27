@@ -133,6 +133,20 @@ describe('Signer sessions', () => {
         expect(updatedPermissions).toEqual(expect.objectContaining(expectedScopes));
       });
 
+      it('should not modify any permissions if no scopes is passed - i.e. if we keep the same permissions', () => {
+        assertNonNullish(savedPermissions);
+
+        saveSessionScopes({
+          owner,
+          origin,
+          scopes: []
+        });
+
+        const updatedPermissions = get<SessionPermissions>({key: expectedKey});
+
+        expect(updatedPermissions).toEqual(savedPermissions);
+      });
+
       it('should update the updatedAt field for existing scopes', () => {
         assertNonNullish(savedPermissions);
 
