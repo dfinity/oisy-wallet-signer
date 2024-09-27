@@ -28,6 +28,7 @@
 		"@junobuild/config": "^0.0.14",
 		"@junobuild/vite-plugin": "^0.0.18",
 		"@playwright/test": "^1.47.1",
+		"@rollup/plugin-inject": "^5.0.5",
 		"@sveltejs/adapter-static": "^3.0.5",
 		"@sveltejs/kit": "^2.5.28",
 		"@sveltejs/vite-plugin-svelte": "^3.1.2",
