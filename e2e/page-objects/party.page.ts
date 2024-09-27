@@ -34,7 +34,7 @@ export class PartyPage extends IdentityPage {
   }
 
   async goto(): Promise<void> {
-    await this.page.goto('http://localhost:5173');
+    await this.page.goto('http://localhost:5173/dev');
   }
 
   async connect(): Promise<void> {
