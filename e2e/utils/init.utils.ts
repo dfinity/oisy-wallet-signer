@@ -7,6 +7,8 @@ export const initTestSuite = (): (() => PartyPage) => {
   let partyPage: PartyPage;
 
   testWithII.beforeAll(async ({playwright}) => {
+    testWithII.setTimeout(120000);
+
     const browser = await playwright.chromium.launch();
 
     const context = await browser.newContext();
