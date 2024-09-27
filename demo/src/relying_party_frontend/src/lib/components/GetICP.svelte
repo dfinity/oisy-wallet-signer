@@ -12,7 +12,7 @@
 
 	// TODO: display error on timeout
 	// TODO: connect button first that ask for accounts
-    // TODO: then display wallet account owner and its balance
+	// TODO: then display wallet account owner and its balance
 
 	const onclick = async () => {
 		try {
