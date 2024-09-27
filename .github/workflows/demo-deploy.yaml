@@ -1,0 +1,30 @@
+name: Deploy to Juno
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Prepare
+        uses: ./.github/actions/prepare
+      - name: Prepare Demo
+        uses: ./.github/actions/prepare
+        with:
+          folder: 'demo'
+      - name: Build
+        run: npm run build:party
+        working-directory: 'demo'
+
+      - name: Deploy to Juno
+        uses: junobuild/juno-action@main
+        working-directory: 'demo'
+        with:
+          args: deploy
+        env:
+          JUNO_TOKEN: ${{ secrets.JUNO_TOKEN }}
