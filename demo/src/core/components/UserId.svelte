@@ -12,7 +12,7 @@
 	let userId = $derived($authStore?.identity?.getPrincipal().toText() ?? '');
 </script>
 
-<Value id="user-id-section" title="User ID">
+<Value id="user-id-section" title="Your User ID">
 	<output data-tid="user-id"
 		>{shorten ? shortenWithMiddleEllipsis({ text: userId }) : userId}</output
 	>

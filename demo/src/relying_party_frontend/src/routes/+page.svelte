@@ -5,8 +5,8 @@
 	import SendICP from '$lib/components/SendICP.svelte';
 </script>
 
-<p class="dark:text-white mb-8">
-	Get and send 0.05 ICP (minus fees) using the Oisy Wallet and signer standards.
+<p class="dark:text-white mb-4">
+	Get and send 0.05 ICP (minus fees) to your Oisy Wallet using the signer standards.
 </p>
 
 <UserId shorten />
