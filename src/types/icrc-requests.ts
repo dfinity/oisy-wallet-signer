@@ -9,7 +9,7 @@ import {
   ICRC49_CALL_CANISTER
 } from '../constants/icrc.constants';
 import {base64ToUint8Array} from '../utils/base64.utils';
-import {IcrcBlob} from './blob';
+import {IcrcBlobSchema} from './blob';
 import {IcrcScopedMethodSchema} from './icrc-standards';
 import {PrincipalTextSchema} from './principal';
 import {inferRpcRequestWithParamsSchema, inferRpcRequestWithoutParamsSchema} from './rpc';
@@ -89,8 +89,8 @@ export const IcrcCallCanisterRequestParamsSchema = z.object({
   canisterId: PrincipalTextSchema,
   sender: PrincipalTextSchema,
   method: z.string().trim().min(1),
-  arg: IcrcBlob,
-  nonce: IcrcBlob.optional().refine(
+  arg: IcrcBlobSchema,
+  nonce: IcrcBlobSchema.optional().refine(
     (blob) => {
       try {
         return isNullish(blob) || base64ToUint8Array(blob).length <= 32;
