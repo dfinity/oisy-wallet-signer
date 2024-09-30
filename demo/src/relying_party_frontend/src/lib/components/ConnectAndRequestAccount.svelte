@@ -19,6 +19,8 @@
 				url: WALLET_URL
 			});
 
+			await wallet.requestPermissions();
+
 			const accounts = await wallet.accounts();
 
 			account = accounts?.[0];
