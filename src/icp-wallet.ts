@@ -1,5 +1,6 @@
 import {IDL} from '@dfinity/candid';
 import {toIcrc1TransferRawRequest, type Icrc1TransferRequest} from '@dfinity/ledger-icp';
+import {TransferArgs} from './constants/icrc.idl.constants';
 import {RelyingParty} from './relying-party';
 import type {IcrcAccount} from './types/icrc-accounts';
 import type {IcrcCallCanisterResult} from './types/icrc-responses';
@@ -37,30 +38,9 @@ export class IcpWallet extends RelyingParty {
     request: Icrc1TransferRequest;
     ledgerCanisterId?: PrincipalText;
   } & Pick<IcrcAccount, 'owner'>): Promise<IcrcCallCanisterResult> => {
-    // TODO: this should be exposed by Candid IDL
-    const SubAccount = IDL.Vec(IDL.Nat8);
-
-    const Icrc1Tokens = IDL.Nat;
-
-    const Icrc1Timestamp = IDL.Nat64;
-
-    const Account = IDL.Record({
-      owner: IDL.Principal,
-      subaccount: IDL.Opt(SubAccount)
-    });
-
-    const TransferArg = IDL.Record({
-      to: Account,
-      fee: IDL.Opt(Icrc1Tokens),
-      memo: IDL.Opt(IDL.Vec(IDL.Nat8)),
-      from_subaccount: IDL.Opt(SubAccount),
-      created_at_time: IDL.Opt(Icrc1Timestamp),
-      amount: Icrc1Tokens
-    });
-
     const rawRequest = toIcrc1TransferRawRequest(request);
 
-    const arg = uint8ArrayToBase64(new Uint8Array(IDL.encode([TransferArg], [rawRequest])));
+    const arg = uint8ArrayToBase64(new Uint8Array(IDL.encode([TransferArgs], [rawRequest])));
 
     // TODO: uncomment nonce and add TODO - not yet supported by agent-js
 
