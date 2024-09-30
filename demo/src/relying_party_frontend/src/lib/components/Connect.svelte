@@ -9,7 +9,7 @@
 		requestAccounts?: boolean;
 	};
 
-	let { wallet = $bindable(), requestAccounts = false } = $props();
+	let { wallet = $bindable(), requestAccounts = false }: Props = $props();
 
 	let walletState = $state<IcpWallet | undefined>(undefined);
 
