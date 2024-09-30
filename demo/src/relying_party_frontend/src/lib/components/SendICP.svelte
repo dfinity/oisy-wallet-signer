@@ -78,9 +78,9 @@
 				duration: 3000
 			});
 		} catch (err: unknown) {
-			alertStore.set({
+            alertStore.set({
 				type: 'error',
-				message: 'Unexpected error.'
+				message: 'Unexpected error while sending ICP.'
 			});
 
 			console.error(err);
