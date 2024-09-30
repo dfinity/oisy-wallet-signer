@@ -12,3 +12,5 @@ export const IcrcBlobSchema = z.string().refine(
     message: 'Invalid base64 string'
   }
 );
+
+export type IcrcBlob = z.infer<typeof IcrcBlobSchema>;

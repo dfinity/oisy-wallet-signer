@@ -1,4 +1,3 @@
-import {IDL} from '@dfinity/candid';
 import {toIcrc1TransferRawRequest, type Icrc1TransferRequest} from '@dfinity/ledger-icp';
 import {TransferArgs} from './constants/icrc.idl.constants';
 import {RelyingParty} from './relying-party';
@@ -7,7 +6,7 @@ import type {IcrcCallCanisterResult} from './types/icrc-responses';
 import type {Origin} from './types/post-message';
 import type {PrincipalText} from './types/principal';
 import type {RelyingPartyOptions} from './types/relying-party-options';
-import {uint8ArrayToBase64} from './utils/base64.utils';
+import {encodeArg} from './utils/call.utils';
 
 const ICP_LEDGER_CANISTER_ID = 'ryjl3-tyaaa-aaaaa-aaaba-cai';
 
@@ -38,9 +37,12 @@ export class IcpWallet extends RelyingParty {
     request: Icrc1TransferRequest;
     ledgerCanisterId?: PrincipalText;
   } & Pick<IcrcAccount, 'owner'>): Promise<IcrcCallCanisterResult> => {
-    const rawRequest = toIcrc1TransferRawRequest(request);
+    const rawArgs = toIcrc1TransferRawRequest(request);
 
-    const arg = uint8ArrayToBase64(new Uint8Array(IDL.encode([TransferArgs], [rawRequest])));
+    const arg = encodeArg({
+      recordClass: TransferArgs,
+      rawArgs
+    });
 
     // TODO: uncomment nonce and add TODO - not yet supported by agent-js
 
