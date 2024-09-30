@@ -20,7 +20,7 @@
 <Article>
 	{#if nonNullish(owner)}
 		<div in:fade>
-			<UserId shorten user={owner} title="Your Wallet ID" />
+			<UserId shorten user={owner} title="Your Oisy Wallet ID" />
 
 			<Balance {owner} />
 		</div>
