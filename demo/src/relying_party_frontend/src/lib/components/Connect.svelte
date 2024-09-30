@@ -12,7 +12,7 @@
 	let walletState = $state<IcpWallet | undefined>(undefined);
 
 	const onclick = async () => {
-		const walletState = await IcpWallet.connect({
+		walletState = await IcpWallet.connect({
 			url: WALLET_URL
 		});
 	};
