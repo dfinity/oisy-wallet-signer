@@ -2,21 +2,15 @@
 	import UserId from '$core/components/UserId.svelte';
 	import Balance from '$core/components/Balance.svelte';
 	import Article from '$core/components/Article.svelte';
-	import { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
-	import { isNullish, nonNullish } from '@dfinity/utils';
-	import Connect from '$lib/components/Connect.svelte';
 	import { fade } from 'svelte/transition';
 	import { authStore } from '$core/stores/auth.store';
 	import Wallet from '$lib/components/Wallet.svelte';
 	import SendICP from '$lib/components/SendICP.svelte';
+	import ConnectAndRequestAccount from '$lib/components/ConnectAndRequestAccount.svelte';
+	import type { IcrcAccount } from '@dfinity/oisy-wallet-signer';
+	import { isNullish, nonNullish } from '@dfinity/utils';
 
-	let wallet = $state<IcpWallet | undefined>(undefined);
-
-	$effect(() => {
-		return () => {
-			wallet?.disconnect();
-		};
-	});
+	let account = $state<IcrcAccount | undefined>(undefined);
 </script>
 
 <p class="dark:text-white mb-4">Transfer 0.05 ICP (minus fees) to and from your Oisy Wallet.</p>
@@ -30,9 +24,9 @@
 		</Article>
 
 		<div class="md:min-h-20">
-			{#if isNullish(wallet)}
+			{#if isNullish(account)}
 				<div in:fade>
-					<Connect bind:wallet requestAccounts />
+					<ConnectAndRequestAccount bind:account />
 				</div>
 			{:else}
 				<div in:fade>
@@ -42,9 +36,9 @@
 		</div>
 	</section>
 
-	{#if nonNullish(wallet)}
+	{#if nonNullish(account)}
 		<section in:fade>
-			<Wallet {wallet} />
+			<Wallet {account} />
 		</section>
 	{/if}
 </div>
