@@ -32,10 +32,10 @@ export class IcpWallet extends RelyingParty {
   public icrc1Transfer = async ({
     request,
     owner,
-    canisterId
+    ledgerCanisterId: canisterId
   }: {
     request: Icrc1TransferRequest;
-    canisterId?: PrincipalText;
+    ledgerCanisterId?: PrincipalText;
   } & Pick<IcrcAccount, 'owner'>): Promise<IcrcCallCanisterResult> => {
     // TODO: this should be exposed by Candid IDL
     const SubAccount = IDL.Vec(IDL.Nat8);

@@ -97,7 +97,7 @@ describe('icp-wallet', () => {
 
       const owner = Ed25519KeyIdentity.generate().getPrincipal().toText();
 
-      await icpWallet.icrc1Transfer({request, owner, canisterId: mockCanisterId});
+      await icpWallet.icrc1Transfer({request, owner, ledgerCanisterId: mockCanisterId});
 
       expect(mockCall).toHaveBeenCalledWith({
         params: {

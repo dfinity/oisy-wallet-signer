@@ -1,38 +1,20 @@
 <script lang="ts">
-	import type { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
 	import { Principal } from '@dfinity/principal';
-	import { isNullish, nonNullish } from '@dfinity/utils';
+	import { nonNullish } from '@dfinity/utils';
 	import Article from '$core/components/Article.svelte';
 	import UserId from '$core/components/UserId.svelte';
 	import GetICP from '$lib/components/GetICP.svelte';
 	import Balance from '$core/components/Balance.svelte';
 	import { fade } from 'svelte/transition';
+	import type { IcrcAccount } from '@dfinity/oisy-wallet-signer';
 
 	type Props = {
-		wallet: IcpWallet | undefined;
+		account: IcrcAccount;
 	};
 
-	let { wallet }: Props = $props();
+	let { account }: Props = $props();
 
-	let owner: Principal | undefined = $state(undefined);
-
-	const loadOwner = async (wallet: IcpWallet | undefined) => {
-		const accounts = await wallet?.accounts();
-
-		const account = accounts?.[0];
-
-		if (isNullish(account)) {
-			return;
-		}
-
-		owner = Principal.fromText(account.owner);
-	};
-
-	$effect(() => {
-		(async () => {
-			await loadOwner(wallet);
-		})();
-	});
+	let owner: Principal | undefined = $derived(Principal.fromText(account.owner));
 </script>
 
 <Article>

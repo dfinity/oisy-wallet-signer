@@ -3,7 +3,11 @@
 	import { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
 	import { WALLET_URL } from '$core/constants/app.constants';
 
-	let { wallet = $bindable() } = $props();
+	type Props = {
+		wallet: IcpWallet | undefined;
+	};
+
+	let { wallet = $bindable() }: Props = $props();
 
 	let walletState = $state<IcpWallet | undefined>(undefined);
 

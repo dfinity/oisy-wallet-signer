@@ -80,4 +80,4 @@
 	};
 </script>
 
-<Button {onclick} testId="connect-wallet-button">Get ICP</Button>
+<Button {onclick} testId="connect-wallet-button">Get ICP from Wallet</Button>
