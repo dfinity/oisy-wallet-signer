@@ -94,6 +94,7 @@
     "@dfinity/agent": "^2.1.1",
     "@dfinity/candid": "^2.1.1",
     "@dfinity/ledger-icp": "^2.5.0-next-2024-09-17",
+    "@dfinity/ledger-icrc": "^2.5.0",
     "@dfinity/principal": "^2.1.1",
     "@dfinity/utils": "^2.5.0-next-2024-09-17",
     "borc": "^2.1.1",
