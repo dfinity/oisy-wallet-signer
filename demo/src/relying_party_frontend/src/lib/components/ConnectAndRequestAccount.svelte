@@ -19,7 +19,7 @@
 				url: WALLET_URL
 			});
 
-            await wallet.requestPermissions();
+			await wallet.requestPermissions();
 
 			const accounts = await wallet.accounts();
 
