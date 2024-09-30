@@ -88,4 +88,4 @@
 	};
 </script>
 
-<Button {onclick} testId="connect-wallet-button">Send ICP</Button>
+<Button {onclick} testId="connect-wallet-button">Send ICP to Wallet</Button>

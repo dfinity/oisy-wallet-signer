@@ -2,15 +2,38 @@
 	import Button from '$core/components/Button.svelte';
 	import { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
 	import { WALLET_URL } from '$core/constants/app.constants';
+	import { alertStore } from '$core/stores/alert.store';
 
-	let { wallet = $bindable() } = $props();
+	type Props = {
+		wallet: IcpWallet | undefined;
+		requestAccounts?: boolean;
+	};
+
+	let { wallet = $bindable(), requestAccounts = false }: Props = $props();
 
 	let walletState = $state<IcpWallet | undefined>(undefined);
 
 	const onclick = async () => {
-		walletState = await IcpWallet.connect({
+		const w = await IcpWallet.connect({
 			url: WALLET_URL
 		});
+
+		if (requestAccounts) {
+			try {
+				await w.accounts();
+			} catch (err: unknown) {
+				alertStore.set({
+					type: 'error',
+					message: 'The wallet did not provide any account.'
+				});
+
+				await w.disconnect();
+				console.error(err);
+				return;
+			}
+		}
+
+		walletState = w;
 	};
 
 	$effect(() => {
