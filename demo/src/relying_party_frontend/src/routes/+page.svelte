@@ -32,7 +32,7 @@
 		<div class="md:min-h-20">
 			{#if isNullish(wallet)}
 				<div in:fade>
-					<Connect bind:wallet />
+					<Connect bind:wallet requestAccounts />
 				</div>
 			{:else}
 				<div in:fade>
