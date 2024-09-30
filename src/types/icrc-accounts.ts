@@ -1,9 +1,9 @@
 import {z} from 'zod';
 import {base64ToUint8Array} from '../utils/base64.utils';
-import {IcrcBlob} from './blob';
+import {IcrcBlobSchema} from './blob';
 import {PrincipalTextSchema} from './principal';
 
-const IcrcSubaccountSchema = IcrcBlob.refine(
+const IcrcSubaccountSchema = IcrcBlobSchema.refine(
   (value) => {
     try {
       return base64ToUint8Array(value).length === 32;
