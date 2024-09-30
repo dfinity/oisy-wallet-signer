@@ -1,5 +1,5 @@
 import {z} from 'zod';
-import {IcrcBlob} from './blob';
+import {IcrcBlobSchema} from './blob';
 import {IcrcAccountsSchema} from './icrc-accounts';
 import {
   IcrcPermissionStateSchema,
@@ -110,8 +110,8 @@ export type IcrcAccountsResponse = z.infer<typeof IcrcAccountsResponseSchema>;
 
 export const IcrcCallCanisterResultSchema = z
   .object({
-    contentMap: IcrcBlob,
-    certificate: IcrcBlob
+    contentMap: IcrcBlobSchema,
+    certificate: IcrcBlobSchema
   })
   .strict();
 

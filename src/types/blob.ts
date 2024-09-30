@@ -1,6 +1,6 @@
 import {z} from 'zod';
 
-export const IcrcBlob = z.string().refine(
+export const IcrcBlobSchema = z.string().refine(
   (val) => {
     try {
       return btoa(atob(val)) === val;
