@@ -1,5 +1,14 @@
-import type {Origin, RelyingPartyOptions} from './index';
+import {TransferParams, toTransferArg} from '@dfinity/ledger-icrc';
+import {TransferArgs} from './constants/icrc.idl.constants';
+import type {
+  IcrcAccount,
+  IcrcCallCanisterResult,
+  Origin,
+  PrincipalText,
+  RelyingPartyOptions
+} from './index';
 import {RelyingParty} from './relying-party';
+import {encodeArg} from './utils/call.utils';
 
 export class IcrcWallet extends RelyingParty {
   /**
@@ -16,4 +25,29 @@ export class IcrcWallet extends RelyingParty {
       init: (params: {origin: Origin; popup: Window}) => new IcrcWallet(params)
     });
   }
+
+  transfer = async ({
+    params,
+    owner,
+    ledgerCanisterId: canisterId
+  }: {params: TransferParams; ledgerCanisterId: PrincipalText} & Pick<
+    IcrcAccount,
+    'owner'
+  >): Promise<IcrcCallCanisterResult> => {
+    const rawArgs = toTransferArg(params);
+
+    const arg = encodeArg({
+      recordClass: TransferArgs,
+      rawArgs
+    });
+
+    return await this.call({
+      params: {
+        sender: owner,
+        method: 'icrc1_transfer',
+        canisterId,
+        arg
+      }
+    });
+  };
 }
