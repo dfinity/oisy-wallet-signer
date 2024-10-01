@@ -95,8 +95,6 @@ export class IcpWallet extends RelyingParty {
       shouldFetchRootKey: true
     });
 
-    console.log(canisterId, requestId);
-
     const certificate = await Certificate.create({
       certificate: base64ToUint8Array(cert),
       rootKey: agent.rootKey,
