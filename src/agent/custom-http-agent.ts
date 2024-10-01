@@ -6,11 +6,11 @@ import {
   pollForResponse as pollForResponseAgent,
   type CallRequest,
   type HttpAgentOptions,
-  type SubmitResponse
+  type SubmitResponse, requestIdOf, hashValue
 } from '@dfinity/agent';
 import {bufFromBufLike} from '@dfinity/candid';
 import {Principal} from '@dfinity/principal';
-import {isNullish, nonNullish} from '@dfinity/utils';
+import {arrayBufferToUint8Array, isNullish, nonNullish, uint8ArrayToHexString} from '@dfinity/utils';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import {base64ToUint8Array} from '../utils/base64.utils';
 
@@ -64,6 +64,16 @@ export class CustomHttpAgent {
       // effectiveCanisterId is optional but, actually mandatory according SDK team.
       effectiveCanisterId: canisterId
     });
+
+    console.log("requestDetails:", requestDetails);
+
+    console.log("Ingress expiry hash", uint8ArrayToHexString(arrayBufferToUint8Array(requestDetails!.ingress_expiry.toHash())));
+
+    console.log("Hash", uint8ArrayToHexString(arrayBufferToUint8Array(hashValue(requestDetails!.ingress_expiry))));
+
+    const requestId = requestIdOf(requestDetails!);
+
+    console.log('requestId:', uint8ArrayToHexString(arrayBufferToUint8Array(requestId)));
 
     this.assertRequestDetails(requestDetails);
 

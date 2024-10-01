@@ -1,6 +1,6 @@
 import {
   AnonymousIdentity,
-  Certificate,
+  Certificate, Expiry, hashValue,
   HttpAgent,
   lookupResultToBuffer,
   requestIdOf
@@ -8,7 +8,7 @@ import {
 import type {CallRequest} from '@dfinity/agent/lib/cjs/agent/http/types';
 import {toIcrc1TransferRawRequest, type Icrc1TransferRequest} from '@dfinity/ledger-icp';
 import {Principal} from '@dfinity/principal';
-import {arrayBufferToUint8Array} from '@dfinity/utils';
+import {arrayBufferToUint8Array, uint8ArrayToHexString} from '@dfinity/utils';
 import {decode} from './agent/agentjs-cbor-copy';
 import {TransferArgs} from './constants/icrc.idl.constants';
 import {RelyingParty} from './relying-party';
@@ -69,8 +69,27 @@ export class IcpWallet extends RelyingParty {
       }
     });
 
-    const callRequest: CallRequest = decode(base64ToUint8Array(contentMap));
+    console.log('contentMap', contentMap);
+
+    console.log('cert:', cert);
+
+    // TODO: Decoding ingress_expiry does not work
+    const {ingress_expiry, ...callRequestTmp}: Omit<CallRequest, "ingress_expiry"> & {ingress_expiry: any} = decode(base64ToUint8Array(contentMap));
+
+    const callRequest: CallRequest = {
+      ...callRequestTmp,
+      ingress_expiry: ingress_expiry // TODO: this works BigInt(ingress_expiry.toFixed()) as any
+    } as CallRequest;
+
+    console.log(ingress_expiry);
+
+    console.log("Hash", uint8ArrayToHexString(arrayBufferToUint8Array(hashValue(callRequest.ingress_expiry))));
+
+    console.log('callRequest', callRequest);
+
     const requestId = requestIdOf(callRequest);
+
+    console.log('requestId:', uint8ArrayToHexString(arrayBufferToUint8Array(requestId)));
 
     if (callRequest.method_name !== 'icrc1_transfer') {
       throw new Error('The response method does not match the request method.');
@@ -102,6 +121,8 @@ export class IcpWallet extends RelyingParty {
     });
 
     const path = [new TextEncoder().encode('request_status'), requestId];
+
+    console.log(new TextEncoder().encode('request_status'), path);
 
     const _status = new TextDecoder().decode(
       lookupResultToBuffer(certificate.lookup([...path, 'status']))
