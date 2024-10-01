@@ -130,6 +130,7 @@ export class Signer {
       return;
     }
 
+    // At this point the connection with the relying party should have been initialized and the origin should be set.
     const {valid} = this.assertOrigin(message);
     if (!valid) {
       return;
@@ -172,7 +173,7 @@ export class Signer {
   }
 
   private assertOriginNotInitialized({data: msgData, origin}: SignerMessageEvent): {
-    alreadyInitialized: boolean;
+    errorAlreadyInitialized: boolean;
   } {
     if (nonNullish(this.#walletOrigin)) {
       const {data} = RpcRequestSchema.safeParse(msgData);
@@ -182,14 +183,14 @@ export class Signer {
         origin,
         error: {
           code: SignerErrorCode.ORIGIN_ALREADY_INITIALIZED_ERROR,
-          message: `The signer has already responded to a status request.`
+          message: 'The signer has already responded to a status request.'
         }
       });
 
-      return {alreadyInitialized: true};
+      return {errorAlreadyInitialized: true};
     }
 
-    return {alreadyInitialized: false};
+    return {errorAlreadyInitialized: false};
   }
 
   private assertOrigin({data: msgData, origin}: SignerMessageEvent): {valid: boolean} {
@@ -201,7 +202,9 @@ export class Signer {
         origin,
         error: {
           code: SignerErrorCode.ORIGIN_ERROR,
-          message: `The relying party's origin is not allowed to interact with the signer.`
+          message: isNullish(this.#walletOrigin)
+            ? 'The relying party has not established a connection to the signer.'
+            : `The relying party's origin is not allowed to interact with the signer.`
         }
       });
 
@@ -274,8 +277,8 @@ export class Signer {
     const {success: isStatusRequest, data: statusData} = IcrcStatusRequestSchema.safeParse(data);
 
     if (isStatusRequest) {
-      const {alreadyInitialized} = this.assertOriginNotInitialized({data, origin, ...rest});
-      if (alreadyInitialized) {
+      const {errorAlreadyInitialized} = this.assertOriginNotInitialized({data, origin, ...rest});
+      if (errorAlreadyInitialized) {
         return {handled: true};
       }
 
