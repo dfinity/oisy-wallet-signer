@@ -1,4 +1,15 @@
+import {
+  AnonymousIdentity,
+  Certificate,
+  HttpAgent,
+  lookupResultToBuffer,
+  requestIdOf
+} from '@dfinity/agent';
+import type {CallRequest} from '@dfinity/agent/lib/cjs/agent/http/types';
 import {toIcrc1TransferRawRequest, type Icrc1TransferRequest} from '@dfinity/ledger-icp';
+import {Principal} from '@dfinity/principal';
+import {arrayBufferToUint8Array} from '@dfinity/utils';
+import {decode} from './agent/agentjs-cbor-copy';
 import {TransferArgs} from './constants/icrc.idl.constants';
 import {RelyingParty} from './relying-party';
 import type {IcrcAccount} from './types/icrc-accounts';
@@ -6,6 +17,7 @@ import type {IcrcCallCanisterResult} from './types/icrc-responses';
 import type {Origin} from './types/post-message';
 import type {PrincipalText} from './types/principal';
 import type {RelyingPartyOptions} from './types/relying-party-options';
+import {base64ToUint8Array} from './utils/base64.utils';
 import {encodeArg} from './utils/call.utils';
 
 const ICP_LEDGER_CANISTER_ID = 'ryjl3-tyaaa-aaaaa-aaaba-cai';
@@ -32,7 +44,7 @@ export class IcpWallet extends RelyingParty {
   public icrc1Transfer = async ({
     request,
     owner,
-    ledgerCanisterId: canisterId
+    ledgerCanisterId
   }: {
     request: Icrc1TransferRequest;
     ledgerCanisterId?: PrincipalText;
@@ -44,32 +56,66 @@ export class IcpWallet extends RelyingParty {
       rawArgs
     });
 
+    const canisterId = ledgerCanisterId ?? ICP_LEDGER_CANISTER_ID;
+
     // TODO: uncomment nonce and add TODO - not yet supported by agent-js
 
-    // TODO: decode contentMap cbor to CallRequest
-    // TODO: requestIdOf(contentMap) => requestId
-    // TODO: contentMap (which is a CallRequest) contains arg and method and canister and sender
-    // TODO: const certificate = await Certificate.create({
-    //       certificate: bufFromBufLike(cert),
-    //       rootKey: this.rootKey,
-    //       canisterId: Principal.fromText(canisterId)
-    //     });
-    //
-    //     const path = [new TextEncoder().encode('request_status'), requestId];
-    //
-    //     const status = new TextDecoder().decode(
-    //       lookupResultToBuffer(certificate.lookup([...path, 'status']))
-    //     );
-    // reply = lookupResultToBuffer(certificate.lookup([...path, 'reply']));
-    // TODO: decode reply with Candid
-
-    return await this.call({
+    const {certificate: cert, contentMap} = await this.call({
       params: {
         sender: owner,
         method: 'icrc1_transfer',
-        canisterId: canisterId ?? ICP_LEDGER_CANISTER_ID,
+        canisterId,
         arg
       }
     });
+
+    const callRequest: CallRequest = decode(base64ToUint8Array(contentMap));
+    const requestId = requestIdOf(callRequest);
+
+    if (callRequest.method_name !== 'icrc1_transfer') {
+      throw new Error('The response method does not match the request method.');
+    }
+
+    // TODO: improve performance by modifying encodeArg to return this information
+    const requestArg = base64ToUint8Array(arg);
+
+    const uint8ArrayEqual = ({first, second}: {first: Uint8Array; second: Uint8Array}): boolean =>
+      first.length === second.length && first.every((value, index) => value === second[index]);
+
+    if (!uint8ArrayEqual({first: requestArg, second: arrayBufferToUint8Array(callRequest.arg)})) {
+      throw new Error('The response does not contain the request arguments.');
+    }
+
+    // We have to create an agent to retrieve the rootKey, which is both inefficient and ugly.
+    // TODO: we do not have the identity
+    // TODO: we do not have the host here neither
+    const agent = await HttpAgent.create({
+      identity: new AnonymousIdentity(),
+      host: 'http://localhost:4943',
+      shouldFetchRootKey: true
+    });
+
+    console.log(canisterId, requestId);
+
+    const certificate = await Certificate.create({
+      certificate: base64ToUint8Array(cert),
+      rootKey: agent.rootKey,
+      canisterId: Principal.fromText(canisterId)
+    });
+
+    const path = [new TextEncoder().encode('request_status'), requestId];
+
+    const _status = new TextDecoder().decode(
+      lookupResultToBuffer(certificate.lookup([...path, 'status']))
+    );
+
+    const reply = lookupResultToBuffer(certificate.lookup([...path, 'reply']));
+
+    // TODO: reply is undefined
+    console.log(reply, reply === undefined); // true
+
+    // TODO: decode reply with Candid
+
+    return {certificate: cert, contentMap};
   };
 }
