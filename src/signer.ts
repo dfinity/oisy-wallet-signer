@@ -131,7 +131,7 @@ export class Signer {
     }
 
     // At this point the connection with the relying party should have been initialized and the origin should be set.
-    const {valid} = this.assertOrigin(message);
+    const {valid} = this.assertNotUndefinedAndSameOrigin(message);
     if (!valid) {
       return;
     }
@@ -169,32 +169,63 @@ export class Signer {
   };
 
   private setWalletOrigin({origin}: Pick<SignerMessageEvent, 'origin'>) {
+    // We do not reassign the origin with the same value if it is already set. It is not a significant performance win.
+    if (nonNullish(this.#walletOrigin)) {
+      return;
+    }
+
     this.#walletOrigin = origin;
   }
 
-  // TODO: if already read say ready
-  private assertOriginNotInitialized({data: msgData, origin}: SignerMessageEvent): {
-    errorAlreadyInitialized: boolean;
+  /**
+   * When establishing a connection, validates the origin of a message event to ensure it matches the existing wallet origin - i.e. subsequent status requests - or is undefined - i.e. first status request.
+   * If the origin is invalid, it sends an error notification with the appropriate error code and message.
+   *
+   * @private
+   * @param {object} event - The message event to validate.
+   * @param {any} event.data - The data sent in the message event.
+   * @param {string} event.origin - The origin of the message event.
+   *
+   * @returns {object} An object containing a `valid` boolean property.
+   * @returns {boolean} returns `true` if the origin is either undefined or matches the expected wallet origin, otherwise returns `false` and notifies the error.
+   */
+  private assertUndefinedOrSameOrigin({data: msgData, origin}: SignerMessageEvent): {
+    valid: boolean;
   } {
-    if (nonNullish(this.#walletOrigin)) {
+    if (nonNullish(this.#walletOrigin) && this.#walletOrigin !== origin) {
       const {data} = RpcRequestSchema.safeParse(msgData);
 
       notifyError({
         id: data?.id ?? null,
         origin,
         error: {
-          code: SignerErrorCode.ORIGIN_ALREADY_INITIALIZED_ERROR,
-          message: 'The signer has already responded to a status request.'
+          code: SignerErrorCode.ORIGIN_ERROR,
+          message: `The relying party's origin is not permitted to obtain the status of the signer.`
         }
       });
 
-      return {errorAlreadyInitialized: true};
+      return {valid: false};
     }
 
-    return {errorAlreadyInitialized: false};
+    return {valid: true};
   }
 
-  private assertOrigin({data: msgData, origin}: SignerMessageEvent): {valid: boolean} {
+  /**
+   * Validates that the wallet origin is defined and matches the origin of the message event that established the connection.
+   * If the origin is invalid or the wallet origin is not defined, it sends an error notification
+   * with the appropriate error code and message.
+   *
+   * @private
+   * @param {object} event - The message event to validate.
+   * @param {any} event.data - The data sent in the message event.
+   * @param {string} event.origin - The origin of the message event.
+   *
+   * @returns {object} An object containing a `valid` boolean property.
+   * @returns {boolean} returns `true` if the wallet origin is defined and matches the origin of the message event, otherwise returns `false` and notifies the error.
+   */
+  private assertNotUndefinedAndSameOrigin({data: msgData, origin}: SignerMessageEvent): {
+    valid: boolean;
+  } {
     if (isNullish(this.#walletOrigin) || this.#walletOrigin !== origin) {
       const {data} = RpcRequestSchema.safeParse(msgData);
 
@@ -278,8 +309,8 @@ export class Signer {
     const {success: isStatusRequest, data: statusData} = IcrcStatusRequestSchema.safeParse(data);
 
     if (isStatusRequest) {
-      const {errorAlreadyInitialized} = this.assertOriginNotInitialized({data, origin, ...rest});
-      if (errorAlreadyInitialized) {
+      const {valid} = this.assertUndefinedOrSameOrigin({data, origin, ...rest});
+      if (!valid) {
         return {handled: true};
       }
 
