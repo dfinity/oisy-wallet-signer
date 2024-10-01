@@ -381,6 +381,24 @@ describe('Signer', () => {
         );
       });
 
+      it('should notify READY everytime subsequent call of icrc29_status', () => {
+        const messageEvent = new MessageEvent('message', requestStatus);
+
+        for (let i = 0; i < 3; i++) {
+          window.dispatchEvent(messageEvent);
+
+          expect(postMessageMock).toHaveBeenNthCalledWith(
+            i + 1,
+            {
+              jsonrpc: JSON_RPC_VERSION_2,
+              id: testId,
+              result: 'ready'
+            },
+            testOrigin
+          );
+        }
+      });
+
       it('should not notify any other messages than ready', () => {
         const messageEvent = new MessageEvent('message', requestStatus);
         window.dispatchEvent(messageEvent);
