@@ -19,6 +19,11 @@ export enum SignerErrorCode {
   SENDER_NOT_ALLOWED = 502,
 
   /**
+   * The origin is set, the signer has already responded to a status message request.
+   */
+  ORIGIN_ALREADY_INITIALIZED_ERROR = 503,
+
+  /**
    * A generic error.
    * @see https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#errors
    */

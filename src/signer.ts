@@ -123,13 +123,15 @@ export class Signer {
       return;
     }
 
-    // TODO: the this.#walletOrigin should actually be set when/after "ready" is notified
-    this.assertAndSetOrigin(message);
-
     // TODO: wrap a try catch around all handler and notify "Unexpected exception" in case if issues
 
     const {handled: statusRequestHandled} = this.handleStatusRequest(message);
     if (statusRequestHandled) {
+      return;
+    }
+
+    const {valid} = this.assertOrigin(message);
+    if (!valid) {
       return;
     }
 
@@ -165,8 +167,33 @@ export class Signer {
     });
   };
 
-  private assertAndSetOrigin({data: msgData, origin}: SignerMessageEvent): void {
-    if (nonNullish(this.#walletOrigin) && this.#walletOrigin !== origin) {
+  private setWalletOrigin({origin}: Pick<SignerMessageEvent, 'origin'>) {
+    this.#walletOrigin = origin;
+  }
+
+  private assertOriginNotInitialized({data: msgData, origin}: SignerMessageEvent): {
+    alreadyInitialized: boolean;
+  } {
+    if (nonNullish(this.#walletOrigin)) {
+      const {data} = RpcRequestSchema.safeParse(msgData);
+
+      notifyError({
+        id: data?.id ?? null,
+        origin,
+        error: {
+          code: SignerErrorCode.ORIGIN_ALREADY_INITIALIZED_ERROR,
+          message: `The signer has already responded to a status request.`
+        }
+      });
+
+      return {alreadyInitialized: true};
+    }
+
+    return {alreadyInitialized: false};
+  }
+
+  private assertOrigin({data: msgData, origin}: SignerMessageEvent): {valid: boolean} {
+    if (isNullish(this.#walletOrigin) || this.#walletOrigin !== origin) {
       const {data} = RpcRequestSchema.safeParse(msgData);
 
       notifyError({
@@ -178,15 +205,10 @@ export class Signer {
         }
       });
 
-      return;
+      return {valid: false};
     }
 
-    // We do not reassign the origin with the same value if it is already set. It is not a significant performance win.
-    if (nonNullish(this.#walletOrigin)) {
-      return;
-    }
-
-    this.#walletOrigin = origin;
+    return {valid: true};
   }
 
   /**
@@ -243,17 +265,25 @@ export class Signer {
   /**
    * Handles incoming status requests.
    *
-   * Parses the message data to determine if it conforms to a status request and sends a notification indicating that the signer is ready.
+   * Parses the message data to determine if it conforms to a status request, sends a notification indicating that the signer is ready and set the origin for asserting subsequent calls.
    *
    * @param {SignerMessageEvent} message - The incoming message event containing the data and origin.
    * @returns {Object} An object with a boolean property `handled` indicating whether the request was handled.
    */
-  private handleStatusRequest({data, origin}: SignerMessageEvent): {handled: boolean} {
+  private handleStatusRequest({data, origin, ...rest}: SignerMessageEvent): {handled: boolean} {
     const {success: isStatusRequest, data: statusData} = IcrcStatusRequestSchema.safeParse(data);
 
     if (isStatusRequest) {
+      const {alreadyInitialized} = this.assertOriginNotInitialized({data, origin, ...rest});
+      if (alreadyInitialized) {
+        return {handled: true};
+      }
+
       const {id} = statusData;
       notifyReady({id, origin});
+
+      this.setWalletOrigin({origin});
+
       return {handled: true};
     }
 
