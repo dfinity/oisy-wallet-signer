@@ -172,6 +172,7 @@ export class Signer {
     this.#walletOrigin = origin;
   }
 
+  // TODO: if already read say ready
   private assertOriginNotInitialized({data: msgData, origin}: SignerMessageEvent): {
     errorAlreadyInitialized: boolean;
   } {
