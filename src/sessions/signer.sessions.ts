@@ -84,22 +84,6 @@ export const readSessionValidScopes = (params: SessionIdentifier): IcrcScopesArr
     .map(({updatedAt: _, createdAt: __, ...rest}) => ({...rest}));
 };
 
-export const readSessionInvalidScopes = (
-  params: SessionIdentifier
-): IcrcScopesArray | undefined => {
-  const permissions = get<SessionPermissions>({key: key(params)});
-
-  if (isNullish(permissions)) {
-    return undefined;
-  }
-
-  return permissions.scopes
-    .filter(
-      ({updatedAt}) => updatedAt < Date.now() - SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS
-    )
-    .map(({updatedAt: _, createdAt: __, ...rest}) => ({...rest}));
-};
-
 export const sessionScopeState = ({
   method,
   ...rest
