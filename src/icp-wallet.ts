@@ -13,7 +13,7 @@ import {
 } from '@dfinity/ledger-icp';
 import {Icrc1TransferResult} from '@dfinity/ledger-icp/dist/candid/ledger';
 import {Principal} from '@dfinity/principal';
-import {arrayBufferToUint8Array, assertNonNullish} from '@dfinity/utils';
+import {assertNonNullish} from '@dfinity/utils';
 import {TransferArgs, TransferResult} from './constants/icrc.idl.constants';
 import {RelyingParty} from './relying-party';
 import type {IcrcAccount} from './types/icrc-accounts';
@@ -22,6 +22,7 @@ import type {PrincipalText} from './types/principal';
 import type {RelyingPartyOptions} from './types/relying-party-options';
 import {decodeCallRequest} from './utils/agentjs-cbor-copy.utils';
 import {base64ToUint8Array} from './utils/base64.utils';
+import {assertCallArg, assertCallMethod} from './utils/call.utils';
 import {decodeResult, encodeArg} from './utils/idl.utils';
 
 const ICP_LEDGER_CANISTER_ID = 'ryjl3-tyaaa-aaaaa-aaaba-cai';
@@ -62,12 +63,14 @@ export class IcpWallet extends RelyingParty {
 
     const canisterId = ledgerCanisterId ?? ICP_LEDGER_CANISTER_ID;
 
+    const method = 'icrc1_transfer' as const;
+
     // TODO: uncomment nonce and add TODO - not yet supported by agent-js
 
     const {certificate: cert, contentMap} = await this.call({
       params: {
         sender: owner,
-        method: 'icrc1_transfer',
+        method,
         canisterId,
         arg
       }
@@ -75,20 +78,15 @@ export class IcpWallet extends RelyingParty {
 
     const callRequest = decodeCallRequest(contentMap);
 
-    if (callRequest.method_name !== 'icrc1_transfer') {
-      throw new Error('The response method does not match the request method.');
-    }
+    assertCallMethod({
+      requestMethod: method,
+      responseMethod: callRequest.method_name
+    });
 
-    // TODO: improve performance by modifying encodeArg to return this information
-    const requestArg = base64ToUint8Array(arg);
-
-    const uint8ArrayEqual = ({first, second}: {first: Uint8Array; second: Uint8Array}): boolean =>
-      // eslint-disable-next-line local-rules/prefer-object-params
-      first.length === second.length && first.every((value, index) => value === second[index]);
-
-    if (!uint8ArrayEqual({first: requestArg, second: arrayBufferToUint8Array(callRequest.arg)})) {
-      throw new Error('The response does not contain the request arguments.');
-    }
+    assertCallArg({
+      requestArg: arg,
+      responseArg: callRequest.arg
+    });
 
     // We have to create an agent to retrieve the rootKey, which is both inefficient and ugly.
     // TODO: we do not have the identity
