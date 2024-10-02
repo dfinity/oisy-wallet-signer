@@ -50,13 +50,13 @@ export const assertCallArg = ({
 };
 
 export const decodeResponse = async <T>({
-  callResult: {certificate: cert, contentMap},
-  callParams: {method, arg, canisterId},
-  callResultRecordClass
+  params: {method, arg, canisterId},
+  result: {certificate: cert, contentMap},
+  resultRecordClass
 }: {
-  callResult: IcrcCallCanisterResult;
-  callParams: IcrcCallCanisterRequestParams;
-  callResultRecordClass: RecordClass | VariantClass;
+  params: IcrcCallCanisterRequestParams;
+  result: IcrcCallCanisterResult;
+  resultRecordClass: RecordClass | VariantClass;
 }): Promise<T> => {
   const callRequest = decodeCallRequest(contentMap);
 
@@ -101,7 +101,7 @@ export const decodeResponse = async <T>({
   );
 
   return decodeResult<T>({
-    recordClass: callResultRecordClass,
+    recordClass: resultRecordClass,
     reply
   });
 };

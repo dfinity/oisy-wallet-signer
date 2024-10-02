@@ -69,9 +69,9 @@ export class IcpWallet extends RelyingParty {
     });
 
     const response = await decodeResponse<Icrc1TransferResult>({
-      callParams,
-      callResult,
-      callResultRecordClass: TransferResult
+      params: callParams,
+      result: callResult,
+      resultRecordClass: TransferResult
     });
 
     if ('Err' in response) {
