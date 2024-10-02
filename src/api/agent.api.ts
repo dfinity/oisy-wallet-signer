@@ -1,5 +1,6 @@
 import {isNullish} from '@dfinity/utils';
 import {CustomHttpAgent} from '../agent/custom-http-agent';
+import {MAINNET_REPLICA_URL} from '../constants/core.constants';
 import type {SignerOptions} from '../types/signer-options';
 
 export abstract class AgentApi {
@@ -23,15 +24,13 @@ export abstract class AgentApi {
   }
 
   private async createAgent({owner: identity, host}: SignerOptions): Promise<CustomHttpAgent> {
-    const mainnetHost = 'https://icp-api.io';
-
-    const {hostname} = new URL(host ?? mainnetHost);
+    const {hostname} = new URL(host ?? MAINNET_REPLICA_URL);
 
     const shouldFetchRootKey = ['localhost', '127.0.0.1'].includes(hostname);
 
     return await CustomHttpAgent.create({
       identity,
-      host: host ?? mainnetHost,
+      host: host ?? MAINNET_REPLICA_URL,
       shouldFetchRootKey
     });
   }
