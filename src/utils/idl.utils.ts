@@ -1,6 +1,5 @@
 import {IDL} from '@dfinity/candid';
 import {RecordClass, VariantClass} from '@dfinity/candid/lib/cjs/idl';
-import {isNullish} from '@dfinity/utils';
 import {IcrcBlob} from '../types/blob';
 import {uint8ArrayToBase64} from './base64.utils';
 
@@ -20,10 +19,6 @@ export const decodeResult = <T>({
   reply: ArrayBuffer;
 }): T => {
   const result = IDL.decode([recordClass], reply);
-
-  if (isNullish(result)) {
-    throw new Error('The reply could not be decoded.');
-  }
 
   if (result.length !== 1) {
     throw new Error('More than one object returned. This is unexpected.');
