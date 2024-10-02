@@ -20,3 +20,18 @@ export const TransferArgs = IDL.Record({
   created_at_time: IDL.Opt(Timestamp),
   amount: IDL.Nat
 });
+
+
+export const TransferError = IDL.Variant({
+  GenericError: IDL.Record({
+    message: IDL.Text,
+    error_code: IDL.Nat
+  }),
+  TemporarilyUnavailable: IDL.Null,
+  BadBurn: IDL.Record({min_burn_amount: IDL.Nat}),
+  Duplicate: IDL.Record({duplicate_of: IDL.Nat}),
+  BadFee: IDL.Record({expected_fee: IDL.Nat}),
+  CreatedInFuture: IDL.Record({ledger_time: Timestamp}),
+  TooOld: IDL.Null,
+  InsufficientFunds: IDL.Record({balance: IDL.Nat})
+});

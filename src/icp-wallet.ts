@@ -1,19 +1,26 @@
 import {
   AnonymousIdentity,
   Certificate,
+  Expiry,
   HttpAgent,
   lookupResultToBuffer,
   requestIdOf
 } from '@dfinity/agent';
 import type {CallRequest} from '@dfinity/agent/lib/cjs/agent/http/types';
-import {toIcrc1TransferRawRequest, type Icrc1TransferRequest} from '@dfinity/ledger-icp';
+import {IDL} from '@dfinity/candid';
+import {
+  BlockHeight,
+  mapIcrc1TransferError,
+  toIcrc1TransferRawRequest,
+  type Icrc1TransferRequest
+} from '@dfinity/ledger-icp';
 import {Principal} from '@dfinity/principal';
-import {arrayBufferToUint8Array} from '@dfinity/utils';
+import {arrayBufferToUint8Array, assertNonNullish} from '@dfinity/utils';
+import type {BigNumber} from 'bignumber.js';
 import {decode} from './agent/agentjs-cbor-copy';
-import {TransferArgs} from './constants/icrc.idl.constants';
+import {TransferArgs, TransferError} from './constants/icrc.idl.constants';
 import {RelyingParty} from './relying-party';
 import type {IcrcAccount} from './types/icrc-accounts';
-import type {IcrcCallCanisterResult} from './types/icrc-responses';
 import type {Origin} from './types/post-message';
 import type {PrincipalText} from './types/principal';
 import type {RelyingPartyOptions} from './types/relying-party-options';
@@ -48,7 +55,7 @@ export class IcpWallet extends RelyingParty {
   }: {
     request: Icrc1TransferRequest;
     ledgerCanisterId?: PrincipalText;
-  } & Pick<IcrcAccount, 'owner'>): Promise<IcrcCallCanisterResult> => {
+  } & Pick<IcrcAccount, 'owner'>): Promise<BlockHeight> => {
     const rawArgs = toIcrc1TransferRawRequest(request);
 
     const arg = encodeArg({
@@ -69,17 +76,18 @@ export class IcpWallet extends RelyingParty {
       }
     });
 
-    // TODO: Decoding ingress_expiry does not work
+    // TODO: The decode function copied from agent-js is buggy or does not support decoding the ingress_expiry to BigInt or Expiry. It seems that the value is a BigNumber. That's why we have to strip it from the response and convert it manually.
     const {
       ingress_expiry,
       ...callRequestTmp
-    }: Omit<CallRequest, 'ingress_expiry'> & {ingress_expiry: any} = decode(
+    }: Omit<CallRequest, 'ingress_expiry'> & {ingress_expiry: BigNumber} = decode(
       base64ToUint8Array(contentMap)
     );
 
     const callRequest: CallRequest = {
       ...callRequestTmp,
-      ingress_expiry: ingress_expiry // TODO: this works BigInt(ingress_expiry.toFixed()) as any
+      // There is no constructor or setter to create an agent-js Expiry from a bigint. Type which is expected by CallRequest. Given that we solely require the wrapped BigInt in this function, we can resolve the issue with an ugly cast.
+      ingress_expiry: BigInt(ingress_expiry.toFixed()) as unknown as Expiry
     } as CallRequest;
 
     const requestId = requestIdOf(callRequest);
@@ -117,11 +125,19 @@ export class IcpWallet extends RelyingParty {
 
     const reply = lookupResultToBuffer(certificate.lookup([...path, 'reply']));
 
-    // TODO: reply is undefined
-    console.log(reply, reply === undefined); // true
+    assertNonNullish(
+      reply,
+      'A reply cannot be resolved within the provided certificate. This is unexpected; it should have been known at this point.'
+    );
 
-    // TODO: decode reply with Candid
+    const response: [Icrc1TransferRequest] = IDL.decode([IDL.Variant({Ok: IDL.Nat, Err: TransferError})], reply);
 
-    return {certificate: cert, contentMap};
+    console.log(response);
+
+    if ('Err' in response) {
+      throw mapIcrc1TransferError(response.Err);
+    }
+
+    return response.Ok;
   };
 }
