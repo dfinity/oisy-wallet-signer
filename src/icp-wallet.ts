@@ -26,6 +26,7 @@ import type {PrincipalText} from './types/principal';
 import type {RelyingPartyOptions} from './types/relying-party-options';
 import {base64ToUint8Array} from './utils/base64.utils';
 import {decodeResult, encodeArg} from './utils/idl.utils';
+import {decodeCallRequest} from "./utils/agentjs-cbor-copy.utils";
 
 const ICP_LEDGER_CANISTER_ID = 'ryjl3-tyaaa-aaaaa-aaaba-cai';
 
@@ -76,21 +77,7 @@ export class IcpWallet extends RelyingParty {
       }
     });
 
-    // TODO: The decode function copied from agent-js is buggy or does not support decoding the ingress_expiry to BigInt or Expiry. It seems that the value is a BigNumber. That's why we have to strip it from the response and convert it manually.
-    const {
-      ingress_expiry,
-      ...callRequestTmp
-    }: Omit<CallRequest, 'ingress_expiry'> & {ingress_expiry: BigNumber} = decode(
-      base64ToUint8Array(contentMap)
-    );
-
-    const callRequest: CallRequest = {
-      ...callRequestTmp,
-      // There is no constructor or setter to create an agent-js Expiry from a bigint. Type which is expected by CallRequest. Given that we solely require the wrapped BigInt in this function, we can resolve the issue with an ugly cast.
-      ingress_expiry: BigInt(ingress_expiry.toFixed()) as unknown as Expiry
-    } as CallRequest;
-
-    const requestId = requestIdOf(callRequest);
+    const callRequest = decodeCallRequest(contentMap);
 
     if (callRequest.method_name !== 'icrc1_transfer') {
       throw new Error('The response method does not match the request method.');
@@ -121,6 +108,8 @@ export class IcpWallet extends RelyingParty {
       rootKey: agent.rootKey,
       canisterId: Principal.fromText(canisterId)
     });
+
+    const requestId = requestIdOf(callRequest);
 
     const path = [new TextEncoder().encode('request_status'), requestId];
 
