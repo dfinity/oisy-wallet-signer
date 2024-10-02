@@ -1,5 +1,7 @@
+import {Principal} from '@dfinity/principal';
+import {mockCanisterId, mockPrincipalText} from '../mocks/icrc-accounts.mocks';
 import {uint8ArrayToBase64} from './base64.utils';
-import {assertCallArg, assertCallMethod} from './call.utils';
+import {assertCallArg, assertCallCanisterId, assertCallMethod} from './call.utils';
 
 describe('call.utils', () => {
   describe('assertCallMethod', () => {
@@ -43,6 +45,24 @@ describe('call.utils', () => {
           responseArg
         })
       ).toThrow('The response does not contain the request arguments.');
+    });
+  });
+
+  describe('assertCallCanisterId', () => {
+    it('should not throw an error when canister ID match', () => {
+      const requestCanisterId = Principal.fromText(mockCanisterId);
+      const responseCanisterId = Principal.fromText(mockCanisterId);
+
+      expect(() => assertCallCanisterId({requestCanisterId, responseCanisterId})).not.toThrow();
+    });
+
+    it('should throw an error when methods do not match', () => {
+      const requestCanisterId = Principal.fromText(mockCanisterId);
+      const responseCanisterId = Principal.fromText(mockPrincipalText);
+
+      expect(() => assertCallCanisterId({requestCanisterId, responseCanisterId})).toThrow(
+        'The response canister ID does not match the requested canister ID.'
+      );
     });
   });
 });

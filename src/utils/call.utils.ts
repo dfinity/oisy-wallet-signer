@@ -1,3 +1,4 @@
+import {Principal} from '@dfinity/principal';
 import {arrayBufferToUint8Array} from '@dfinity/utils';
 import {IcrcBlob} from '../types/blob';
 import {Method} from '../types/icrc-requests';
@@ -31,5 +32,17 @@ export const assertCallArg = ({
 
   if (!uint8ArrayEqual({first: requestArg, second: callRequestArg})) {
     throw new Error('The response does not contain the request arguments.');
+  }
+};
+
+export const assertCallCanisterId = ({
+  requestCanisterId,
+  responseCanisterId
+}: {
+  responseCanisterId: Principal;
+  requestCanisterId: Principal;
+}) => {
+  if (requestCanisterId.toText() !== responseCanisterId.toText()) {
+    throw new Error('The response canister ID does not match the requested canister ID.');
   }
 };
