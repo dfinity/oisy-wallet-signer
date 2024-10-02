@@ -49,8 +49,21 @@ export const assertCallArg = ({
   }
 };
 
+// Exposed for testing purposes
+export const assertCallCanisterId = ({
+  requestCanisterId,
+  responseCanisterId
+}: {
+  responseCanisterId: Principal;
+  requestCanisterId: Principal;
+}) => {
+  if (requestCanisterId.toText() !== responseCanisterId.toText()) {
+    throw new Error('The response canister ID does not match the requested canister ID.');
+  }
+};
+
 export const decodeResponse = async <T>({
-  params: {method, arg, canisterId, nonce},
+  params: {method, arg, canisterId},
   result: {certificate: cert, contentMap},
   resultRecordClass
 }: {
