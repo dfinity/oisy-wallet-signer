@@ -19,7 +19,25 @@
 				url: WALLET_URL
 			});
 
-			await wallet.requestPermissions();
+			const permissions = await wallet.permissions();
+
+			const requestPermissionsIfNeeded = async () => {
+				const notGrantedScopes = permissions
+					.filter(({ state }) => state !== 'granted')
+					.map(({ scope }) => scope);
+
+				if (notGrantedScopes.length === 0) {
+					return;
+				}
+
+				await wallet?.requestPermissions({
+					params: {
+						scopes: notGrantedScopes
+					}
+				});
+			};
+
+			await requestPermissionsIfNeeded();
 
 			const accounts = await wallet.accounts();
 
