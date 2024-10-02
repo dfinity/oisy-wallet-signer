@@ -26,7 +26,7 @@ import type {Origin} from './types/post-message';
 import type {PrincipalText} from './types/principal';
 import type {RelyingPartyOptions} from './types/relying-party-options';
 import {base64ToUint8Array} from './utils/base64.utils';
-import {encodeArg} from './utils/call.utils';
+import {encodeArg} from './utils/idl.utils';
 
 const ICP_LEDGER_CANISTER_ID = 'ryjl3-tyaaa-aaaaa-aaaba-cai';
 
