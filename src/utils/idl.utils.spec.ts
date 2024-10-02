@@ -1,9 +1,9 @@
 import {Principal} from '@dfinity/principal';
 import {TransferArgs} from '../constants/icrc.idl.constants';
 import {TransferArgs as TransferArgsType} from '../declarations/icrc-1';
-import {encodeArg} from './call.utils';
+import {encodeArg} from './idl.utils';
 
-describe('call.utils', () => {
+describe('idl.utils', () => {
   it('should encode arguments', () => {
     const rawArgs: TransferArgsType = {
       amount: 5000000n,

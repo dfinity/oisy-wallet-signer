@@ -6,7 +6,7 @@ import type {IcrcCallCanisterResult} from './types/icrc-responses';
 import type {Origin} from './types/post-message';
 import type {PrincipalText} from './types/principal';
 import type {RelyingPartyOptions} from './types/relying-party-options';
-import {encodeArg} from './utils/call.utils';
+import {encodeArg} from './utils/idl.utils';
 
 const ICP_LEDGER_CANISTER_ID = 'ryjl3-tyaaa-aaaaa-aaaba-cai';
 
