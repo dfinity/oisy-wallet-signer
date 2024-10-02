@@ -14,8 +14,9 @@ import {
   toIcrc1TransferRawRequest,
   type Icrc1TransferRequest
 } from '@dfinity/ledger-icp';
+import {Icrc1TransferResult} from '@dfinity/ledger-icp/dist/candid/ledger';
 import {Principal} from '@dfinity/principal';
-import {arrayBufferToUint8Array, assertNonNullish} from '@dfinity/utils';
+import {arrayBufferToUint8Array, assertNonNullish, isNullish} from '@dfinity/utils';
 import type {BigNumber} from 'bignumber.js';
 import {decode} from './agent/agentjs-cbor-copy';
 import {TransferArgs, TransferError} from './constants/icrc.idl.constants';
@@ -100,6 +101,7 @@ export class IcpWallet extends RelyingParty {
     const requestArg = base64ToUint8Array(arg);
 
     const uint8ArrayEqual = ({first, second}: {first: Uint8Array; second: Uint8Array}): boolean =>
+      // eslint-disable-next-line local-rules/prefer-object-params
       first.length === second.length && first.every((value, index) => value === second[index]);
 
     if (!uint8ArrayEqual({first: requestArg, second: arrayBufferToUint8Array(callRequest.arg)})) {
@@ -130,9 +132,18 @@ export class IcpWallet extends RelyingParty {
       'A reply cannot be resolved within the provided certificate. This is unexpected; it should have been known at this point.'
     );
 
-    const response: [Icrc1TransferRequest] = IDL.decode([IDL.Variant({Ok: IDL.Nat, Err: TransferError})], reply);
+    const result = IDL.decode([IDL.Variant({Ok: IDL.Nat, Err: TransferError})], reply);
 
-    console.log(response);
+    if (isNullish(result)) {
+      throw new Error('The reply could not be decoded.');
+    }
+
+    if (result.length !== 1) {
+      throw new Error('More than one object returned. This is unexpected.');
+    }
+
+    // We have to use another ugly type cast because IDL.decode does not accept generics. Additionally, the agent-js implementation does not provide any hints, as its decodeReturnValue relies on the type 'any,' which is bad practice.
+    const [response] = result as unknown as [Icrc1TransferResult];
 
     if ('Err' in response) {
       throw mapIcrc1TransferError(response.Err);

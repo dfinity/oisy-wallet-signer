@@ -21,7 +21,6 @@ export const TransferArgs = IDL.Record({
   amount: IDL.Nat
 });
 
-
 export const TransferError = IDL.Variant({
   GenericError: IDL.Record({
     message: IDL.Text,
