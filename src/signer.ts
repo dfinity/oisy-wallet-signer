@@ -123,13 +123,16 @@ export class Signer {
       return;
     }
 
-    // TODO: the this.#walletOrigin should actually be set when/after "ready" is notified
-    this.assertAndSetOrigin(message);
-
     // TODO: wrap a try catch around all handler and notify "Unexpected exception" in case if issues
 
     const {handled: statusRequestHandled} = this.handleStatusRequest(message);
     if (statusRequestHandled) {
+      return;
+    }
+
+    // At this point the connection with the relying party should have been initialized and the origin should be set.
+    const {valid} = this.assertNotUndefinedAndSameOrigin(message);
+    if (!valid) {
       return;
     }
 
@@ -165,7 +168,30 @@ export class Signer {
     });
   };
 
-  private assertAndSetOrigin({data: msgData, origin}: SignerMessageEvent): void {
+  private setWalletOrigin({origin}: Pick<SignerMessageEvent, 'origin'>) {
+    // We do not reassign the origin with the same value if it is already set. It is not a significant performance win.
+    if (nonNullish(this.#walletOrigin)) {
+      return;
+    }
+
+    this.#walletOrigin = origin;
+  }
+
+  /**
+   * When establishing a connection, validates the origin of a message event to ensure it matches the existing wallet origin - i.e. subsequent status requests - or is undefined - i.e. first status request.
+   * If the origin is invalid, it sends an error notification with the appropriate error code and message.
+   *
+   * @private
+   * @param {object} event - The message event to validate.
+   * @param {any} event.data - The data sent in the message event.
+   * @param {string} event.origin - The origin of the message event.
+   *
+   * @returns {object} An object containing a `valid` boolean property.
+   * @returns {boolean} returns `true` if the origin is either undefined or matches the expected wallet origin, otherwise returns `false` and notifies the error.
+   */
+  private assertUndefinedOrSameOrigin({data: msgData, origin}: SignerMessageEvent): {
+    valid: boolean;
+  } {
     if (nonNullish(this.#walletOrigin) && this.#walletOrigin !== origin) {
       const {data} = RpcRequestSchema.safeParse(msgData);
 
@@ -174,19 +200,50 @@ export class Signer {
         origin,
         error: {
           code: SignerErrorCode.ORIGIN_ERROR,
-          message: `The relying party's origin is not allowed to interact with the signer.`
+          message: `The relying party's origin is not permitted to obtain the status of the signer.`
         }
       });
 
-      return;
+      return {valid: false};
     }
 
-    // We do not reassign the origin with the same value if it is already set. It is not a significant performance win.
-    if (nonNullish(this.#walletOrigin)) {
-      return;
+    return {valid: true};
+  }
+
+  /**
+   * Validates that the wallet origin is defined and matches the origin of the message event that established the connection.
+   * If the origin is invalid or the wallet origin is not defined, it sends an error notification
+   * with the appropriate error code and message.
+   *
+   * @private
+   * @param {object} event - The message event to validate.
+   * @param {any} event.data - The data sent in the message event.
+   * @param {string} event.origin - The origin of the message event.
+   *
+   * @returns {object} An object containing a `valid` boolean property.
+   * @returns {boolean} returns `true` if the wallet origin is defined and matches the origin of the message event, otherwise returns `false` and notifies the error.
+   */
+  private assertNotUndefinedAndSameOrigin({data: msgData, origin}: SignerMessageEvent): {
+    valid: boolean;
+  } {
+    if (isNullish(this.#walletOrigin) || this.#walletOrigin !== origin) {
+      const {data} = RpcRequestSchema.safeParse(msgData);
+
+      notifyError({
+        id: data?.id ?? null,
+        origin,
+        error: {
+          code: SignerErrorCode.ORIGIN_ERROR,
+          message: isNullish(this.#walletOrigin)
+            ? 'The relying party has not established a connection to the signer.'
+            : `The relying party's origin is not allowed to interact with the signer.`
+        }
+      });
+
+      return {valid: false};
     }
 
-    this.#walletOrigin = origin;
+    return {valid: true};
   }
 
   /**
@@ -243,17 +300,25 @@ export class Signer {
   /**
    * Handles incoming status requests.
    *
-   * Parses the message data to determine if it conforms to a status request and sends a notification indicating that the signer is ready.
+   * Parses the message data to determine if it conforms to a status request, sends a notification indicating that the signer is ready and set the origin for asserting subsequent calls.
    *
    * @param {SignerMessageEvent} message - The incoming message event containing the data and origin.
    * @returns {Object} An object with a boolean property `handled` indicating whether the request was handled.
    */
-  private handleStatusRequest({data, origin}: SignerMessageEvent): {handled: boolean} {
+  private handleStatusRequest({data, origin, ...rest}: SignerMessageEvent): {handled: boolean} {
     const {success: isStatusRequest, data: statusData} = IcrcStatusRequestSchema.safeParse(data);
 
     if (isStatusRequest) {
+      const {valid} = this.assertUndefinedOrSameOrigin({data, origin, ...rest});
+      if (!valid) {
+        return {handled: true};
+      }
+
       const {id} = statusData;
       notifyReady({id, origin});
+
+      this.setWalletOrigin({origin});
+
       return {handled: true};
     }
 
