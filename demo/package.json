@@ -55,12 +55,12 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@dfinity/agent": "^2.1.1",
-		"@dfinity/auth-client": "^2.1.1",
-		"@dfinity/candid": "^2.1.1",
-		"@dfinity/ledger-icp": "^2.5.0-next-2024-09-17",
-		"@dfinity/principal": "^2.1.1",
-		"@dfinity/utils": "^2.5.0-next-2024-09-17",
+		"@dfinity/agent": "^2.1.2",
+		"@dfinity/auth-client": "^2.1.2",
+		"@dfinity/candid": "^2.1.2",
+		"@dfinity/ledger-icp": "^2.6.0",
+		"@dfinity/principal": "^2.1.2",
+		"@dfinity/utils": "^2.5.1",
 		"buffer": "^6.0.3",
 		"zod": "^3.23.8"
 	}

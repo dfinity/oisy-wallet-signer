@@ -401,6 +401,7 @@ export class Signer {
         return {handled: true};
       }
 
+      // TODO: In the future, we might want to prompt only if the requested permissions are not already granted. We should prevent the case where the relying party requests permissions without first checking if those permissions have already been granted. Let's see how the signer is used by the community first.
       // TODO: Can the newer version of TypeScript infer "as IcrcScope"?
       const supportedRequestedScopes = requestedScopes
         .filter(
