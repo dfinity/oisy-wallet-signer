@@ -72,10 +72,10 @@ export const decodeResponse = async <T>({
 
   // We have to create an agent to retrieve the rootKey, which is both inefficient and a bit ugly to some extension.
   const {
-    location: {origin}
+    location: {origin, hostname}
   } = window;
 
-  const localhost = ['localhost', '127.0.0.1'].includes(origin);
+  const localhost = ['localhost', '127.0.0.1'].includes(hostname);
 
   const agent = await HttpAgent.create({
     identity: new AnonymousIdentity(),
