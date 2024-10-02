@@ -8,7 +8,7 @@ import {
 import {RecordClass, VariantClass} from '@dfinity/candid/lib/cjs/idl';
 import {Principal} from '@dfinity/principal';
 import {arrayBufferToUint8Array, assertNonNullish} from '@dfinity/utils';
-import {MAINNET_REPLICA_URL} from '../../demo/src/core/constants/app.constants';
+import {MAINNET_REPLICA_URL} from '../constants/core.constants';
 import {IcrcBlob} from '../types/blob';
 import {IcrcCallCanisterRequestParams, Method} from '../types/icrc-requests';
 import type {IcrcCallCanisterResult} from '../types/icrc-responses';

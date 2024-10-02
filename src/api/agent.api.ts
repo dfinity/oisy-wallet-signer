@@ -1,6 +1,6 @@
 import {isNullish} from '@dfinity/utils';
-import {MAINNET_REPLICA_URL} from '../../demo/src/core/constants/app.constants';
 import {CustomHttpAgent} from '../agent/custom-http-agent';
+import {MAINNET_REPLICA_URL} from '../constants/core.constants';
 import type {SignerOptions} from '../types/signer-options';
 
 export abstract class AgentApi {
