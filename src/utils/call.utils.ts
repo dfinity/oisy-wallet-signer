@@ -50,7 +50,7 @@ export const assertCallArg = ({
 };
 
 export const decodeResponse = async <T>({
-  params: {method, arg, canisterId},
+  params: {method, arg, canisterId, nonce},
   result: {certificate: cert, contentMap},
   resultRecordClass
 }: {
@@ -95,6 +95,7 @@ export const decodeResponse = async <T>({
 
   const reply = lookupResultToBuffer(certificate.lookup([...path, 'reply']));
 
+  // TODO: Instead of blindly throwing a general exception we can read the rejection and provide an error that contains details such as reject_message, error_code and reject_code.
   assertNonNullish(
     reply,
     'A reply cannot be resolved within the provided certificate. This is unexpected; it should have been known at this point.'
