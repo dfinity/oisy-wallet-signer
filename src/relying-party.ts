@@ -545,6 +545,10 @@ export class RelyingParty {
       return {handled: false};
     };
 
+    // TODO: Automatically generate a nonce if not provided by the consumer.
+    // TODO: Improve typings. Externally, it can be undefined, but internally it should not be.
+    // TODO: Assert the nonce during the decoding of the response.
+
     const postRequest = (id: RpcId): void => {
       requestCallCanister({
         popup: this.#popup,

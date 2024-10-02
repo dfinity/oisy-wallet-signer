@@ -49,6 +49,19 @@ export const assertCallArg = ({
   }
 };
 
+// Exposed for testing purposes
+export const assertCallCanisterId = ({
+  requestCanisterId,
+  responseCanisterId
+}: {
+  responseCanisterId: Principal;
+  requestCanisterId: Principal;
+}) => {
+  if (requestCanisterId.toText() !== responseCanisterId.toText()) {
+    throw new Error('The response canister ID does not match the requested canister ID.');
+  }
+};
+
 export const decodeResponse = async <T>({
   params: {method, arg, canisterId},
   result: {certificate: cert, contentMap},
@@ -59,6 +72,11 @@ export const decodeResponse = async <T>({
   resultRecordClass: RecordClass | VariantClass;
 }): Promise<T> => {
   const callRequest = decodeCallRequest(contentMap);
+
+  assertCallCanisterId({
+    requestCanisterId: Principal.fromText(canisterId),
+    responseCanisterId: callRequest.canister_id
+  });
 
   assertCallMethod({
     requestMethod: method,
@@ -95,6 +113,7 @@ export const decodeResponse = async <T>({
 
   const reply = lookupResultToBuffer(certificate.lookup([...path, 'reply']));
 
+  // TODO: Instead of blindly throwing a general exception we can read the rejection and provide an error that contains details such as reject_message, error_code and reject_code.
   assertNonNullish(
     reply,
     'A reply cannot be resolved within the provided certificate. This is unexpected; it should have been known at this point.'

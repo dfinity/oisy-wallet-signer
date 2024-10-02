@@ -1,3 +1,4 @@
+import {Principal} from '@dfinity/principal';
 import {TransferResult} from '../constants/icrc.idl.constants';
 import {
   mockLocalBlockHeight,
@@ -6,8 +7,9 @@ import {
   mockLocalCallTime
 } from '../mocks/call-utils.mocks';
 import {mockLocalIcRootKey} from '../mocks/custom-http-agent-responses.mocks';
+import {mockCanisterId, mockPrincipalText} from '../mocks/icrc-accounts.mocks';
 import {uint8ArrayToBase64} from './base64.utils';
-import {assertCallArg, assertCallMethod, decodeResponse} from './call.utils';
+import {assertCallArg, assertCallCanisterId, assertCallMethod, decodeResponse} from './call.utils';
 
 vi.mock('@dfinity/agent', async (importOriginal) => {
   // eslint-disable-next-line @typescript-eslint/consistent-type-imports
@@ -79,6 +81,24 @@ describe('call.utils', () => {
     });
   });
 
+  describe('assertCallCanisterId', () => {
+    it('should not throw an error when canister ID match', () => {
+      const requestCanisterId = Principal.fromText(mockCanisterId);
+      const responseCanisterId = Principal.fromText(mockCanisterId);
+
+      expect(() => assertCallCanisterId({requestCanisterId, responseCanisterId})).not.toThrow();
+    });
+
+    it('should throw an error when methods do not match', () => {
+      const requestCanisterId = Principal.fromText(mockCanisterId);
+      const responseCanisterId = Principal.fromText(mockPrincipalText);
+
+      expect(() => assertCallCanisterId({requestCanisterId, responseCanisterId})).toThrow(
+        'The response canister ID does not match the requested canister ID.'
+      );
+    });
+  });
+
   describe('decodeResponse', () => {
     beforeEach(() => {
       vi.setSystemTime(mockLocalCallTime);
@@ -100,5 +120,7 @@ describe('call.utils', () => {
         Ok: mockLocalBlockHeight
       });
     });
+
+    // TODO: enhance testing with edge case and invalid responses.
   });
 });
