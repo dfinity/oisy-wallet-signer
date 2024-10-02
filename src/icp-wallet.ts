@@ -1,12 +1,10 @@
 import {
   AnonymousIdentity,
   Certificate,
-  Expiry,
   HttpAgent,
   lookupResultToBuffer,
   requestIdOf
 } from '@dfinity/agent';
-import type {CallRequest} from '@dfinity/agent/lib/cjs/agent/http/types';
 import {
   BlockHeight,
   mapIcrc1TransferError,
@@ -16,17 +14,15 @@ import {
 import {Icrc1TransferResult} from '@dfinity/ledger-icp/dist/candid/ledger';
 import {Principal} from '@dfinity/principal';
 import {arrayBufferToUint8Array, assertNonNullish} from '@dfinity/utils';
-import type {BigNumber} from 'bignumber.js';
-import {decode} from './agent/agentjs-cbor-copy';
 import {TransferArgs, TransferResult} from './constants/icrc.idl.constants';
 import {RelyingParty} from './relying-party';
 import type {IcrcAccount} from './types/icrc-accounts';
 import type {Origin} from './types/post-message';
 import type {PrincipalText} from './types/principal';
 import type {RelyingPartyOptions} from './types/relying-party-options';
+import {decodeCallRequest} from './utils/agentjs-cbor-copy.utils';
 import {base64ToUint8Array} from './utils/base64.utils';
 import {decodeResult, encodeArg} from './utils/idl.utils';
-import {decodeCallRequest} from "./utils/agentjs-cbor-copy.utils";
 
 const ICP_LEDGER_CANISTER_ID = 'ryjl3-tyaaa-aaaaa-aaaba-cai';
 
