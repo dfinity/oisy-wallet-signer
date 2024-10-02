@@ -8,7 +8,7 @@ import type {
   RelyingPartyOptions
 } from './index';
 import {RelyingParty} from './relying-party';
-import {encodeArg} from './utils/call.utils';
+import {encodeArg} from './utils/idl.utils';
 
 export class IcrcWallet extends RelyingParty {
   /**
