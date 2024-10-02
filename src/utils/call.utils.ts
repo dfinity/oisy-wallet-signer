@@ -73,6 +73,11 @@ export const decodeResponse = async <T>({
 }): Promise<T> => {
   const callRequest = decodeCallRequest(contentMap);
 
+  assertCallCanisterId({
+    requestCanisterId: Principal.fromText(canisterId),
+    responseCanisterId: callRequest.canister_id
+  });
+
   assertCallMethod({
     requestMethod: method,
     responseMethod: callRequest.method_name
