@@ -14,7 +14,12 @@ import type {IcrcScopedMethod} from '../types/icrc-standards';
 import type {SessionPermissions} from '../types/signer-sessions';
 import * as storageUtils from '../utils/storage.utils';
 import {del, get} from '../utils/storage.utils';
-import {readSessionValidScopes, saveSessionScopes, sessionScopeState} from './signer.sessions';
+import {
+  readSessionInvalidScopes,
+  readSessionValidScopes,
+  saveSessionScopes,
+  sessionScopeState
+} from './signer.sessions';
 
 describe('Signer sessions', () => {
   const owner = Ed25519KeyIdentity.generate().getPrincipal();
@@ -172,64 +177,133 @@ describe('Signer sessions', () => {
   });
 
   describe('Read', () => {
-    it('should read the permissions from local storage', () => {
-      saveSessionScopes({
-        owner,
-        origin,
-        scopes
+    describe('Valid', () => {
+      it('should read the permissions from local storage', () => {
+        saveSessionScopes({
+          owner,
+          origin,
+          scopes
+        });
+
+        const permissions = get<SessionPermissions>({key: expectedKey});
+
+        expect(permissions).toEqual(expect.objectContaining(expectedScopes));
+
+        const validScopes = readSessionValidScopes({owner, origin});
+
+        expect(validScopes).toEqual(expect.objectContaining([scopeToTest, scopeToRetain]));
       });
 
-      const permissions = get<SessionPermissions>({key: expectedKey});
+      it('should return undefined if no permissions were ever saved', () => {
+        const scopes = readSessionValidScopes({owner, origin});
 
-      expect(permissions).toEqual(expect.objectContaining(expectedScopes));
-
-      const validScopes = readSessionValidScopes({owner, origin});
-
-      expect(validScopes).toEqual(expect.objectContaining([scopeToTest, scopeToRetain]));
-    });
-
-    it('should return undefined if no permissions were ever saved', () => {
-      const scopes = readSessionValidScopes({owner, origin});
-
-      expect(scopes).toBeUndefined();
-    });
-
-    it('should return empty array for permissions older than the validity period', () => {
-      saveSessionScopes({
-        owner,
-        origin,
-        scopes
+        expect(scopes).toBeUndefined();
       });
 
-      vi.advanceTimersByTime(SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS + 1);
+      it('should return empty array for permissions older than the validity period', () => {
+        saveSessionScopes({
+          owner,
+          origin,
+          scopes
+        });
 
-      const sessionScopes = readSessionValidScopes({owner, origin});
+        vi.advanceTimersByTime(SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS + 1);
 
-      expect(sessionScopes).toHaveLength(0);
-    });
+        const sessionScopes = readSessionValidScopes({owner, origin});
 
-    it('should return the permissions if exactly equals the validity period', () => {
-      saveSessionScopes({
-        owner,
-        origin,
-        scopes
+        expect(sessionScopes).toHaveLength(0);
       });
 
-      vi.advanceTimersByTime(SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS);
+      it('should return the permissions if exactly equals the validity period', () => {
+        saveSessionScopes({
+          owner,
+          origin,
+          scopes
+        });
 
-      const permissions = get<SessionPermissions>({key: expectedKey});
+        vi.advanceTimersByTime(SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS);
 
-      expect(permissions).toEqual(expect.objectContaining(expectedScopes));
+        const permissions = get<SessionPermissions>({key: expectedKey});
 
-      const validScopes = readSessionValidScopes({owner, origin});
+        expect(permissions).toEqual(expect.objectContaining(expectedScopes));
 
-      expect(validScopes).toEqual(expect.objectContaining([scopeToTest, scopeToRetain]));
+        const validScopes = readSessionValidScopes({owner, origin});
+
+        expect(validScopes).toEqual(expect.objectContaining([scopeToTest, scopeToRetain]));
+      });
+
+      it('should return undefined if permissions are nullish', () => {
+        const scopes = readSessionValidScopes({owner, origin});
+
+        expect(scopes).toBeUndefined();
+      });
     });
 
-    it('should return undefined if permissions are nullish', () => {
-      const scopes = readSessionValidScopes({owner, origin});
+    describe('Invalid', () => {
+      it('should return undefined if no permissions were ever saved', () => {
+        const scopes = readSessionInvalidScopes({owner, origin});
 
-      expect(scopes).toBeUndefined();
+        expect(scopes).toBeUndefined();
+      });
+
+      it('should return the permissions older than the validity period', () => {
+        saveSessionScopes({
+          owner,
+          origin,
+          scopes
+        });
+
+        vi.advanceTimersByTime(SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS + 1);
+
+        const sessionScopes = readSessionInvalidScopes({owner, origin});
+
+        expect(sessionScopes).toHaveLength(scopes.length);
+        expect(sessionScopes).toEqual(scopes);
+      });
+
+      it('should return empty permissions if exactly equals the validity period', () => {
+        saveSessionScopes({
+          owner,
+          origin,
+          scopes
+        });
+
+        vi.advanceTimersByTime(SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS);
+
+        const permissions = get<SessionPermissions>({key: expectedKey});
+
+        expect(permissions).toEqual(expect.objectContaining(expectedScopes));
+
+        const validScopes = readSessionInvalidScopes({owner, origin});
+
+        expect(validScopes).not.toBeUndefined();
+        expect(validScopes?.length).toEqual(0);
+      });
+
+      it('should return empty permissions if validity period is not yet over', () => {
+        saveSessionScopes({
+          owner,
+          origin,
+          scopes
+        });
+
+        vi.advanceTimersByTime(SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS - 1);
+
+        const permissions = get<SessionPermissions>({key: expectedKey});
+
+        expect(permissions).toEqual(expect.objectContaining(expectedScopes));
+
+        const validScopes = readSessionInvalidScopes({owner, origin});
+
+        expect(validScopes).not.toBeUndefined();
+        expect(validScopes?.length).toEqual(0);
+      });
+
+      it('should return undefined if permissions are nullish', () => {
+        const scopes = readSessionInvalidScopes({owner, origin});
+
+        expect(scopes).toBeUndefined();
+      });
     });
   });
 
