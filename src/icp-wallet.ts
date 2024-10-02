@@ -7,7 +7,6 @@ import {
   requestIdOf
 } from '@dfinity/agent';
 import type {CallRequest} from '@dfinity/agent/lib/cjs/agent/http/types';
-import {IDL} from '@dfinity/candid';
 import {
   BlockHeight,
   mapIcrc1TransferError,
@@ -16,17 +15,17 @@ import {
 } from '@dfinity/ledger-icp';
 import {Icrc1TransferResult} from '@dfinity/ledger-icp/dist/candid/ledger';
 import {Principal} from '@dfinity/principal';
-import {arrayBufferToUint8Array, assertNonNullish, isNullish} from '@dfinity/utils';
+import {arrayBufferToUint8Array, assertNonNullish} from '@dfinity/utils';
 import type {BigNumber} from 'bignumber.js';
 import {decode} from './agent/agentjs-cbor-copy';
-import {TransferArgs, TransferError} from './constants/icrc.idl.constants';
+import {TransferArgs, TransferResult} from './constants/icrc.idl.constants';
 import {RelyingParty} from './relying-party';
 import type {IcrcAccount} from './types/icrc-accounts';
 import type {Origin} from './types/post-message';
 import type {PrincipalText} from './types/principal';
 import type {RelyingPartyOptions} from './types/relying-party-options';
 import {base64ToUint8Array} from './utils/base64.utils';
-import {encodeArg} from './utils/idl.utils';
+import {decodeResult, encodeArg} from './utils/idl.utils';
 
 const ICP_LEDGER_CANISTER_ID = 'ryjl3-tyaaa-aaaaa-aaaba-cai';
 
@@ -132,18 +131,10 @@ export class IcpWallet extends RelyingParty {
       'A reply cannot be resolved within the provided certificate. This is unexpected; it should have been known at this point.'
     );
 
-    const result = IDL.decode([IDL.Variant({Ok: IDL.Nat, Err: TransferError})], reply);
-
-    if (isNullish(result)) {
-      throw new Error('The reply could not be decoded.');
-    }
-
-    if (result.length !== 1) {
-      throw new Error('More than one object returned. This is unexpected.');
-    }
-
-    // We have to use another ugly type cast because IDL.decode does not accept generics. Additionally, the agent-js implementation does not provide any hints, as its decodeReturnValue relies on the type 'any,' which is bad practice.
-    const [response] = result as unknown as [Icrc1TransferResult];
+    const response = decodeResult<Icrc1TransferResult>({
+      recordClass: TransferResult,
+      reply
+    });
 
     if ('Err' in response) {
       throw mapIcrc1TransferError(response.Err);

@@ -34,3 +34,5 @@ export const TransferError = IDL.Variant({
   TooOld: IDL.Null,
   InsufficientFunds: IDL.Record({balance: IDL.Nat})
 });
+
+export const TransferResult = IDL.Variant({Ok: IDL.Nat, Err: TransferError});
