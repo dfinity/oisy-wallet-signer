@@ -1,29 +1,19 @@
 import {
-  AnonymousIdentity,
-  Certificate,
-  HttpAgent,
-  lookupResultToBuffer,
-  requestIdOf
-} from '@dfinity/agent';
-import {
   BlockHeight,
   mapIcrc1TransferError,
   toIcrc1TransferRawRequest,
   type Icrc1TransferRequest
 } from '@dfinity/ledger-icp';
 import {Icrc1TransferResult} from '@dfinity/ledger-icp/dist/candid/ledger';
-import {Principal} from '@dfinity/principal';
-import {assertNonNullish} from '@dfinity/utils';
 import {TransferArgs, TransferResult} from './constants/icrc.idl.constants';
 import {RelyingParty} from './relying-party';
 import type {IcrcAccount} from './types/icrc-accounts';
+import type {IcrcCallCanisterRequestParams} from './types/icrc-requests';
 import type {Origin} from './types/post-message';
 import type {PrincipalText} from './types/principal';
 import type {RelyingPartyOptions} from './types/relying-party-options';
-import {decodeCallRequest} from './utils/agentjs-cbor-copy.utils';
-import {base64ToUint8Array} from './utils/base64.utils';
-import {assertCallArg, assertCallMethod} from './utils/call.utils';
-import {decodeResult, encodeArg} from './utils/idl.utils';
+import {decodeResponse} from './utils/call.utils';
+import {encodeArg} from './utils/idl.utils';
 
 const ICP_LEDGER_CANISTER_ID = 'ryjl3-tyaaa-aaaaa-aaaba-cai';
 
@@ -65,58 +55,23 @@ export class IcpWallet extends RelyingParty {
 
     const method = 'icrc1_transfer' as const;
 
+    const callParams: IcrcCallCanisterRequestParams = {
+      sender: owner,
+      method,
+      canisterId,
+      arg
+    };
+
     // TODO: uncomment nonce and add TODO - not yet supported by agent-js
 
-    const {certificate: cert, contentMap} = await this.call({
-      params: {
-        sender: owner,
-        method,
-        canisterId,
-        arg
-      }
+    const callResult = await this.call({
+      params: callParams
     });
 
-    const callRequest = decodeCallRequest(contentMap);
-
-    assertCallMethod({
-      requestMethod: method,
-      responseMethod: callRequest.method_name
-    });
-
-    assertCallArg({
-      requestArg: arg,
-      responseArg: callRequest.arg
-    });
-
-    // We have to create an agent to retrieve the rootKey, which is both inefficient and ugly.
-    // TODO: we do not have the identity
-    // TODO: we do not have the host here neither
-    const agent = await HttpAgent.create({
-      identity: new AnonymousIdentity(),
-      host: 'http://localhost:4943',
-      shouldFetchRootKey: true
-    });
-
-    const certificate = await Certificate.create({
-      certificate: base64ToUint8Array(cert),
-      rootKey: agent.rootKey,
-      canisterId: Principal.fromText(canisterId)
-    });
-
-    const requestId = requestIdOf(callRequest);
-
-    const path = [new TextEncoder().encode('request_status'), requestId];
-
-    const reply = lookupResultToBuffer(certificate.lookup([...path, 'reply']));
-
-    assertNonNullish(
-      reply,
-      'A reply cannot be resolved within the provided certificate. This is unexpected; it should have been known at this point.'
-    );
-
-    const response = decodeResult<Icrc1TransferResult>({
-      recordClass: TransferResult,
-      reply
+    const response = await decodeResponse<Icrc1TransferResult>({
+      callParams,
+      callResult,
+      callResultRecordClass: TransferResult
     });
 
     if ('Err' in response) {
