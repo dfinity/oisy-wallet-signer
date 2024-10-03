@@ -24,11 +24,7 @@
 		</Article>
 
 		<div class="md:min-h-20">
-			{#if isNullish(account)}
-				<div in:fade>
-					<ConnectAndRequestAccount bind:account />
-				</div>
-			{:else}
+			{#if nonNullish(account)}
 				<div in:fade>
 					<SendICP />
 				</div>
@@ -36,9 +32,15 @@
 		</div>
 	</section>
 
-	{#if nonNullish(account)}
-		<section in:fade>
-			<Wallet {account} />
-		</section>
-	{/if}
+	<section>
+		{#if nonNullish(account)}
+			<div in:fade>
+				<Wallet {account} />
+			</div>
+		{:else}
+			<div in:fade>
+				<ConnectAndRequestAccount bind:account />
+			</div>
+		{/if}
+	</section>
 </div>
