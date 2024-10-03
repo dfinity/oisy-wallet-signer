@@ -1,10 +1,8 @@
 <script lang="ts">
-	import Button from '$core/components/Button.svelte';
 	import { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
 	import { WALLET_URL } from '$core/constants/app.constants';
 	import { alertStore } from '$core/stores/alert.store';
 	import type { IcrcAccount } from '@dfinity/oisy-wallet-signer';
-	import Article from '$core/components/Article.svelte';
 	import IconAdd from '$lib/components/IconAdd.svelte';
 
 	type Props = {

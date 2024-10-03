@@ -8,7 +8,7 @@
 	import SendICP from '$lib/components/SendICP.svelte';
 	import ConnectAndRequestAccount from '$lib/components/ConnectAndRequestAccount.svelte';
 	import type { IcrcAccount } from '@dfinity/oisy-wallet-signer';
-	import { isNullish, nonNullish } from '@dfinity/utils';
+	import { nonNullish } from '@dfinity/utils';
 
 	let account = $state<IcrcAccount | undefined>(undefined);
 </script>
