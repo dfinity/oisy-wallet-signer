@@ -8,7 +8,7 @@ import {
 import {RecordClass, VariantClass} from '@dfinity/candid/lib/cjs/idl';
 import {Principal} from '@dfinity/principal';
 import {arrayBufferToUint8Array, assertNonNullish} from '@dfinity/utils';
-import {MAINNET_REPLICA_URL} from '../constants/core.constants';
+import {LOCAL_REPLICA_URL, MAINNET_REPLICA_URL} from '../constants/core.constants';
 import {IcrcBlob} from '../types/blob';
 import {IcrcCallCanisterRequestParams, Method} from '../types/icrc-requests';
 import type {IcrcCallCanisterResult} from '../types/icrc-responses';
@@ -90,14 +90,14 @@ export const decodeResponse = async <T>({
 
   // We have to create an agent to retrieve the rootKey, which is both inefficient and a bit ugly to some extension.
   const {
-    location: {origin, hostname}
+    location: {hostname}
   } = window;
 
   const localhost = ['localhost', '127.0.0.1'].includes(hostname);
 
   const agent = await HttpAgent.create({
     identity: new AnonymousIdentity(),
-    host: localhost ? origin : MAINNET_REPLICA_URL,
+    host: localhost ? LOCAL_REPLICA_URL : MAINNET_REPLICA_URL,
     ...(localhost && {shouldFetchRootKey: true})
   });
 
