@@ -1,23 +1,42 @@
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import type {Icrc1TransferRequest} from '@dfinity/ledger-icp';
-import {Principal} from '@dfinity/principal';
 import {toNullable} from '@dfinity/utils';
 import {IcpWallet} from './icp-wallet';
-import {mockCanisterId, mockPrincipalText} from './mocks/icrc-accounts.mocks';
+import {
+  mockLocalBlockHeight,
+  mockLocalCallParams,
+  mockLocalCallResult,
+  mockLocalCallTime,
+  mockLocalRelyingPartyPrincipal
+} from './mocks/call-utils.mocks';
+import {mockLocalIcRootKey} from './mocks/custom-http-agent-responses.mocks';
+import {mockCanisterId} from './mocks/icrc-accounts.mocks';
 import type {RelyingPartyOptions} from './types/relying-party-options';
 import {JSON_RPC_VERSION_2} from './types/rpc';
-import {uint8ArrayToBase64} from './utils/base64.utils';
+import * as callUtils from './utils/call.utils';
 
-vi.mock('@dfinity/candid', async (importOriginal) => {
+vi.mock('@dfinity/agent', async (importOriginal) => {
   // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-  const originalModule = await importOriginal<typeof import('@dfinity/candid')>();
+  const originalModule = await importOriginal<typeof import('@dfinity/agent')>();
+
+  class MockHttpAgent {
+    call = vi.fn();
+    create = vi.fn();
+
+    get rootKey(): ArrayBuffer {
+      return mockLocalIcRootKey.buffer;
+    }
+  }
+
+  Object.defineProperty(MockHttpAgent, 'create', {
+    value: vi.fn().mockResolvedValue(new MockHttpAgent()),
+    writable: true
+  });
 
   return {
     ...originalModule,
-    IDL: {
-      ...originalModule.IDL,
-      encode: vi.fn().mockReturnValue(new Uint8Array([1, 2, 3, 5, 6, 9, 9, 9]))
-    }
+    HttpAgent: MockHttpAgent,
+    pollForResponse: vi.fn()
   };
 });
 
@@ -37,6 +56,8 @@ describe('icp-wallet', () => {
   let icpWallet: IcpWallet;
 
   beforeEach(async () => {
+    vi.setSystemTime(mockLocalCallTime);
+
     originalOpen = window.open;
 
     vi.stubGlobal(
@@ -56,37 +77,34 @@ describe('icp-wallet', () => {
   afterEach(async () => {
     window.open = originalOpen;
 
-    vi.clearAllMocks();
-
     await icpWallet.disconnect();
+
+    vi.clearAllMocks();
+    vi.useRealTimers();
   });
 
   describe('icrc1Transfer', () => {
     const request: Icrc1TransferRequest = {
       to: {
-        owner: Principal.fromText(mockPrincipalText),
+        owner: mockLocalRelyingPartyPrincipal,
         subaccount: toNullable()
       },
-      amount: 123n,
-      fee: 1n
+      amount: 5000000n
     };
 
+    const {sender} = mockLocalCallParams;
+
     it('should call `call` with the correct parameters when icrc1Transfer is invoked', async () => {
-      const mockCall = vi.fn().mockResolvedValue({});
+      const mockCall = vi.fn().mockResolvedValue(mockLocalCallResult);
 
       icpWallet.call = mockCall;
 
-      const owner = Ed25519KeyIdentity.generate().getPrincipal().toText();
+      const result = await icpWallet.icrc1Transfer({request, owner: sender});
 
-      await icpWallet.icrc1Transfer({request, owner});
+      expect(result).toEqual(mockLocalBlockHeight);
 
       expect(mockCall).toHaveBeenCalledWith({
-        params: {
-          sender: owner,
-          method: 'icrc1_transfer',
-          canisterId: 'ryjl3-tyaaa-aaaaa-aaaba-cai',
-          arg: uint8ArrayToBase64(new Uint8Array([1, 2, 3, 5, 6, 9, 9, 9]))
-        }
+        params: mockLocalCallParams
       });
     });
 
@@ -95,16 +113,33 @@ describe('icp-wallet', () => {
 
       icpWallet.call = mockCall;
 
-      const owner = Ed25519KeyIdentity.generate().getPrincipal().toText();
+      vi.spyOn(callUtils, 'decodeResponse').mockResolvedValue({Ok: mockLocalBlockHeight});
 
-      await icpWallet.icrc1Transfer({request, owner, ledgerCanisterId: mockCanisterId});
+      await icpWallet.icrc1Transfer({request, owner: sender, ledgerCanisterId: mockCanisterId});
 
       expect(mockCall).toHaveBeenCalledWith({
         params: {
-          sender: owner,
-          method: 'icrc1_transfer',
-          canisterId: mockCanisterId,
-          arg: uint8ArrayToBase64(new Uint8Array([1, 2, 3, 5, 6, 9, 9, 9]))
+          ...mockLocalCallParams,
+          canisterId: mockCanisterId
+        }
+      });
+    });
+
+    it('should call `call` with the specific sender', async () => {
+      const mockCall = vi.fn().mockResolvedValue({});
+
+      icpWallet.call = mockCall;
+
+      vi.spyOn(callUtils, 'decodeResponse').mockResolvedValue({Ok: mockLocalBlockHeight});
+
+      const owner = Ed25519KeyIdentity.generate().getPrincipal().toText();
+
+      await icpWallet.icrc1Transfer({request, owner});
+
+      expect(mockCall).toHaveBeenCalledWith({
+        params: {
+          ...mockLocalCallParams,
+          sender: owner
         }
       });
     });

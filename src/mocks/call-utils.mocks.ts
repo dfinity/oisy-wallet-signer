@@ -1,8 +1,13 @@
 /**
  * These values were copied from a test performed locally against a local replica of Juno Docker.
  */
+import {Principal} from '@dfinity/principal';
 import {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import {IcrcCallCanisterResult} from '../types/icrc-responses';
+
+export const mockLocalRelyingPartyPrincipal = Principal.fromText(
+  's3oqv-3j7id-xjhbm-3owbe-fvwly-oso6u-vej6n-bexck-koyu2-bxb6y-wae'
+);
 
 export const mockLocalCallParams: IcrcCallCanisterRequestParams = {
   arg: 'RElETAZte24AbAKzsNrDA2ithsqDBQFufW54bAb7ygECxvy2AgO6ieXCBAGi3pTrBgGC8/ORDATYo4yoDX0BBQEdP0Duk4WbdYJC1svDpO9SpE+aElxKU7FNBuH2LAIAAZBOAAAAwJaxAg==',

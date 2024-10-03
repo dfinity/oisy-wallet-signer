@@ -1,11 +1,18 @@
-import {toIcrc1TransferRawRequest, type Icrc1TransferRequest} from '@dfinity/ledger-icp';
-import {TransferArgs} from './constants/icrc.idl.constants';
+import {
+  BlockHeight,
+  mapIcrc1TransferError,
+  toIcrc1TransferRawRequest,
+  type Icrc1TransferRequest
+} from '@dfinity/ledger-icp';
+import {Icrc1TransferResult} from '@dfinity/ledger-icp/dist/candid/ledger';
+import {TransferArgs, TransferResult} from './constants/icrc.idl.constants';
 import {RelyingParty} from './relying-party';
 import type {IcrcAccount} from './types/icrc-accounts';
-import type {IcrcCallCanisterResult} from './types/icrc-responses';
+import type {IcrcCallCanisterRequestParams} from './types/icrc-requests';
 import type {Origin} from './types/post-message';
 import type {PrincipalText} from './types/principal';
 import type {RelyingPartyOptions} from './types/relying-party-options';
+import {decodeResponse} from './utils/call.utils';
 import {encodeArg} from './utils/idl.utils';
 
 const ICP_LEDGER_CANISTER_ID = 'ryjl3-tyaaa-aaaaa-aaaba-cai';
@@ -32,11 +39,11 @@ export class IcpWallet extends RelyingParty {
   public icrc1Transfer = async ({
     request,
     owner,
-    ledgerCanisterId: canisterId
+    ledgerCanisterId
   }: {
     request: Icrc1TransferRequest;
     ledgerCanisterId?: PrincipalText;
-  } & Pick<IcrcAccount, 'owner'>): Promise<IcrcCallCanisterResult> => {
+  } & Pick<IcrcAccount, 'owner'>): Promise<BlockHeight> => {
     const rawArgs = toIcrc1TransferRawRequest(request);
 
     const arg = encodeArg({
@@ -44,32 +51,33 @@ export class IcpWallet extends RelyingParty {
       rawArgs
     });
 
+    const canisterId = ledgerCanisterId ?? ICP_LEDGER_CANISTER_ID;
+
+    const method = 'icrc1_transfer' as const;
+
+    const callParams: IcrcCallCanisterRequestParams = {
+      sender: owner,
+      method,
+      canisterId,
+      arg
+    };
+
     // TODO: uncomment nonce and add TODO - not yet supported by agent-js
 
-    // TODO: decode contentMap cbor to CallRequest
-    // TODO: requestIdOf(contentMap) => requestId
-    // TODO: contentMap (which is a CallRequest) contains arg and method and canister and sender
-    // TODO: const certificate = await Certificate.create({
-    //       certificate: bufFromBufLike(cert),
-    //       rootKey: this.rootKey,
-    //       canisterId: Principal.fromText(canisterId)
-    //     });
-    //
-    //     const path = [new TextEncoder().encode('request_status'), requestId];
-    //
-    //     const status = new TextDecoder().decode(
-    //       lookupResultToBuffer(certificate.lookup([...path, 'status']))
-    //     );
-    // reply = lookupResultToBuffer(certificate.lookup([...path, 'reply']));
-    // TODO: decode reply with Candid
-
-    return await this.call({
-      params: {
-        sender: owner,
-        method: 'icrc1_transfer',
-        canisterId: canisterId ?? ICP_LEDGER_CANISTER_ID,
-        arg
-      }
+    const callResult = await this.call({
+      params: callParams
     });
+
+    const response = await decodeResponse<Icrc1TransferResult>({
+      params: callParams,
+      result: callResult,
+      resultRecordClass: TransferResult
+    });
+
+    if ('Err' in response) {
+      throw mapIcrc1TransferError(response.Err);
+    }
+
+    return response.Ok;
   };
 }
