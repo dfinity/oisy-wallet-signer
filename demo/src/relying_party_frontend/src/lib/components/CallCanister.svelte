@@ -4,10 +4,9 @@
 	import { fade } from 'svelte/transition';
 	import Button from '$core/components/Button.svelte';
 	import Value from '$core/components/Value.svelte';
-	import type { IcrcCallCanisterResult } from '@dfinity/oisy-wallet-signer';
 	import { accountsStore } from '$lib/stores/accounts.store';
 	import { authStore } from '$core/stores/auth.store';
-	import type { Icrc1TransferRequest } from '@dfinity/ledger-icp';
+	import type {BlockHeight, Icrc1TransferRequest} from '@dfinity/ledger-icp';
 	import { E8S_PER_ICP } from '$core/constants/app.constants';
 	import { emit } from '$core/utils/events.utils';
 
@@ -17,7 +16,7 @@
 
 	let { wallet }: Props = $props();
 
-	let result = $state<IcrcCallCanisterResult | undefined>(undefined);
+	let result = $state<BlockHeight | undefined>(undefined);
 
 	const onclick = async () => {
 		// TODO: handle errors
