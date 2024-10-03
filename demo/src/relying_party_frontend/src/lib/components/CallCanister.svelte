@@ -6,7 +6,7 @@
 	import Value from '$core/components/Value.svelte';
 	import { accountsStore } from '$lib/stores/accounts.store';
 	import { authStore } from '$core/stores/auth.store';
-	import type {BlockHeight, Icrc1TransferRequest} from '@dfinity/ledger-icp';
+	import type { BlockHeight, Icrc1TransferRequest } from '@dfinity/ledger-icp';
 	import { E8S_PER_ICP } from '$core/constants/app.constants';
 	import { emit } from '$core/utils/events.utils';
 
