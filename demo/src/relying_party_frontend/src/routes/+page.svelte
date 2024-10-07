@@ -8,7 +8,7 @@
 	import SendICP from '$lib/components/SendICP.svelte';
 	import ConnectAndRequestAccount from '$lib/components/ConnectAndRequestAccount.svelte';
 	import type { IcrcAccount } from '@dfinity/oisy-wallet-signer';
-	import { isNullish, nonNullish } from '@dfinity/utils';
+	import { nonNullish } from '@dfinity/utils';
 
 	let account = $state<IcrcAccount | undefined>(undefined);
 </script>
@@ -24,11 +24,7 @@
 		</Article>
 
 		<div class="md:min-h-20">
-			{#if isNullish(account)}
-				<div in:fade>
-					<ConnectAndRequestAccount bind:account />
-				</div>
-			{:else}
+			{#if nonNullish(account)}
 				<div in:fade>
 					<SendICP />
 				</div>
@@ -36,9 +32,15 @@
 		</div>
 	</section>
 
-	{#if nonNullish(account)}
-		<section in:fade>
-			<Wallet {account} />
-		</section>
-	{/if}
+	<section>
+		{#if nonNullish(account)}
+			<div in:fade>
+				<Wallet {account} />
+			</div>
+		{:else}
+			<div in:fade>
+				<ConnectAndRequestAccount bind:account />
+			</div>
+		{/if}
+	</section>
 </div>
