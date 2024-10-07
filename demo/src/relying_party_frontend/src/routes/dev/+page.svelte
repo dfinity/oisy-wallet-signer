@@ -16,10 +16,19 @@
 	let wallet = $state<IcpWallet | undefined>(undefined);
 
 	$effect(() => {
+		disconnected = false;
+
 		return () => {
 			wallet?.disconnect();
 		};
 	});
+
+	let disconnected = $state<boolean>(false);
+
+	const onDisconnect = () => {
+		console.log('HERE onDisconnect')
+		disconnected = true;
+	};
 </script>
 
 <UserId user={$authStore?.identity?.getPrincipal()} />
@@ -28,11 +37,17 @@
 
 {#if isNullish(wallet)}
 	<div class="pt-6" in:fade>
-		<Connect bind:wallet />
+		<Connect bind:wallet {onDisconnect} />
+	</div>
+{:else if !disconnected}
+	<div in:fade>
+		<Value id="wallet-connected" testId="wallet-connected" title="Wallet status">Connected</Value>
 	</div>
 {:else}
 	<div in:fade>
-		<Value id="wallet-connected" testId="wallet-connected" title="Wallet status">Connected</Value>
+		<Value id="wallet-disconnected" testId="wallet-disconnected" title="Wallet status"
+			>Disconnected</Value
+		>
 	</div>
 {/if}
 

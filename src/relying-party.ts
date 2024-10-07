@@ -223,10 +223,8 @@ export class RelyingParty {
    * @returns {Promise<void>} A promise that resolves when the signer has been successfully disconnected.
    */
   disconnect = async (): Promise<void> => {
-    console.log('daslkmadslkmasdklm');
     clearInterval(this.#walletStatusInterval);
     this.#popup.close();
-    console.log(this.#onDisconnect);
     this.#onDisconnect?.();
   };
 
