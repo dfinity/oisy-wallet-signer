@@ -61,6 +61,8 @@ describe('icrc-wallet', () => {
     await icrcWallet.disconnect();
   });
 
+  // TODO: implement same tests as "Connection errors" and "Connection success" for IcrcWallet as in RelyingParty spec
+
   describe('icrc1Transfer', () => {
     const params: TransferParams = {
       to: {

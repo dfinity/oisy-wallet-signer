@@ -83,6 +83,8 @@ describe('icp-wallet', () => {
     vi.useRealTimers();
   });
 
+  // TODO: implement same tests as "Connection errors" and "Connection success" for IcpWallet as in RelyingParty spec
+
   describe('icrc1Transfer', () => {
     const request: Icrc1TransferRequest = {
       to: {
