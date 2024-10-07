@@ -55,15 +55,23 @@ export class RelyingParty {
   readonly #origin: Origin;
   readonly #popup: Window;
 
+  readonly #onDisconnect;
+
   #walletStatus: WalletStatus = 'connected';
   readonly #walletStatusInterval: NodeJS.Timeout;
 
   // TODO: maybe we also want to make the relying party a bit more opiniated in the sense that on connect or each time a request is sent, we can first check if the desired standards is supported.
   // e.g. I'm the client and I ask for "accounts" but actually the signer does not support accounts.
 
-  protected constructor({origin, popup}: {origin: Origin; popup: Window}) {
+  protected constructor({
+    origin,
+    popup,
+    onDisconnect
+  }: {origin: Origin; popup: Window} & Pick<RelyingPartyOptions, 'onDisconnect'>) {
     this.#origin = origin;
     this.#popup = popup;
+
+    this.#onDisconnect = onDisconnect;
 
     this.#walletStatus = 'connected';
     this.#walletStatusInterval = setInterval(
@@ -83,10 +91,14 @@ export class RelyingParty {
    * @param {RelyingPartyOptions} options - The options to initialize the signer.
    * @returns {Promise<RelyingParty>} A promise that resolves to an object, which can be used to interact with the signer when it is connected.
    */
-  static async connect(options: RelyingPartyOptions): Promise<RelyingParty> {
+  static async connect({onDisconnect, ...rest}: RelyingPartyOptions): Promise<RelyingParty> {
     return await this.connectSigner({
-      options,
-      init: (params: {origin: Origin; popup: Window}) => new RelyingParty(params)
+      options: rest,
+      init: (params: {origin: Origin; popup: Window}) =>
+        new RelyingParty({
+          ...params,
+          onDisconnect
+        })
     });
   }
 
@@ -211,8 +223,11 @@ export class RelyingParty {
    * @returns {Promise<void>} A promise that resolves when the signer has been successfully disconnected.
    */
   disconnect = async (): Promise<void> => {
+    console.log('daslkmadslkmasdklm');
     clearInterval(this.#walletStatusInterval);
     this.#popup.close();
+    console.log(this.#onDisconnect);
+    this.#onDisconnect?.();
   };
 
   private checkWalletStatusCallback = (): void => {

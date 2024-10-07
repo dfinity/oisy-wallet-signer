@@ -32,7 +32,7 @@ import {
   type IcrcCallCanisterResult
 } from './types/icrc-responses';
 import {RelyingPartyResponseError} from './types/relying-party-errors';
-import type {RelyingPartyOptions} from './types/relying-party-options';
+import type {OnDisconnect, RelyingPartyOptions} from './types/relying-party-options';
 import {JSON_RPC_VERSION_2, RpcResponseWithResultOrErrorSchema} from './types/rpc';
 import {uint8ArrayToBase64} from './utils/base64.utils';
 import {windowFeatures} from './utils/window.utils';
@@ -252,8 +252,11 @@ describe('Relying Party', () => {
       });
 
       describe('Disconnect', () => {
-        const connectAndDisconnect = async () => {
-          const promise = RelyingParty.connect(mockParameters);
+        const connectAndDisconnect = async (onDisconnect?: OnDisconnect) => {
+          const promise = RelyingParty.connect({
+            ...mockParameters,
+            onDisconnect
+          });
 
           window.dispatchEvent(messageEventReady);
 
@@ -279,6 +282,14 @@ describe('Relying Party', () => {
           expect(clearIntervalSpy).toHaveBeenCalledTimes(1);
 
           clearIntervalSpy.mockRestore();
+        });
+
+        it.only('should call onDisconnect callback', async () => {
+          const spyOnDisconnect = vi.fn();
+
+          await connectAndDisconnect(spyOnDisconnect);
+
+          expect(spyOnDisconnect).toHaveBeenCalledTimes(1);
         });
       });
     });
