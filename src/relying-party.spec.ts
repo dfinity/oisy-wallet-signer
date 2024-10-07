@@ -263,7 +263,7 @@ describe('Relying Party', () => {
           expect(window.close).not.toHaveBeenCalled();
 
           await disconnect();
-        }
+        };
 
         it('should close popup on disconnect', async () => {
           await connectAndDisconnect();
@@ -1276,10 +1276,6 @@ describe('Relying Party', () => {
         });
       });
     });
-
-    describe("Polling", () => {
-
-    })
   });
 
   describe('Window failure', () => {
