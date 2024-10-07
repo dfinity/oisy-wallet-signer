@@ -252,7 +252,7 @@ describe('Relying Party', () => {
       });
 
       describe('Disconnect', () => {
-        it('should close popup on disconnect', async () => {
+        const connectAndDisconnect = async () => {
           const promise = RelyingParty.connect(mockParameters);
 
           window.dispatchEvent(messageEventReady);
@@ -263,8 +263,22 @@ describe('Relying Party', () => {
           expect(window.close).not.toHaveBeenCalled();
 
           await disconnect();
+        }
+
+        it('should close popup on disconnect', async () => {
+          await connectAndDisconnect();
 
           expect(window.close).toHaveBeenCalled();
+        });
+
+        it('should clear interval on disconnect', async () => {
+          const clearIntervalSpy = vi.spyOn(global, 'clearInterval');
+
+          await connectAndDisconnect();
+
+          expect(clearIntervalSpy).toHaveBeenCalledTimes(1);
+
+          clearIntervalSpy.mockRestore();
         });
       });
     });
@@ -1262,6 +1276,10 @@ describe('Relying Party', () => {
         });
       });
     });
+
+    describe("Polling", () => {
+
+    })
   });
 
   describe('Window failure', () => {
