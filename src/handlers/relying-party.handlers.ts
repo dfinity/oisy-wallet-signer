@@ -40,7 +40,7 @@ export const retryRequestStatus = async ({
   timeoutInMilliseconds: number;
   intervalInMilliseconds?: number;
 }): Promise<ReadyOrError | 'timeout'> => {
-  const requestStatus = (): void => {
+  const requestInitialStatus = (): void => {
     const msg: IcrcStatusRequest = {
       jsonrpc: JSON_RPC_VERSION_2,
       id,
@@ -56,8 +56,19 @@ export const retryRequestStatus = async ({
       timeoutInMilliseconds / (intervalInMilliseconds ?? DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS),
     intervalInMilliseconds,
     isReady,
-    fn: requestStatus
+    fn: requestInitialStatus
   });
+};
+
+export const requestStatus = ({id, ...rest}: Request): void => {
+  const msg: IcrcStatusRequest = {
+    jsonrpc: JSON_RPC_VERSION_2,
+    id,
+    method: ICRC29_STATUS
+  };
+
+  // Requesting status does not require user interaction therefore it can be queried without focusing the popup.
+  postMsg({msg, ...rest});
 };
 
 export const requestSupportedStandards = ({id, ...rest}: Request): void => {

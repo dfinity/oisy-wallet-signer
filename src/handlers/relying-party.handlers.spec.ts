@@ -4,6 +4,7 @@ import {
   ICRC25_REQUEST_PERMISSIONS,
   ICRC25_SUPPORTED_STANDARDS,
   ICRC27_ACCOUNTS,
+  ICRC29_STATUS,
   ICRC49_CALL_CANISTER
 } from '../constants/icrc.constants';
 import {mockCallCanisterParams} from '../mocks/call-canister.mocks';
@@ -15,6 +16,7 @@ import {
   requestAccounts,
   requestCallCanister,
   requestPermissions,
+  requestStatus,
   requestSupportedStandards,
   retryRequestStatus
 } from './relying-party.handlers';
@@ -133,6 +135,27 @@ describe('Relying Party handlers', () => {
 
         await vi.advanceTimersByTimeAsync(retries * DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS);
       }));
+  });
+
+  describe('Request status', () => {
+    it('should send the correct message to the popup', () => {
+      requestStatus({id: testId, popup, origin: testOrigin});
+
+      expect(postMessageMock).toHaveBeenCalledWith(
+        {
+          jsonrpc: JSON_RPC_VERSION_2,
+          id: testId,
+          method: ICRC29_STATUS
+        },
+        testOrigin
+      );
+    });
+
+    it('should not bring the popup in front with focus', () => {
+      requestStatus({id: testId, popup, origin: testOrigin});
+
+      expect(focusMock).not.toHaveBeenCalled();
+    });
   });
 
   describe('Supported standards', () => {
