@@ -315,6 +315,12 @@ export class RelyingParty {
     }) => Promise<{handled: boolean; result?: T}>;
   }): Promise<T> =>
     await new Promise<T>((resolve, reject) => {
+      const {connected, err} = this.assertWalletConnected();
+      if (!connected) {
+        reject(err ?? new Error('Unexpected reason for disconnection.'));
+        return;
+      }
+
       const {success: optionsSuccess, error} = RelyingPartyRequestOptionsSchema.safeParse(options);
 
       if (!optionsSuccess) {
@@ -331,12 +337,6 @@ export class RelyingParty {
         );
         disconnect();
       }, timeoutInMilliseconds);
-
-      const {connected, err} = this.assertWalletConnected();
-      if (!connected) {
-        reject(err ?? new Error('Unexpected reason for disconnection.'));
-        return;
-      }
 
       const onMessage = async ({origin, data}: RelyingPartyMessageEvent): Promise<void> => {
         const {success} = RpcResponseWithResultOrErrorSchema.safeParse(data);
