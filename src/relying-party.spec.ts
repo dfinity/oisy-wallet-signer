@@ -284,7 +284,7 @@ describe('Relying Party', () => {
           clearIntervalSpy.mockRestore();
         });
 
-        it.only('should call onDisconnect callback', async () => {
+        it('should call onDisconnect callback', async () => {
           const spyOnDisconnect = vi.fn();
 
           await connectAndDisconnect(spyOnDisconnect);
