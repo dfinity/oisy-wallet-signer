@@ -50,10 +50,12 @@ describe('Relying Party', () => {
   });
 
   let originalOpen: typeof window.open;
+  let originalClose: typeof window.close;
 
   describe('Window success', () => {
     beforeEach(() => {
       originalOpen = window.open;
+      originalClose = window.close;
 
       vi.stubGlobal(
         'open',
@@ -65,6 +67,7 @@ describe('Relying Party', () => {
 
     afterEach(() => {
       window.open = originalOpen;
+      window.close = originalClose;
 
       vi.restoreAllMocks();
     });
@@ -444,6 +447,23 @@ describe('Relying Party', () => {
 
           await expect(promise).rejects.toThrowError(new RelyingPartyResponseError(error));
         });
+
+        it('should throw error if the signer popup is closed', async () => {
+          const spy = vi.spyOn(window, 'close').mockImplementation(() => {
+            // @ts-expect-error: we are testing this on purpose
+            this.closed = true;
+          });
+
+          window.close();
+
+          await expect(relyingParty.supportedStandards()).rejects.toThrow(
+            'The signer has been closed. Your request cannot be processed.'
+          );
+
+          spy.mockReset();
+
+          (window as {closed: boolean}).closed = false;
+        });
       });
 
       describe('Request success', () => {
@@ -642,6 +662,23 @@ describe('Relying Party', () => {
 
             await expect(promise).rejects.toThrowError(new RelyingPartyResponseError(error));
           });
+
+          it('should throw error if the signer popup is closed', async () => {
+            const spy = vi.spyOn(window, 'close').mockImplementation(() => {
+              // @ts-expect-error: we are testing this on purpose
+              this.closed = true;
+            });
+
+            window.close();
+
+            await expect(relyingParty.permissions()).rejects.toThrow(
+              'The signer has been closed. Your request cannot be processed.'
+            );
+
+            spy.mockReset();
+
+            (window as {closed: boolean}).closed = false;
+          });
         });
 
         describe('Request success', () => {
@@ -820,6 +857,23 @@ describe('Relying Party', () => {
             };
 
             await expect(promise).rejects.toThrowError(new RelyingPartyResponseError(error));
+          });
+
+          it('should throw error if the signer popup is closed', async () => {
+            const spy = vi.spyOn(window, 'close').mockImplementation(() => {
+              // @ts-expect-error: we are testing this on purpose
+              this.closed = true;
+            });
+
+            window.close();
+
+            await expect(relyingParty.requestPermissions()).rejects.toThrow(
+              'The signer has been closed. Your request cannot be processed.'
+            );
+
+            spy.mockReset();
+
+            (window as {closed: boolean}).closed = false;
           });
         });
 
@@ -1043,6 +1097,23 @@ describe('Relying Party', () => {
 
           await expect(promise).rejects.toThrowError(new RelyingPartyResponseError(error));
         });
+
+        it('should throw error if the signer popup is closed', async () => {
+          const spy = vi.spyOn(window, 'close').mockImplementation(() => {
+            // @ts-expect-error: we are testing this on purpose
+            this.closed = true;
+          });
+
+          window.close();
+
+          await expect(relyingParty.accounts()).rejects.toThrow(
+            'The signer has been closed. Your request cannot be processed.'
+          );
+
+          spy.mockReset();
+
+          (window as {closed: boolean}).closed = false;
+        });
       });
 
       describe('Request success', () => {
@@ -1238,6 +1309,23 @@ describe('Relying Party', () => {
           };
 
           await expect(promise).rejects.toThrowError(new RelyingPartyResponseError(error));
+        });
+
+        it('should throw error if the signer popup is closed', async () => {
+          const spy = vi.spyOn(window, 'close').mockImplementation(() => {
+            // @ts-expect-error: we are testing this on purpose
+            this.closed = true;
+          });
+
+          window.close();
+
+          await expect(relyingParty.call({params: mockCallCanisterParams})).rejects.toThrow(
+            'The signer has been closed. Your request cannot be processed.'
+          );
+
+          spy.mockReset();
+
+          (window as {closed: boolean}).closed = false;
         });
       });
 
