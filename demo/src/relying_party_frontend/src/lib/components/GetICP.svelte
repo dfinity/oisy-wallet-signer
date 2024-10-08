@@ -2,7 +2,7 @@
 	import { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
 	import Button from '$core/components/Button.svelte';
 	import { authStore } from '$core/stores/auth.store';
-	import { isNullish } from '@dfinity/utils';
+    import {isNullish, notEmptyString} from '@dfinity/utils';
 	import { alertStore } from '$core/stores/alert.store';
 	import { emit } from '$core/utils/events.utils';
 	import { getTransferRequest } from '$lib/utils/transfer.utils';
@@ -68,12 +68,12 @@
 				duration: 3000
 			});
 		} catch (err: unknown) {
+            const message = (err as Error).message;
+
 			alertStore.set({
 				type: 'error',
-				message: 'message' in (err as Error) ? (err as Error).message : 'Unexpected error.'
+				message: notEmptyString(message) ? message : 'Unexpected error. Check the console output; this is just a demo 😉! Joking aside, you may just not have enough funds for the transfer.'
 			});
-
-			console.error(err);
 		} finally {
 			await wallet?.disconnect();
 		}
