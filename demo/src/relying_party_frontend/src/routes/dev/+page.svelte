@@ -26,7 +26,6 @@
 	let disconnected = $state<boolean>(false);
 
 	const onDisconnect = () => {
-		console.log('HERE onDisconnect')
 		disconnected = true;
 	};
 </script>

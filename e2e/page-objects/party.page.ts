@@ -67,6 +67,14 @@ export class PartyPage extends IdentityPage {
     await expect(this.page.getByTestId('wallet-connected')).toHaveScreenshot();
   }
 
+  async assertDisconnected(): Promise<void> {
+    // The relying party polls every 5 sec for the status of the wallet. The constant is currently not exposed.
+    await this.page.waitForTimeout(10000);
+
+    await expect(this.page.getByTestId('wallet-connected')).not.toBeVisible();
+    await expect(this.page.getByTestId('wallet-disconnected')).toBeVisible();
+  }
+
   async assertSupportedStandards(): Promise<void> {
     await expect(this.page.getByTestId('supported-standards')).toBeVisible();
 
@@ -169,5 +177,9 @@ export class PartyPage extends IdentityPage {
     await this.#walletPage?.assertBalance('54.5000');
 
     await this.assertBalance('0.5000');
+  }
+
+  async closeWalletWindow(): Promise<void> {
+    await this.#walletPage?.close();
   }
 }
