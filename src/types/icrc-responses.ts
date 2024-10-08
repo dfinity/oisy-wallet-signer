@@ -12,6 +12,8 @@ const IcrcScopeMethodSchema = z.object({
   method: IcrcScopedMethodSchema
 });
 
+export type IcrcScopeMethod = z.infer<typeof IcrcScopeMethodSchema>;
+
 export const IcrcScopeSchema = z
   .object({
     scope: IcrcScopeMethodSchema,
