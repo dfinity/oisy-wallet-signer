@@ -312,6 +312,8 @@ export class RelyingParty {
     }) => Promise<{handled: boolean; result?: T}>;
   }): Promise<T> =>
     await new Promise<T>((resolve, reject) => {
+      // TODO: is window is closed or wallet status is disconnected, the request cannot be performed therefore we should throw an error
+
       const {success: optionsSuccess, error} = RelyingPartyRequestOptionsSchema.safeParse(options);
 
       if (!optionsSuccess) {
