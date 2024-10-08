@@ -34,7 +34,10 @@ import {
 } from './types/icrc-responses';
 import type {Origin} from './types/post-message';
 import type {RelyingPartyMessageEvent, RelyingPartyMessageEventData} from './types/relying-party';
-import {RelyingPartyResponseError} from './types/relying-party-errors';
+import {
+  RelyingPartyDisconnectedError,
+  RelyingPartyResponseError
+} from './types/relying-party-errors';
 import {RelyingPartyOptionsSchema, type RelyingPartyOptions} from './types/relying-party-options';
 import {
   RelyingPartyRequestOptionsSchema,
@@ -312,8 +315,6 @@ export class RelyingParty {
     }) => Promise<{handled: boolean; result?: T}>;
   }): Promise<T> =>
     await new Promise<T>((resolve, reject) => {
-      // TODO: is window is closed or wallet status is disconnected, the request cannot be performed therefore we should throw an error
-
       const {success: optionsSuccess, error} = RelyingPartyRequestOptionsSchema.safeParse(options);
 
       if (!optionsSuccess) {
@@ -330,6 +331,12 @@ export class RelyingParty {
         );
         disconnect();
       }, timeoutInMilliseconds);
+
+      const {connected, err} = this.assertWalletConnected();
+      if (!connected) {
+        reject(err ?? new Error('Unexpected reason for disconnection.'));
+        return;
+      }
 
       const onMessage = async ({origin, data}: RelyingPartyMessageEvent): Promise<void> => {
         const {success} = RpcResponseWithResultOrErrorSchema.safeParse(data);
@@ -379,6 +386,31 @@ export class RelyingParty {
 
       postRequest(requestId);
     });
+
+  private assertWalletConnected(): {connected: boolean; err?: RelyingPartyDisconnectedError} {
+    if (this.#walletStatus === 'disconnected') {
+      return {
+        connected: false,
+        err: new RelyingPartyDisconnectedError(
+          'The signer has been disconnected. Your request cannot be processed.'
+        )
+      };
+    }
+
+    // Can happen given that the polling for the status wallet happens every RELYING_PARTY_CHECK_WALLET_STATUS_INTERVAL seconds
+    if (this.#popup.closed) {
+      return {
+        connected: false,
+        err: new RelyingPartyDisconnectedError(
+          'The signer has been closed. Your request cannot be processed.'
+        )
+      };
+    }
+
+    return {
+      connected: true
+    };
+  }
 
   /**
    * List the standards supported by the signer.

@@ -9,3 +9,5 @@ export class RelyingPartyResponseError extends Error {
     this.code = code;
   }
 }
+
+export class RelyingPartyDisconnectedError extends Error {}
