@@ -450,7 +450,7 @@ describe('Relying Party', () => {
 
         it('should throw error if the signer popup is closed', async () => {
           const spy = vi.spyOn(window, 'close').mockImplementation(() => {
-            // @ts-ignore
+            // @ts-expect-error: we are testing this on purpose
             this.closed = true;
           });
 
@@ -462,7 +462,7 @@ describe('Relying Party', () => {
 
           spy.mockReset();
 
-          (window as any).closed = false;
+          (window as {closed: boolean}).closed = false;
         });
       });
 
@@ -665,7 +665,7 @@ describe('Relying Party', () => {
 
           it('should throw error if the signer popup is closed', async () => {
             const spy = vi.spyOn(window, 'close').mockImplementation(() => {
-              // @ts-ignore
+              // @ts-expect-error: we are testing this on purpose
               this.closed = true;
             });
 
@@ -677,7 +677,7 @@ describe('Relying Party', () => {
 
             spy.mockReset();
 
-            (window as any).closed = false;
+            (window as {closed: boolean}).closed = false;
           });
         });
 
@@ -861,7 +861,7 @@ describe('Relying Party', () => {
 
           it('should throw error if the signer popup is closed', async () => {
             const spy = vi.spyOn(window, 'close').mockImplementation(() => {
-              // @ts-ignore
+              // @ts-expect-error: we are testing this on purpose
               this.closed = true;
             });
 
@@ -873,7 +873,7 @@ describe('Relying Party', () => {
 
             spy.mockReset();
 
-            (window as any).closed = false;
+            (window as {closed: boolean}).closed = false;
           });
         });
 
@@ -1100,7 +1100,7 @@ describe('Relying Party', () => {
 
         it('should throw error if the signer popup is closed', async () => {
           const spy = vi.spyOn(window, 'close').mockImplementation(() => {
-            // @ts-ignore
+            // @ts-expect-error: we are testing this on purpose
             this.closed = true;
           });
 
@@ -1112,7 +1112,7 @@ describe('Relying Party', () => {
 
           spy.mockReset();
 
-          (window as any).closed = false;
+          (window as {closed: boolean}).closed = false;
         });
       });
 
@@ -1313,7 +1313,7 @@ describe('Relying Party', () => {
 
         it('should throw error if the signer popup is closed', async () => {
           const spy = vi.spyOn(window, 'close').mockImplementation(() => {
-            // @ts-ignore
+            // @ts-expect-error: we are testing this on purpose
             this.closed = true;
           });
 
@@ -1325,7 +1325,7 @@ describe('Relying Party', () => {
 
           spy.mockReset();
 
-          (window as any).closed = false;
+          (window as {closed: boolean}).closed = false;
         });
       });
 
