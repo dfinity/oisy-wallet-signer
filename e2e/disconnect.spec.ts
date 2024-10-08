@@ -4,9 +4,9 @@ import {initTestSuite} from './utils/init.utils';
 const getPartyPage = initTestSuite();
 
 testWithII('should requests permissions and list accounts', async () => {
-    const partyPage = getPartyPage();
+  const partyPage = getPartyPage();
 
-    await partyPage.closeWalletWindow();
+  await partyPage.closeWalletWindow();
 
-    await partyPage.assertDisconnected();
+  await partyPage.assertDisconnected();
 });
