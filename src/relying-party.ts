@@ -388,6 +388,8 @@ export class RelyingParty {
     });
 
   private assertWalletConnected(): {connected: boolean; err?: RelyingPartyDisconnectedError} {
+    // TODO: this use case is not covered yet with a unit test. Some issue with mocking the timer.
+    // On the contrary, the other use case, the popup being closed, is already covered.
     if (this.#walletStatus === 'disconnected') {
       return {
         connected: false,
