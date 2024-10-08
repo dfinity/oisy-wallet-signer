@@ -20,3 +20,45 @@ It implements various ICRC standards that have been discussed and developed by t
 While primarily developed for OISY, the library can be integrated into any wallet or project seeking signer capabilities.
 
 Additionally, it includes opinionated clients that enable interactions with the ICP or ICRC ledgers without the need for any specific JavaScript framework, making the library fully agnostic.
+
+## 🖥️ Installation
+
+```bash
+# with npm
+npm install --save-dev @dfinity/oisy-wallet-signer
+# with pnpm
+pnpm add --save-dev @dfinity/oisy-wallet-signer
+# with yarn
+yarn add -D @dfinity/oisy-wallet-signer
+```
+
+## ✍️ Usage in a Wallet
+
+To use the OISY Wallet Signer within your wallet or project, follow these steps:
+
+### 1. Initialize a Signer
+
+Turning your application into a signer that starts listening and processing ICRC messages requires the initialization of a `Signer` object.
+
+```typescript
+const signer = Signer.init({
+    owner
+});
+```
+
+The `owner` is the non-anonymous identity that can interact with the signer. Commonly, it is the user of your app.
+
+> [!TIP]
+> When developing locally, you can initialize the signer with a parameter `host` that points to your local replica.
+> By default, it uses `https://icp-api.io`
+
+```typescript
+const signer = Signer.init({
+    owner,
+    host: 'http://localhost:4943'
+});
+```
+
+
+
+
