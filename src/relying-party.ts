@@ -1,11 +1,13 @@
 import {assertNonNullish, nonNullish, notEmptyString} from '@dfinity/utils';
 import {
+  RELYING_PARTY_CHECK_WALLET_STATUS_INTERVAL,
   RELYING_PARTY_CONNECT_TIMEOUT_IN_MILLISECONDS,
   RELYING_PARTY_DEFAULT_SCOPES,
   RELYING_PARTY_TIMEOUT_ACCOUNTS,
   RELYING_PARTY_TIMEOUT_CALL_CANISTER,
   RELYING_PARTY_TIMEOUT_PERMISSIONS,
   RELYING_PARTY_TIMEOUT_REQUEST_PERMISSIONS,
+  RELYING_PARTY_TIMEOUT_REQUEST_STATUS,
   RELYING_PARTY_TIMEOUT_REQUEST_SUPPORTED_STANDARD
 } from './constants/relying-party.constants';
 import {DEFAULT_SIGNER_WINDOW_TOP_RIGHT} from './constants/window.constants';
@@ -14,6 +16,7 @@ import {
   requestAccounts,
   requestCallCanister,
   requestPermissions,
+  requestStatus,
   requestSupportedStandards,
   retryRequestStatus
 } from './handlers/relying-party.handlers';
@@ -46,22 +49,35 @@ import {
 import type {ReadyOrError} from './utils/timeout.utils';
 import {windowFeatures} from './utils/window.utils';
 
+type WalletStatus = 'connected' | 'disconnected';
+
 export class RelyingParty {
   readonly #origin: Origin;
   readonly #popup: Window;
 
-  // TODO: we cannot destroy the relying party but the popup might be destroyed / closed manually
-  // - should we set origin and popup to null when closed?
-  // - should we expose a callback event to inform the consumer?
-  //
-  // PS: setInterval(() => if popup.closed {reset}, 1000)
+  readonly #onDisconnect;
+
+  #walletStatus: WalletStatus = 'connected';
+  readonly #walletStatusInterval: NodeJS.Timeout;
 
   // TODO: maybe we also want to make the relying party a bit more opiniated in the sense that on connect or each time a request is sent, we can first check if the desired standards is supported.
   // e.g. I'm the client and I ask for "accounts" but actually the signer does not support accounts.
 
-  protected constructor({origin, popup}: {origin: Origin; popup: Window}) {
+  protected constructor({
+    origin,
+    popup,
+    onDisconnect
+  }: {origin: Origin; popup: Window} & Pick<RelyingPartyOptions, 'onDisconnect'>) {
     this.#origin = origin;
     this.#popup = popup;
+
+    this.#onDisconnect = onDisconnect;
+
+    this.#walletStatus = 'connected';
+    this.#walletStatusInterval = setInterval(
+      this.checkWalletStatusCallback,
+      RELYING_PARTY_CHECK_WALLET_STATUS_INTERVAL
+    );
   }
 
   // TODO: create an opinionated extends of RelyingParty which does connect + request accounts in one short
@@ -75,10 +91,14 @@ export class RelyingParty {
    * @param {RelyingPartyOptions} options - The options to initialize the signer.
    * @returns {Promise<RelyingParty>} A promise that resolves to an object, which can be used to interact with the signer when it is connected.
    */
-  static async connect(options: RelyingPartyOptions): Promise<RelyingParty> {
+  static async connect({onDisconnect, ...rest}: RelyingPartyOptions): Promise<RelyingParty> {
     return await this.connectSigner({
-      options,
-      init: (params: {origin: Origin; popup: Window}) => new RelyingParty(params)
+      options: rest,
+      init: (params: {origin: Origin; popup: Window}) =>
+        new RelyingParty({
+          ...params,
+          onDisconnect
+        })
     });
   }
 
@@ -203,8 +223,63 @@ export class RelyingParty {
    * @returns {Promise<void>} A promise that resolves when the signer has been successfully disconnected.
    */
   disconnect = async (): Promise<void> => {
+    clearInterval(this.#walletStatusInterval);
     this.#popup.close();
+    this.#onDisconnect?.();
   };
+
+  private checkWalletStatusCallback = (): void => {
+    void this.checkWalletStatus();
+  };
+
+  private async checkWalletStatus() {
+    const handleMessage = async ({
+      data,
+      id
+    }: {
+      data: RelyingPartyMessageEventData;
+      id: RpcId;
+    }): Promise<{handled: boolean; result: WalletStatus}> => {
+      const {success: isWalletReady, data: walletReadyData} =
+        IcrcReadyResponseSchema.safeParse(data);
+      if (isWalletReady && id === walletReadyData?.id) {
+        return {handled: true, result: 'connected'};
+      }
+
+      // This can only happen in the rare event that the Wallet is disconnected immediately after the postMessage inquiring about the status is emitted.
+      return {handled: true, result: 'disconnected'};
+    };
+
+    const postRequest = (id: RpcId): void => {
+      requestStatus({
+        popup: this.#popup,
+        origin: this.#origin,
+        id
+      });
+    };
+
+    const checkWalletStatus = async (): Promise<WalletStatus> => {
+      try {
+        return await this.request<WalletStatus>({
+          options: {
+            timeoutInMilliseconds: RELYING_PARTY_TIMEOUT_REQUEST_STATUS
+          },
+          postRequest,
+          handleMessage
+        });
+      } catch (_err: unknown) {
+        return 'disconnected';
+      }
+    };
+
+    this.#walletStatus = await checkWalletStatus();
+
+    if (this.#walletStatus === 'connected') {
+      return;
+    }
+
+    await this.disconnect();
+  }
 
   /**
    * Sends an asynchronous request to the signer and handles the response with the provided handlers.
@@ -237,6 +312,8 @@ export class RelyingParty {
     }) => Promise<{handled: boolean; result?: T}>;
   }): Promise<T> =>
     await new Promise<T>((resolve, reject) => {
+      // TODO: is window is closed or wallet status is disconnected, the request cannot be performed therefore we should throw an error
+
       const {success: optionsSuccess, error} = RelyingPartyRequestOptionsSchema.safeParse(options);
 
       if (!optionsSuccess) {

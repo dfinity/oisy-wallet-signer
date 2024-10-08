@@ -72,4 +72,26 @@ describe('RelyingPartyOptions', () => {
     const result = RelyingPartyOptionsSchema.safeParse(validData);
     expect(result.success).toBe(true);
   });
+
+  it('should validate with the optional onDisconnect callback', () => {
+    const validData = {
+      url: 'https://example.com',
+      onDisconnect: () => {
+        // Do nothing
+      }
+    };
+
+    const result = RelyingPartyOptionsSchema.safeParse(validData);
+    expect(result.success).toBe(true);
+  });
+
+  it('should fail validation if onDisconnect is not a function', () => {
+    const invalidData = {
+      url: 'https://example.com',
+      onDisconnect: 'not-a-function' // Invalid type for onDisconnect
+    };
+
+    const result = RelyingPartyOptionsSchema.safeParse(invalidData);
+    expect(result.success).toBe(false);
+  });
 });

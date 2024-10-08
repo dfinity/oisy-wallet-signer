@@ -43,6 +43,10 @@ const WindowOptionsSchema = z.object({
 
 export type WindowOptions = z.infer<typeof WindowOptionsSchema>;
 
+const OnDisconnectSchema = z.function().args().returns(z.void()).optional();
+
+export type OnDisconnect = z.infer<typeof OnDisconnectSchema>;
+
 export const RelyingPartyOptionsSchema = z.object({
   /**
    * The URL of the signer.
@@ -58,7 +62,12 @@ export const RelyingPartyOptionsSchema = z.object({
   /**
    * The connection options for establishing the connection with the signer.
    */
-  connectionOptions: ConnectionOptionsSchema.optional()
+  connectionOptions: ConnectionOptionsSchema.optional(),
+
+  /**
+   * Optional callback function that is triggered when the relying party disconnects from the wallet.
+   */
+  onDisconnect: OnDisconnectSchema
 });
 
 export type RelyingPartyOptions = z.infer<typeof RelyingPartyOptionsSchema>;
