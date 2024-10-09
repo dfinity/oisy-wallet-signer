@@ -408,3 +408,37 @@ const accounts = await wallet.accounts();
 
 const account = accounts?.[0];
 ```
+
+### 4. Call Canister
+
+Finally, you are ready to call the canister to transfer ICP (or ICRC tokens if you are using `IcrcWallet`).
+
+The opinionated clients of this library use the same interfaces as their counterparts that do not require a signer but operate imperatively—namely, `@dfinity/ledger-icp` and `@dfinity/ledger-icrc`. This means that any payload you provide as a request or receive as a response is identical to those used by these standard interfaces.
+
+For example, let's say we want to transfer ICP from the account the user have in the wallet to the one registered in your client.
+
+```typescript
+import type {Account} from '@dfinity/ledger-icp';
+
+const E8S_PER_ICP = 100_000_000n;
+const ONE_ICP = 1n * E8S_PER_ICP;
+
+const to: Account = {
+  owner: YOUR_USER_PRINCIPAL,
+  subaccount: []
+};
+
+const request = {
+  owner: to,
+  amount: ONE_ICP
+};
+
+await wallet.icrc1Transfer({
+  owner: account.owner,
+  request
+});
+```
+
+The `request` argument is the payload for the transfer. It contains the standard information required to send ICP. In this example, the target recipient is the user signed in to your app (without a subaccount), and we aim to transfer 1 ICP.
+
+To process the canister call, the request needs to be initiated for a known account, which is why the `owner` of the `icrc1Transfer` is set to the `account` that was resolved in the previous chapter.
