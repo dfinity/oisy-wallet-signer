@@ -458,3 +458,60 @@ You can find various examples of the library's implementation in the [demo](./de
   1. A [demo](./demo/src/relying_party_frontend/src/routes/+page.svelte) that simulates a "real-life" usage scenario of the library in an application, such as in a webshop.
   2. An extended [client](./demo/src/relying_party_frontend/src/routes/dev/+page.svelte) primarily used for end-to-end (E2E) testing, allowing for the evaluation of each standard separately.
 
+### Running Tests Locally
+
+Proceed as follows to run the test suite locally:
+
+```bash
+git clone https://github.com/dfinity/oisy-wallet-signer
+cd oisy-wallet-signer
+npm ci
+npm run test
+```
+
+### Running E2E Tests Locally
+
+While the test suite covers most cases, the library is also covered by some E2E tests that focus more on "happy path" scenarios rather than "extended edge cases".
+
+To run these those locally, you'll need to install the Juno CLI. Follow the steps below:
+
+1. Install Docker:
+
+Make sure you have Docker installed on your machine ([Windows](https://docs.docker.com/desktop/install/windows-install/), [MacOS](https://docs.docker.com/desktop/install/mac-install/), or [Linux](https://docs.docker.com/desktop/install/linux-install/)).
+
+> [!NOTE]
+> For MacBooks with M processors, it is important to use Docker Desktop version 4.25.0 or later, ideally the latest available version.
+
+2. Install Juno CLI:
+
+```bash
+npm i -g @junobuild/cli
+```
+
+3. Start the Demo:
+
+Navigate to the [demo](./demo) directory and start the environment:
+
+> [!NOTE]
+> Each command should be run in a separate terminal or in the background.
+
+```bash
+cd demo
+juno dev start
+npm run dev:party
+npm run dev:wallet
+```
+
+4. Run the Tests:
+
+Return to the root directory and execute the tests:
+
+```
+npm run e2e
+```
+
+## 🧑‍🤝‍🧑 Community
+
+- [Identity and Wallet Standards](https://github.com/dfinity/wg-identity-authentication/)
+- [Forum](https://forum.dfinity.org/)
+- [Discord](https://discord.gg/E9FxceAg2j)
