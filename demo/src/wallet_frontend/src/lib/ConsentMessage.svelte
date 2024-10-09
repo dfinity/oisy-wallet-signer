@@ -1,11 +1,11 @@
 <script lang="ts">
 	import type { Signer } from '@dfinity/oisy-wallet-signer/signer';
 	import { isNullish, nonNullish } from '@dfinity/utils';
-	import type { icrc21_consent_info } from '@dfinity/oisy-wallet-signer';
 	import {
 		type ConsentMessageApproval,
 		type ConsentMessagePromptPayload,
 		type ResultConsentMessage,
+		type icrc21_consent_info,
 		ICRC21_CALL_CONSENT_MESSAGE,
 		type Rejection
 	} from '@dfinity/oisy-wallet-signer';
