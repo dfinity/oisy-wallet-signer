@@ -59,6 +59,14 @@ const signer = Signer.init({
 });
 ```
 
+### 2. Implement the Disconnection
 
+Before moving on, it's important to implement the disconnection of the signer. This can happen when your user signs out or when the component in which it is used is unmounted.
+
+```typescript
+signer?.disconnect();
+```
+
+Disconnecting the signer removes its listener and also resets the origin indication with which it was communicating.
 
 
