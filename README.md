@@ -335,7 +335,7 @@ const wallet = await IcpWallet.connect({
       position: 'center',
       features: DEFAULT_SIGNER_WINDOW_FEATURES
    },
-   url: 'https://staging.oisy.com/sign',
+   url: 'http://localhost:5174/sign',
    onDisconnect
 });
 ```
