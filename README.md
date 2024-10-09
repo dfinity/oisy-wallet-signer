@@ -154,3 +154,72 @@ The flow works as follows:
 3. In your app or wallet, you receive the `approve` callback.
 4. You either prompt your user to select a list of accounts, or your application automatically decides which accounts can be shared. For example, you store those accounts in a variable called `yourAccounts`.
 5. Finally, you approve the accounts to the signer by calling the callback: `approve(yourAccounts);`.
+
+#### C. Consent Message
+
+The signer will never execute a call to a canister without first prompting your wallet or project to approve or deny the action.
+
+To provide explanation on the action being requested, the signer retrieves a, hopefully, human-readable consent message from the targeted canister, as defined by the [ICRC-21: Canister Call Consent Messages](https://github.com/dfinity/wg-identity-authentication/blob/main/topics/ICRC-21/icrc_21_consent_msg.md) specification, and displays it for your user's review.
+
+Since a consent message is only fetched when a canister call is requested, this prompt is triggered only if the necessary permissions to call canisters have been granted.
+
+```typescript
+let approve: ConsentMessageApproval | undefined = undefined;
+let reject: Rejection | undefined = undefined;
+let consentInfo: icrc21_consent_info | undefined = undefined;
+
+let loading = false;
+
+signer.register({
+    method: ICRC21_CALL_CONSENT_MESSAGE,
+    prompt: ({ status, ...rest }: ConsentMessagePromptPayload) => {
+        switch (status) {
+            case 'result': {
+                approve = rest.approve;
+                reject = rest.reject;
+                consentInfo = rest.consentInfo;
+                loading = false;
+                break;
+            }
+            case 'loading': {
+                loading = true;
+                break;
+            }
+            default: {
+                approve = undefined;
+                reject = undefined;
+                consentInfo = undefined;
+                loading = false;
+            }
+        }
+    }
+});
+```
+
+To register a prompt for permissions, you need to specify the method `ICRC21_CALL_CONSENT_MESSAGE` and provide a callback that will be executed by the library each time a consent message is fetched.
+
+The `prompt` callback receives several parameters:
+
+- **`status`**: Fetching a consent message requires an **update call**, which can take a few seconds to complete. Additionally, the process might encounter errors due to networking issues or if the targeted canister does not implement such an API. For this reason, the callback might be triggered multiple times per call, each time providing a different status.
+- **`approve`**: A callback used to approve the consent message. Approving the message instructs the signer to proceed with executing the requested call to the targeted canister.
+- **`reject`**: A callback to reject the canister call, meaning no action will be taken, and the client will receive an error in response.
+- **`consentInfo`**: The information containing the consent message, formatted in Markdown.
+
+> [!NOTE]
+> The OISY Wallet Signer currently supports only a generic display of the consent message.
+
+The flow works as follows:
+
+1. The client requests a call to a canister.
+2. The signer checks the permissions:
+   - If the permissions have neither been granted nor denied, the signer prompts you to confirm or deny the scopes.
+   - If permissions have been denied, the signer responds with an error.
+   - If permissions are granted, the `prompt` callback is triggered by the signer with the status `loading`.
+3. The signer fetches the consent message:
+   - If fetching the message fails, the callback is triggered with the status `error`, and the client is notified with an error.
+   - If fetching succeeds, your app or wallet receives the consent information (`consentInfo`), along with the `approve` and `reject` callbacks.
+4. You present the formatted consent message to your user and prompt them to either approve or deny the call to the canister.
+5. Based on your user's decision, you either approve or reject the canister call:
+   - To reject, you execute the callback `reject();`, which prompts the signer to respond to the client with an error.
+   - To approve, you execute the callback `approve();`, instructing the signer to proceed with executing the canister call.
+
