@@ -223,3 +223,40 @@ The flow works as follows:
    - To reject, you execute the callback `reject();`, which prompts the signer to respond to the client with an error.
    - To approve, you execute the callback `approve();`, instructing the signer to proceed with executing the canister call.
 
+#### D. Call Canister
+
+Calling a canister does not require direct interaction from your wallet or project. However, you might want to provide some visual feedback to your users while the call is being executed or to inform them when it succeeds or fails. For this purpose, you can register a prompt for the [ICRC-49: Call Canister](https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_49_call_canister.md) specification.
+
+The signer will execute the call only if the necessary permissions have been granted and the consent message has been approved.
+
+```typescript
+let status: Status | undefined = undefined;
+
+signer.register({
+   method: ICRC49_CALL_CANISTER,
+   prompt: ({ status: callCanisterStatus, ...rest }: CallCanisterPromptPayload) => {
+      status = callCanisterStatus;
+   }
+});
+```
+
+To register a prompt for a call to a canister, you need to specify the method `ICRC49_CALL_CANISTER` and provide a callback that will be executed by the library.
+
+The `prompt` callback receives several parameters:
+
+- **`status`**: The callback may be triggered multiple times per call, each time providing a different status: `loading`, `result`, or `error`.
+- **`result`**: If the call to the canister succeeds, the prompt provides the results. These results include a `contentMap` and a `certificate`, both of which are blobs.
+- **`error`**: If the call fails, any errors returned by the canister or network (if available) will be provided by the prompt.
+
+> [!TIP]
+> In OISY Wallet, we do not display the result or error. We only interpret the status, as the actual results of the call to the canister are expected to be handled by the client that requested the signer to execute the action.
+
+The flow works as follows:
+
+> [!NOTE]
+> The flow that leads to executing the call to the canister is described in the previous chapter, "Consent Message." The following description assumes that the permissions and consent message have been approved.
+
+1. Before initiating the call to the canister, the signer prompts to inform that the request is about to start, with the status set to `loading`.
+2. The call to the canister is executed.
+3. Upon receiving a result or error, the prompt is triggered with the appropriate status, and a corresponding response is sent to the client. 
+
