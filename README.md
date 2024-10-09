@@ -83,14 +83,14 @@ That is why, to effectively implement these features, you need to register promp
 
 #### A. Request Permissions
 
-Any actions supported by the OISY Wallet Signer library has to be first granted by the user of your wallet or project as defined by the ICRC-25: Signer Interaction Standard.
+Any actions supported by the OISY Wallet Signer library has to be first granted by the user of your wallet or project as defined by the [ICRC-25: Signer Interaction Standard](https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_request_permissions).
 
 If a permission is granted, an action can be performed. If never granted nor approved, the library will continue to prompt for permission each time the action is requested. If denied, it will deny the access to the actions and respond with an error to the client.
 
 The permissions prompt is triggered upon explicit request by the client but, automatically as well if the signer detects that an action is called and those have never been set.
 
 > [!NOTE]
-> Permissions have a lifecycle which is currrently set to 7 days. This means that user of your wallet or project will potentially be prompted every week to re-confirm the permissions they have set.
+> Permissions have a lifecycle that is currently set to 7 days. This means that users of your wallet or project may be prompted every week to re-confirm the permissions they have set.
 
 ```typescript
 let scopes: IcrcScope[] | undefined = undefined;
@@ -107,7 +107,7 @@ signer.register({
 
 To register a prompt for permissions, you need to specify the method `ICRC25_REQUEST_PERMISSIONS` and provide a callback that will be executed by the library each time permissions are requested.
 
-The callback receives two parameters:
+The `prompt` callback receives two parameters:
 
 - **`requestedScopes`**: The requested scopes that need to be approved or denied. For example, this could include permissions like listing accounts or initiating actions to call canisters.
 - **`confirm`**: A callback that can be used to respond to the signer and, by extension, to the client, with the permissions that were granted or denied.
@@ -118,3 +118,39 @@ The flow works as follows:
 2. In your app or wallet, you receive the `requestedScopes` and the `confirm` callback.
 3. You either prompt your user to approve or deny the requested scopes, or your application automatically makes these decisions. For example, the result of this decision-making process might be stored in a variable called `yourScopes`.
 4. Finally, you confirm the permissions to the signer by calling the callback: `confirm(yourScopes);`.
+
+#### B. Accounts
+
+The client can request information about the accounts managed by your wallet or project. This behavior is defined by the [ICRC-27: Accounts](https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_27_accounts.md) specification.
+
+The corresponding prompt is triggered each time the account list is requested if the necessary permissions have been granted.
+
+If the client requests the accounts and the permissions have been denied, the signer will automatically respond with an error. If the permissions have neither been granted nor denied, you will be prompted to make this decision first.
+
+```typescript
+let approve: AccountsApproval | undefined = undefined;
+
+signer.register({
+    method: ICRC27_ACCOUNTS,
+    prompt: ({ approve: approveAccounts }: AccountsPromptPayload) => {
+        approve = approveAccounts;
+    }
+});
+```
+
+To register a prompt for accounts, you need to specify the method `ICRC27_ACCOUNTS` and provide a callback that will be executed by the library each time accounts are requested.
+
+The `prompt` callback receives a sole parameter:
+
+- **`approve`**: A callback that can be used to respond to the signer and, by extension, to the client, with the accounts.
+
+The flow works as follows:
+
+1. The client requests the list of accounts.
+2. The signer checks the permissions.
+   a. If never granted or denied, the signer prompts you to confirm or deny the scopes.
+   b. If denied, it responds with an error.
+   c. If permissions are granted, the `prompt` callback is triggered by the signer.
+3. In your app or wallet, you receive the `approve` callback.
+4. You either prompt your user to select a list of accounts, or your application automatically decides which accounts can be shared. For example, you store those accounts in a variable called `yourAccounts`.
+5. Finally, you approve the accounts to the signer by calling the callback: `approve(yourAccounts);`.
