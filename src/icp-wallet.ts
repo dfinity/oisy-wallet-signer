@@ -40,6 +40,7 @@ export class IcpWallet extends RelyingParty {
   // TODO: documentation
   // TODO: return BlockHeight?
   // TODO: zod but, we have to redeclare Icrc1TransferRequest
+  // TODO: extends with call options
   public icrc1Transfer = async ({
     request,
     owner,
