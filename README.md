@@ -41,6 +41,8 @@ To use the OISY Wallet Signer within your wallet or project, follow these steps:
 Turning your application into a signer that starts listening and processing ICRC messages requires the initialization of a `Signer` object.
 
 ```typescript
+import { Signer } from '@dfinity/oisy-wallet-signer/signer';
+
 const signer = Signer.init({
     owner
 });
@@ -93,6 +95,13 @@ The permissions prompt is triggered upon explicit request by the client but, aut
 > Permissions have a lifecycle that is currently set to 7 days. This means that users of your wallet or project may be prompted every week to re-confirm the permissions they have set.
 
 ```typescript
+import {
+   ICRC25_REQUEST_PERMISSIONS,
+   type IcrcScope,
+   type PermissionsConfirmation,
+   type PermissionsPromptPayload
+} from '@dfinity/oisy-wallet-signer';
+
 let scopes: IcrcScope[] | undefined = undefined;
 let confirm: PermissionsConfirmation | undefined = undefined;
 
@@ -128,6 +137,12 @@ The corresponding prompt is triggered each time the account list is requested if
 If the client requests the accounts and the permissions have been denied, the signer will automatically respond with an error. If the permissions have neither been granted nor denied, you will be prompted to make this decision first.
 
 ```typescript
+import {
+   ICRC27_ACCOUNTS,
+   type AccountsApproval,
+   type AccountsPromptPayload
+} from '@dfinity/oisy-wallet-signer';
+
 let approve: AccountsApproval | undefined = undefined;
 
 signer.register({
@@ -164,6 +179,15 @@ To provide explanation on the action being requested, the signer retrieves a, ho
 Since a consent message is only fetched when a canister call is requested, this prompt is triggered only if the necessary permissions to call canisters have been granted.
 
 ```typescript
+import {
+   type ConsentMessageApproval,
+   type ConsentMessagePromptPayload,
+   type ResultConsentMessage,
+   type icrc21_consent_info,
+   ICRC21_CALL_CONSENT_MESSAGE,
+   type Rejection
+} from '@dfinity/oisy-wallet-signer';
+
 let approve: ConsentMessageApproval | undefined = undefined;
 let reject: Rejection | undefined = undefined;
 let consentInfo: icrc21_consent_info | undefined = undefined;
@@ -230,6 +254,12 @@ Calling a canister does not require direct interaction from your wallet or proje
 The signer will execute the call only if the necessary permissions have been granted and the consent message has been approved.
 
 ```typescript
+import {
+   type CallCanisterPromptPayload,
+   ICRC49_CALL_CANISTER,
+   type Status
+} from '@dfinity/oisy-wallet-signer';
+
 let status: Status | undefined = undefined;
 
 signer.register({
