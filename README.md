@@ -442,3 +442,19 @@ await wallet.icrc1Transfer({
 The `request` argument is the payload for the transfer. It contains the standard information required to send ICP. In this example, the target recipient is the user signed in to your app (without a subaccount), and we aim to transfer 1 ICP.
 
 To process the canister call, the request needs to be initiated for a known account, which is why the `owner` of the `icrc1Transfer` is set to the `account` that was resolved in the previous chapter.
+
+## 💁‍♂️️ Tips & Tricks
+
+### Examples
+
+You can find various examples of the library's implementation in the [demo](./demo).
+
+> [!TIP]
+> These examples are implemented in Svelte v5.
+
+- The [wallet](./demo/src/wallet_frontend) frontend app is a test application that demonstrates the signer's capabilities of the library.
+
+- The [relying party](./demo/src/relying_party_frontend) is a client that contains two distinct routes:
+  1. A [demo](./demo/src/relying_party_frontend/src/routes/+page.svelte) that simulates a "real-life" usage scenario of the library in an application, such as in a webshop.
+  2. An extended [client](./demo/src/relying_party_frontend/src/routes/dev/+page.svelte) primarily used for end-to-end (E2E) testing, allowing for the evaluation of each standard separately.
+
