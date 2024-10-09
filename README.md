@@ -290,3 +290,10 @@ The flow works as follows:
 2. The call to the canister is executed.
 3. Upon receiving a result or error, the prompt is triggered with the appropriate status, and a corresponding response is sent to the client. 
 
+## ✍️ Usage in a Client
+
+As mentioned in the introduction, this library is primarily developed for OISY. However, it also includes opinionated clients that enable interactions with the ICP or ICRC ledgers in any JavaScript application.
+
+> [!IMPORTANT]
+> These clients are not yet used by any known dApps, which is why they currently only support ICRC-1 transfers. If you wish to use other ICRC methods or ICP transfers, please reach out.
+
