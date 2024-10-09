@@ -297,3 +297,45 @@ As mentioned in the introduction, this library is primarily developed for OISY. 
 > [!IMPORTANT]
 > These clients are not yet used by any known dApps, which is why they currently only support ICRC-1 transfers. If you wish to use other ICRC methods or ICP transfers, please reach out.
 
+### 1. Initialize a Wallet
+
+Communicating with a wallet or project that supports signer standards is initialized by creating a client.
+
+> [!NOTE]
+> In this and the following chapters, we use the `IcpWallet` client to interact with the ICP ledger through a signer. However, the approach is similar if you wish to communicate with an ICRC ledger through a signer; in that case, use the other exposed client, the `IcrcWallet`.
+
+```typescript
+import { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
+
+const wallet = await IcpWallet.connect({
+   url: 'https://staging.oisy.com/sign'
+});
+```
+
+The `url` is the URL of the signer to which you would like to connect. In the case of OISY, the production URL is `https://staging.oisy.com/sign`. If you wish to connect to a local wallet or project, you can, for example, specify a URL like `http://localhost:5174/sign`. 
+
+In addition to this parameter, the connection can also be established with various additional parameters:
+
+- **`windowOptions`**: Allows you to specify how the popup with the wallet or project that acts as a signer should be opened. You can define its position (e.g., centered or top-right) and set specific dimensions. By default, the signer is opened as a popup at the top-right edge of the user's browser on desktop or as a separate tab on mobile.
+- **`connectionOptions`**: Lets you specify timeout and polling options when establishing the connection with the signer.
+- **`onDisconnect`**: By providing this callback, your application can be notified if the user closes the signer window.
+
+For example:
+
+```typescript
+import { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
+import { DEFAULT_SIGNER_WINDOW_FEATURES } from '@dfinity/oisy-wallet-signer';
+
+const onDisconnect = (): void => console.log("The user has close the wallet popup.");
+
+const wallet = await IcpWallet.connect({
+   windowOptions: {
+      width: 576,
+      height: 625,
+      position: 'center',
+      features: DEFAULT_SIGNER_WINDOW_FEATURES
+   },
+   url: 'https://staging.oisy.com/sign',
+   onDisconnect
+});
+```
