@@ -41,10 +41,10 @@ To use the OISY Wallet Signer within your wallet or project, follow these steps:
 Turning your application into a signer that starts listening and processing ICRC messages requires the initialization of a `Signer` object.
 
 ```typescript
-import { Signer } from '@dfinity/oisy-wallet-signer/signer';
+import {Signer} from '@dfinity/oisy-wallet-signer/signer';
 
 const signer = Signer.init({
-    owner
+  owner
 });
 ```
 
@@ -56,8 +56,8 @@ The `owner` is the non-anonymous identity that can interact with the signer. Com
 
 ```typescript
 const signer = Signer.init({
-    owner,
-    host: 'http://localhost:4943'
+  owner,
+  host: 'http://localhost:4943'
 });
 ```
 
@@ -66,7 +66,7 @@ const signer = Signer.init({
 Before moving on, it's important to implement the disconnection of the signer. This can happen when your user signs out or when the component in which it is used is unmounted.
 
 ```typescript
-signer?.disconnect();
+signer.disconnect();
 ```
 
 Disconnecting the signer removes its listener and also resets the origin indication with which it was communicating.
@@ -96,21 +96,21 @@ The permissions prompt is triggered upon explicit request by the client but, aut
 
 ```typescript
 import {
-   ICRC25_REQUEST_PERMISSIONS,
-   type IcrcScope,
-   type PermissionsConfirmation,
-   type PermissionsPromptPayload
+  ICRC25_REQUEST_PERMISSIONS,
+  type IcrcScope,
+  type PermissionsConfirmation,
+  type PermissionsPromptPayload
 } from '@dfinity/oisy-wallet-signer';
 
 let scopes: IcrcScope[] | undefined = undefined;
 let confirm: PermissionsConfirmation | undefined = undefined;
 
 signer.register({
-    method: ICRC25_REQUEST_PERMISSIONS,
-    prompt: ({ confirm: confirmScopes, requestedScopes }: PermissionsPromptPayload) => {
-        scopes = requestedScopes;
-        confirm = confirmScopes;
-    }
+  method: ICRC25_REQUEST_PERMISSIONS,
+  prompt: ({confirm: confirmScopes, requestedScopes}: PermissionsPromptPayload) => {
+    scopes = requestedScopes;
+    confirm = confirmScopes;
+  }
 });
 ```
 
@@ -138,18 +138,18 @@ If the client requests the accounts and the permissions have been denied, the si
 
 ```typescript
 import {
-   ICRC27_ACCOUNTS,
-   type AccountsApproval,
-   type AccountsPromptPayload
+  ICRC27_ACCOUNTS,
+  type AccountsApproval,
+  type AccountsPromptPayload
 } from '@dfinity/oisy-wallet-signer';
 
 let approve: AccountsApproval | undefined = undefined;
 
 signer.register({
-    method: ICRC27_ACCOUNTS,
-    prompt: ({ approve: approveAccounts }: AccountsPromptPayload) => {
-        approve = approveAccounts;
-    }
+  method: ICRC27_ACCOUNTS,
+  prompt: ({approve: approveAccounts}: AccountsPromptPayload) => {
+    approve = approveAccounts;
+  }
 });
 ```
 
@@ -180,12 +180,12 @@ Since a consent message is only fetched when a canister call is requested, this 
 
 ```typescript
 import {
-   type ConsentMessageApproval,
-   type ConsentMessagePromptPayload,
-   type ResultConsentMessage,
-   type icrc21_consent_info,
-   ICRC21_CALL_CONSENT_MESSAGE,
-   type Rejection
+  type ConsentMessageApproval,
+  type ConsentMessagePromptPayload,
+  type ResultConsentMessage,
+  type icrc21_consent_info,
+  ICRC21_CALL_CONSENT_MESSAGE,
+  type Rejection
 } from '@dfinity/oisy-wallet-signer';
 
 let approve: ConsentMessageApproval | undefined = undefined;
@@ -195,28 +195,28 @@ let consentInfo: icrc21_consent_info | undefined = undefined;
 let loading = false;
 
 signer.register({
-    method: ICRC21_CALL_CONSENT_MESSAGE,
-    prompt: ({ status, ...rest }: ConsentMessagePromptPayload) => {
-        switch (status) {
-            case 'result': {
-                approve = rest.approve;
-                reject = rest.reject;
-                consentInfo = rest.consentInfo;
-                loading = false;
-                break;
-            }
-            case 'loading': {
-                loading = true;
-                break;
-            }
-            default: {
-                approve = undefined;
-                reject = undefined;
-                consentInfo = undefined;
-                loading = false;
-            }
-        }
+  method: ICRC21_CALL_CONSENT_MESSAGE,
+  prompt: ({status, ...rest}: ConsentMessagePromptPayload) => {
+    switch (status) {
+      case 'result': {
+        approve = rest.approve;
+        reject = rest.reject;
+        consentInfo = rest.consentInfo;
+        loading = false;
+        break;
+      }
+      case 'loading': {
+        loading = true;
+        break;
+      }
+      default: {
+        approve = undefined;
+        reject = undefined;
+        consentInfo = undefined;
+        loading = false;
+      }
     }
+  }
 });
 ```
 
@@ -255,18 +255,18 @@ The signer will execute the call only if the necessary permissions have been gra
 
 ```typescript
 import {
-   type CallCanisterPromptPayload,
-   ICRC49_CALL_CANISTER,
-   type Status
+  type CallCanisterPromptPayload,
+  ICRC49_CALL_CANISTER,
+  type Status
 } from '@dfinity/oisy-wallet-signer';
 
 let status: Status | undefined = undefined;
 
 signer.register({
-   method: ICRC49_CALL_CANISTER,
-   prompt: ({ status: callCanisterStatus, ...rest }: CallCanisterPromptPayload) => {
-      status = callCanisterStatus;
-   }
+  method: ICRC49_CALL_CANISTER,
+  prompt: ({status: callCanisterStatus, ...rest}: CallCanisterPromptPayload) => {
+    status = callCanisterStatus;
+  }
 });
 ```
 
@@ -288,7 +288,7 @@ The flow works as follows:
 
 1. Before initiating the call to the canister, the signer prompts to inform that the request is about to start, with the status set to `loading`.
 2. The call to the canister is executed.
-3. Upon receiving a result or error, the prompt is triggered with the appropriate status, and a corresponding response is sent to the client. 
+3. Upon receiving a result or error, the prompt is triggered with the appropriate status, and a corresponding response is sent to the client.
 
 ## ✍️ Usage in a Client
 
@@ -305,14 +305,14 @@ Communicating with a wallet or project that supports signer standards is initial
 > In this and the following chapters, we use the `IcpWallet` client to interact with the ICP ledger through a signer. However, the approach is similar if you wish to communicate with an ICRC ledger through a signer; in that case, use the other exposed client, the `IcrcWallet`.
 
 ```typescript
-import { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
+import {IcpWallet} from '@dfinity/oisy-wallet-signer/icp-wallet';
 
 const wallet = await IcpWallet.connect({
-   url: 'https://staging.oisy.com/sign'
+  url: 'https://staging.oisy.com/sign'
 });
 ```
 
-The `url` is the URL of the signer to which you would like to connect. In the case of OISY, the production URL is `https://staging.oisy.com/sign`. If you wish to connect to a local wallet or project, you can, for example, specify a URL like `http://localhost:5174/sign`. 
+The `url` is the URL of the signer to which you would like to connect. In the case of OISY, the production URL is `https://staging.oisy.com/sign`. If you wish to connect to a local wallet or project, you can, for example, specify a URL like `http://localhost:5174/sign`.
 
 In addition to this parameter, the connection can also be established with various additional parameters:
 
@@ -323,19 +323,88 @@ In addition to this parameter, the connection can also be established with vario
 For example:
 
 ```typescript
-import { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
-import { DEFAULT_SIGNER_WINDOW_FEATURES } from '@dfinity/oisy-wallet-signer';
+import {IcpWallet} from '@dfinity/oisy-wallet-signer/icp-wallet';
+import {DEFAULT_SIGNER_WINDOW_FEATURES} from '@dfinity/oisy-wallet-signer';
 
-const onDisconnect = (): void => console.log("The user has close the wallet popup.");
+const onDisconnect = (): void => console.log('The user has close the wallet popup.');
 
 const wallet = await IcpWallet.connect({
-   windowOptions: {
-      width: 576,
-      height: 625,
-      position: 'center',
-      features: DEFAULT_SIGNER_WINDOW_FEATURES
-   },
-   url: 'http://localhost:5174/sign',
-   onDisconnect
+  windowOptions: {
+    width: 576,
+    height: 625,
+    position: 'center',
+    features: DEFAULT_SIGNER_WINDOW_FEATURES
+  },
+  url: 'http://localhost:5174/sign',
+  onDisconnect
 });
+```
+
+### 2. Implement the Disconnection
+
+Before moving on, it's important to implement the disconnection of the wallet. This can happen when your user signs out or when the component in which it is used is unmounted.
+
+```typescript
+wallet.disconnect();
+```
+
+Disconnecting the wallet closes its popup, removes the listeners that are waiting for responses, and stops the polling that checks whether the wallet is still active.
+
+### 3. Request Permissions and Accounts
+
+When interacting with OISY, you don't need to explicitly request permissions to comply with the specification, as the signer library used by the wallet automatically handles permissions for you. However, based on the feedback we've gathered from early users, it seems that explicitly requesting permissions once, if necessary, before initiating any other actions provides a smoother and more intuitive experience.
+
+Similarly, you might want to display information in your app about the account(s) available in the signer. This is especially relevant when integrating with OISY, as it currently supports a single account and can respond to account requests without prompting the user (assuming the permissions have already been granted).
+
+For these reasons, we recommend chaining these two operations—requesting permissions and retrieving account information—after the connection has been established.
+
+> [!NOTE]
+> In the future, we may consider incorporating this pattern directly into the opinionated clients, so you won't need to implement it manually. If this approach resonates with you while using this library, please let us know.
+
+```typescript
+import {IcpWallet} from '@dfinity/oisy-wallet-signer/icp-wallet';
+import type {IcrcAccount, IcrcScopeMethod, IcrcScopesArray} from '@dfinity/oisy-wallet-signer';
+
+const wallet = await IcpWallet.connect({
+  url: 'https://staging.oisy.com/sign'
+});
+
+const permissions = await wallet.permissions();
+
+const requestPermissionsIfNeeded = async (): Promise<{allScopesGranted: boolean}> => {
+  const findNotGranted = (permissions: IcrcScopesArray): IcrcScopeMethod[] =>
+    permissions.filter(({state}) => state !== 'granted').map(({scope}) => scope);
+
+  const notGrantedScopes = findNotGranted(permissions);
+
+  if (notGrantedScopes.length === 0) {
+    return {allScopesGranted: true};
+  }
+
+  const result = await wallet.requestPermissions({
+    params: {
+      scopes: notGrantedScopes
+    }
+  });
+
+  const remainingNotGrantedScopes = findNotGranted(result ?? []);
+
+  if (remainingNotGrantedScopes.length === 0) {
+    return {allScopesGranted: true};
+  }
+
+  console.error('The wallet requires all permissions to be approved.');
+
+  return {allScopesGranted: false};
+};
+
+const {allScopesGranted} = await requestPermissionsIfNeeded();
+
+if (!allScopesGranted) {
+  return;
+}
+
+const accounts = await wallet.accounts();
+
+const account = accounts?.[0];
 ```
