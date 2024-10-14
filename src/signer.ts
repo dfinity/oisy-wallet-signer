@@ -125,40 +125,8 @@ export class Signer {
 
     // TODO: wrap a try catch around all handler and notify "Unexpected exception" in case if issues
 
-    const {handled: statusRequestHandled} = this.handleStatusRequest(message);
-    if (statusRequestHandled) {
-      return;
-    }
-
-    // At this point the connection with the relying party should have been initialized and the origin should be set.
-    const {valid} = this.assertNotUndefinedAndSameOrigin(message);
-    if (!valid) {
-      return;
-    }
-
-    const {handled: supportedStandardsRequestHandled} = this.handleSupportedStandards(message);
-    if (supportedStandardsRequestHandled) {
-      return;
-    }
-
-    const {handled: permissionsHandled} = this.handlePermissionsRequest(message);
-    if (permissionsHandled) {
-      return;
-    }
-
-    const {handled: requestsPermissionsHandled} =
-      await this.handleRequestPermissionsRequest(message);
-    if (requestsPermissionsHandled) {
-      return;
-    }
-
-    const {handled: accountsHandled} = await this.handleAccounts(message);
-    if (accountsHandled) {
-      return;
-    }
-
-    const {handled: callCanisterHandled} = await this.handleCallCanister(message);
-    if (callCanisterHandled) {
+    const {handled} = await this.handleMessage(message);
+    if (handled) {
       return;
     }
 
@@ -167,6 +135,47 @@ export class Signer {
       origin
     });
   };
+
+  private async handleMessage(message: SignerMessageEvent): Promise<{handled: boolean}> {
+    const {handled: statusRequestHandled} = this.handleStatusRequest(message);
+    if (statusRequestHandled) {
+      return {handled: true};
+    }
+
+    // At this point the connection with the relying party should have been initialized and the origin should be set.
+    const {valid} = this.assertNotUndefinedAndSameOrigin(message);
+    if (!valid) {
+      return {handled: true};
+    }
+
+    const {handled: supportedStandardsRequestHandled} = this.handleSupportedStandards(message);
+    if (supportedStandardsRequestHandled) {
+      return {handled: true};
+    }
+
+    const {handled: permissionsHandled} = this.handlePermissionsRequest(message);
+    if (permissionsHandled) {
+      return {handled: true};
+    }
+
+    const {handled: requestsPermissionsHandled} =
+      await this.handleRequestPermissionsRequest(message);
+    if (requestsPermissionsHandled) {
+      return {handled: true};
+    }
+
+    const {handled: accountsHandled} = await this.handleAccounts(message);
+    if (accountsHandled) {
+      return {handled: true};
+    }
+
+    const {handled: callCanisterHandled} = await this.handleCallCanister(message);
+    if (callCanisterHandled) {
+      return {handled: true};
+    }
+
+    return {handled: false};
+  }
 
   private setWalletOrigin({origin}: Pick<SignerMessageEvent, 'origin'>) {
     // We do not reassign the origin with the same value if it is already set. It is not a significant performance win.
