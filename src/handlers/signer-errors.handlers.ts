@@ -65,3 +65,14 @@ export const notifySenderNotAllowedError = (notify: Notify): void => {
     }
   });
 };
+
+export const notifyBusyError = (notify: Notify): void => {
+  notifyError({
+    ...notify,
+    error: {
+      code: SignerErrorCode.BUSY,
+      message:
+        'The signer is currently processing a request and cannot handle new requests at this time.'
+    }
+  });
+};
