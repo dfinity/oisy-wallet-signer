@@ -2065,7 +2065,8 @@ describe('Signer', () => {
                 });
 
                 it('should reset to idle', async () => {
-                  expect(spySetIdle).toHaveBeenCalledTimes(1);
+                  // Signer checks if accounts and handle permissions should be handled before call canister and we currently always reset to idle
+                  await vi.waitFor(() => expect(spySetIdle).toHaveBeenCalledTimes(3));
                 });
               });
 
