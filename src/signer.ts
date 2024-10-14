@@ -254,13 +254,15 @@ export class Signer {
   }
 
   private async handleWithBusy(
-    handler: () => Promise<{handled: boolean}>
+    handler: (setBusy: () => void) => Promise<{handled: boolean}>
   ): Promise<{handled: boolean}> {
-    this.#busy = true;
-
     try {
-      return await handler();
+      // There is maybe a better pattern but this way we avoid to duplicate the code that assign the state.
+      const setBusy = () => (this.#busy = true);
+
+      return await handler(setBusy);
     } finally {
+      // For simplicity reasons we always reset to state idle even if it was not set to busy as we do not want to hang on a busy state if an exception is thrown.
       this.setIdle();
     }
   }
@@ -447,13 +449,15 @@ export class Signer {
     data,
     origin
   }: SignerMessageEvent): Promise<{handled: boolean}> {
-    const handler = async (): Promise<{handled: boolean}> => {
+    const handler = async (setBusy: () => void): Promise<{handled: boolean}> => {
       const {success: isRequestPermissionsRequest, data: requestPermissionsData} =
         IcrcRequestAnyPermissionsRequestSchema.safeParse(data);
 
       if (!isRequestPermissionsRequest) {
         return {handled: false};
       }
+
+      setBusy();
 
       const {
         id: requestId,
@@ -581,13 +585,15 @@ export class Signer {
    * @returns {Object} An object with a boolean property `handled` indicating whether the request was handled.
    */
   private async handleAccounts({data, origin}: SignerMessageEvent): Promise<{handled: boolean}> {
-    const handler = async (): Promise<{handled: boolean}> => {
+    const handler = async (setBusy: () => void): Promise<{handled: boolean}> => {
       const {success: isAccountsRequest, data: accountsData} =
         IcrcAccountsRequestSchema.safeParse(data);
 
       if (!isAccountsRequest) {
         return {handled: false};
       }
+
+      setBusy();
 
       const {id: requestId} = accountsData;
 
@@ -693,13 +699,15 @@ export class Signer {
     data,
     origin
   }: SignerMessageEvent): Promise<{handled: boolean}> {
-    const handler = async (): Promise<{handled: boolean}> => {
+    const handler = async (setBusy: () => void): Promise<{handled: boolean}> => {
       const {success: isCallCanisterRequest, data: callData} =
         IcrcCallCanisterRequestSchema.safeParse(data);
 
       if (!isCallCanisterRequest) {
         return {handled: false};
       }
+
+      setBusy();
 
       const {id: requestId, params} = callData;
 
