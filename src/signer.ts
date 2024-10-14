@@ -134,19 +134,15 @@ export class Signer {
 
     // TODO: wrap a try catch around all handler and notify "Unexpected exception" in case if issues
 
-    try {
-      const {handled} = await this.handleMessage(message);
-      if (handled) {
-        return;
-      }
-
-      notifyErrorRequestNotSupported({
-        id: requestData?.id ?? null,
-        origin
-      });
-    } finally {
-      this.setIdle();
+    const {handled} = await this.handleMessage(message);
+    if (handled) {
+      return;
     }
+
+    notifyErrorRequestNotSupported({
+      id: requestData?.id ?? null,
+      origin
+    });
   };
 
   private async handleMessage(message: SignerMessageEvent): Promise<{handled: boolean}> {
@@ -262,11 +258,11 @@ export class Signer {
   ): Promise<{handled: boolean}> {
     this.#busy = true;
 
-    return await handler();
-  }
-
-  private setIdle() {
-    this.#busy = false;
+    try {
+      return await handler();
+    } finally {
+      this.#busy = false;
+    }
   }
 
   /**
