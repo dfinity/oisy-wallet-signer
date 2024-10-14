@@ -3,6 +3,7 @@ import {SignerErrorCode} from '../constants/signer.constants';
 import {mockErrorNotify} from '../mocks/signer-error.mocks';
 import {JSON_RPC_VERSION_2, type RpcId, type RpcResponseWithError} from '../types/rpc';
 import {
+  notifyBusyError,
   notifyErrorActionAborted,
   notifyErrorPermissionNotGranted,
   notifyErrorRequestNotSupported,
@@ -155,6 +156,26 @@ describe('Signer-errors.handlers', () => {
       };
 
       notifySenderNotAllowedError({id: requestId, origin: testOrigin});
+
+      const expectedMessage: RpcResponseWithError = {
+        jsonrpc: JSON_RPC_VERSION_2,
+        id: requestId,
+        error
+      };
+
+      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, testOrigin);
+    });
+  });
+
+  describe('notifyBusyError', () => {
+    it('should post an error message indicating the signer is busy', () => {
+      const error = {
+        code: SignerErrorCode.BUSY,
+        message:
+          'The signer is currently processing a request and cannot handle new requests at this time.'
+      };
+
+      notifyBusyError({id: requestId, origin: testOrigin});
 
       const expectedMessage: RpcResponseWithError = {
         jsonrpc: JSON_RPC_VERSION_2,

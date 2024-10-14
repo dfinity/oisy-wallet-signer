@@ -19,6 +19,11 @@ export enum SignerErrorCode {
   SENDER_NOT_ALLOWED = 502,
 
   /**
+   * The signer is currently processing a request and cannot handle new requests.
+   */
+  BUSY = 503,
+
+  /**
    * A generic error.
    * @see https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#errors
    */
