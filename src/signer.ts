@@ -8,6 +8,7 @@ import {
 import {SIGNER_DEFAULT_SCOPES, SignerErrorCode} from './constants/signer.constants';
 import {
   notifyErrorActionAborted,
+  notifyErrorBusy,
   notifyErrorMissingPrompt,
   notifyErrorPermissionNotGranted,
   notifyErrorRequestNotSupported
@@ -77,6 +78,9 @@ export class Signer {
   #consentMessagePrompt: ConsentMessagePrompt | undefined;
   #callCanisterPrompt: CallCanisterPrompt | undefined;
 
+  // TODO: improve implementation to avoid an unexpected misusage in the future where an issue in the code would lead the busy flag to be reset to idle while effectively still being busy
+  #busy = false;
+
   readonly #signerService = new SignerService();
 
   private constructor(options: SignerOptions) {
@@ -123,17 +127,26 @@ export class Signer {
       return;
     }
 
-    // TODO: wrap a try catch around all handler and notify "Unexpected exception" in case if issues
-
-    const {handled} = await this.handleMessage(message);
-    if (handled) {
+    const {busy} = this.assertNotBusy(message);
+    if (busy) {
       return;
     }
 
-    notifyErrorRequestNotSupported({
-      id: requestData?.id ?? null,
-      origin
-    });
+    // TODO: wrap a try catch around all handler and notify "Unexpected exception" in case if issues
+
+    try {
+      const {handled} = await this.handleMessage(message);
+      if (handled) {
+        return;
+      }
+
+      notifyErrorRequestNotSupported({
+        id: requestData?.id ?? null,
+        origin
+      });
+    } finally {
+      this.setIdle();
+    }
   };
 
   private async handleMessage(message: SignerMessageEvent): Promise<{handled: boolean}> {
@@ -217,6 +230,43 @@ export class Signer {
     }
 
     return {valid: true};
+  }
+
+  /**
+   * Checks if the signer is busy and notifies the relying party if it is.
+   *
+   * This is required for security reason to avoid the consumer of the signer to for example process a call canister while at the same time new permissions are requested.
+   *
+   * @private
+   * @param {object} event - The message event to validate.
+   * @param {any} event.data - The data sent in the message event.
+   * @param {string} event.origin - The origin of the message event.
+   *
+   * @returns {object} An object containing a `busy` boolean property.
+   * @returns {boolean} returns true` if the signer is busy, otherwise `false`.
+   */
+  private assertNotBusy({data: msgData, origin}: SignerMessageEvent): {busy: boolean} {
+    if (this.#busy) {
+      notifyErrorBusy({
+        id: msgData?.id ?? null,
+        origin
+      });
+      return {busy: true};
+    }
+
+    return {busy: false};
+  }
+
+  private async handleWithBusy(
+    handler: () => Promise<{handled: boolean}>
+  ): Promise<{handled: boolean}> {
+    this.#busy = true;
+
+    return await handler();
+  }
+
+  private setIdle() {
+    this.#busy = false;
   }
 
   /**
@@ -395,10 +445,14 @@ export class Signer {
     data,
     origin
   }: SignerMessageEvent): Promise<{handled: boolean}> {
-    const {success: isRequestPermissionsRequest, data: requestPermissionsData} =
-      IcrcRequestAnyPermissionsRequestSchema.safeParse(data);
+    const handler = async (): Promise<{handled: boolean}> => {
+      const {success: isRequestPermissionsRequest, data: requestPermissionsData} =
+        IcrcRequestAnyPermissionsRequestSchema.safeParse(data);
 
-    if (isRequestPermissionsRequest) {
+      if (!isRequestPermissionsRequest) {
+        return {handled: false};
+      }
+
       const {
         id: requestId,
         params: {scopes: requestedScopes}
@@ -448,9 +502,9 @@ export class Signer {
       });
 
       return {handled: true};
-    }
+    };
 
-    return {handled: false};
+    return await this.handleWithBusy(handler);
   }
 
   private async promptPermissions(
@@ -525,10 +579,14 @@ export class Signer {
    * @returns {Object} An object with a boolean property `handled` indicating whether the request was handled.
    */
   private async handleAccounts({data, origin}: SignerMessageEvent): Promise<{handled: boolean}> {
-    const {success: isAccountsRequest, data: accountsData} =
-      IcrcAccountsRequestSchema.safeParse(data);
+    const handler = async (): Promise<{handled: boolean}> => {
+      const {success: isAccountsRequest, data: accountsData} =
+        IcrcAccountsRequestSchema.safeParse(data);
 
-    if (isAccountsRequest) {
+      if (!isAccountsRequest) {
+        return {handled: false};
+      }
+
       const {id: requestId} = accountsData;
 
       const notifyAccounts = async (): Promise<void> => {
@@ -570,9 +628,9 @@ export class Signer {
       }
 
       return {handled: true};
-    }
+    };
 
-    return {handled: false};
+    return await this.handleWithBusy(handler);
   }
 
   private async prompt({
@@ -633,10 +691,14 @@ export class Signer {
     data,
     origin
   }: SignerMessageEvent): Promise<{handled: boolean}> {
-    const {success: isCallCanisterRequest, data: callData} =
-      IcrcCallCanisterRequestSchema.safeParse(data);
+    const handler = async (): Promise<{handled: boolean}> => {
+      const {success: isCallCanisterRequest, data: callData} =
+        IcrcCallCanisterRequestSchema.safeParse(data);
 
-    if (isCallCanisterRequest) {
+      if (!isCallCanisterRequest) {
+        return {handled: false};
+      }
+
       const {id: requestId, params} = callData;
 
       const permission = await this.assertAndPromptPermissions({
@@ -677,9 +739,9 @@ export class Signer {
       });
 
       return {handled: true};
-    }
+    };
 
-    return {handled: false};
+    return await this.handleWithBusy(handler);
   }
 
   /**
