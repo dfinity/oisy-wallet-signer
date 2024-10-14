@@ -63,6 +63,7 @@ export const saveSessionScopes = ({
     updatedAt: now
   };
 
+  // TODO: To prevent overwriting permissions when the user has multiple wallets open in different windows, we should ensure that permissions are not overwritten by asserting based on their timestamps.
   set({key: permissionKey, value: updatedPermissions});
 };
 
