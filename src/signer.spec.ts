@@ -688,6 +688,32 @@ describe('Signer', () => {
       });
 
       describe('Ready', () => {
+        const prepareConfirm = async (): Promise<{
+          confirm: PermissionsConfirmation | undefined;
+          messageEvent: MessageEvent;
+        }> => {
+          let confirm: PermissionsConfirmation | undefined;
+
+          signer.register({
+            method: ICRC25_REQUEST_PERMISSIONS,
+            prompt: ({confirm: confirmScopes, requestedScopes: _}: PermissionsPromptPayload) => {
+              confirm = confirmScopes;
+            }
+          });
+
+          const messageEvent = new MessageEvent('message', requestPermissionsMsg);
+          window.dispatchEvent(messageEvent);
+
+          await vi.waitFor(() => {
+            expect(confirm).not.toBeUndefined();
+          });
+
+          return {
+            confirm,
+            messageEvent
+          };
+        };
+
         beforeEach(async () => {
           vi.useFakeTimers();
 
@@ -853,21 +879,7 @@ describe('Signer', () => {
         });
 
         it('should notify all permissions', async () => {
-          let confirm: PermissionsConfirmation | undefined;
-
-          signer.register({
-            method: ICRC25_REQUEST_PERMISSIONS,
-            prompt: ({confirm: confirmScopes, requestedScopes: _}: PermissionsPromptPayload) => {
-              confirm = confirmScopes;
-            }
-          });
-
-          const messageEvent = new MessageEvent('message', requestPermissionsMsg);
-          window.dispatchEvent(messageEvent);
-
-          await vi.waitFor(() => {
-            expect(confirm).not.toBeUndefined();
-          });
+          const {confirm} = await prepareConfirm();
 
           confirm?.([
             {
@@ -1037,21 +1049,7 @@ describe('Signer', () => {
         });
 
         it('should reject if busy', async () => {
-          let confirm: PermissionsConfirmation | undefined;
-
-          signer.register({
-            method: ICRC25_REQUEST_PERMISSIONS,
-            prompt: ({confirm: confirmScopes, requestedScopes: _}: PermissionsPromptPayload) => {
-              confirm = confirmScopes;
-            }
-          });
-
-          const messageEvent = new MessageEvent('message', requestPermissionsMsg);
-          window.dispatchEvent(messageEvent);
-
-          await vi.waitFor(() => {
-            expect(confirm).not.toBeUndefined();
-          });
+          const {messageEvent} = await prepareConfirm();
 
           // Sending a second request should lead to busy given that the confirm is not handled
           window.dispatchEvent(messageEvent);
@@ -1070,6 +1068,21 @@ describe('Signer', () => {
               testOrigin
             );
           });
+        });
+
+        it('should reset to idle', async () => {
+          const {confirm} = await prepareConfirm();
+
+          const spy = vi.spyOn(signer as unknown as {setIdle: () => void}, 'setIdle');
+
+          confirm?.([
+            {
+              scope: {method: ICRC49_CALL_CANISTER},
+              state: IcrcPermissionStateSchema.enum.granted
+            }
+          ]);
+
+          await vi.waitFor(() => expect(spy).toHaveBeenCalledTimes(1));
         });
       });
     });
@@ -1373,11 +1386,10 @@ describe('Signer', () => {
         });
 
         describe('Ready', () => {
-          beforeEach(async () => {
-            await initWalletReady();
-          });
-
-          it('should notify account for icrc27_accounts if permissions were already granted', async () => {
+          const prepareApprove = async (): Promise<{
+            messageEvent: MessageEvent;
+            approve: AccountsApproval | undefined;
+          }> => {
             let approve: AccountsApproval | undefined;
 
             signer.register({
@@ -1404,6 +1416,16 @@ describe('Signer', () => {
             await vi.waitFor(() => {
               expect(approve).not.toBeUndefined();
             });
+
+            return {messageEvent, approve};
+          };
+
+          beforeEach(async () => {
+            await initWalletReady();
+          });
+
+          it('should notify account for icrc27_accounts if permissions were already granted', async () => {
+            const {approve} = await prepareApprove();
 
             approve?.(mockAccounts);
 
@@ -1566,32 +1588,7 @@ describe('Signer', () => {
           });
 
           it('should reject if busy', async () => {
-            let approve: AccountsApproval | undefined;
-
-            signer.register({
-              method: ICRC27_ACCOUNTS,
-              prompt: ({approve: confirm}: AccountsPromptPayload) => {
-                approve = confirm;
-              }
-            });
-
-            saveSessionScopes({
-              owner: signerOptions.owner.getPrincipal(),
-              origin: testOrigin,
-              scopes: [
-                {
-                  scope: {method: ICRC27_ACCOUNTS},
-                  state: IcrcPermissionStateSchema.enum.granted
-                }
-              ]
-            });
-
-            const messageEvent = new MessageEvent('message', requestAccountsMsg);
-            window.dispatchEvent(messageEvent);
-
-            await vi.waitFor(() => {
-              expect(approve).not.toBeUndefined();
-            });
+            const {messageEvent} = await prepareApprove();
 
             // Sending a second request should lead to busy given that the approve is not handled
             window.dispatchEvent(messageEvent);
@@ -1610,6 +1607,16 @@ describe('Signer', () => {
                 testOrigin
               );
             });
+          });
+
+          it('should reset to idle', async () => {
+            const {approve} = await prepareApprove();
+
+            const spy = vi.spyOn(signer as unknown as {setIdle: () => void}, 'setIdle');
+
+            approve?.(mockAccounts);
+
+            await vi.waitFor(() => expect(spy).toHaveBeenCalledTimes(1));
           });
         });
       });
@@ -1654,6 +1661,39 @@ describe('Signer', () => {
             });
 
             describe('Call canister success', () => {
+              const prepareConfirm = async (): Promise<{
+                confirm: PermissionsConfirmation | undefined;
+                messageEvent: MessageEvent;
+                promptSpy: MockInstance;
+              }> => {
+                let confirm: PermissionsConfirmation | undefined;
+                const promptSpy = vi.fn();
+
+                signer.register({
+                  method: ICRC25_REQUEST_PERMISSIONS,
+                  prompt: ({
+                    confirm: confirmScopes,
+                    requestedScopes: _
+                  }: PermissionsPromptPayload) => {
+                    confirm = confirmScopes;
+                  }
+                });
+
+                signer.register({
+                  method: ICRC21_CALL_CONSENT_MESSAGE,
+                  prompt: promptSpy
+                });
+
+                const messageEvent = new MessageEvent('message', requestCallCanisterMsg);
+                window.dispatchEvent(messageEvent);
+
+                await vi.waitFor(() => {
+                  expect(confirm).not.toBeUndefined();
+                });
+
+                return {confirm, messageEvent, promptSpy};
+              };
+
               beforeEach(() => {
                 spyConsentMessage.mockResolvedValue({
                   Ok: mockConsentInfo
@@ -1689,30 +1729,7 @@ describe('Signer', () => {
               });
 
               it('should prompt consent message after prompt for icrc49_call_canister permissions', async () => {
-                let confirm: PermissionsConfirmation | undefined;
-                const promptSpy = vi.fn();
-
-                signer.register({
-                  method: ICRC25_REQUEST_PERMISSIONS,
-                  prompt: ({
-                    confirm: confirmScopes,
-                    requestedScopes: _
-                  }: PermissionsPromptPayload) => {
-                    confirm = confirmScopes;
-                  }
-                });
-
-                signer.register({
-                  method: ICRC21_CALL_CONSENT_MESSAGE,
-                  prompt: promptSpy
-                });
-
-                const messageEvent = new MessageEvent('message', requestCallCanisterMsg);
-                window.dispatchEvent(messageEvent);
-
-                await vi.waitFor(() => {
-                  expect(confirm).not.toBeUndefined();
-                });
+                const {confirm, promptSpy} = await prepareConfirm();
 
                 confirm?.([
                   {
@@ -1771,30 +1788,7 @@ describe('Signer', () => {
               });
 
               it('should reject if busy', async () => {
-                let confirm: PermissionsConfirmation | undefined;
-                const promptSpy = vi.fn();
-
-                signer.register({
-                  method: ICRC25_REQUEST_PERMISSIONS,
-                  prompt: ({
-                    confirm: confirmScopes,
-                    requestedScopes: _
-                  }: PermissionsPromptPayload) => {
-                    confirm = confirmScopes;
-                  }
-                });
-
-                signer.register({
-                  method: ICRC21_CALL_CONSENT_MESSAGE,
-                  prompt: promptSpy
-                });
-
-                const messageEvent = new MessageEvent('message', requestCallCanisterMsg);
-                window.dispatchEvent(messageEvent);
-
-                await vi.waitFor(() => {
-                  expect(confirm).not.toBeUndefined();
-                });
+                const {messageEvent} = await prepareConfirm();
 
                 // Sending a second request should lead to busy given that the confirm is not handled
                 window.dispatchEvent(messageEvent);
@@ -2040,8 +2034,11 @@ describe('Signer', () => {
 
               describe('Call success', () => {
                 let notifyCallCanisterSpy: MockInstance;
+                let spySetIdle: MockInstance;
 
                 beforeEach(async () => {
+                  spySetIdle = vi.spyOn(signer as unknown as {setIdle: () => void}, 'setIdle');
+
                   spyCanisterCall = vi
                     .spyOn(SignerApi.prototype, 'call')
                     .mockResolvedValue(mockCallCanisterSuccess);
@@ -2065,6 +2062,10 @@ describe('Signer', () => {
                     origin: testOrigin,
                     result: mockCallCanisterSuccess
                   });
+                });
+
+                it('should reset to idle', async () => {
+                  expect(spySetIdle).toHaveBeenCalledTimes(1);
                 });
               });
 

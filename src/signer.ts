@@ -261,8 +261,14 @@ export class Signer {
     try {
       return await handler();
     } finally {
-      this.#busy = false;
+      this.setIdle();
     }
+  }
+
+  // This function, strictly speaking, is useful for testing purposes to easily assert the busy flag is reset back to an idle state.
+  // What it does is obviously mandatory.
+  private setIdle() {
+    this.#busy = false;
   }
 
   /**
