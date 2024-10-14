@@ -3,10 +3,10 @@ import {isNullish, notEmptyString} from '@dfinity/utils';
 import {SignerApi} from '../api/signer.api';
 import {
   notifyErrorActionAborted,
+  notifyErrorMissingPrompt,
   notifyErrorRequestNotSupported,
-  notifyMissingPromptError,
-  notifyNetworkError,
-  notifySenderNotAllowedError
+  notifyErrorSenderNotAllowed,
+  notifyNetworkError
 } from '../handlers/signer-errors.handlers';
 import {notifyCallCanister} from '../handlers/signer-success.handlers';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
@@ -43,7 +43,7 @@ export class SignerService {
 
     // The consumer currently has no way to unregister the prompt, so we know that it is defined. However, to be future-proof, it's better to ensure it is defined.
     if (isNullish(prompt)) {
-      notifyMissingPromptError(notify);
+      notifyErrorMissingPrompt(notify);
       return {result: 'error'};
     }
 
@@ -166,7 +166,7 @@ export class SignerService {
       return {result: 'valid'};
     }
 
-    notifySenderNotAllowedError(notify);
+    notifyErrorSenderNotAllowed(notify);
 
     return {result: 'invalid'};
   }

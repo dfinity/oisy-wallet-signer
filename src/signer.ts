@@ -8,9 +8,9 @@ import {
 import {SIGNER_DEFAULT_SCOPES, SignerErrorCode} from './constants/signer.constants';
 import {
   notifyErrorActionAborted,
+  notifyErrorMissingPrompt,
   notifyErrorPermissionNotGranted,
-  notifyErrorRequestNotSupported,
-  notifyMissingPromptError
+  notifyErrorRequestNotSupported
 } from './handlers/signer-errors.handlers';
 import {
   notifyAccounts as notifyAccountsHandlers,
@@ -502,7 +502,7 @@ export class Signer {
   private assertWalletOriginAndNotifyMissingPromptError(id: RpcId | undefined): void {
     assertNonNullish(this.#walletOrigin, "The relying party's origin is unknown.");
 
-    notifyMissingPromptError({
+    notifyErrorMissingPrompt({
       id: id ?? null,
       origin: this.#walletOrigin
     });

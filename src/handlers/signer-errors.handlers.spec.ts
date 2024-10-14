@@ -3,13 +3,13 @@ import {SignerErrorCode} from '../constants/signer.constants';
 import {mockErrorNotify} from '../mocks/signer-error.mocks';
 import {JSON_RPC_VERSION_2, type RpcId, type RpcResponseWithError} from '../types/rpc';
 import {
-  notifyBusyError,
   notifyErrorActionAborted,
+  notifyErrorBusy,
+  notifyErrorMissingPrompt,
   notifyErrorPermissionNotGranted,
   notifyErrorRequestNotSupported,
-  notifyMissingPromptError,
-  notifyNetworkError,
-  notifySenderNotAllowedError
+  notifyErrorSenderNotAllowed,
+  notifyNetworkError
 } from './signer-errors.handlers';
 
 describe('Signer-errors.handlers', () => {
@@ -129,14 +129,14 @@ describe('Signer-errors.handlers', () => {
     });
   });
 
-  describe('notifyMissingPromptError', () => {
+  describe('notifyErrorMissingPrompt', () => {
     it('should post an error message indicating missing prompt registration', () => {
       const error = {
         code: SignerErrorCode.PERMISSIONS_PROMPT_NOT_REGISTERED,
         message: 'The signer has not registered a prompt to respond to permission requests.'
       };
 
-      notifyMissingPromptError({id: requestId, origin: testOrigin});
+      notifyErrorMissingPrompt({id: requestId, origin: testOrigin});
 
       const expectedMessage: RpcResponseWithError = {
         jsonrpc: JSON_RPC_VERSION_2,
@@ -148,14 +148,14 @@ describe('Signer-errors.handlers', () => {
     });
   });
 
-  describe('notifySenderNotAllowedError', () => {
+  describe('notifyErrorSenderNotAllowed', () => {
     it('should post an error message indicating sender not allowed', () => {
       const error = {
         code: SignerErrorCode.SENDER_NOT_ALLOWED,
         message: 'The sender must match the owner of the signer.'
       };
 
-      notifySenderNotAllowedError({id: requestId, origin: testOrigin});
+      notifyErrorSenderNotAllowed({id: requestId, origin: testOrigin});
 
       const expectedMessage: RpcResponseWithError = {
         jsonrpc: JSON_RPC_VERSION_2,
@@ -167,7 +167,7 @@ describe('Signer-errors.handlers', () => {
     });
   });
 
-  describe('notifyBusyError', () => {
+  describe('notifyErrorBusy', () => {
     it('should post an error message indicating the signer is busy', () => {
       const error = {
         code: SignerErrorCode.BUSY,
@@ -175,7 +175,7 @@ describe('Signer-errors.handlers', () => {
           'The signer is currently processing a request and cannot handle new requests at this time.'
       };
 
-      notifyBusyError({id: requestId, origin: testOrigin});
+      notifyErrorBusy({id: requestId, origin: testOrigin});
 
       const expectedMessage: RpcResponseWithError = {
         jsonrpc: JSON_RPC_VERSION_2,

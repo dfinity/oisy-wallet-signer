@@ -389,7 +389,7 @@ describe('Signer services', () => {
         expect(prompt).not.toHaveBeenCalled();
       });
 
-      it('should call notifySenderNotAllowedError if sender does not match owner', async () => {
+      it('should call notifyErrorSenderNotAllowed if sender does not match owner', async () => {
         await signerService.assertAndPromptConsentMessage({
           notify,
           params: invalidParams,

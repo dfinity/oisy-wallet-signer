@@ -46,7 +46,7 @@ export const notifyErrorPermissionNotGranted = (notify: Notify): void => {
   });
 };
 
-export const notifyMissingPromptError = (notify: Notify): void => {
+export const notifyErrorMissingPrompt = (notify: Notify): void => {
   notifyError({
     ...notify,
     error: {
@@ -56,7 +56,7 @@ export const notifyMissingPromptError = (notify: Notify): void => {
   });
 };
 
-export const notifySenderNotAllowedError = (notify: Notify): void => {
+export const notifyErrorSenderNotAllowed = (notify: Notify): void => {
   notifyError({
     ...notify,
     error: {
@@ -66,7 +66,7 @@ export const notifySenderNotAllowedError = (notify: Notify): void => {
   });
 };
 
-export const notifyBusyError = (notify: Notify): void => {
+export const notifyErrorBusy = (notify: Notify): void => {
   notifyError({
     ...notify,
     error: {
