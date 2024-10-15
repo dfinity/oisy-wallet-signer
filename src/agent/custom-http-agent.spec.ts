@@ -294,12 +294,12 @@ describe('CustomHttpAgent', () => {
         }
       };
 
-      beforeEach(async () => {
+      beforeEach(() => {
         spyCall = vi.spyOn(agent.agent, 'call').mockResolvedValue(mockPollSubmitResponse);
       });
 
       describe('Success', () => {
-        beforeEach(async () => {
+        beforeEach(() => {
           spyPollForResponse = vi.spyOn(httpAgent, 'pollForResponse').mockResolvedValue({
             certificate,
             reply: expect.anything()
@@ -371,7 +371,7 @@ describe('CustomHttpAgent', () => {
       });
 
       describe('Success but invalid response', () => {
-        beforeEach(async () => {
+        beforeEach(() => {
           spyPollForResponse = vi.spyOn(httpAgent, 'pollForResponse').mockResolvedValue({
             // @ts-expect-error: we are testing this on purpose
             certificate: null,
@@ -394,7 +394,7 @@ describe('CustomHttpAgent', () => {
       });
 
       describe('Error', () => {
-        beforeEach(async () => {
+        beforeEach(() => {
           spyPollForResponse = vi
             .spyOn(httpAgent, 'pollForResponse')
             .mockRejectedValue(new Error('Polling error'));

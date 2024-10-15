@@ -236,7 +236,7 @@ describe('Relying Party', () => {
           expect(window.close).not.toHaveBeenCalled();
         });
 
-        it('should close popup on connection not successful', async () =>
+        it('should close popup on connection not successful', () =>
           // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
           new Promise<void>(async (resolve) => {
             vi.useFakeTimers();
@@ -341,7 +341,7 @@ describe('Relying Party', () => {
 
         it.each(options)(
           'should timeout for $title if signer does not answer with expected standards',
-          async ({options}) =>
+          ({options}) =>
             // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
             new Promise<void>(async (resolve) => {
               vi.useFakeTimers();
@@ -363,7 +363,7 @@ describe('Relying Party', () => {
             })
         );
 
-        it('should timeout if response ID is not the same as request ID', async () =>
+        it('should timeout if response ID is not the same as request ID', () =>
           // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
           new Promise<void>(async (resolve) => {
             vi.useFakeTimers();
@@ -557,7 +557,7 @@ describe('Relying Party', () => {
 
           it.each(options)(
             'should timeout for $title if signer does not answer with expected permissions',
-            async ({options}) =>
+            ({options}) =>
               // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
               new Promise<void>(async (resolve) => {
                 vi.useFakeTimers();
@@ -578,7 +578,7 @@ describe('Relying Party', () => {
               })
           );
 
-          it('should timeout if response ID is not the same as request ID', async () =>
+          it('should timeout if response ID is not the same as request ID', () =>
             // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
             new Promise<void>(async (resolve) => {
               vi.useFakeTimers();
@@ -752,7 +752,7 @@ describe('Relying Party', () => {
 
           it.each(options)(
             'should timeout for $title if signer does not answer with expected permissions',
-            async ({options}) =>
+            ({options}) =>
               // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
               new Promise<void>(async (resolve) => {
                 vi.useFakeTimers();
@@ -774,7 +774,7 @@ describe('Relying Party', () => {
               })
           );
 
-          it('should timeout if response ID is not the same as request ID', async () =>
+          it('should timeout if response ID is not the same as request ID', () =>
             // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
             new Promise<void>(async (resolve) => {
               vi.useFakeTimers();
@@ -992,7 +992,7 @@ describe('Relying Party', () => {
 
         it.each(options)(
           'should timeout for $title if signer does not answer with expected accounts',
-          async ({options}) =>
+          ({options}) =>
             // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
             new Promise<void>(async (resolve) => {
               vi.useFakeTimers();
@@ -1013,7 +1013,7 @@ describe('Relying Party', () => {
             })
         );
 
-        it('should timeout if response ID is not the same as request ID', async () =>
+        it('should timeout if response ID is not the same as request ID', () =>
           // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
           new Promise<void>(async (resolve) => {
             vi.useFakeTimers();
@@ -1206,7 +1206,7 @@ describe('Relying Party', () => {
 
         it.each(options)(
           'should timeout for $title if signer does not answer with result',
-          async ({options}) =>
+          ({options}) =>
             // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
             new Promise<void>(async (resolve) => {
               vi.useFakeTimers();
@@ -1227,7 +1227,7 @@ describe('Relying Party', () => {
             })
         );
 
-        it('should timeout if response ID is not the same as request ID', async () =>
+        it('should timeout if response ID is not the same as request ID', () =>
           // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
           new Promise<void>(async (resolve) => {
             vi.useFakeTimers();
