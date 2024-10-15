@@ -1386,7 +1386,7 @@ describe('Relying Party', () => {
           expect(callResult).toEqual(result);
         });
 
-        it.only('should call the assertions utils to validate the result', async () => {
+        it('should call the assertions utils to validate the result', async () => {
           const promise = relyingParty.call({options: {requestId}, params: mockCallCanisterParams});
 
           window.dispatchEvent(messageEventScopes);
