@@ -1,4 +1,5 @@
 import {z} from 'zod';
+import {UrlSchema} from './url';
 
 const ConnectionOptionsSchema = z.object({
   /**
@@ -51,7 +52,7 @@ export const RelyingPartyOptionsSchema = z.object({
   /**
    * The URL of the signer.
    */
-  url: z.string().url(),
+  url: UrlSchema,
 
   /**
    * Optional window options to display the signer, which can be an object of type WindowOptions or a string.

@@ -1,6 +1,7 @@
 import {type Identity} from '@dfinity/agent';
 import {isNullish} from '@dfinity/utils';
 import {z} from 'zod';
+import {UrlSchema} from './url';
 
 const IdentitySchema = z.custom<Identity>((value: unknown): boolean => {
   if (isNullish(value)) {
@@ -28,7 +29,7 @@ const IdentityNotAnonymousSchema = IdentitySchema.refine(
 
 export type IdentityNotAnonymous = z.infer<typeof IdentityNotAnonymousSchema>;
 
-export const SignerHostSchema = z.string().url().optional();
+export const SignerHostSchema = UrlSchema.optional();
 
 export type SignerHost = z.infer<typeof SignerHostSchema>;
 
