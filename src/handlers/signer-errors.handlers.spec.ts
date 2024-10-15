@@ -17,23 +17,21 @@ describe('Signer-errors.handlers', () => {
 
   const testOrigin = 'https://hello.com';
 
-  let originalOpener: typeof window.opener;
+  let sourceMock: Window;
 
   let postMessageMock: Mock;
 
   beforeEach(() => {
-    originalOpener = window.opener;
-
     postMessageMock = vi.fn();
 
-    vi.stubGlobal('opener', {postMessage: postMessageMock});
+    sourceMock = {
+      postMessage: postMessageMock
+    } as unknown as Window;
 
     requestId = crypto.randomUUID();
   });
 
   afterEach(() => {
-    window.opener = originalOpener;
-
     vi.clearAllMocks();
   });
 
@@ -44,7 +42,7 @@ describe('Signer-errors.handlers', () => {
         message: 'The request sent by the relying party is not supported by the signer.'
       };
 
-      notifyErrorRequestNotSupported({id: requestId, origin: testOrigin});
+      notifyErrorRequestNotSupported({id: requestId, origin: testOrigin, source: sourceMock});
 
       const expectedMessage: RpcResponseWithError = {
         jsonrpc: JSON_RPC_VERSION_2,
@@ -52,7 +50,7 @@ describe('Signer-errors.handlers', () => {
         error
       };
 
-      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, testOrigin);
+      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage);
     });
 
     it('should post an error message with custom message when provided', () => {
@@ -63,7 +61,12 @@ describe('Signer-errors.handlers', () => {
         message
       };
 
-      notifyErrorRequestNotSupported({id: requestId, origin: testOrigin, message});
+      notifyErrorRequestNotSupported({
+        id: requestId,
+        origin: testOrigin,
+        message,
+        source: sourceMock
+      });
 
       const expectedMessage: RpcResponseWithError = {
         jsonrpc: JSON_RPC_VERSION_2,
@@ -71,7 +74,7 @@ describe('Signer-errors.handlers', () => {
         error
       };
 
-      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, testOrigin);
+      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage);
     });
   });
 
@@ -83,7 +86,7 @@ describe('Signer-errors.handlers', () => {
           'The signer has not granted the necessary permissions to process the request from the relying party.'
       };
 
-      notifyErrorPermissionNotGranted({id: requestId, origin: testOrigin});
+      notifyErrorPermissionNotGranted({id: requestId, origin: testOrigin, source: sourceMock});
 
       const expectedMessage: RpcResponseWithError = {
         jsonrpc: JSON_RPC_VERSION_2,
@@ -91,13 +94,13 @@ describe('Signer-errors.handlers', () => {
         error
       };
 
-      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, testOrigin);
+      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage);
     });
   });
 
   describe('notifyErrorActionAborted', () => {
     it('should post an error message indicating action was aborted', () => {
-      notifyErrorActionAborted({id: requestId, origin: testOrigin});
+      notifyErrorActionAborted({id: requestId, origin: testOrigin, source: sourceMock});
 
       const expectedMessage: RpcResponseWithError = {
         jsonrpc: JSON_RPC_VERSION_2,
@@ -105,7 +108,7 @@ describe('Signer-errors.handlers', () => {
         error: mockErrorNotify
       };
 
-      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, testOrigin);
+      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage);
     });
   });
 
@@ -117,7 +120,12 @@ describe('Signer-errors.handlers', () => {
         message: customMessage
       };
 
-      notifyNetworkError({id: requestId, origin: testOrigin, message: customMessage});
+      notifyNetworkError({
+        id: requestId,
+        origin: testOrigin,
+        message: customMessage,
+        source: sourceMock
+      });
 
       const expectedMessage: RpcResponseWithError = {
         jsonrpc: JSON_RPC_VERSION_2,
@@ -125,7 +133,7 @@ describe('Signer-errors.handlers', () => {
         error
       };
 
-      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, testOrigin);
+      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage);
     });
   });
 
@@ -136,7 +144,7 @@ describe('Signer-errors.handlers', () => {
         message: 'The signer has not registered a prompt to respond to permission requests.'
       };
 
-      notifyErrorMissingPrompt({id: requestId, origin: testOrigin});
+      notifyErrorMissingPrompt({id: requestId, origin: testOrigin, source: sourceMock});
 
       const expectedMessage: RpcResponseWithError = {
         jsonrpc: JSON_RPC_VERSION_2,
@@ -144,7 +152,7 @@ describe('Signer-errors.handlers', () => {
         error
       };
 
-      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, testOrigin);
+      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage);
     });
   });
 
@@ -155,7 +163,7 @@ describe('Signer-errors.handlers', () => {
         message: 'The sender must match the owner of the signer.'
       };
 
-      notifyErrorSenderNotAllowed({id: requestId, origin: testOrigin});
+      notifyErrorSenderNotAllowed({id: requestId, origin: testOrigin, source: sourceMock});
 
       const expectedMessage: RpcResponseWithError = {
         jsonrpc: JSON_RPC_VERSION_2,
@@ -163,7 +171,7 @@ describe('Signer-errors.handlers', () => {
         error
       };
 
-      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, testOrigin);
+      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage);
     });
   });
 
@@ -175,7 +183,7 @@ describe('Signer-errors.handlers', () => {
           'The signer is currently processing a request and cannot handle new requests at this time.'
       };
 
-      notifyErrorBusy({id: requestId, origin: testOrigin});
+      notifyErrorBusy({id: requestId, origin: testOrigin, source: sourceMock});
 
       const expectedMessage: RpcResponseWithError = {
         jsonrpc: JSON_RPC_VERSION_2,
@@ -183,7 +191,7 @@ describe('Signer-errors.handlers', () => {
         error
       };
 
-      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, testOrigin);
+      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage);
     });
   });
 });

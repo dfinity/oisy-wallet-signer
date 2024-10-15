@@ -8,22 +8,21 @@ describe('Signer handlers', () => {
   let id: RpcId;
   const origin = 'https://hello.com';
 
-  let originalOpener: typeof window.opener;
+  let sourceMock: Window;
 
   let postMessageMock: Mock;
 
   beforeEach(() => {
     id = crypto.randomUUID();
-    originalOpener = window.opener;
 
     postMessageMock = vi.fn();
 
-    vi.stubGlobal('opener', {postMessage: postMessageMock});
+    sourceMock = {
+      postMessage: postMessageMock
+    } as unknown as Window;
   });
 
   afterEach(() => {
-    window.opener = originalOpener;
-
     vi.restoreAllMocks();
   });
 
@@ -34,7 +33,7 @@ describe('Signer handlers', () => {
         message: 'This is an error test.'
       };
 
-      notifyError({id, origin, error});
+      notifyError({id, origin, error, source: sourceMock});
 
       const expectedMessage: RpcResponseWithError = {
         jsonrpc: JSON_RPC_VERSION_2,
@@ -42,7 +41,7 @@ describe('Signer handlers', () => {
         error
       };
 
-      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
+      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage);
     });
   });
 
@@ -54,9 +53,9 @@ describe('Signer handlers', () => {
         result: 'ready'
       };
 
-      notify({msg, origin});
+      notify({msg, origin, source: sourceMock});
 
-      expect(postMessageMock).toHaveBeenCalledWith(msg, origin);
+      expect(postMessageMock).toHaveBeenCalledWith(msg);
     });
   });
 });

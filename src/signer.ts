@@ -42,7 +42,6 @@ import {
   type IcrcPermissionState,
   type IcrcScopedMethod
 } from './types/icrc-standards';
-import type {Origin} from './types/post-message';
 import {RpcRequestSchema, type RpcId} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
 import {MissingPromptError} from './types/signer-errors';
@@ -109,12 +108,17 @@ export class Signer {
   // This means that the signer will have to keep track of its activity.
   // See https://github.com/dfinity/wg-identity-authentication/pull/212
 
-  private readonly onMessageListener = (message: SignerMessageEvent): void => {
+  private readonly onMessageListener = (message: MessageEvent): void => {
     void this.onMessage(message);
   };
 
-  private readonly onMessage = async (message: SignerMessageEvent): Promise<void> => {
+  private readonly onMessage = async ({source, ...message}: MessageEvent): Promise<void> => {
     const {data, origin} = message;
+
+    if (isNullish(source)) {
+      // An unknown source is unlikely, but if it occurs, we simply ignore it without notifying the signer, as it is irrelevant. Additionally, the source is essential for responding to the relying party.
+      return;
+    }
 
     const {success, data: requestData} = RpcRequestSchema.safeParse(data);
 
@@ -125,14 +129,19 @@ export class Signer {
 
     // TODO: wrap a try catch around all handler and notify "Unexpected exception" in case if issues
 
-    const {handled} = await this.handleMessage(message);
+    const {handled} = await this.handleMessage({
+      ...message,
+      source
+    });
+
     if (handled) {
       return;
     }
 
     notifyErrorRequestNotSupported({
       id: requestData?.id ?? null,
-      origin
+      origin,
+      source
     });
   };
 
@@ -198,7 +207,7 @@ export class Signer {
    * @returns {object} An object containing a `valid` boolean property.
    * @returns {boolean} returns `true` if the origin is either undefined or matches the expected wallet origin, otherwise returns `false` and notifies the error.
    */
-  private assertUndefinedOrSameOrigin({data: msgData, origin}: SignerMessageEvent): {
+  private assertUndefinedOrSameOrigin({data: msgData, origin, source}: SignerMessageEvent): {
     valid: boolean;
   } {
     if (nonNullish(this.#walletOrigin) && this.#walletOrigin !== origin) {
@@ -210,7 +219,8 @@ export class Signer {
         error: {
           code: SignerErrorCode.ORIGIN_ERROR,
           message: `The relying party's origin is not permitted to obtain the status of the signer.`
-        }
+        },
+        source
       });
 
       return {valid: false};
@@ -232,7 +242,7 @@ export class Signer {
    * @returns {object} An object containing a `valid` boolean property.
    * @returns {boolean} returns `true` if the wallet origin is defined and matches the origin of the message event, otherwise returns `false` and notifies the error.
    */
-  private assertNotUndefinedAndSameOrigin({data: msgData, origin}: SignerMessageEvent): {
+  private assertNotUndefinedAndSameOrigin({data: msgData, origin, source}: SignerMessageEvent): {
     valid: boolean;
   } {
     if (isNullish(this.#walletOrigin) || this.#walletOrigin !== origin) {
@@ -246,7 +256,8 @@ export class Signer {
           message: isNullish(this.#walletOrigin)
             ? 'The relying party has not established a connection to the signer.'
             : `The relying party's origin is not allowed to interact with the signer.`
-        }
+        },
+        source
       });
 
       return {valid: false};
@@ -314,17 +325,19 @@ export class Signer {
    * @param {SignerMessageEvent} message - The incoming message event containing the data and origin.
    * @returns {Object} An object with a boolean property `handled` indicating whether the request was handled.
    */
-  private handleStatusRequest({data, origin, ...rest}: SignerMessageEvent): {handled: boolean} {
+  private handleStatusRequest({data, origin, source, ...rest}: SignerMessageEvent): {
+    handled: boolean;
+  } {
     const {success: isStatusRequest, data: statusData} = IcrcStatusRequestSchema.safeParse(data);
 
     if (isStatusRequest) {
-      const {valid} = this.assertUndefinedOrSameOrigin({data, origin, ...rest});
+      const {valid} = this.assertUndefinedOrSameOrigin({data, origin, source, ...rest});
       if (!valid) {
         return {handled: true};
       }
 
       const {id} = statusData;
-      notifyReady({id, origin});
+      notifyReady({id, origin, source});
 
       this.setWalletOrigin({origin});
 
@@ -342,13 +355,13 @@ export class Signer {
    * @param {SignerMessageEvent} message - The incoming message event containing the data and origin.
    * @returns {Object} An object with a boolean property `handled` indicating whether the request was handled.
    */
-  private handleSupportedStandards({data, origin}: SignerMessageEvent): {handled: boolean} {
+  private handleSupportedStandards({data, origin, source}: SignerMessageEvent): {handled: boolean} {
     const {success: isSupportedStandardsRequest, data: supportedStandardsData} =
       IcrcSupportedStandardsRequestSchema.safeParse(data);
 
     if (isSupportedStandardsRequest) {
       const {id} = supportedStandardsData;
-      notifySupportedStandards({id, origin});
+      notifySupportedStandards({id, origin, source});
       return {handled: true};
     }
 
@@ -363,14 +376,14 @@ export class Signer {
    * @param {SignerMessageEvent} message - The incoming message event containing the data and origin.
    * @returns {Object} An object with a boolean property `handled` indicating whether the request was handled.
    */
-  private handlePermissionsRequest({data}: SignerMessageEvent): {handled: boolean} {
+  private handlePermissionsRequest({data, source}: SignerMessageEvent): {handled: boolean} {
     const {success: isPermissionsRequestRequest, data: permissionsRequestData} =
       IcrcPermissionsRequestSchema.safeParse(data);
 
     if (isPermissionsRequestRequest) {
       const {id} = permissionsRequestData;
 
-      this.emitPermissions({id});
+      this.emitPermissions({id, source});
 
       return {handled: true};
     }
@@ -393,7 +406,8 @@ export class Signer {
    */
   private async handleRequestPermissionsRequest({
     data,
-    origin
+    origin,
+    source
   }: SignerMessageEvent): Promise<{handled: boolean}> {
     const {success: isRequestPermissionsRequest, data: requestPermissionsData} =
       IcrcRequestAnyPermissionsRequestSchema.safeParse(data);
@@ -405,7 +419,7 @@ export class Signer {
       } = requestPermissionsData;
 
       if (isNullish(this.#permissionsPrompt)) {
-        this.assertWalletOriginAndNotifyMissingPromptError(requestId);
+        this.assertWalletOriginAndNotifyMissingPromptError({id: requestId, source});
 
         return {handled: true};
       }
@@ -439,12 +453,13 @@ export class Signer {
         });
 
         this.savePermissions({scopes: confirmedScopes});
-        this.emitPermissions({id: requestId});
+        this.emitPermissions({id: requestId, source});
       };
 
       await this.prompt({
         requestId,
-        promptFn
+        promptFn,
+        source
       });
 
       return {handled: true};
@@ -473,7 +488,10 @@ export class Signer {
     return await promise;
   }
 
-  private emitPermissions({id}: Pick<NotifyPermissions, 'id'>): void {
+  private emitPermissions({
+    id,
+    source
+  }: Pick<NotifyPermissions, 'id'> & Pick<SignerMessageEvent, 'source'>): void {
     assertNonNullish(this.#walletOrigin, "The relying party's origin is unknown.");
 
     const {owner} = this.#signerOptions;
@@ -495,16 +513,21 @@ export class Signer {
     notifyPermissionScopes({
       id,
       origin: this.#walletOrigin,
-      scopes: allScopes
+      scopes: allScopes,
+      source
     });
   }
 
-  private assertWalletOriginAndNotifyMissingPromptError(id: RpcId | undefined): void {
+  private assertWalletOriginAndNotifyMissingPromptError({
+    id,
+    source
+  }: {id: RpcId | undefined} & Pick<SignerMessageEvent, 'source'>): void {
     assertNonNullish(this.#walletOrigin, "The relying party's origin is unknown.");
 
     notifyErrorMissingPrompt({
       id: id ?? null,
-      origin: this.#walletOrigin
+      origin: this.#walletOrigin,
+      source
     });
   }
 
@@ -524,7 +547,11 @@ export class Signer {
    * @param {SignerMessageEvent} message - The incoming message event containing the data and origin.
    * @returns {Object} An object with a boolean property `handled` indicating whether the request was handled.
    */
-  private async handleAccounts({data, origin}: SignerMessageEvent): Promise<{handled: boolean}> {
+  private async handleAccounts({
+    data,
+    origin,
+    source
+  }: SignerMessageEvent): Promise<{handled: boolean}> {
     const {success: isAccountsRequest, data: accountsData} =
       IcrcAccountsRequestSchema.safeParse(data);
 
@@ -536,30 +563,33 @@ export class Signer {
           const {result, accounts} = await this.promptAccounts({origin});
 
           if (result === 'rejected') {
-            notifyErrorActionAborted({id: requestId, origin});
+            notifyErrorActionAborted({id: requestId, origin, source});
             return;
           }
 
-          notifyAccountsHandlers({accounts, id: requestId, origin});
+          notifyAccountsHandlers({accounts, id: requestId, origin, source});
         };
 
         await this.prompt({
           requestId,
-          promptFn
+          promptFn,
+          source
         });
       };
 
       const permission = await this.assertAndPromptPermissions({
         method: ICRC27_ACCOUNTS,
         requestId,
-        origin
+        origin,
+        source
       });
 
       switch (permission) {
         case 'denied': {
           notifyErrorPermissionNotGranted({
             id: requestId ?? null,
-            origin
+            origin,
+            source
           });
           break;
         }
@@ -577,16 +607,17 @@ export class Signer {
 
   private async prompt({
     requestId,
-    promptFn
+    promptFn,
+    source
   }: {
     promptFn: () => Promise<void>;
     requestId: RpcId;
-  }): Promise<void> {
+  } & Pick<SignerMessageEvent, 'source'>): Promise<void> {
     try {
       await promptFn();
     } catch (err: unknown) {
       if (err instanceof MissingPromptError) {
-        this.assertWalletOriginAndNotifyMissingPromptError(requestId);
+        this.assertWalletOriginAndNotifyMissingPromptError({id: requestId, source});
         return;
       }
 
@@ -631,7 +662,8 @@ export class Signer {
    */
   private async handleCallCanister({
     data,
-    origin
+    origin,
+    source
   }: SignerMessageEvent): Promise<{handled: boolean}> {
     const {success: isCallCanisterRequest, data: callData} =
       IcrcCallCanisterRequestSchema.safeParse(data);
@@ -642,20 +674,23 @@ export class Signer {
       const permission = await this.assertAndPromptPermissions({
         method: ICRC49_CALL_CANISTER,
         requestId,
-        origin
+        origin,
+        source
       });
 
       if (permission === 'denied') {
         notifyErrorPermissionNotGranted({
           id: requestId ?? null,
-          origin
+          origin,
+          source
         });
         return {handled: true};
       }
 
       const notify: Notify = {
         id: requestId,
-        origin
+        origin,
+        source
       };
 
       const {result: userConsent} = await this.#signerService.assertAndPromptConsentMessage({
@@ -702,12 +737,14 @@ export class Signer {
   private async assertAndPromptPermissions({
     method,
     origin,
-    requestId
+    requestId,
+    source
   }: {
     method: IcrcScopedMethod;
-    origin: Origin;
     requestId: RpcId;
-  }): Promise<Omit<IcrcPermissionState, 'ask_on_use'>> {
+  } & Pick<SignerMessageEvent, 'origin' | 'source'>): Promise<
+    Omit<IcrcPermissionState, 'ask_on_use'>
+  > {
     const {owner} = this.#signerOptions;
 
     const currentPermission = sessionScopeState({
@@ -751,7 +788,8 @@ export class Signer {
 
           this.prompt({
             requestId,
-            promptFn
+            promptFn,
+            source
           }).catch((err) => {
             reject(err);
           });

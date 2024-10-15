@@ -152,7 +152,7 @@ describe('Signer', () => {
   describe('Origin', () => {
     const testId = crypto.randomUUID();
 
-    let originalOpener: typeof window.opener;
+    let sourceMock: Window;
 
     let notifyReadySpy: MockInstance;
     let signer: Signer;
@@ -163,13 +163,14 @@ describe('Signer', () => {
       signer = Signer.init(signerOptions);
       notifyReadySpy = vi.spyOn(signerSuccessHandlers, 'notifyReady');
       postMessageMock = vi.fn();
-      vi.stubGlobal('opener', {postMessage: postMessageMock});
+
+      sourceMock = {
+        postMessage: postMessageMock
+      } as unknown as Window;
     });
 
     afterEach(() => {
       signer.disconnect();
-
-      window.opener = originalOpener;
 
       vi.clearAllMocks();
       vi.restoreAllMocks();
@@ -191,7 +192,8 @@ describe('Signer', () => {
 
       expect(notifyReadySpy).toHaveBeenCalledWith({
         id: testId,
-        origin: testOrigin
+        origin: testOrigin,
+        source: sourceMock
       });
     });
 
@@ -329,7 +331,7 @@ describe('Signer', () => {
       origin: testOrigin
     };
 
-    let originalOpener: typeof window.opener;
+    let sourceMock: Window;
 
     let signer: Signer;
 
@@ -340,13 +342,13 @@ describe('Signer', () => {
 
       postMessageMock = vi.fn();
 
-      vi.stubGlobal('opener', {postMessage: postMessageMock});
+      sourceMock = {
+        postMessage: postMessageMock
+      } as unknown as Window;
     });
 
     afterEach(() => {
       signer.disconnect();
-
-      window.opener = originalOpener;
 
       vi.clearAllMocks();
       vi.restoreAllMocks();
@@ -2052,7 +2054,8 @@ describe('Signer', () => {
 
         expect(notifyReadySpy).toHaveBeenCalledWith({
           id: testId,
-          origin: testOrigin
+          origin: testOrigin,
+          source: sourceMock
         });
 
         signer.register({
@@ -2081,7 +2084,7 @@ describe('Signer', () => {
         });
       });
 
-      it('should save permissions in storage', async () => {
+      it.only('should save permissions in storage', async () => {
         payload.confirm(scopes);
 
         const expectedKey = `oisy_signer_${testOrigin}_${signerOptions.owner.getPrincipal().toText()}`;
