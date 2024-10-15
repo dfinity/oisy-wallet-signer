@@ -1,3 +1,4 @@
+import {MockInstance} from 'vitest';
 import {
   ICRC25_PERMISSIONS,
   ICRC25_REQUEST_PERMISSIONS,
@@ -35,6 +36,7 @@ import {RelyingPartyResponseError} from './types/relying-party-errors';
 import type {OnDisconnect, RelyingPartyOptions} from './types/relying-party-options';
 import {JSON_RPC_VERSION_2, RpcResponseWithResultOrErrorSchema} from './types/rpc';
 import {uint8ArrayToBase64} from './utils/base64.utils';
+import * as callUtils from './utils/call.utils';
 import {windowFeatures} from './utils/window.utils';
 
 describe('Relying Party', () => {
@@ -1341,6 +1343,16 @@ describe('Relying Party', () => {
           }
         });
 
+        let spyAssertCallResponse: MockInstance;
+
+        beforeEach(() => {
+          spyAssertCallResponse = vi
+            .spyOn(callUtils, 'assertCallResponse')
+            .mockImplementation(() => {
+              // Do nothing
+            });
+        });
+
         it('should call the signer with postMessage and encoded arguments', async () => {
           const spy = vi.spyOn(relyingPartyHandlers, 'requestCallCanister');
           const spyPostMessage = vi.spyOn(window, 'postMessage');
@@ -1372,6 +1384,19 @@ describe('Relying Party', () => {
           const callResult = await promise;
 
           expect(callResult).toEqual(result);
+        });
+
+        it('should call the assertions utils to validate the result', async () => {
+          const promise = relyingParty.call({options: {requestId}, params: mockCallCanisterParams});
+
+          window.dispatchEvent(messageEventScopes);
+
+          const callResult = await promise;
+
+          expect(spyAssertCallResponse).toHaveBeenNthCalledWith(1, {
+            result: callResult,
+            params: mockCallCanisterParams
+          });
         });
       });
     });

@@ -31,6 +31,8 @@ export class IcrcWallet extends RelyingParty {
     });
   }
 
+  // TODO: this function implementation is to be finalized including decoding and asserting response.
+  // Similar to what's already done in icrc1_transfer of IcpWallet.
   transfer = async ({
     params,
     owner,

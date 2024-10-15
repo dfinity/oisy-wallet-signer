@@ -1,4 +1,5 @@
 import {Principal} from '@dfinity/principal';
+import type {MockInstance} from 'vitest';
 import {TransferResult} from '../constants/icrc.idl.constants';
 import {
   mockLocalBlockHeight,
@@ -7,9 +8,9 @@ import {
   mockLocalCallTime
 } from '../mocks/call-utils.mocks';
 import {mockLocalIcRootKey} from '../mocks/custom-http-agent-responses.mocks';
-import {mockCanisterId, mockPrincipalText} from '../mocks/icrc-accounts.mocks';
-import {uint8ArrayToBase64} from './base64.utils';
-import {assertCallArg, assertCallCanisterId, assertCallMethod, decodeResponse} from './call.utils';
+import {decodeCallRequest} from './agentjs-cbor-copy.utils';
+import * as callUtils from './call.assert.utils';
+import {assertCallResponse, decodeResponse} from './call.utils';
 
 vi.mock('@dfinity/agent', async (importOriginal) => {
   // eslint-disable-next-line @typescript-eslint/consistent-type-imports
@@ -37,65 +38,66 @@ vi.mock('@dfinity/agent', async (importOriginal) => {
 });
 
 describe('call.utils', () => {
-  describe('assertCallMethod', () => {
-    it('should not throw an error when methods match', () => {
-      const requestMethod = 'icrc1_transfer';
-      const responseMethod = 'icrc1_transfer';
+  describe('assertCallResponse', () => {
+    let spyAssertCallMethod: MockInstance;
+    let spyAssertCallCanisterId: MockInstance;
+    let spyAssertCallArg: MockInstance;
 
-      expect(() => assertCallMethod({requestMethod, responseMethod})).not.toThrow();
+    beforeEach(() => {
+      spyAssertCallMethod = vi.spyOn(callUtils, 'assertCallMethod');
+      spyAssertCallCanisterId = vi.spyOn(callUtils, 'assertCallCanisterId');
+      spyAssertCallArg = vi.spyOn(callUtils, 'assertCallArg');
     });
 
-    it('should throw an error when methods do not match', () => {
-      const requestMethod = 'icrc1_transfer';
-      const responseMethod = 'test';
-
-      expect(() => assertCallMethod({requestMethod, responseMethod})).toThrow(
-        'The response method does not match the request method.'
-      );
-    });
-  });
-
-  describe('assertCallArg', () => {
-    it('should not throw an error when arguments match', () => {
-      const responseArg = new Uint8Array([1, 2, 3, 4, 5, 6, 7]);
-      const requestArgBlob = uint8ArrayToBase64(responseArg);
-
+    it('should validate a valid response', () => {
       expect(() =>
-        assertCallArg({
-          requestArg: requestArgBlob,
-          responseArg
+        assertCallResponse({
+          params: mockLocalCallParams,
+          result: mockLocalCallResult
         })
       ).not.toThrow();
     });
 
-    it('should throw an error when arguments do not match', () => {
-      const responseArg = new Uint8Array([1, 2, 3, 4, 5, 6, 7]);
-      const requestArgBlob = uint8ArrayToBase64(new Uint8Array([1, 2, 3]));
+    it('should call assertCallMethod with correct params', () => {
+      assertCallResponse({
+        params: mockLocalCallParams,
+        result: mockLocalCallResult
+      });
 
-      expect(() =>
-        assertCallArg({
-          requestArg: requestArgBlob,
-          responseArg
-        })
-      ).toThrow('The response does not contain the request arguments.');
-    });
-  });
+      const callRequest = decodeCallRequest(mockLocalCallResult.contentMap);
 
-  describe('assertCallCanisterId', () => {
-    it('should not throw an error when canister ID match', () => {
-      const requestCanisterId = Principal.fromText(mockCanisterId);
-      const responseCanisterId = Principal.fromText(mockCanisterId);
-
-      expect(() => assertCallCanisterId({requestCanisterId, responseCanisterId})).not.toThrow();
+      expect(spyAssertCallMethod).toHaveBeenCalledWith({
+        requestMethod: mockLocalCallParams.method,
+        responseMethod: callRequest.method_name
+      });
     });
 
-    it('should throw an error when methods do not match', () => {
-      const requestCanisterId = Principal.fromText(mockCanisterId);
-      const responseCanisterId = Principal.fromText(mockPrincipalText);
+    it('should call assertCallCanisterId with correct params', () => {
+      assertCallResponse({
+        params: mockLocalCallParams,
+        result: mockLocalCallResult
+      });
 
-      expect(() => assertCallCanisterId({requestCanisterId, responseCanisterId})).toThrow(
-        'The response canister ID does not match the requested canister ID.'
-      );
+      const callRequest = decodeCallRequest(mockLocalCallResult.contentMap);
+
+      expect(spyAssertCallCanisterId).toHaveBeenCalledWith({
+        requestCanisterId: Principal.fromText(mockLocalCallParams.canisterId),
+        responseCanisterId: callRequest.canister_id
+      });
+    });
+
+    it('should call assertCallArg with correct params', () => {
+      assertCallResponse({
+        params: mockLocalCallParams,
+        result: mockLocalCallResult
+      });
+
+      const callRequest = decodeCallRequest(mockLocalCallResult.contentMap);
+
+      expect(spyAssertCallArg).toHaveBeenCalledWith({
+        requestArg: mockLocalCallParams.arg,
+        responseArg: callRequest.arg
+      });
     });
   });
 
