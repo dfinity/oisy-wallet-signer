@@ -40,7 +40,7 @@ describe('ICRC standards', () => {
     }
   ];
 
-  it.each(methodEnums)('should validate $title with IcrcMethodSchema', async ({validEnum}) => {
+  it.each(methodEnums)('should validate $title with IcrcMethodSchema', ({validEnum}) => {
     expect(IcrcMethodSchema.safeParse(validEnum).success).toBe(true);
   });
 
@@ -74,13 +74,13 @@ describe('ICRC standards', () => {
     }
   ];
 
-  it.each(scopeEnums)('should validate $title with IcrcScopedMethodSchema', async ({validEnum}) => {
+  it.each(scopeEnums)('should validate $title with IcrcScopedMethodSchema', ({validEnum}) => {
     expect(IcrcScopedMethodSchema.safeParse(validEnum).success).toBe(true);
   });
 
   it.each(invalidScopeEnums)(
     'should not validate $title with IcrcScopedMethodSchema',
-    async ({validEnum}) => {
+    ({validEnum}) => {
       expect(IcrcScopedMethodSchema.safeParse(validEnum).success).toBe(false);
     }
   );
@@ -104,7 +104,7 @@ describe('ICRC standards', () => {
     }
   ];
 
-  it.each(standardEnums)('should validate $title with IcrcStandardSchema', async ({validEnum}) => {
+  it.each(standardEnums)('should validate $title with IcrcStandardSchema', ({validEnum}) => {
     expect(IcrcStandardSchema.safeParse(validEnum).success).toBe(true);
   });
 

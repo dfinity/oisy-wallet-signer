@@ -126,6 +126,7 @@ describe('icrc-21.canister.api', () => {
         icrc21_canister_call_consent_message: vi
           .fn()
           .mockImplementation(async (_request: icrc21_consent_message_request) => {
+            await Promise.resolve();
             throw mockError;
           }) as unknown as Icrc21Actor['icrc21_canister_call_consent_message']
       });

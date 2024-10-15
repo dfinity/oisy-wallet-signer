@@ -74,7 +74,7 @@
     "prepublishOnly": "if [ $(basename $PWD) != 'dist' ]; then echo 'Publishing is only allowed from the dist directory.' && exit 1; fi"
   },
   "devDependencies": {
-    "@dfinity/eslint-config-oisy-wallet": "^0.0.4",
+    "@dfinity/eslint-config-oisy-wallet": "^0.0.6",
     "@dfinity/identity": "^2.1.1",
     "@dfinity/internet-identity-playwright": "^0.0.3",
     "@playwright/test": "^1.47.1",
