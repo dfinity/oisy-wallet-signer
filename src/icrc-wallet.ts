@@ -5,7 +5,8 @@ import type {
   IcrcCallCanisterResult,
   Origin,
   PrincipalText,
-  RelyingPartyOptions
+  RelyingPartyOptions,
+  RelyingPartyRequestOptions
 } from './index';
 import {RelyingParty} from './relying-party';
 import {encodeArg} from './utils/idl.utils';
@@ -33,11 +34,13 @@ export class IcrcWallet extends RelyingParty {
   transfer = async ({
     params,
     owner,
-    ledgerCanisterId: canisterId
-  }: {params: TransferParams; ledgerCanisterId: PrincipalText} & Pick<
-    IcrcAccount,
-    'owner'
-  >): Promise<IcrcCallCanisterResult> => {
+    ledgerCanisterId: canisterId,
+    options
+  }: {
+    params: TransferParams;
+    ledgerCanisterId: PrincipalText;
+    options?: RelyingPartyRequestOptions;
+  } & Pick<IcrcAccount, 'owner'>): Promise<IcrcCallCanisterResult> => {
     const rawArgs = toTransferArg(params);
 
     const arg = encodeArg({
@@ -51,7 +54,8 @@ export class IcrcWallet extends RelyingParty {
         method: 'icrc1_transfer',
         canisterId,
         arg
-      }
+      },
+      options
     });
   };
 }
