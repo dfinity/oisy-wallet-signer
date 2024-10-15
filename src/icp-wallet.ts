@@ -12,6 +12,7 @@ import type {IcrcCallCanisterRequestParams} from './types/icrc-requests';
 import type {Origin} from './types/post-message';
 import type {PrincipalText} from './types/principal';
 import type {RelyingPartyOptions} from './types/relying-party-options';
+import type {RelyingPartyRequestOptions} from './types/relying-party-requests';
 import {decodeResponse} from './utils/call.utils';
 import {encodeArg} from './utils/idl.utils';
 
@@ -37,18 +38,28 @@ export class IcpWallet extends RelyingParty {
     });
   }
 
-  // TODO: documentation
-  // TODO: return BlockHeight?
-  // TODO: zod but, we have to redeclare Icrc1TransferRequest
-  // TODO: extends with call options
+  /**
+   * Transfer ICP to the destination Account. Returns the index of the block containing the tx if it was successful.
+   *
+   * @param {Object} params - The transfer parameters.
+   * @param {Icrc1TransferRequest} params.request - The request object containing transfer details.
+   * @param {string} params.owner - The owner of the wallet
+   * @param {PrincipalText} [params.ledgerCanisterId] - Optional ledger canister ID, if not provided, uses the default ICP ledger canister ID.
+   * @param {RelyingPartyRequestOptions} [params.options] - Optional parameters for the request, such as request ID, authorization, or timeout.
+   *
+   * @returns {Promise<BlockHeight>} The block height of the transfer transaction if successful.
+   */
   public icrc1Transfer = async ({
     request,
     owner,
-    ledgerCanisterId
+    ledgerCanisterId,
+    options
   }: {
+    options?: RelyingPartyRequestOptions;
     request: Icrc1TransferRequest;
     ledgerCanisterId?: PrincipalText;
   } & Pick<IcrcAccount, 'owner'>): Promise<BlockHeight> => {
+    // TODO: should we convert ic-js to zod? or should we map Icrc1TransferRequest to zod?
     const rawArgs = toIcrc1TransferRawRequest(request);
 
     const arg = encodeArg({
@@ -70,7 +81,8 @@ export class IcpWallet extends RelyingParty {
     // TODO: uncomment nonce and add TODO - not yet supported by agent-js
 
     const callResult = await this.call({
-      params: callParams
+      params: callParams,
+      options
     });
 
     const response = await decodeResponse<Icrc1TransferResult>({

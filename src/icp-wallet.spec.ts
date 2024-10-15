@@ -145,5 +145,25 @@ describe('icp-wallet', () => {
         }
       });
     });
+
+    it('should call `call` with the specific options', async () => {
+      const mockCall = vi.fn().mockResolvedValue({});
+
+      icpWallet.call = mockCall;
+
+      vi.spyOn(callUtils, 'decodeResponse').mockResolvedValue({Ok: mockLocalBlockHeight});
+
+      const options = {
+        pollingIntervalInMilliseconds: 600,
+        timeoutInMilliseconds: 120000
+      };
+
+      await icpWallet.icrc1Transfer({request, owner: sender, options});
+
+      expect(mockCall).toHaveBeenCalledWith({
+        params: mockLocalCallParams,
+        options
+      });
+    });
   });
 });
