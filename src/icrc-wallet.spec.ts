@@ -91,5 +91,30 @@ describe('icrc-wallet', () => {
         }
       });
     });
+
+    it('should call `call` with the specific options', async () => {
+      const mockCall = vi.fn().mockResolvedValue({});
+
+      icrcWallet.call = mockCall;
+
+      const owner = Ed25519KeyIdentity.generate().getPrincipal().toText();
+
+      const options = {
+        pollingIntervalInMilliseconds: 600,
+        timeoutInMilliseconds: 120000
+      };
+
+      await icrcWallet.transfer({params, owner, ledgerCanisterId: mockCanisterId, options});
+
+      expect(mockCall).toHaveBeenCalledWith({
+        params: {
+          sender: owner,
+          method: 'icrc1_transfer',
+          canisterId: mockCanisterId,
+          arg: uint8ArrayToBase64(new Uint8Array([1, 2, 3, 5, 6, 9, 9, 9]))
+        },
+        options
+      });
+    });
   });
 });

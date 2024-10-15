@@ -12,6 +12,7 @@ import type {IcrcCallCanisterRequestParams} from './types/icrc-requests';
 import type {Origin} from './types/post-message';
 import type {PrincipalText} from './types/principal';
 import type {RelyingPartyOptions} from './types/relying-party-options';
+import type {RelyingPartyRequestOptions} from './types/relying-party-requests';
 import {decodeResponse} from './utils/call.utils';
 import {encodeArg} from './utils/idl.utils';
 
@@ -40,12 +41,13 @@ export class IcpWallet extends RelyingParty {
   // TODO: documentation
   // TODO: return BlockHeight?
   // TODO: zod but, we have to redeclare Icrc1TransferRequest
-  // TODO: extends with call options
   public icrc1Transfer = async ({
     request,
     owner,
-    ledgerCanisterId
+    ledgerCanisterId,
+    options
   }: {
+    options?: RelyingPartyRequestOptions;
     request: Icrc1TransferRequest;
     ledgerCanisterId?: PrincipalText;
   } & Pick<IcrcAccount, 'owner'>): Promise<BlockHeight> => {
@@ -70,7 +72,8 @@ export class IcpWallet extends RelyingParty {
     // TODO: uncomment nonce and add TODO - not yet supported by agent-js
 
     const callResult = await this.call({
-      params: callParams
+      params: callParams,
+      options
     });
 
     const response = await decodeResponse<Icrc1TransferResult>({
