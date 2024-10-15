@@ -38,9 +38,17 @@ export class IcpWallet extends RelyingParty {
     });
   }
 
-  // TODO: documentation
-  // TODO: return BlockHeight?
-  // TODO: zod but, we have to redeclare Icrc1TransferRequest
+  /**
+   * Transfer ICP to the destination Account. Returns the index of the block containing the tx if it was successful.
+   *
+   * @param {Object} params - The transfer parameters.
+   * @param {Icrc1TransferRequest} params.request - The request object containing transfer details.
+   * @param {string} params.owner - The owner of the wallet
+   * @param {PrincipalText} [params.ledgerCanisterId] - Optional ledger canister ID, if not provided, uses the default ICP ledger canister ID.
+   * @param {RelyingPartyRequestOptions} [params.options] - Optional parameters for the request, such as request ID, authorization, or timeout.
+   *
+   * @returns {Promise<BlockHeight>} The block height of the transfer transaction if successful.
+   */
   public icrc1Transfer = async ({
     request,
     owner,
@@ -51,6 +59,7 @@ export class IcpWallet extends RelyingParty {
     request: Icrc1TransferRequest;
     ledgerCanisterId?: PrincipalText;
   } & Pick<IcrcAccount, 'owner'>): Promise<BlockHeight> => {
+    // TODO: should we convert ic-js to zod? or should we map Icrc1TransferRequest to zod?
     const rawArgs = toIcrc1TransferRawRequest(request);
 
     const arg = encodeArg({
