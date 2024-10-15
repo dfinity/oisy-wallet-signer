@@ -49,6 +49,7 @@ import {
   RpcResponseWithResultOrErrorSchema,
   type RpcId
 } from './types/rpc';
+import {assertCallResponse} from './utils/call.utils';
 import type {ReadyOrError} from './utils/timeout.utils';
 import {windowFeatures} from './utils/window.utils';
 
@@ -669,7 +670,7 @@ export class RelyingParty {
       });
     };
 
-    return await this.request<IcrcCallCanisterResult>({
+    const result = await this.request<IcrcCallCanisterResult>({
       options: {
         timeoutInMilliseconds: timeoutInMilliseconds ?? RELYING_PARTY_TIMEOUT_CALL_CANISTER,
         ...rest
@@ -677,6 +678,13 @@ export class RelyingParty {
       postRequest,
       handleMessage
     });
+
+    assertCallResponse({
+      params,
+      result
+    });
+
+    return result;
   };
 
   private readonly handleErrorMessage = ({

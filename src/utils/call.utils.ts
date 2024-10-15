@@ -7,70 +7,22 @@ import {
 } from '@dfinity/agent';
 import {RecordClass, VariantClass} from '@dfinity/candid/lib/cjs/idl';
 import {Principal} from '@dfinity/principal';
-import {arrayBufferToUint8Array, assertNonNullish} from '@dfinity/utils';
+import {assertNonNullish} from '@dfinity/utils';
 import {LOCAL_REPLICA_URL, MAINNET_REPLICA_URL} from '../constants/core.constants';
-import {IcrcBlob} from '../types/blob';
-import {IcrcCallCanisterRequestParams, Method} from '../types/icrc-requests';
+import {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import type {IcrcCallCanisterResult} from '../types/icrc-responses';
 import {decodeCallRequest} from './agentjs-cbor-copy.utils';
 import {base64ToUint8Array} from './base64.utils';
+import {assertCallArg, assertCallCanisterId, assertCallMethod} from './call.assert.utils';
 import {decodeResult} from './idl.utils';
 
-// Exposed for testing purposes
-export const assertCallMethod = ({
-  requestMethod,
-  responseMethod
-}: {
-  responseMethod: string;
-  requestMethod: Method;
-}) => {
-  if (responseMethod !== requestMethod) {
-    throw new Error('The response method does not match the request method.');
-  }
-};
-
-// Exposed for testing purposes
-export const assertCallArg = ({
-  responseArg,
-  requestArg: requestArgBlob
-}: {
-  responseArg: ArrayBuffer;
-  requestArg: IcrcBlob;
-}) => {
-  const requestArg = base64ToUint8Array(requestArgBlob);
-  const callRequestArg = arrayBufferToUint8Array(responseArg);
-
-  const uint8ArrayEqual = ({first, second}: {first: Uint8Array; second: Uint8Array}): boolean =>
-    // eslint-disable-next-line local-rules/prefer-object-params
-    first.length === second.length && first.every((value, index) => value === second[index]);
-
-  if (!uint8ArrayEqual({first: requestArg, second: callRequestArg})) {
-    throw new Error('The response does not contain the request arguments.');
-  }
-};
-
-// Exposed for testing purposes
-export const assertCallCanisterId = ({
-  requestCanisterId,
-  responseCanisterId
-}: {
-  responseCanisterId: Principal;
-  requestCanisterId: Principal;
-}) => {
-  if (requestCanisterId.toText() !== responseCanisterId.toText()) {
-    throw new Error('The response canister ID does not match the requested canister ID.');
-  }
-};
-
-export const decodeResponse = async <T>({
+export const assertCallResponse = ({
   params: {method, arg, canisterId},
-  result: {certificate: cert, contentMap},
-  resultRecordClass
+  result: {contentMap}
 }: {
   params: IcrcCallCanisterRequestParams;
   result: IcrcCallCanisterResult;
-  resultRecordClass: RecordClass | VariantClass;
-}): Promise<T> => {
+}) => {
   const callRequest = decodeCallRequest(contentMap);
 
   assertCallCanisterId({
@@ -87,6 +39,19 @@ export const decodeResponse = async <T>({
     requestArg: arg,
     responseArg: callRequest.arg
   });
+};
+
+export const decodeResponse = async <T>({
+  params: {canisterId},
+  result: {certificate: cert, contentMap},
+  resultRecordClass
+}: {
+  params: IcrcCallCanisterRequestParams;
+  result: IcrcCallCanisterResult;
+  resultRecordClass: RecordClass | VariantClass;
+}): Promise<T> => {
+  // TODO: improve performance by avoiding the need to decode the call requests multiple times. For example. IcpWallet and IcrcWallet could use a new protected function of RelyingParty that would extend call and return the callRequest that is asserted.
+  const callRequest = decodeCallRequest(contentMap);
 
   // We have to create an agent to retrieve the rootKey, which is both inefficient and a bit ugly to some extension.
   const {
