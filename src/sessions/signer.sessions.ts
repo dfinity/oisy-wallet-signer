@@ -5,6 +5,7 @@ import {SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS} from '../constants/si
 import type {IcrcScopesArray} from '../types/icrc-responses';
 import type {IcrcPermissionState, IcrcScopedMethod} from '../types/icrc-standards';
 import type {Origin} from '../types/post-message';
+import {SignerOptions} from '../types/signer-options';
 import type {SessionIcrcScope, SessionPermissions} from '../types/signer-sessions';
 import {get, set} from '../utils/storage.utils';
 
@@ -67,7 +68,10 @@ export const saveSessionScopes = ({
   set({key: permissionKey, value: updatedPermissions});
 };
 
-export const readSessionValidScopes = (params: SessionIdentifier): IcrcScopesArray | undefined => {
+export const readSessionValidScopes = ({
+  sessionOptions,
+  ...params
+}: SessionIdentifier & Pick<SignerOptions, 'sessionOptions'>): IcrcScopesArray | undefined => {
   const permissions = get<SessionPermissions>({key: key(params)});
 
   if (isNullish(permissions)) {
@@ -80,7 +84,11 @@ export const readSessionValidScopes = (params: SessionIdentifier): IcrcScopesArr
   // 2. Comparing the creation date was granted within the last 30 days.
   return permissions.scopes
     .filter(
-      ({updatedAt}) => updatedAt >= Date.now() - SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS
+      ({updatedAt}) =>
+        updatedAt >=
+        Date.now() -
+          (sessionOptions?.sessionPermissionExpirationInMilliseconds ??
+            SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS)
     )
     .map(({updatedAt: _, createdAt: __, ...rest}) => ({...rest}));
 };

@@ -533,11 +533,12 @@ export class Signer {
   private emitPermissions({id}: Pick<NotifyPermissions, 'id'>): void {
     assertNonNullish(this.#walletOrigin, "The relying party's origin is unknown.");
 
-    const {owner} = this.#signerOptions;
+    const {owner, sessionOptions} = this.#signerOptions;
 
     const scopes = readSessionValidScopes({
       owner: owner.getPrincipal(),
-      origin: this.#walletOrigin
+      origin: this.#walletOrigin,
+      sessionOptions
     });
 
     // The relying party should always receive the full list of permissions, and those that have never been requested or have expired should be provided as "ask_on_use".
