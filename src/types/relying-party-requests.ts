@@ -5,8 +5,9 @@ export const RelyingPartyRequestOptionsTimeoutSchema = z.object({
   /**
    * Specifies the maximum duration in milliseconds for attempting to request an interaction with the relying party.
    * If the relying party does not answer within this duration, the process will time out.
+   * Must be a positive number.
    */
-  timeoutInMilliseconds: z.number()
+  timeoutInMilliseconds: z.number().positive()
 });
 
 export const RelyingPartyRequestOptionsSchema = z

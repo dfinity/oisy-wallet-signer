@@ -48,6 +48,26 @@ describe('Signer-sessions', () => {
     expect(() => SessionPermissionsSchema.parse(invalidData)).toThrow();
   });
 
+  it('should fail validation with a negative createdAt', () => {
+    const invalidData = {
+      scopes,
+      createdAt: -1000,
+      updatedAt: Date.now()
+    };
+
+    expect(() => SessionPermissionsSchema.parse(invalidData)).toThrow();
+  });
+
+  it('should fail validation with a zero createdAt', () => {
+    const invalidData = {
+      scopes,
+      createdAt: 0,
+      updatedAt: Date.now()
+    };
+
+    expect(() => SessionPermissionsSchema.parse(invalidData)).toThrow();
+  });
+
   it('should fail validation if updatedAt is not a number', () => {
     const invalidData = {
       scopes,
@@ -62,6 +82,26 @@ describe('Signer-sessions', () => {
     const invalidData = {
       scopes,
       created: Date.now()
+    };
+
+    expect(() => SessionPermissionsSchema.parse(invalidData)).toThrow();
+  });
+
+  it('should fail validation with a negative updatedAt', () => {
+    const invalidData = {
+      scopes,
+      createdAt: Date.now(),
+      updatedAt: -1000
+    };
+
+    expect(() => SessionPermissionsSchema.parse(invalidData)).toThrow();
+  });
+
+  it('should fail validation with a zero updatedAt', () => {
+    const invalidData = {
+      scopes,
+      createdAt: Date.now(),
+      updatedAt: 0
     };
 
     expect(() => SessionPermissionsSchema.parse(invalidData)).toThrow();
