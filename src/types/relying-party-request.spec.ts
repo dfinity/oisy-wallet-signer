@@ -26,5 +26,23 @@ describe('RelyingPartyRequests', () => {
       const result = RelyingPartyRequestOptionsSchema.safeParse(invalidData);
       expect(result.success).toBe(false);
     });
+
+    it('should fail validation with a non-positive timeoutInMilliseconds', () => {
+      const invalidData = {
+        timeoutInMilliseconds: -500
+      };
+
+      const result = RelyingPartyRequestOptionsSchema.safeParse(invalidData);
+      expect(result.success).toBe(false);
+    });
+
+    it('should fail validation with a zero timeoutInMilliseconds', () => {
+      const invalidData = {
+        timeoutInMilliseconds: 0
+      };
+
+      const result = RelyingPartyRequestOptionsSchema.safeParse(invalidData);
+      expect(result.success).toBe(false);
+    });
   });
 });
