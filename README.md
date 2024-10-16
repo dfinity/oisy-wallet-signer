@@ -37,7 +37,7 @@ Additionally, it includes opinionated clients that enable interactions with the 
   - [2. Implement the Disconnection](#2-implement-the-disconnection-1)
   - [3. Request Permissions and Accounts](#3-request-permissions-and-accounts)
   - [4. Call Canister](#4-call-canister)
-- [:information_desk_person::️ Tips & Tricks](#information_desk_person-tricks)
+- [:information_desk_person::️ Tips & Tricks](#information_desk_person-tips--tricks)
   - [Examples](#examples)
   - [Running Tests Locally](#running-tests-locally)
   - [Running E2E Tests Locally](#running-e2e-tests-locally)
