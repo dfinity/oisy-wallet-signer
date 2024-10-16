@@ -510,6 +510,43 @@ Return to the root directory and execute the tests:
 npm run e2e
 ```
 
+### Developing with OISY Wallet
+
+The demo of a relying party can be used to test the integration of signer features within the OISY Wallet.
+
+1. Install OISY Wallet
+
+```bash
+git clone https://github.com/dfinity/oisy-wallet
+cd oisy-wallet
+npm ci
+npm run deploy
+```
+
+2. Start the local replica
+
+Within the `oisy-wallet` folder:
+
+```bash
+dfx start
+```
+
+3. Run the demo
+
+Navigate to the [demo](./demo) folder of the OISY Wallet Signer and start the demo on port `5173`:
+
+```
+npm run dev:party
+```
+
+4. Start OISY Wallet
+
+In `oisy-wallet` project, run the local development server on port `5174`:
+
+```bash
+npm run dev
+```
+
 ## 🧑‍🤝‍🧑 Community
 
 - [Identity and Wallet Standards](https://github.com/dfinity/wg-identity-authentication/)
