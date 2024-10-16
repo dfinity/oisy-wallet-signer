@@ -466,7 +466,7 @@ The `request` argument is the payload for the transfer. It contains the standard
 
 To process the canister call, the request needs to be initiated for a known account, which is why the `owner` of the `icrc1Transfer` is set to the `account` that was resolved in the previous chapter.
 
-## :couple: Tips & Tricks
+## :information_desk_person: Tips & Tricks
 
 ### Examples
 
@@ -570,7 +570,7 @@ In `oisy-wallet` project, run the local development server on port `5174`:
 npm run dev
 ```
 
-## :busts_in_silhouette: Community
+## :couple: Community
 
 - [Identity and Wallet Standards](https://github.com/dfinity/wg-identity-authentication/)
 - [Forum](https://forum.dfinity.org/)
