@@ -8,7 +8,7 @@ import {
   ICRC27_ACCOUNTS,
   ICRC49_CALL_CANISTER
 } from '../constants/icrc.constants';
-import {DEFAULT_SIGNER_SESSION_PERMISSION_EXPIRATION_PERIOD_IN_MS} from '../constants/signer.constants';
+import {SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS} from '../constants/signer.constants';
 import type {IcrcScope, IcrcScopesArray} from '../types/icrc-responses';
 import type {IcrcScopedMethod} from '../types/icrc-standards';
 import type {SessionPermissions} from '../types/signer-sessions';
@@ -150,7 +150,7 @@ describe('Signer sessions', () => {
       it('should update the updatedAt field for existing scopes', () => {
         assertNonNullish(savedPermissions);
 
-        vi.advanceTimersByTime(DEFAULT_SIGNER_SESSION_PERMISSION_EXPIRATION_PERIOD_IN_MS);
+        vi.advanceTimersByTime(SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS);
 
         saveSessionScopes({
           owner,
@@ -201,7 +201,7 @@ describe('Signer sessions', () => {
         scopes
       });
 
-      vi.advanceTimersByTime(DEFAULT_SIGNER_SESSION_PERMISSION_EXPIRATION_PERIOD_IN_MS + 1);
+      vi.advanceTimersByTime(SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS + 1);
 
       const sessionScopes = readSessionValidScopes({owner, origin});
 
@@ -215,7 +215,7 @@ describe('Signer sessions', () => {
         scopes
       });
 
-      vi.advanceTimersByTime(DEFAULT_SIGNER_SESSION_PERMISSION_EXPIRATION_PERIOD_IN_MS);
+      vi.advanceTimersByTime(SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS);
 
       const permissions = get<SessionPermissions>({key: expectedKey});
 
@@ -301,7 +301,7 @@ describe('Signer sessions', () => {
         scopes
       });
 
-      vi.advanceTimersByTime(DEFAULT_SIGNER_SESSION_PERMISSION_EXPIRATION_PERIOD_IN_MS + 1);
+      vi.advanceTimersByTime(SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS + 1);
 
       const state = sessionScopeState({
         owner,

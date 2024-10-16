@@ -66,4 +66,4 @@ export const SIGNER_DEFAULT_SCOPES: IcrcScopesArray = Object.values(
   IcrcScopedMethodSchema.Values
 ).map((method) => ({scope: {method}, state: ICRC25_PERMISSION_ASK_ON_USE}));
 
-export const DEFAULT_SIGNER_SESSION_PERMISSION_EXPIRATION_PERIOD_IN_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+export const SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS = 7 * 24 * 60 * 60 * 1000; // 7 days
