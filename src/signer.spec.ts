@@ -521,18 +521,9 @@ describe('Signer', () => {
       });
 
       describe('Permissions', () => {
-        const msg = {
-          data: {
-            id: testId,
-            jsonrpc: JSON_RPC_VERSION_2,
-            method: ICRC25_PERMISSIONS
-          },
-          origin: testOrigin
-        };
-
         describe('Not ready', () => {
           it('should notify connection is not yet established', () => {
-            const messageEvent = new MessageEvent('message', msg);
+            const messageEvent = new MessageEvent('message', requestPermissions);
             window.dispatchEvent(messageEvent);
 
             expect(postMessageMock).toHaveBeenCalledWith(
@@ -576,7 +567,7 @@ describe('Signer', () => {
           });
 
           it('should notify default permissions for icrc25_permissions', () => {
-            const messageEvent = new MessageEvent('message', msg);
+            const messageEvent = new MessageEvent('message', requestPermissions);
             window.dispatchEvent(messageEvent);
 
             expect(postMessageMock).toHaveBeenCalledWith(
@@ -609,7 +600,7 @@ describe('Signer', () => {
               scopes
             });
 
-            const messageEvent = new MessageEvent('message', msg);
+            const messageEvent = new MessageEvent('message', requestPermissions);
             window.dispatchEvent(messageEvent);
 
             expect(postMessageMock).toHaveBeenCalledWith(
@@ -651,7 +642,7 @@ describe('Signer', () => {
 
             vi.advanceTimersByTime(SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS + 1);
 
-            const messageEvent = new MessageEvent('message', msg);
+            const messageEvent = new MessageEvent('message', requestPermissions);
             window.dispatchEvent(messageEvent);
 
             expect(postMessageMock).toHaveBeenCalledWith(
@@ -677,7 +668,7 @@ describe('Signer', () => {
           });
 
           it('should not notify any other messages than icrc25_permissions', () => {
-            const messageEvent = new MessageEvent('message', msg);
+            const messageEvent = new MessageEvent('message', requestPermissions);
             window.dispatchEvent(messageEvent);
 
             expect(notifyPermissionsSpy).toHaveBeenCalled();
