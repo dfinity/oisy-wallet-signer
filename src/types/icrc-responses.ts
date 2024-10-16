@@ -7,6 +7,7 @@ import {
   IcrcStandardSchema
 } from './icrc-standards';
 import {inferRpcResponseSchema} from './rpc';
+import {UrlSchema} from './url';
 
 const IcrcScopeMethodSchema = z.object({
   method: IcrcScopedMethodSchema
@@ -53,10 +54,16 @@ const SupportedStandardsUrlSchema = z
   .regex(urlRegex)
   .refine(
     (url) => {
+      try {
+        UrlSchema.parse(url);
+      } catch (_err: unknown) {
+        return false;
+      }
+
       const match = /(ICRC-\d+)\.md/g.exec(url);
 
       if (match === null) {
-        return;
+        return false;
       }
 
       const [_, icrc] = match;
