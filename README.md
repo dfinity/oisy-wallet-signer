@@ -32,17 +32,17 @@ Additionally, it includes opinionated clients that enable interactions with the 
     - [B. Accounts](#b-accounts)
     - [C. Consent Message](#c-consent-message)
     - [D. Call Canister](#d-call-canister)
-- [✍️ Usage in a Client](#-usage-in-a-client)
+- [✍️ Usage in a Client](#writing_hand-usage-in-a-client)
   - [1. Initialize a Wallet](#1-initialize-a-wallet)
   - [2. Implement the Disconnection](#2-implement-the-disconnection-1)
   - [3. Request Permissions and Accounts](#3-request-permissions-and-accounts)
   - [4. Call Canister](#4-call-canister)
-- [💁‍♂️️ Tips & Tricks](#-tips--tricks)
+- [💁‍♂️️ Tips & Tricks](#man_tipping_hand-tips--tricks)
   - [Examples](#examples)
   - [Running Tests Locally](#running-tests-locally)
   - [Running E2E Tests Locally](#running-e2e-tests-locally)
   - [Developing with OISY Wallet](#developing-with-oisy-wallet)
-- [🧑‍🤝‍🧑 Community](#-community)
+- [🧑‍🤝‍🧑 Community](#busts_in_silhouette-community)
 
 ## :computer: Installation
 
@@ -313,7 +313,7 @@ The flow works as follows:
 2. The call to the canister is executed.
 3. Upon receiving a result or error, the prompt is triggered with the appropriate status, and a corresponding response is sent to the client.
 
-## ✍️ Usage in a Client
+## :writing_hand: Usage in a Client
 
 As mentioned in the introduction, this library is primarily developed for OISY. However, it also includes opinionated clients that enable interactions with the ICP or ICRC ledgers in any JavaScript application.
 
@@ -466,7 +466,7 @@ The `request` argument is the payload for the transfer. It contains the standard
 
 To process the canister call, the request needs to be initiated for a known account, which is why the `owner` of the `icrc1Transfer` is set to the `account` that was resolved in the previous chapter.
 
-## 💁‍♂️️ Tips & Tricks
+## :man_tipping_hand: Tips & Tricks
 
 ### Examples
 
@@ -570,7 +570,7 @@ In `oisy-wallet` project, run the local development server on port `5174`:
 npm run dev
 ```
 
-## 🧑‍🤝‍🧑 Community
+## :busts_in_silhouette: Community
 
 - [Identity and Wallet Standards](https://github.com/dfinity/wg-identity-authentication/)
 - [Forum](https://forum.dfinity.org/)
