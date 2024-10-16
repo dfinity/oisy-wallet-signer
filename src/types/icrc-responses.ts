@@ -47,7 +47,7 @@ export type IcrcScopesResponse = z.infer<typeof IcrcScopesResponseSchema>;
 const urlRegex =
   /^https:\/\/github\.com\/dfinity\/ICRC\/blob\/main\/ICRCs\/ICRC-\d+\/ICRC-\d+\.md$/;
 
-const UrlSchema = z
+const SupportedStandardsUrlSchema = z
   .string()
   .url()
   .regex(urlRegex)
@@ -73,7 +73,7 @@ export const IcrcSupportedStandardsSchema = z
     z
       .object({
         name: IcrcStandardSchema,
-        url: UrlSchema
+        url: SupportedStandardsUrlSchema
       })
       .strict()
   )
