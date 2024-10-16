@@ -226,6 +226,7 @@ export class RelyingParty {
    *
    * @returns {Promise<void>} A promise that resolves when the signer has been successfully disconnected.
    */
+  // eslint-disable-next-line require-await
   disconnect = async (): Promise<void> => {
     clearInterval(this.#walletStatusInterval);
     this.#popup.close();
@@ -237,13 +238,13 @@ export class RelyingParty {
   };
 
   private async checkWalletStatus() {
-    const handleMessage = async ({
+    const handleMessage = ({
       data,
       id
     }: {
       data: RelyingPartyMessageEventData;
       id: RpcId;
-    }): Promise<{handled: boolean; result: WalletStatus}> => {
+    }): {handled: boolean; result: WalletStatus} => {
       const {success: isWalletReady, data: walletReadyData} =
         IcrcReadyResponseSchema.safeParse(data);
       if (isWalletReady && id === walletReadyData?.id) {
@@ -310,10 +311,10 @@ export class RelyingParty {
     options: Omit<RelyingPartyRequestOptions, 'timeoutInMilliseconds'> &
       Required<Pick<RelyingPartyRequestOptions, 'timeoutInMilliseconds'>>;
     postRequest: (id: RpcId) => void;
-    handleMessage: (params: {
-      data: RelyingPartyMessageEventData;
-      id: RpcId;
-    }) => Promise<{handled: boolean; result?: T}>;
+    handleMessage: (params: {data: RelyingPartyMessageEventData; id: RpcId}) => {
+      handled: boolean;
+      result?: T;
+    };
   }): Promise<T> =>
     await new Promise<T>((resolve, reject) => {
       const {connected, err} = this.assertWalletConnected();
@@ -339,7 +340,7 @@ export class RelyingParty {
         disconnect();
       }, timeoutInMilliseconds);
 
-      const onMessage = async ({origin, data}: RelyingPartyMessageEvent): Promise<void> => {
+      const onMessage = ({origin, data}: RelyingPartyMessageEvent) => {
         const {success} = RpcResponseWithResultOrErrorSchema.safeParse(data);
 
         if (!success) {
@@ -358,7 +359,7 @@ export class RelyingParty {
           return;
         }
 
-        const {handled, result} = await handleMessage({data, id: requestId});
+        const {handled, result} = handleMessage({data, id: requestId});
 
         if (handled && nonNullish(result)) {
           resolve(result);
@@ -374,15 +375,11 @@ export class RelyingParty {
         }
       };
 
-      const onMessageListener = (message: RelyingPartyMessageEvent): void => {
-        void onMessage(message);
-      };
-
-      window.addEventListener('message', onMessageListener);
+      window.addEventListener('message', onMessage);
 
       const disconnect = (): void => {
         clearTimeout(timeoutId);
-        window.removeEventListener('message', onMessageListener);
+        window.removeEventListener('message', onMessage);
       };
 
       postRequest(requestId);
@@ -426,13 +423,13 @@ export class RelyingParty {
   supportedStandards = async ({
     options: {timeoutInMilliseconds, ...rest} = {}
   }: {options?: RelyingPartyRequestOptions} = {}): Promise<IcrcSupportedStandards> => {
-    const handleMessage = async ({
+    const handleMessage = ({
       data,
       id
     }: {
       data: RelyingPartyMessageEventData;
       id: RpcId;
-    }): Promise<{handled: boolean; result?: IcrcSupportedStandards}> => {
+    }): {handled: boolean; result?: IcrcSupportedStandards} => {
       const {success: isSupportedStandards, data: supportedStandardsData} =
         IcrcSupportedStandardsResponseSchema.safeParse(data);
 
@@ -541,13 +538,13 @@ export class RelyingParty {
     options: RelyingPartyRequestOptionsWithTimeout;
     postRequest: (id: RpcId) => void;
   }): Promise<IcrcScopesArray> => {
-    const handleMessage = async ({
+    const handleMessage = ({
       data,
       id
     }: {
       data: RelyingPartyMessageEventData;
       id: RpcId;
-    }): Promise<{handled: boolean; result?: IcrcScopesArray}> => {
+    }): {handled: boolean; result?: IcrcScopesArray} => {
       const {success: isRequestPermissions, data: requestPermissionsData} =
         IcrcScopesResponseSchema.safeParse(data);
 
@@ -584,13 +581,13 @@ export class RelyingParty {
   accounts = async ({
     options: {timeoutInMilliseconds, ...rest} = {}
   }: {options?: RelyingPartyRequestOptions} = {}): Promise<IcrcAccounts> => {
-    const handleMessage = async ({
+    const handleMessage = ({
       data,
       id
     }: {
       data: RelyingPartyMessageEventData;
       id: RpcId;
-    }): Promise<{handled: boolean; result?: IcrcAccounts}> => {
+    }): {handled: boolean; result?: IcrcAccounts} => {
       const {success: isAccounts, data: accountsData} = IcrcAccountsResponseSchema.safeParse(data);
 
       if (isAccounts && id === accountsData?.id && nonNullish(accountsData?.result)) {
@@ -639,13 +636,13 @@ export class RelyingParty {
     options?: RelyingPartyRequestOptions;
     params: IcrcCallCanisterRequestParams;
   }): Promise<IcrcCallCanisterResult> => {
-    const handleMessage = async ({
+    const handleMessage = ({
       data,
       id
     }: {
       data: RelyingPartyMessageEventData;
       id: RpcId;
-    }): Promise<{handled: boolean; result?: IcrcCallCanisterResult}> => {
+    }): {handled: boolean; result?: IcrcCallCanisterResult} => {
       const {success: isCallCanister, data: resultData} =
         IcrcCallCanisterResponseSchema.safeParse(data);
 

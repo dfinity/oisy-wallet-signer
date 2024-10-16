@@ -2048,7 +2048,7 @@ describe('Signer', () => {
                   await approveAndCall();
                 });
 
-                it('should call canister and notify success', async () => {
+                it('should call canister and notify success', () => {
                   expect(spyCanisterCall).toHaveBeenNthCalledWith(1, {
                     ...signerOptions,
                     params: {
@@ -2084,7 +2084,7 @@ describe('Signer', () => {
                   await approveAndCall();
                 });
 
-                it('should call canister and notify error', async () => {
+                it('should call canister and notify error', () => {
                   expect(spyCanisterCall).toHaveBeenNthCalledWith(1, {
                     ...signerOptions,
                     params: {

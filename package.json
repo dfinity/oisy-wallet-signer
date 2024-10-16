@@ -74,29 +74,29 @@
     "prepublishOnly": "if [ $(basename $PWD) != 'dist' ]; then echo 'Publishing is only allowed from the dist directory.' && exit 1; fi"
   },
   "devDependencies": {
-    "@dfinity/eslint-config-oisy-wallet": "^0.0.4",
-    "@dfinity/identity": "^2.1.1",
+    "@dfinity/eslint-config-oisy-wallet": "^0.0.6",
+    "@dfinity/identity": "^2.1.2",
     "@dfinity/internet-identity-playwright": "^0.0.3",
-    "@playwright/test": "^1.47.1",
+    "@playwright/test": "^1.48.0",
     "@types/jest": "^29.5.13",
     "@types/node": "^20.12.7",
-    "esbuild": "^0.23.1",
-    "jsdom": "^25.0.0",
+    "esbuild": "^0.24.0",
+    "jsdom": "^25.0.1",
     "prettier": "^3.3.3",
-    "prettier-plugin-organize-imports": "^4.0.0",
+    "prettier-plugin-organize-imports": "^4.1.0",
     "typescript": "^5.3.3",
-    "vitest": "^2.1.1"
+    "vitest": "^2.1.3"
   },
   "engines": {
     "node": ">=20"
   },
   "peerDependencies": {
-    "@dfinity/agent": "^2.1.1",
-    "@dfinity/candid": "^2.1.1",
-    "@dfinity/ledger-icp": "^2.6.0",
-    "@dfinity/ledger-icrc": "^2.6.0",
-    "@dfinity/principal": "^2.1.1",
-    "@dfinity/utils": "^2.5.0-next-2024-09-17",
+    "@dfinity/agent": "^2.1.2",
+    "@dfinity/candid": "^2.1.2",
+    "@dfinity/ledger-icp": "^2.6.1",
+    "@dfinity/ledger-icrc": "^2.6.1",
+    "@dfinity/principal": "^2.1.2",
+    "@dfinity/utils": "^2.5.2",
     "borc": "^2.1.1",
     "simple-cbor": "^0.4.1",
     "zod": "^3.23.8"
