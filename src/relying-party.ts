@@ -340,11 +340,18 @@ export class RelyingParty {
         disconnect();
       }, timeoutInMilliseconds);
 
-      const onMessage = ({origin, data}: RelyingPartyMessageEvent) => {
+      const onMessage = ({origin, data, source}: RelyingPartyMessageEvent) => {
         const {success} = RpcResponseWithResultOrErrorSchema.safeParse(data);
 
         if (!success) {
           // We are only interested in JSON-RPC messages, so we are ignoring any other messages emitted at the window level, as the consumer might be using other events.
+          return;
+        }
+
+        if (source !== this.#popup) {
+          reject(new Error('The response is not originating from the window that was opened.'));
+
+          disconnect();
           return;
         }
 
