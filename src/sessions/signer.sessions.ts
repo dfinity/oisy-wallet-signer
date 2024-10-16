@@ -1,7 +1,7 @@
 import type {Principal} from '@dfinity/principal';
 import {isNullish} from '@dfinity/utils';
 import {ICRC25_PERMISSION_ASK_ON_USE} from '../constants/icrc.constants';
-import {SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS} from '../constants/signer.constants';
+import {DEFAULT_SIGNER_SESSION_PERMISSION_EXPIRATION_PERIOD_IN_MS} from '../constants/signer.constants';
 import type {IcrcScopesArray} from '../types/icrc-responses';
 import type {IcrcPermissionState, IcrcScopedMethod} from '../types/icrc-standards';
 import type {Origin} from '../types/post-message';
@@ -80,7 +80,8 @@ export const readSessionValidScopes = (params: SessionIdentifier): IcrcScopesArr
   // 2. Comparing the creation date was granted within the last 30 days.
   return permissions.scopes
     .filter(
-      ({updatedAt}) => updatedAt >= Date.now() - SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS
+      ({updatedAt}) =>
+        updatedAt >= Date.now() - DEFAULT_SIGNER_SESSION_PERMISSION_EXPIRATION_PERIOD_IN_MS
     )
     .map(({updatedAt: _, createdAt: __, ...rest}) => ({...rest}));
 };

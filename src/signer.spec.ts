@@ -14,8 +14,8 @@ import {
   ICRC49_CALL_CANISTER
 } from './constants/icrc.constants';
 import {
+  DEFAULT_SIGNER_SESSION_PERMISSION_EXPIRATION_PERIOD_IN_MS,
   SIGNER_DEFAULT_SCOPES,
-  SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS,
   SIGNER_SUPPORTED_STANDARDS,
   SignerErrorCode
 } from './constants/signer.constants';
@@ -626,7 +626,7 @@ describe('Signer', () => {
             scopes
           });
 
-          vi.advanceTimersByTime(SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS + 1);
+          vi.advanceTimersByTime(DEFAULT_SIGNER_SESSION_PERMISSION_EXPIRATION_PERIOD_IN_MS + 1);
 
           const messageEvent = new MessageEvent('message', msg);
           window.dispatchEvent(messageEvent);
@@ -989,7 +989,7 @@ describe('Signer', () => {
             scopes
           });
 
-          vi.advanceTimersByTime(SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS + 1);
+          vi.advanceTimersByTime(DEFAULT_SIGNER_SESSION_PERMISSION_EXPIRATION_PERIOD_IN_MS + 1);
 
           const messageEvent = new MessageEvent('message', requestPermissionsMsg);
           window.dispatchEvent(messageEvent);

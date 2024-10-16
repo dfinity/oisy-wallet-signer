@@ -88,4 +88,72 @@ describe('SignerOptions', () => {
       expect(() => SignerOptionsSchema.parse(validSignerOptions)).not.toThrow();
     });
   });
+
+  describe('SessionOptions', () => {
+    const owner = Ed25519KeyIdentity.generate();
+
+    it('should validate when optional sessionOptions is not provided', () => {
+      const validSignerOptions = {
+        owner
+      };
+
+      const result = SignerOptionsSchema.parse(validSignerOptions);
+      expect(result.sessionOptions).toBeUndefined();
+    });
+
+    it('should validate when valid sessionOptions are provided', () => {
+      const validSignerOptions = {
+        owner,
+        sessionOptions: {
+          sessionPermissionExpirationInMilliseconds: 7 * 24 * 60 * 60 * 1000
+        }
+      };
+
+      expect(() => SignerOptionsSchema.parse(validSignerOptions)).not.toThrow();
+    });
+
+    it('should throw an error for invalid sessionPermissionExpirationInMilliseconds (negative)', () => {
+      const invalidSignerOptions = {
+        owner,
+        sessionOptions: {
+          sessionPermissionExpirationInMilliseconds: -1000
+        }
+      };
+
+      expect(() => SignerOptionsSchema.parse(invalidSignerOptions)).toThrow();
+    });
+
+    it('should throw an error for invalid sessionPermissionExpirationInMilliseconds (zero)', () => {
+      const invalidSignerOptions = {
+        owner,
+        sessionOptions: {
+          sessionPermissionExpirationInMilliseconds: 0
+        }
+      };
+
+      expect(() => SignerOptionsSchema.parse(invalidSignerOptions)).toThrow();
+    });
+
+    it('should throw an error for non-numeric sessionPermissionExpirationInMilliseconds', () => {
+      const invalidSignerOptions = {
+        owner,
+        sessionOptions: {
+          sessionPermissionExpirationInMilliseconds: 'not-a-number'
+        }
+      };
+
+      expect(() => SignerOptionsSchema.parse(invalidSignerOptions)).toThrow();
+    });
+
+    it('should validate when sessionPermissionExpirationInMilliseconds is a positive number', () => {
+      const validSignerOptions = {
+        owner,
+        sessionOptions: {
+          sessionPermissionExpirationInMilliseconds: 5000
+        }
+      };
+
+      expect(() => SignerOptionsSchema.parse(validSignerOptions)).not.toThrow();
+    });
+  });
 });
