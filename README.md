@@ -21,6 +21,30 @@ While primarily developed for OISY, the library can be integrated into any walle
 
 Additionally, it includes opinionated clients that enable interactions with the ICP or ICRC ledgers without the need for any specific JavaScript framework, making the library fully agnostic.
 
+## 📚 Table of Contents
+
+- [🚀 Introduction](#-introduction)
+- [🖥️ Installation](#-installation)
+- [✍️ Usage in a Wallet](#-usage-in-a-wallet)
+  - [1. Initialize a Signer](#1-initialize-a-signer)
+  - [2. Implement the Disconnection](#2-implement-the-disconnection)
+  - [3. Register Prompts](#3-register-prompts)
+    - [A. Request Permissions](#a-request-permissions)
+    - [B. Accounts](#b-accounts)
+    - [C. Consent Message](#c-consent-message)
+    - [D. Call Canister](#d-call-canister)
+- [✍️ Usage in a Client](#-usage-in-a-client)
+  - [1. Initialize a Wallet](#1-initialize-a-wallet)
+  - [2. Implement the Disconnection](#2-implement-the-disconnection-1)
+  - [3. Request Permissions and Accounts](#3-request-permissions-and-accounts)
+  - [4. Call Canister](#4-call-canister)
+- [💁‍♂️️ Tips & Tricks](#-tips--tricks)
+  - [Examples](#examples)
+  - [Running Tests Locally](#running-tests-locally)
+  - [Running E2E Tests Locally](#running-e2e-tests-locally)
+  - [Developing with OISY Wallet](#developing-with-oisy-wallet)
+- [🧑‍🤝‍🧑 Community](#-community)
+
 ## 🖥️ Installation
 
 ```bash
