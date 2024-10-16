@@ -24,7 +24,7 @@ Additionally, it includes opinionated clients that enable interactions with the 
 ## 📚 Table of Contents
 
 - [🖥️ Installation](#computer-installation)
-- [✍️ Usage in a Wallet](#-usage-in-a-wallet)
+- [✍️ Usage in a Wallet](#writing_hand-usage-in-a-wallet)
   - [1. Initialize a Signer](#1-initialize-a-signer)
   - [2. Implement the Disconnection](#2-implement-the-disconnection)
   - [3. Register Prompts](#3-register-prompts)
@@ -55,7 +55,7 @@ pnpm add --save-dev @dfinity/oisy-wallet-signer
 yarn add -D @dfinity/oisy-wallet-signer
 ```
 
-## ✍️ Usage in a Wallet
+## :writing_hand: Usage in a Wallet
 
 To use the OISY Wallet Signer within your wallet or project, follow these steps:
 
