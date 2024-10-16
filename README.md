@@ -11,7 +11,7 @@ A library designed to facilitate communication between a dApp and the [OISY Wall
 
 </div>
 
-## 🚀 Introduction
+## :rocket: Introduction
 
 OISY Wallet Signer is a lightweight library designed to connect dApps with the OISY Wallet on the Internet Computer, enabling secure message signing and transaction approvals.
 
@@ -23,8 +23,7 @@ Additionally, it includes opinionated clients that enable interactions with the 
 
 ## 📚 Table of Contents
 
-- [🚀 Introduction](#-introduction)
-- [🖥️ Installation](#-installation)
+- [🖥️ Installation](#computer-installation)
 - [✍️ Usage in a Wallet](#-usage-in-a-wallet)
   - [1. Initialize a Signer](#1-initialize-a-signer)
   - [2. Implement the Disconnection](#2-implement-the-disconnection)
@@ -45,7 +44,7 @@ Additionally, it includes opinionated clients that enable interactions with the 
   - [Developing with OISY Wallet](#developing-with-oisy-wallet)
 - [🧑‍🤝‍🧑 Community](#-community)
 
-## 🖥️ Installation
+## :computer: Installation
 
 ```bash
 # with npm
