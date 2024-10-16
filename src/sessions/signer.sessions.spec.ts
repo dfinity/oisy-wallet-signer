@@ -231,6 +231,30 @@ describe('Signer sessions', () => {
 
       expect(scopes).toBeUndefined();
     });
+
+    it('should use sessionPermissionExpirationInMilliseconds from sessionOptions', () => {
+      saveSessionScopes({
+        owner,
+        origin,
+        scopes
+      });
+
+      const sessionOptions = {
+        sessionPermissionExpirationInMilliseconds: 2 * 24 * 60 * 60 * 1000 // 2 days
+      };
+
+      // Now
+      const validScopes = readSessionValidScopes({owner, origin, sessionOptions});
+
+      expect(validScopes).toHaveLength(2);
+
+      // 3 days later
+      vi.advanceTimersByTime(3 * 24 * 60 * 60 * 1000);
+
+      const emptyScopes = readSessionValidScopes({owner, origin, sessionOptions});
+
+      expect(emptyScopes).toHaveLength(0);
+    });
   });
 
   describe('Session', () => {
