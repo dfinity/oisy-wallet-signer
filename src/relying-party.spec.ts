@@ -44,6 +44,7 @@ describe('Relying Party', () => {
 
   const messageEventReady = new MessageEvent('message', {
     origin: mockParameters.url,
+    source: window,
     data: {
       jsonrpc: JSON_RPC_VERSION_2,
       id: crypto.randomUUID(),
@@ -99,6 +100,7 @@ describe('Relying Party', () => {
 
           const messageEvent = new MessageEvent('message', {
             origin: hackerOrigin,
+            source: window,
             data: {
               jsonrpc: JSON_RPC_VERSION_2,
               id: crypto.randomUUID(),
@@ -198,6 +200,7 @@ describe('Relying Party', () => {
 
           const messageEventNotRpc = new MessageEvent('message', {
             data: 'test',
+            source: window,
             origin: mockParameters.url
           });
 
@@ -384,6 +387,7 @@ describe('Relying Party', () => {
 
             const messageEventSupportedStandards = new MessageEvent('message', {
               origin: mockParameters.url,
+              source: window,
               data: {
                 jsonrpc: JSON_RPC_VERSION_2,
                 id: crypto.randomUUID(),
@@ -405,6 +409,7 @@ describe('Relying Party', () => {
 
           const messageEvent = new MessageEvent('message', {
             origin: hackerOrigin,
+            source: window,
             data: {
               jsonrpc: JSON_RPC_VERSION_2,
               id: crypto.randomUUID(),
@@ -430,6 +435,7 @@ describe('Relying Party', () => {
 
           const messageEvent = new MessageEvent('message', {
             origin: mockParameters.url,
+            source: window,
             data: {
               jsonrpc: JSON_RPC_VERSION_2,
               id: testId,
@@ -473,6 +479,7 @@ describe('Relying Party', () => {
 
         const messagePayload = {
           origin: mockParameters.url,
+          source: window,
           data: {
             jsonrpc: JSON_RPC_VERSION_2,
             id: requestId,
@@ -618,6 +625,7 @@ describe('Relying Party', () => {
 
               const messageEventScopes = new MessageEvent('message', {
                 origin: mockParameters.url,
+                source: window,
                 data: {
                   jsonrpc: JSON_RPC_VERSION_2,
                   id: crypto.randomUUID(),
@@ -639,6 +647,7 @@ describe('Relying Party', () => {
 
             const messageEvent = new MessageEvent('message', {
               origin: hackerOrigin,
+              source: window,
               data: {
                 jsonrpc: JSON_RPC_VERSION_2,
                 id: crypto.randomUUID(),
@@ -664,6 +673,7 @@ describe('Relying Party', () => {
 
             const messageEvent = new MessageEvent('message', {
               origin: mockParameters.url,
+              source: window,
               data: {
                 jsonrpc: JSON_RPC_VERSION_2,
                 id: testId,
@@ -707,6 +717,7 @@ describe('Relying Party', () => {
 
           const messagePayload = {
             origin: mockParameters.url,
+            source: window,
             data: {
               jsonrpc: JSON_RPC_VERSION_2,
               id: requestId,
@@ -833,6 +844,7 @@ describe('Relying Party', () => {
 
               const messageEventScopes = new MessageEvent('message', {
                 origin: mockParameters.url,
+                source: window,
                 data: {
                   jsonrpc: JSON_RPC_VERSION_2,
                   id: crypto.randomUUID(),
@@ -854,6 +866,7 @@ describe('Relying Party', () => {
 
             const messageEvent = new MessageEvent('message', {
               origin: hackerOrigin,
+              source: window,
               data: {
                 jsonrpc: JSON_RPC_VERSION_2,
                 id: crypto.randomUUID(),
@@ -879,6 +892,7 @@ describe('Relying Party', () => {
 
             const messageEvent = new MessageEvent('message', {
               origin: mockParameters.url,
+              source: window,
               data: {
                 jsonrpc: JSON_RPC_VERSION_2,
                 id: testId,
@@ -922,6 +936,7 @@ describe('Relying Party', () => {
 
           const messagePayload = {
             origin: mockParameters.url,
+            source: window,
             data: {
               jsonrpc: JSON_RPC_VERSION_2,
               id: requestId,
@@ -1091,6 +1106,7 @@ describe('Relying Party', () => {
 
             const messageEventSupportedStandards = new MessageEvent('message', {
               origin: mockParameters.url,
+              source: window,
               data: {
                 jsonrpc: JSON_RPC_VERSION_2,
                 id: crypto.randomUUID(),
@@ -1112,6 +1128,7 @@ describe('Relying Party', () => {
 
           const messageEvent = new MessageEvent('message', {
             origin: hackerOrigin,
+            source: window,
             data: {
               jsonrpc: JSON_RPC_VERSION_2,
               id: crypto.randomUUID(),
@@ -1137,6 +1154,7 @@ describe('Relying Party', () => {
 
           const messageEvent = new MessageEvent('message', {
             origin: mockParameters.url,
+            source: window,
             data: {
               jsonrpc: JSON_RPC_VERSION_2,
               id: testId,
@@ -1180,6 +1198,7 @@ describe('Relying Party', () => {
 
         const messagePayload = {
           origin: mockParameters.url,
+          source: window,
           data: {
             jsonrpc: JSON_RPC_VERSION_2,
             id: requestId,
@@ -1324,6 +1343,7 @@ describe('Relying Party', () => {
 
             const messageEventScopes = new MessageEvent('message', {
               origin: mockParameters.url,
+              source: window,
               data: {
                 jsonrpc: JSON_RPC_VERSION_2,
                 id: '123',
@@ -1343,6 +1363,7 @@ describe('Relying Party', () => {
 
           const messageEvent = new MessageEvent('message', {
             origin: hackerOrigin,
+            source: window,
             data: {
               jsonrpc: JSON_RPC_VERSION_2,
               id: '123',
@@ -1369,6 +1390,7 @@ describe('Relying Party', () => {
 
           const messageEvent = new MessageEvent('message', {
             origin: mockParameters.url,
+            source: window,
             data: {
               jsonrpc: JSON_RPC_VERSION_2,
               id: testId,
@@ -1412,6 +1434,7 @@ describe('Relying Party', () => {
 
         const messagePayload = {
           origin: mockParameters.url,
+          source: window,
           data: {
             jsonrpc: JSON_RPC_VERSION_2,
             id: requestId,
