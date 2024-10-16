@@ -44,6 +44,7 @@ describe('Relying Party', () => {
 
   const messageEventReady = new MessageEvent('message', {
     origin: mockParameters.url,
+    source: window,
     data: {
       jsonrpc: JSON_RPC_VERSION_2,
       id: crypto.randomUUID(),
@@ -99,6 +100,7 @@ describe('Relying Party', () => {
 
           const messageEvent = new MessageEvent('message', {
             origin: hackerOrigin,
+            source: window,
             data: {
               jsonrpc: JSON_RPC_VERSION_2,
               id: crypto.randomUUID(),
@@ -198,6 +200,7 @@ describe('Relying Party', () => {
 
           const messageEventNotRpc = new MessageEvent('message', {
             data: 'test',
+            source: window,
             origin: mockParameters.url
           });
 
@@ -384,6 +387,7 @@ describe('Relying Party', () => {
 
             const messageEventSupportedStandards = new MessageEvent('message', {
               origin: mockParameters.url,
+              source: window,
               data: {
                 jsonrpc: JSON_RPC_VERSION_2,
                 id: crypto.randomUUID(),
@@ -405,6 +409,7 @@ describe('Relying Party', () => {
 
           const messageEvent = new MessageEvent('message', {
             origin: hackerOrigin,
+            source: window,
             data: {
               jsonrpc: JSON_RPC_VERSION_2,
               id: crypto.randomUUID(),
@@ -430,6 +435,7 @@ describe('Relying Party', () => {
 
           const messageEvent = new MessageEvent('message', {
             origin: mockParameters.url,
+            source: window,
             data: {
               jsonrpc: JSON_RPC_VERSION_2,
               id: testId,
@@ -471,8 +477,9 @@ describe('Relying Party', () => {
       describe('Request success', () => {
         const requestId = crypto.randomUUID();
 
-        const messageEventSupportedStandards = new MessageEvent('message', {
+        const messagePayload = {
           origin: mockParameters.url,
+          source: window,
           data: {
             jsonrpc: JSON_RPC_VERSION_2,
             id: requestId,
@@ -480,7 +487,9 @@ describe('Relying Party', () => {
               supportedStandards
             }
           }
-        });
+        };
+
+        const messageEventSupportedStandards = new MessageEvent('message', messagePayload);
 
         it('should call the signer with postMessage', async () => {
           const spy = vi.spyOn(relyingPartyHandlers, 'requestSupportedStandards');
@@ -512,6 +521,23 @@ describe('Relying Party', () => {
           const result = await promise;
 
           expect(result).toEqual(supportedStandards);
+        });
+
+        it('should throw an error if the message source is not the opened popup window', async () => {
+          const mockHackerWindow = {} as Window;
+
+          const messageEventWithDifferentSource = new MessageEvent('message', {
+            ...messagePayload,
+            source: mockHackerWindow
+          });
+
+          const promise = relyingParty.supportedStandards({options: {requestId}});
+
+          window.dispatchEvent(messageEventWithDifferentSource);
+
+          await expect(async () => await promise).rejects.toThrow(
+            'The response is not originating from the window that was opened.'
+          );
         });
       });
     });
@@ -599,6 +625,7 @@ describe('Relying Party', () => {
 
               const messageEventScopes = new MessageEvent('message', {
                 origin: mockParameters.url,
+                source: window,
                 data: {
                   jsonrpc: JSON_RPC_VERSION_2,
                   id: crypto.randomUUID(),
@@ -620,6 +647,7 @@ describe('Relying Party', () => {
 
             const messageEvent = new MessageEvent('message', {
               origin: hackerOrigin,
+              source: window,
               data: {
                 jsonrpc: JSON_RPC_VERSION_2,
                 id: crypto.randomUUID(),
@@ -645,6 +673,7 @@ describe('Relying Party', () => {
 
             const messageEvent = new MessageEvent('message', {
               origin: mockParameters.url,
+              source: window,
               data: {
                 jsonrpc: JSON_RPC_VERSION_2,
                 id: testId,
@@ -686,8 +715,9 @@ describe('Relying Party', () => {
         describe('Request success', () => {
           const requestId = crypto.randomUUID();
 
-          const messageEventScopes = new MessageEvent('message', {
+          const messagePayload = {
             origin: mockParameters.url,
+            source: window,
             data: {
               jsonrpc: JSON_RPC_VERSION_2,
               id: requestId,
@@ -695,7 +725,9 @@ describe('Relying Party', () => {
                 scopes
               }
             }
-          });
+          };
+
+          const messageEventScopes = new MessageEvent('message', messagePayload);
 
           it('should call the signer with postMessage', async () => {
             const spy = vi.spyOn(relyingPartyHandlers, 'permissions');
@@ -727,6 +759,23 @@ describe('Relying Party', () => {
             const result = await promise;
 
             expect(result).toEqual(scopes);
+          });
+
+          it('should throw an error if the message source is not the opened popup window', async () => {
+            const mockHackerWindow = {} as Window;
+
+            const messageEventWithDifferentSource = new MessageEvent('message', {
+              ...messagePayload,
+              source: mockHackerWindow
+            });
+
+            const promise = relyingParty.permissions({options: {requestId}});
+
+            window.dispatchEvent(messageEventWithDifferentSource);
+
+            await expect(async () => await promise).rejects.toThrow(
+              'The response is not originating from the window that was opened.'
+            );
           });
         });
       });
@@ -795,6 +844,7 @@ describe('Relying Party', () => {
 
               const messageEventScopes = new MessageEvent('message', {
                 origin: mockParameters.url,
+                source: window,
                 data: {
                   jsonrpc: JSON_RPC_VERSION_2,
                   id: crypto.randomUUID(),
@@ -816,6 +866,7 @@ describe('Relying Party', () => {
 
             const messageEvent = new MessageEvent('message', {
               origin: hackerOrigin,
+              source: window,
               data: {
                 jsonrpc: JSON_RPC_VERSION_2,
                 id: crypto.randomUUID(),
@@ -841,6 +892,7 @@ describe('Relying Party', () => {
 
             const messageEvent = new MessageEvent('message', {
               origin: mockParameters.url,
+              source: window,
               data: {
                 jsonrpc: JSON_RPC_VERSION_2,
                 id: testId,
@@ -882,8 +934,9 @@ describe('Relying Party', () => {
         describe('Request success', () => {
           const requestId = crypto.randomUUID();
 
-          const messageEventScopes = new MessageEvent('message', {
+          const messagePayload = {
             origin: mockParameters.url,
+            source: window,
             data: {
               jsonrpc: JSON_RPC_VERSION_2,
               id: requestId,
@@ -891,7 +944,9 @@ describe('Relying Party', () => {
                 scopes
               }
             }
-          });
+          };
+
+          const messageEventScopes = new MessageEvent('message', messagePayload);
 
           it('should call the signer with postMessage and default scopes', async () => {
             const spy = vi.spyOn(relyingPartyHandlers, 'requestPermissions');
@@ -952,6 +1007,23 @@ describe('Relying Party', () => {
             const result = await promise;
 
             expect(result).toEqual(scopes);
+          });
+
+          it('should throw an error if the message source is not the opened popup window', async () => {
+            const mockHackerWindow = {} as Window;
+
+            const messageEventWithDifferentSource = new MessageEvent('message', {
+              ...messagePayload,
+              source: mockHackerWindow
+            });
+
+            const promise = relyingParty.requestPermissions({options: {requestId}});
+
+            window.dispatchEvent(messageEventWithDifferentSource);
+
+            await expect(async () => await promise).rejects.toThrow(
+              'The response is not originating from the window that was opened.'
+            );
           });
         });
       });
@@ -1034,6 +1106,7 @@ describe('Relying Party', () => {
 
             const messageEventSupportedStandards = new MessageEvent('message', {
               origin: mockParameters.url,
+              source: window,
               data: {
                 jsonrpc: JSON_RPC_VERSION_2,
                 id: crypto.randomUUID(),
@@ -1055,6 +1128,7 @@ describe('Relying Party', () => {
 
           const messageEvent = new MessageEvent('message', {
             origin: hackerOrigin,
+            source: window,
             data: {
               jsonrpc: JSON_RPC_VERSION_2,
               id: crypto.randomUUID(),
@@ -1080,6 +1154,7 @@ describe('Relying Party', () => {
 
           const messageEvent = new MessageEvent('message', {
             origin: mockParameters.url,
+            source: window,
             data: {
               jsonrpc: JSON_RPC_VERSION_2,
               id: testId,
@@ -1121,8 +1196,9 @@ describe('Relying Party', () => {
       describe('Request success', () => {
         const requestId = crypto.randomUUID();
 
-        const messageEventSupportedStandards = new MessageEvent('message', {
+        const messagePayload = {
           origin: mockParameters.url,
+          source: window,
           data: {
             jsonrpc: JSON_RPC_VERSION_2,
             id: requestId,
@@ -1130,7 +1206,9 @@ describe('Relying Party', () => {
               accounts: mockAccounts
             }
           }
-        });
+        };
+
+        const messageEventSupportedStandards = new MessageEvent('message', messagePayload);
 
         it('should call the signer with postMessage', async () => {
           const spy = vi.spyOn(relyingPartyHandlers, 'requestAccounts');
@@ -1162,6 +1240,23 @@ describe('Relying Party', () => {
           const result = await promise;
 
           expect(result).toEqual(mockAccounts);
+        });
+
+        it('should throw an error if the message source is not the opened popup window', async () => {
+          const mockHackerWindow = {} as Window;
+
+          const messageEventWithDifferentSource = new MessageEvent('message', {
+            ...messagePayload,
+            source: mockHackerWindow
+          });
+
+          const promise = relyingParty.accounts({options: {requestId}});
+
+          window.dispatchEvent(messageEventWithDifferentSource);
+
+          await expect(async () => await promise).rejects.toThrow(
+            'The response is not originating from the window that was opened.'
+          );
         });
       });
     });
@@ -1248,6 +1343,7 @@ describe('Relying Party', () => {
 
             const messageEventScopes = new MessageEvent('message', {
               origin: mockParameters.url,
+              source: window,
               data: {
                 jsonrpc: JSON_RPC_VERSION_2,
                 id: '123',
@@ -1267,6 +1363,7 @@ describe('Relying Party', () => {
 
           const messageEvent = new MessageEvent('message', {
             origin: hackerOrigin,
+            source: window,
             data: {
               jsonrpc: JSON_RPC_VERSION_2,
               id: '123',
@@ -1293,6 +1390,7 @@ describe('Relying Party', () => {
 
           const messageEvent = new MessageEvent('message', {
             origin: mockParameters.url,
+            source: window,
             data: {
               jsonrpc: JSON_RPC_VERSION_2,
               id: testId,
@@ -1334,14 +1432,17 @@ describe('Relying Party', () => {
       describe('Request success', () => {
         const requestId = crypto.randomUUID();
 
-        const messageEventScopes = new MessageEvent('message', {
+        const messagePayload = {
           origin: mockParameters.url,
+          source: window,
           data: {
             jsonrpc: JSON_RPC_VERSION_2,
             id: requestId,
             result
           }
-        });
+        };
+
+        const messageEventScopes = new MessageEvent('message', messagePayload);
 
         let spyAssertCallResponse: MockInstance;
 
@@ -1397,6 +1498,23 @@ describe('Relying Party', () => {
             result: callResult,
             params: mockCallCanisterParams
           });
+        });
+
+        it('should throw an error if the message source is not the opened popup window', async () => {
+          const mockHackerWindow = {} as Window;
+
+          const messageEventWithDifferentSource = new MessageEvent('message', {
+            ...messagePayload,
+            source: mockHackerWindow
+          });
+
+          const promise = relyingParty.call({options: {requestId}, params: mockCallCanisterParams});
+
+          window.dispatchEvent(messageEventWithDifferentSource);
+
+          await expect(async () => await promise).rejects.toThrow(
+            'The response is not originating from the window that was opened.'
+          );
         });
       });
     });
