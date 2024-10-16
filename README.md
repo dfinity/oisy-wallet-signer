@@ -23,8 +23,8 @@ Additionally, it includes opinionated clients that enable interactions with the 
 
 ## 📚 Table of Contents
 
-- [🖥️ Installation](#computer-installation)
-- [✍️ Usage in a Wallet](#writing_hand-usage-in-a-wallet)
+- [:computer: Installation](#computer-installation)
+- [:writing_hand: Usage in a Wallet](#writing_hand-usage-in-a-wallet)
   - [1. Initialize a Signer](#1-initialize-a-signer)
   - [2. Implement the Disconnection](#2-implement-the-disconnection)
   - [3. Register Prompts](#3-register-prompts)
@@ -32,17 +32,17 @@ Additionally, it includes opinionated clients that enable interactions with the 
     - [B. Accounts](#b-accounts)
     - [C. Consent Message](#c-consent-message)
     - [D. Call Canister](#d-call-canister)
-- [✍️ Usage in a Client](#writing_hand-usage-in-a-client)
+- [:writing_hand: Usage in a Client](#writing_hand-usage-in-a-client)
   - [1. Initialize a Wallet](#1-initialize-a-wallet)
   - [2. Implement the Disconnection](#2-implement-the-disconnection-1)
   - [3. Request Permissions and Accounts](#3-request-permissions-and-accounts)
   - [4. Call Canister](#4-call-canister)
-- [💁‍♂️️ Tips & Tricks](#man_tipping_hand-tips--tricks)
+- [:information_desk_person::️ Tips & Tricks](#information_desk_person-tricks)
   - [Examples](#examples)
   - [Running Tests Locally](#running-tests-locally)
   - [Running E2E Tests Locally](#running-e2e-tests-locally)
   - [Developing with OISY Wallet](#developing-with-oisy-wallet)
-- [🧑‍🤝‍🧑 Community](#busts_in_silhouette-community)
+- [:couple: Community](#couple-community)
 
 ## :computer: Installation
 
@@ -466,7 +466,7 @@ The `request` argument is the payload for the transfer. It contains the standard
 
 To process the canister call, the request needs to be initiated for a known account, which is why the `owner` of the `icrc1Transfer` is set to the `account` that was resolved in the previous chapter.
 
-## :man_tipping_hand: Tips & Tricks
+## :couple: Tips & Tricks
 
 ### Examples
 
