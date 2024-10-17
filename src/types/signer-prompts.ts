@@ -40,13 +40,7 @@ const RejectionSchema = z.function().returns(z.void());
 
 export type Rejection = z.infer<typeof RejectionSchema>;
 
-export const StatusSchema = z.enum(['loading', 'result', 'error']);
-
-export type Status = z.infer<typeof StatusSchema>;
-
-const LoadingSchema = PayloadOriginSchema.extend({
-  status: z.literal(StatusSchema.enum.loading)
-});
+const StatusSchema = z.enum(['result', 'error']);
 
 const ErrorSchema = PayloadOriginSchema.extend({
   status: z.literal(StatusSchema.enum.error),
@@ -116,6 +110,16 @@ const ConsentMessageApprovalSchema = z.function().returns(z.void());
 
 export type ConsentMessageApproval = z.infer<typeof ConsentMessageApprovalSchema>;
 
+const LoadingConsentMessageStatusSchema = z.enum(['loading']);
+
+const ConsentMessageStatusSchema = LoadingConsentMessageStatusSchema.or(StatusSchema);
+
+export type ConsentMessageStatus = z.infer<typeof ConsentMessageStatusSchema>;
+
+const LoadingConsentMessageSchema = PayloadOriginSchema.extend({
+  status: z.literal(LoadingConsentMessageStatusSchema.enum.loading)
+});
+
 const ResultConsentMessageSchema = PayloadOriginSchema.extend({
   status: z.literal(StatusSchema.enum.result),
   consentInfo: z.custom<icrc21_consent_info>(),
@@ -126,7 +130,7 @@ const ResultConsentMessageSchema = PayloadOriginSchema.extend({
 export type ResultConsentMessage = z.infer<typeof ResultConsentMessageSchema>;
 
 const ConsentMessagePromptPayloadSchema = z.union([
-  LoadingSchema,
+  LoadingConsentMessageSchema,
   ResultConsentMessageSchema,
   ErrorSchema
 ]);
@@ -150,6 +154,16 @@ export type ConsentMessagePrompt = z.infer<typeof ConsentMessagePromptSchema>;
 
 // Prompt for call canister
 
+const ExecutingCallCanisterStatusSchema = z.enum(['executing']);
+
+const CallCanisterStatusSchema = ExecutingCallCanisterStatusSchema.or(StatusSchema);
+
+export type CallCanisterStatus = z.infer<typeof CallCanisterStatusSchema>;
+
+const ExecutingCallCanisterSchema = PayloadOriginSchema.extend({
+  status: z.literal(ExecutingCallCanisterStatusSchema.enum.executing)
+});
+
 const ResultCallCanisterSchema = z.intersection(
   PayloadOriginSchema.extend({
     status: z.literal(StatusSchema.enum.result)
@@ -158,7 +172,7 @@ const ResultCallCanisterSchema = z.intersection(
 );
 
 const CallCanisterPromptPayloadSchema = z.union([
-  LoadingSchema,
+  ExecutingCallCanisterSchema,
   ResultCallCanisterSchema,
   ErrorSchema
 ]);
