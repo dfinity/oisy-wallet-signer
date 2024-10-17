@@ -297,7 +297,7 @@ To register a prompt for a call to a canister, you need to specify the method `I
 
 The `prompt` callback receives several parameters:
 
-- **`status`**: The callback may be triggered multiple times per call, each time providing a different status: `loading`, `result`, or `error`.
+- **`status`**: The callback may be triggered multiple times per call, each time providing a different status: `executing`, `result`, or `error`.
 - **`result`**: If the call to the canister succeeds, the prompt provides the results. These results include a `contentMap` and a `certificate`, both of which are blobs.
 - **`error`**: If the call fails, any errors returned by the canister or network (if available) will be provided by the prompt.
 
@@ -309,7 +309,7 @@ The flow works as follows:
 > [!NOTE]
 > The flow that leads to executing the call to the canister is described in the previous chapter, "Consent Message." The following description assumes that the permissions and consent message have been approved.
 
-1. Before initiating the call to the canister, the signer prompts to inform that the request is about to start, with the status set to `loading`.
+1. Before initiating the call to the canister, the signer prompts to inform that the request is about to start, with the status set to `executing`.
 2. The call to the canister is executed.
 3. Upon receiving a result or error, the prompt is triggered with the appropriate status, and a corresponding response is sent to the client.
 
