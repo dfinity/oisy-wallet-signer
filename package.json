@@ -75,7 +75,7 @@
   },
   "devDependencies": {
     "@dfinity/eslint-config-oisy-wallet": "^0.0.6",
-    "@dfinity/identity": "^2.1.2",
+    "@dfinity/identity": "^2.0.0",
     "@dfinity/internet-identity-playwright": "^0.0.3",
     "@playwright/test": "^1.48.0",
     "@types/jest": "^29.5.13",
@@ -91,11 +91,11 @@
     "node": ">=20"
   },
   "peerDependencies": {
-    "@dfinity/agent": "^2.1.2",
-    "@dfinity/candid": "^2.1.2",
+    "@dfinity/agent": "^2.0.0",
+    "@dfinity/candid": "^2.0.0",
     "@dfinity/ledger-icp": "^2.6.1",
     "@dfinity/ledger-icrc": "^2.6.1",
-    "@dfinity/principal": "^2.1.2",
+    "@dfinity/principal": "^2.0.0",
     "@dfinity/utils": "^2.5.2",
     "borc": "^2.1.1",
     "simple-cbor": "^0.4.1",
