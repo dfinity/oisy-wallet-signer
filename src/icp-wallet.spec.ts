@@ -99,6 +99,7 @@ describe('icp-wallet', () => {
     it('should call `call` with the correct parameters when icrc1Transfer is invoked', async () => {
       const mockCall = vi.fn().mockResolvedValue(mockLocalCallResult);
 
+      // @ts-expect-error we mock call for testing purposes
       icpWallet.call = mockCall;
 
       const result = await icpWallet.icrc1Transfer({request, owner: sender});
@@ -113,6 +114,7 @@ describe('icp-wallet', () => {
     it('should call `call` with the specific canister ID', async () => {
       const mockCall = vi.fn().mockResolvedValue({});
 
+      // @ts-expect-error we mock call for testing purposes
       icpWallet.call = mockCall;
 
       vi.spyOn(callUtils, 'decodeResponse').mockResolvedValue({Ok: mockLocalBlockHeight});
@@ -130,6 +132,7 @@ describe('icp-wallet', () => {
     it('should call `call` with the specific sender', async () => {
       const mockCall = vi.fn().mockResolvedValue({});
 
+      // @ts-expect-error we mock call for testing purposes
       icpWallet.call = mockCall;
 
       vi.spyOn(callUtils, 'decodeResponse').mockResolvedValue({Ok: mockLocalBlockHeight});
@@ -149,6 +152,7 @@ describe('icp-wallet', () => {
     it('should call `call` with the specific options', async () => {
       const mockCall = vi.fn().mockResolvedValue({});
 
+      // @ts-expect-error we mock call for testing purposes
       icpWallet.call = mockCall;
 
       vi.spyOn(callUtils, 'decodeResponse').mockResolvedValue({Ok: mockLocalBlockHeight});
