@@ -1,14 +1,21 @@
-import {TransferParams, toTransferArg} from '@dfinity/ledger-icrc';
-import {TransferArgs} from './constants/icrc.idl.constants';
+import {
+  IcrcBlockIndex,
+  IcrcTransferError,
+  IcrcTransferVariatError,
+  TransferParams,
+  toTransferArg
+} from '@dfinity/ledger-icrc';
+import {TransferArgs, TransferResult} from './constants/icrc.idl.constants';
 import type {
   IcrcAccount,
-  IcrcCallCanisterResult,
+  IcrcCallCanisterRequestParams,
   Origin,
   PrincipalText,
   RelyingPartyOptions,
   RelyingPartyRequestOptions
 } from './index';
 import {RelyingParty} from './relying-party';
+import {decodeResponse} from './utils/call.utils';
 import {encodeArg} from './utils/idl.utils';
 
 export class IcrcWallet extends RelyingParty {
@@ -31,8 +38,17 @@ export class IcrcWallet extends RelyingParty {
     });
   }
 
-  // TODO: this function implementation is to be finalized including decoding and asserting response.
-  // Similar to what's already done in icrc1_transfer of IcpWallet.
+  /**
+   * Transfer Icrc tokens to the destination Account. Returns the index of the block containing the tx if it was successful.
+   *
+   * @param {Object} params - The transfer parameters.
+   * @param {TransferParams} params.params - The object containing transfer details, such as amount and destination.
+   * @param {string} params.owner - The owner of the wallet.
+   * @param {PrincipalText} [params.ledgerCanisterId] - Optional ledger canister ID, defaults to the Icrc ledger if not provided.
+   * @param {RelyingPartyRequestOptions} [params.options] - Optional parameters for the request, such as request ID, authorization, or timeout.
+   *
+   * @returns {Promise<IcrcBlockIndex>} A promise that resolves to the block index of the transfer transaction if successful.
+   */
   transfer = async ({
     params,
     owner,
@@ -42,7 +58,7 @@ export class IcrcWallet extends RelyingParty {
     params: TransferParams;
     ledgerCanisterId: PrincipalText;
     options?: RelyingPartyRequestOptions;
-  } & Pick<IcrcAccount, 'owner'>): Promise<IcrcCallCanisterResult> => {
+  } & Pick<IcrcAccount, 'owner'>): Promise<IcrcBlockIndex> => {
     const rawArgs = toTransferArg(params);
 
     const arg = encodeArg({
@@ -50,14 +66,33 @@ export class IcrcWallet extends RelyingParty {
       rawArgs
     });
 
-    return await this.call({
-      params: {
-        sender: owner,
-        method: 'icrc1_transfer',
-        canisterId,
-        arg
-      },
+    const callParams: IcrcCallCanisterRequestParams = {
+      sender: owner,
+      method: 'icrc1_transfer',
+      canisterId,
+      arg
+    };
+
+    const callResult = await this.call({
+      params: callParams,
       options
     });
+
+    type TransferResult = {Ok: IcrcBlockIndex} | {Err: IcrcTransferVariatError};
+
+    const response = await decodeResponse<TransferResult>({
+      params: callParams,
+      result: callResult,
+      resultRecordClass: TransferResult
+    });
+
+    if ('Err' in response) {
+      throw new IcrcTransferError({
+        errorType: response.Err,
+        msg: 'Failed to transfer'
+      });
+    }
+
+    return response.Ok;
   };
 }
