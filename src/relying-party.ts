@@ -625,6 +625,9 @@ export class RelyingParty {
     });
   };
 
+  // TODO: This method is marked as `protected` because it lacks response validation.
+  // Validation is deferred to opinionated implementations like `IcpWallet` or `IcrcWallet`.
+  // If you wish to make this method public, ensure that proper validation is implemented first.
   /**
    * Call a canister method via the signer.
    *
@@ -636,7 +639,7 @@ export class RelyingParty {
    * @returns {Promise<IcrcCallCanisterResult>} A promise that resolves to the result of the canister call.
    * @see [ICRC49 Call Canister](https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_49_call_canister.md)
    */
-  call = async ({
+  protected call = async ({
     options: {timeoutInMilliseconds, ...rest} = {},
     params
   }: {

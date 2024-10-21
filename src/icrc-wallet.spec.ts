@@ -76,6 +76,7 @@ describe('icrc-wallet', () => {
     it('should call `call` with the correct parameters when transfer is invoked', async () => {
       const mockCall = vi.fn().mockResolvedValue({});
 
+      // @ts-expect-error we mock call for testing purposes
       icrcWallet.call = mockCall;
 
       const owner = Ed25519KeyIdentity.generate().getPrincipal().toText();
@@ -95,6 +96,7 @@ describe('icrc-wallet', () => {
     it('should call `call` with the specific options', async () => {
       const mockCall = vi.fn().mockResolvedValue({});
 
+      // @ts-expect-error we mock call for testing purposes
       icrcWallet.call = mockCall;
 
       const owner = Ed25519KeyIdentity.generate().getPrincipal().toText();
