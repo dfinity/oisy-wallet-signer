@@ -145,7 +145,7 @@ describe('SignerPrompts', () => {
   describe('CallCanister prompt', () => {
     it('should validate a CallCanisterPrompt with status "loading"', () => {
       const prompt = (payload: CallCanisterPromptPayload): void => {
-        if (payload.status === 'loading') {
+        if (payload.status === 'executing') {
           // Do nothing
         }
       };

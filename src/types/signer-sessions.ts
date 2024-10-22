@@ -2,8 +2,8 @@ import {z} from 'zod';
 import {IcrcScopeSchema} from './icrc-responses';
 
 export const SessionTimestampsSchema = z.object({
-  createdAt: z.number(),
-  updatedAt: z.number()
+  createdAt: z.number().positive(),
+  updatedAt: z.number().positive()
 });
 
 export const SessionIcrcScopeSchema = IcrcScopeSchema.merge(SessionTimestampsSchema);

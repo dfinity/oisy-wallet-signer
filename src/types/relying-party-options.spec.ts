@@ -19,6 +19,54 @@ describe('RelyingPartyOptions', () => {
     expect(result.success).toBe(true);
   });
 
+  it('should fail validation with a negative pollingIntervalInMilliseconds', () => {
+    const invalidData = {
+      url: 'https://example.com',
+      connectionOptions: {
+        pollingIntervalInMilliseconds: -500
+      }
+    };
+
+    const result = RelyingPartyOptionsSchema.safeParse(invalidData);
+    expect(result.success).toBe(false);
+  });
+
+  it('should fail validation with zero pollingIntervalInMilliseconds', () => {
+    const invalidData = {
+      url: 'https://example.com',
+      connectionOptions: {
+        pollingIntervalInMilliseconds: 0
+      }
+    };
+
+    const result = RelyingPartyOptionsSchema.safeParse(invalidData);
+    expect(result.success).toBe(false);
+  });
+
+  it('should fail validation with a zero timeoutInMilliseconds', () => {
+    const invalidData = {
+      url: 'https://example.com',
+      connectionOptions: {
+        timeoutInMilliseconds: 0
+      }
+    };
+
+    const result = RelyingPartyOptionsSchema.safeParse(invalidData);
+    expect(result.success).toBe(false);
+  });
+
+  it('should fail validation with a negative timeoutInMilliseconds', () => {
+    const invalidData = {
+      url: 'https://example.com',
+      connectionOptions: {
+        timeoutInMilliseconds: -120000
+      }
+    };
+
+    const result = RelyingPartyOptionsSchema.safeParse(invalidData);
+    expect(result.success).toBe(false);
+  });
+
   it('should validate with correct relying party options and string window options', () => {
     const validData = {
       url: 'https://example.com',
@@ -50,6 +98,48 @@ describe('RelyingPartyOptions', () => {
 
     const result = RelyingPartyOptionsSchema.safeParse(invalidData);
     expect(result.success).toBe(false);
+  });
+
+  it('should fail validation with zero width for the signer window', () => {
+    const invalidData = {
+      url: 'https://example.com',
+      windowOptions: {
+        position: 'center',
+        width: 0,
+        height: 300
+      }
+    };
+
+    const result = RelyingPartyOptionsSchema.safeParse(invalidData);
+    expect(result.success).toBe(false);
+  });
+
+  it('should fail validation with zero height for the signer window', () => {
+    const invalidData = {
+      url: 'https://example.com',
+      windowOptions: {
+        position: 'center',
+        width: 400,
+        height: 0
+      }
+    };
+
+    const result = RelyingPartyOptionsSchema.safeParse(invalidData);
+    expect(result.success).toBe(false);
+  });
+
+  it('should pass validation with positive width and height for the signer window', () => {
+    const validData = {
+      url: 'https://example.com',
+      windowOptions: {
+        position: 'center',
+        width: 400,
+        height: 300
+      }
+    };
+
+    const result = RelyingPartyOptionsSchema.safeParse(validData);
+    expect(result.success).toBe(true);
   });
 
   it('should fail validation with incorrect connectionOptions object', () => {

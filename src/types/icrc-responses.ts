@@ -7,6 +7,7 @@ import {
   IcrcStandardSchema
 } from './icrc-standards';
 import {inferRpcResponseSchema} from './rpc';
+import {UrlSchema} from './url';
 
 const IcrcScopeMethodSchema = z.object({
   method: IcrcScopedMethodSchema
@@ -47,16 +48,22 @@ export type IcrcScopesResponse = z.infer<typeof IcrcScopesResponseSchema>;
 const urlRegex =
   /^https:\/\/github\.com\/dfinity\/ICRC\/blob\/main\/ICRCs\/ICRC-\d+\/ICRC-\d+\.md$/;
 
-const UrlSchema = z
+const SupportedStandardsUrlSchema = z
   .string()
   .url()
   .regex(urlRegex)
   .refine(
     (url) => {
+      try {
+        UrlSchema.parse(url);
+      } catch (_err: unknown) {
+        return false;
+      }
+
       const match = /(ICRC-\d+)\.md/g.exec(url);
 
       if (match === null) {
-        return;
+        return false;
       }
 
       const [_, icrc] = match;
@@ -73,7 +80,7 @@ export const IcrcSupportedStandardsSchema = z
     z
       .object({
         name: IcrcStandardSchema,
-        url: UrlSchema
+        url: SupportedStandardsUrlSchema
       })
       .strict()
   )

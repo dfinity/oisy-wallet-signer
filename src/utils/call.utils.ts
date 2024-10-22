@@ -13,11 +13,16 @@ import {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import type {IcrcCallCanisterResult} from '../types/icrc-responses';
 import {decodeCallRequest} from './agentjs-cbor-copy.utils';
 import {base64ToUint8Array} from './base64.utils';
-import {assertCallArg, assertCallCanisterId, assertCallMethod} from './call.assert.utils';
+import {
+  assertCallArg,
+  assertCallCanisterId,
+  assertCallMethod,
+  assertCallSender
+} from './call.assert.utils';
 import {decodeResult} from './idl.utils';
 
 export const assertCallResponse = ({
-  params: {method, arg, canisterId},
+  params: {method, arg, canisterId, sender},
   result: {contentMap}
 }: {
   params: IcrcCallCanisterRequestParams;
@@ -38,6 +43,11 @@ export const assertCallResponse = ({
   assertCallArg({
     requestArg: arg,
     responseArg: callRequest.arg
+  });
+
+  assertCallSender({
+    requestSender: sender,
+    responseSender: callRequest.sender
   });
 };
 

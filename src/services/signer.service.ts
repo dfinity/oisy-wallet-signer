@@ -125,7 +125,7 @@ export class SignerService {
   }): Promise<{result: 'success' | 'error'}> {
     const {origin} = notify;
 
-    prompt?.({origin, status: 'loading'});
+    prompt?.({origin, status: 'executing'});
 
     try {
       const result = await this.#signerApi.call({

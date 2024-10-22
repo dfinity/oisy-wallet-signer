@@ -1,6 +1,7 @@
 import {type Identity} from '@dfinity/agent';
 import {isNullish} from '@dfinity/utils';
 import {z} from 'zod';
+import {UrlSchema} from './url';
 
 const IdentitySchema = z.custom<Identity>((value: unknown): boolean => {
   if (isNullish(value)) {
@@ -28,9 +29,21 @@ const IdentityNotAnonymousSchema = IdentitySchema.refine(
 
 export type IdentityNotAnonymous = z.infer<typeof IdentityNotAnonymousSchema>;
 
-export const SignerHostSchema = z.string().url().optional();
+export const SignerHostSchema = UrlSchema.optional();
 
 export type SignerHost = z.infer<typeof SignerHostSchema>;
+
+const SessionOptionsSchema = z.object({
+  /**
+   * Specifies the duration in milliseconds for which the session permissions are valid.
+   * After this period, the user is requested to approve or deny permissions again.
+   * Must be a positive number.
+   *
+   * @default 7 days (7 * 24 * 60 * 60 * 1000 = 604800000 milliseconds)
+   *
+   */
+  sessionPermissionExpirationInMilliseconds: z.number().positive().optional()
+});
 
 export const SignerOptionsSchema = z.object({
   /**
@@ -45,7 +58,12 @@ export const SignerOptionsSchema = z.object({
    * The replica's host to which the signer should connect to.
    * If localhost or 127.0.0.1 are provided, the signer will automatically connect to a local replica and fetch the root key for the agent.
    */
-  host: SignerHostSchema
+  host: SignerHostSchema,
+
+  /**
+   * Options for managing session behavior, including session expiration times.
+   */
+  sessionOptions: SessionOptionsSchema.optional()
 });
 
 export type SignerOptions = z.infer<typeof SignerOptionsSchema>;

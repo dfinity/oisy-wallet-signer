@@ -11,7 +11,7 @@ A library designed to facilitate communication between a dApp and the [OISY Wall
 
 </div>
 
-## 🚀 Introduction
+## :rocket: Introduction
 
 OISY Wallet Signer is a lightweight library designed to connect dApps with the OISY Wallet on the Internet Computer, enabling secure message signing and transaction approvals.
 
@@ -21,7 +21,30 @@ While primarily developed for OISY, the library can be integrated into any walle
 
 Additionally, it includes opinionated clients that enable interactions with the ICP or ICRC ledgers without the need for any specific JavaScript framework, making the library fully agnostic.
 
-## 🖥️ Installation
+## 📚 Table of Contents
+
+- [:computer: Installation](#computer-installation)
+- [:writing_hand: Usage in a Wallet](#writing_hand-usage-in-a-wallet)
+  - [1. Initialize a Signer](#1-initialize-a-signer)
+  - [2. Implement the Disconnection](#2-implement-the-disconnection)
+  - [3. Register Prompts](#3-register-prompts)
+    - [A. Request Permissions](#a-request-permissions)
+    - [B. Accounts](#b-accounts)
+    - [C. Consent Message](#c-consent-message)
+    - [D. Call Canister](#d-call-canister)
+- [:writing_hand: Usage in a Client](#writing_hand-usage-in-a-client)
+  - [1. Initialize a Wallet](#1-initialize-a-wallet)
+  - [2. Implement the Disconnection](#2-implement-the-disconnection-1)
+  - [3. Request Permissions and Accounts](#3-request-permissions-and-accounts)
+  - [4. Call Canister](#4-call-canister)
+- [:information_desk_person: Tips & Tricks](#information_desk_person-tips--tricks)
+  - [Examples](#examples)
+  - [Running Tests Locally](#running-tests-locally)
+  - [Running E2E Tests Locally](#running-e2e-tests-locally)
+  - [Developing with OISY Wallet](#developing-with-oisy-wallet)
+- [:couple: Community](#couple-community)
+
+## :computer: Installation
 
 ```bash
 # with npm
@@ -32,7 +55,7 @@ pnpm add --save-dev @dfinity/oisy-wallet-signer
 yarn add -D @dfinity/oisy-wallet-signer
 ```
 
-## ✍️ Usage in a Wallet
+## :writing_hand: Usage in a Wallet
 
 To use the OISY Wallet Signer within your wallet or project, follow these steps:
 
@@ -274,7 +297,7 @@ To register a prompt for a call to a canister, you need to specify the method `I
 
 The `prompt` callback receives several parameters:
 
-- **`status`**: The callback may be triggered multiple times per call, each time providing a different status: `loading`, `result`, or `error`.
+- **`status`**: The callback may be triggered multiple times per call, each time providing a different status: `executing`, `result`, or `error`.
 - **`result`**: If the call to the canister succeeds, the prompt provides the results. These results include a `contentMap` and a `certificate`, both of which are blobs.
 - **`error`**: If the call fails, any errors returned by the canister or network (if available) will be provided by the prompt.
 
@@ -286,11 +309,11 @@ The flow works as follows:
 > [!NOTE]
 > The flow that leads to executing the call to the canister is described in the previous chapter, "Consent Message." The following description assumes that the permissions and consent message have been approved.
 
-1. Before initiating the call to the canister, the signer prompts to inform that the request is about to start, with the status set to `loading`.
+1. Before initiating the call to the canister, the signer prompts to inform that the request is about to start, with the status set to `executing`.
 2. The call to the canister is executed.
 3. Upon receiving a result or error, the prompt is triggered with the appropriate status, and a corresponding response is sent to the client.
 
-## ✍️ Usage in a Client
+## :writing_hand: Usage in a Client
 
 As mentioned in the introduction, this library is primarily developed for OISY. However, it also includes opinionated clients that enable interactions with the ICP or ICRC ledgers in any JavaScript application.
 
@@ -443,7 +466,7 @@ The `request` argument is the payload for the transfer. It contains the standard
 
 To process the canister call, the request needs to be initiated for a known account, which is why the `owner` of the `icrc1Transfer` is set to the `account` that was resolved in the previous chapter.
 
-## 💁‍♂️️ Tips & Tricks
+## :information_desk_person: Tips & Tricks
 
 ### Examples
 
@@ -510,7 +533,44 @@ Return to the root directory and execute the tests:
 npm run e2e
 ```
 
-## 🧑‍🤝‍🧑 Community
+### Developing with OISY Wallet
+
+The demo of a relying party can be used to test the integration of signer features within the OISY Wallet.
+
+1. Install OISY Wallet
+
+```bash
+git clone https://github.com/dfinity/oisy-wallet
+cd oisy-wallet
+npm ci
+npm run deploy
+```
+
+2. Start the local replica
+
+Within the `oisy-wallet` folder:
+
+```bash
+dfx start
+```
+
+3. Run the demo
+
+Navigate to the [demo](./demo) folder of the OISY Wallet Signer and start the demo on port `5173`:
+
+```
+npm run dev:party
+```
+
+4. Start OISY Wallet
+
+In `oisy-wallet` project, run the local development server on port `5174`:
+
+```bash
+npm run dev
+```
+
+## :couple: Community
 
 - [Identity and Wallet Standards](https://github.com/dfinity/wg-identity-authentication/)
 - [Forum](https://forum.dfinity.org/)

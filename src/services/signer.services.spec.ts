@@ -494,7 +494,7 @@ describe('Signer services', () => {
       });
     });
 
-    it('should trigger prompt "loading" before the call canister if a prompt is provided', async () => {
+    it('should trigger prompt "executing" before the call canister if a prompt is provided', async () => {
       spySignerApiCall.mockResolvedValue(mockCanisterCallSuccess);
 
       await signerService.callCanister({
@@ -506,7 +506,7 @@ describe('Signer services', () => {
 
       expect(prompt).toHaveBeenCalledWith({
         origin: testOrigin,
-        status: 'loading'
+        status: 'executing'
       });
     });
 

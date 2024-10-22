@@ -3,7 +3,7 @@
 	import {
 		type CallCanisterPromptPayload,
 		ICRC49_CALL_CANISTER,
-		type Status
+		type CallCanisterStatus
 	} from '@dfinity/oisy-wallet-signer';
 	import { isNullish, nonNullish } from '@dfinity/utils';
 	import { fade } from 'svelte/transition';
@@ -15,7 +15,7 @@
 
 	let { signer }: Props = $props();
 
-	let status = $state<Status | undefined>(undefined);
+	let status = $state<CallCanisterStatus | undefined>(undefined);
 
 	$effect(() => {
 		if (isNullish(signer)) {
@@ -42,7 +42,7 @@
 	<div class="dark:text-white" in:fade>
 		<p class="font-bold mt-6">Call canister:</p>
 		<p class="mb-2 break-words">
-			{#if status === 'loading'}
+			{#if status === 'executing'}
 				<output data-tid="loading-call-canister">Loading call canister...</output>
 			{:else if status === 'result'}
 				<output data-tid="result-call-canister">Canister call successful.</output>
