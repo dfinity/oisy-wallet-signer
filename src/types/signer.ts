@@ -19,4 +19,6 @@ const SignerMessageEventDataSchema = z
 
 export type SignerMessageEventData = z.infer<typeof SignerMessageEventDataSchema>;
 
-export type SignerMessageEvent = MessageEvent<SignerMessageEventData | never>;
+export type SignerMessageEvent = Omit<MessageEvent<SignerMessageEventData | never>, 'source'> & {
+  source: MessageEventSource;
+};
