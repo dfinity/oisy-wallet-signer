@@ -1,7 +1,12 @@
 import {Principal} from '@dfinity/principal';
 import {mockCanisterId, mockPrincipalText} from '../mocks/icrc-accounts.mocks';
 import {uint8ArrayToBase64} from './base64.utils';
-import {assertCallArg, assertCallCanisterId, assertCallMethod} from './call.assert.utils';
+import {
+  assertCallArg,
+  assertCallCanisterId,
+  assertCallMethod,
+  assertCallSender
+} from './call.assert.utils';
 
 describe('call.assert.utils', () => {
   describe('assertCallMethod', () => {
@@ -62,6 +67,27 @@ describe('call.assert.utils', () => {
 
       expect(() => assertCallCanisterId({requestCanisterId, responseCanisterId})).toThrow(
         'The response canister ID does not match the requested canister ID.'
+      );
+    });
+  });
+
+  describe('assertCallSender', () => {
+    const senders = [
+      Principal.fromText(mockPrincipalText),
+      Principal.fromText(mockPrincipalText).toUint8Array()
+    ];
+
+    it.each(senders)('should not throw an error when sender match', (responseSender) => {
+      const requestSender = mockPrincipalText;
+
+      expect(() => assertCallSender({requestSender, responseSender})).not.toThrow();
+    });
+
+    it.each(senders)('should throw an error when methods do not match', (responseSender) => {
+      const requestSender = mockCanisterId;
+
+      expect(() => assertCallSender({requestSender, responseSender})).toThrow(
+        'The response sender does not match the request sender.'
       );
     });
   });

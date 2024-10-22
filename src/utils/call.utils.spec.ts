@@ -42,11 +42,13 @@ describe('call.utils', () => {
     let spyAssertCallMethod: MockInstance;
     let spyAssertCallCanisterId: MockInstance;
     let spyAssertCallArg: MockInstance;
+    let spyAssertCallSender: MockInstance;
 
     beforeEach(() => {
       spyAssertCallMethod = vi.spyOn(callUtils, 'assertCallMethod');
       spyAssertCallCanisterId = vi.spyOn(callUtils, 'assertCallCanisterId');
       spyAssertCallArg = vi.spyOn(callUtils, 'assertCallArg');
+      spyAssertCallSender = vi.spyOn(callUtils, 'assertCallSender');
     });
 
     it('should validate a valid response', () => {
@@ -97,6 +99,20 @@ describe('call.utils', () => {
       expect(spyAssertCallArg).toHaveBeenCalledWith({
         requestArg: mockLocalCallParams.arg,
         responseArg: callRequest.arg
+      });
+    });
+
+    it('should call assertCallSender with correct params', () => {
+      assertCallResponse({
+        params: mockLocalCallParams,
+        result: mockLocalCallResult
+      });
+
+      const callRequest = decodeCallRequest(mockLocalCallResult.contentMap);
+
+      expect(spyAssertCallSender).toHaveBeenCalledWith({
+        requestSender: mockLocalCallParams.sender,
+        responseSender: callRequest.sender
       });
     });
   });
