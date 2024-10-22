@@ -2,6 +2,7 @@ import {Principal} from '@dfinity/principal';
 import {arrayBufferToUint8Array} from '@dfinity/utils';
 import {IcrcBlob} from '../types/blob';
 import {Method} from '../types/icrc-requests';
+import {PrincipalText} from '../types/principal';
 import {base64ToUint8Array} from './base64.utils';
 
 export const assertCallMethod = ({
@@ -44,5 +45,22 @@ export const assertCallCanisterId = ({
 }) => {
   if (requestCanisterId.toText() !== responseCanisterId.toText()) {
     throw new Error('The response canister ID does not match the requested canister ID.');
+  }
+};
+
+export const assertCallSender = ({
+  requestSender,
+  responseSender
+}: {
+  responseSender: Uint8Array | Principal;
+  requestSender: PrincipalText;
+}) => {
+  const receivedSender =
+    responseSender instanceof Uint8Array
+      ? Principal.fromUint8Array(responseSender)
+      : responseSender;
+
+  if (receivedSender.toText() !== Principal.fromText(requestSender).toText()) {
+    throw new Error('The response sender does not match the request sender.');
   }
 };
