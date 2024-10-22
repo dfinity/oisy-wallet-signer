@@ -6,8 +6,8 @@ A library designed to facilitate communication between a dApp and the [OISY Wall
 <br/>
 
 [![Internet Computer portal](https://img.shields.io/badge/Internet-Computer-grey?logo=internet%20computer)](https://internetcomputer.org)
-[![GitHub CI Library Checks Workflow Status](https://img.shields.io/github/actions/workflow/status/dfinity/oisy-wallet-signer/lib-checks.yml?logo=github&label=Lib%20checks)](https://github.com/dfinity/oisy-wallet-signer/actions/workflows/lib-checks.yml)
-[![GitHub CI Library Tests Workflow Status](https://img.shields.io/github/actions/workflow/status/dfinity/oisy-wallet-signer/lib-tests.yml?logo=github&label=Lib%20tests)](https://github.com/dfinity/oisy-wallet-signer/actions/workflows/lib-tests.yml)
+[![GitHub CI Library Checks Workflow Status](https://img.shields.io/github/actions/workflow/status/dfinity/oisy-wallet-signer/lib-checks.yml?logo=github&label=Checks)](https://github.com/dfinity/oisy-wallet-signer/actions/workflows/lib-checks.yml)
+[![GitHub CI Library Tests Workflow Status](https://img.shields.io/github/actions/workflow/status/dfinity/oisy-wallet-signer/lib-tests.yml?logo=github&label=Tests)](https://github.com/dfinity/oisy-wallet-signer/actions/workflows/lib-tests.yml)
 [![GitHub CI E2E Tests Workflow Status](https://img.shields.io/github/actions/workflow/status/dfinity/oisy-wallet-signer/e2e-tests.yml?logo=github&label=E2E%20tests)](https://github.com/dfinity/oisy-wallet-signer/actions/workflows/e2e-tests.yml)
 
 </div>
