@@ -11,6 +11,7 @@ import {assertNonNullish} from '@dfinity/utils';
 import {LOCAL_REPLICA_URL, MAINNET_REPLICA_URL} from '../constants/core.constants';
 import {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import type {IcrcCallCanisterResult} from '../types/icrc-responses';
+import {RelyingPartyWalletHost} from '../types/relying-party-wallet-options';
 import {decodeCallRequest} from './agentjs-cbor-copy.utils';
 import {base64ToUint8Array} from './base64.utils';
 import {
@@ -54,11 +55,13 @@ export const assertCallResponse = ({
 export const decodeResponse = async <T>({
   params: {canisterId},
   result: {certificate: cert, contentMap},
-  resultRecordClass
+  resultRecordClass,
+  host
 }: {
   params: IcrcCallCanisterRequestParams;
   result: IcrcCallCanisterResult;
   resultRecordClass: RecordClass | VariantClass;
+  host?: RelyingPartyWalletHost;
 }): Promise<T> => {
   // TODO: improve performance by avoiding the need to decode the call requests multiple times. For example. IcpWallet and IcrcWallet could use a new protected function of RelyingParty that would extend call and return the callRequest that is asserted.
   const callRequest = decodeCallRequest(contentMap);
@@ -72,7 +75,7 @@ export const decodeResponse = async <T>({
 
   const agent = await HttpAgent.create({
     identity: new AnonymousIdentity(),
-    host: localhost ? LOCAL_REPLICA_URL : MAINNET_REPLICA_URL,
+    host: localhost ? (host ?? LOCAL_REPLICA_URL) : MAINNET_REPLICA_URL,
     ...(localhost && {shouldFetchRootKey: true})
   });
 

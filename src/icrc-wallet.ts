@@ -11,23 +11,40 @@ import type {
   IcrcCallCanisterRequestParams,
   Origin,
   PrincipalText,
-  RelyingPartyOptions,
   RelyingPartyRequestOptions
 } from './index';
 import {RelyingParty} from './relying-party';
+import {
+  RelyingPartyWalletHost,
+  RelyingPartyWalletOptions
+} from './types/relying-party-wallet-options';
 import {decodeResponse} from './utils/call.utils';
 import {encodeArg} from './utils/idl.utils';
 
 export class IcrcWallet extends RelyingParty {
+  readonly #host: RelyingPartyWalletHost;
+
+  /**
+   * @override Overrides the constructor to include the `host` property, which may be used specifically in the wallet client, as opposed to the generic relying party client.
+   */
+  protected constructor({
+    host,
+    ...rest
+  }: {origin: Origin; popup: Window} & Pick<RelyingPartyWalletOptions, 'onDisconnect' | 'host'>) {
+    super(rest);
+
+    this.#host = host;
+  }
+
   /**
    * Establishes a connection with an ICRC Wallet.
    *
    * @override
    * @static
-   * @param {RelyingPartyOptions} options - The options to initialize the ICRC Wallet signer.
+   * @param {RelyingPartyWalletOptions} options - The options to initialize the ICRC Wallet signer.
    * @returns {Promise<IcrcWallet>} A promise that resolves to an object, which can be used to interact with the ICRC Wallet when it is connected.
    */
-  static async connect({onDisconnect, ...rest}: RelyingPartyOptions): Promise<IcrcWallet> {
+  static async connect({onDisconnect, ...rest}: RelyingPartyWalletOptions): Promise<IcrcWallet> {
     return await this.connectSigner({
       options: rest,
       init: (params: {origin: Origin; popup: Window}) =>
@@ -83,7 +100,8 @@ export class IcrcWallet extends RelyingParty {
     const response = await decodeResponse<TransferResult>({
       params: callParams,
       result: callResult,
-      resultRecordClass: TransferResult
+      resultRecordClass: TransferResult,
+      host: this.#host
     });
 
     if ('Err' in response) {
