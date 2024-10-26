@@ -40,7 +40,11 @@ import {
   RelyingPartyDisconnectedError,
   RelyingPartyResponseError
 } from './types/relying-party-errors';
-import {RelyingPartyOptionsSchema, type RelyingPartyOptions} from './types/relying-party-options';
+import {
+  RelyingPartyHost,
+  RelyingPartyOptionsSchema,
+  type RelyingPartyOptions
+} from './types/relying-party-options';
 import {
   RelyingPartyRequestOptionsSchema,
   type RelyingPartyRequestOptions,
@@ -63,6 +67,8 @@ export class RelyingParty {
 
   readonly #onDisconnect;
 
+  protected readonly host: RelyingPartyHost;
+
   #walletStatus: WalletStatus = 'connected';
   readonly #walletStatusInterval: NodeJS.Timeout;
 
@@ -72,12 +78,15 @@ export class RelyingParty {
   protected constructor({
     origin,
     popup,
-    onDisconnect
-  }: {origin: Origin; popup: Window} & Pick<RelyingPartyOptions, 'onDisconnect'>) {
+    onDisconnect,
+    host
+  }: {origin: Origin; popup: Window} & Pick<RelyingPartyOptions, 'onDisconnect' | 'host'>) {
     this.#origin = origin;
     this.#popup = popup;
 
     this.#onDisconnect = onDisconnect;
+
+    this.host = host;
 
     this.#walletStatus = 'connected';
     this.#walletStatusInterval = setInterval(

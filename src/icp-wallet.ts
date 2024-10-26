@@ -11,44 +11,23 @@ import type {IcrcAccount} from './types/icrc-accounts';
 import type {IcrcCallCanisterRequestParams} from './types/icrc-requests';
 import type {Origin} from './types/post-message';
 import type {PrincipalText} from './types/principal';
+import {RelyingPartyOptions} from './types/relying-party-options';
 import type {RelyingPartyRequestOptions} from './types/relying-party-requests';
-import {
-  RelyingPartyWalletHost,
-  RelyingPartyWalletOptions
-} from './types/relying-party-wallet-options';
 import {decodeResponse} from './utils/call.utils';
 import {encodeArg} from './utils/idl.utils';
 
 const ICP_LEDGER_CANISTER_ID = 'ryjl3-tyaaa-aaaaa-aaaba-cai';
 
 export class IcpWallet extends RelyingParty {
-  readonly #host: RelyingPartyWalletHost;
-
-  /**
-   * @override Overrides the constructor to include the `host` property, which may be used specifically in the wallet client, as opposed to the generic relying party client.
-   */
-  protected constructor({
-    host,
-    ...rest
-  }: {origin: Origin; popup: Window} & Pick<RelyingPartyWalletOptions, 'onDisconnect' | 'host'>) {
-    super(rest);
-
-    this.#host = host;
-  }
-
   /**
    * Establishes a connection with an ICP Wallet.
    *
    * @override
    * @static
-   * @param {RelyingPartyWalletOptions} options - The options to initialize the ICP Wallet signer.
+   * @param {RelyingPartyOptions} options - The options to initialize the ICP Wallet signer.
    * @returns {Promise<IcpWallet>} A promise that resolves to an object, which can be used to interact with the ICP Wallet when it is connected.
    */
-  static async connect({
-    onDisconnect,
-    host,
-    ...rest
-  }: RelyingPartyWalletOptions): Promise<IcpWallet> {
+  static async connect({onDisconnect, host, ...rest}: RelyingPartyOptions): Promise<IcpWallet> {
     return await this.connectSigner({
       options: rest,
       init: (params: {origin: Origin; popup: Window}) =>
@@ -111,7 +90,7 @@ export class IcpWallet extends RelyingParty {
       params: callParams,
       result: callResult,
       resultRecordClass: TransferResult,
-      host: this.#host
+      host: this.host
     });
 
     if ('Err' in response) {

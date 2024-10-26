@@ -11,7 +11,7 @@ import {assertNonNullish} from '@dfinity/utils';
 import {LOCAL_REPLICA_URL, MAINNET_REPLICA_URL} from '../constants/core.constants';
 import {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import type {IcrcCallCanisterResult} from '../types/icrc-responses';
-import {RelyingPartyWalletHost} from '../types/relying-party-wallet-options';
+import {RelyingPartyHost} from '../types/relying-party-options';
 import {decodeCallRequest} from './agentjs-cbor-copy.utils';
 import {base64ToUint8Array} from './base64.utils';
 import {
@@ -61,7 +61,7 @@ export const decodeResponse = async <T>({
   params: IcrcCallCanisterRequestParams;
   result: IcrcCallCanisterResult;
   resultRecordClass: RecordClass | VariantClass;
-  host?: RelyingPartyWalletHost;
+  host?: RelyingPartyHost;
 }): Promise<T> => {
   // TODO: improve performance by avoiding the need to decode the call requests multiple times. For example. IcpWallet and IcrcWallet could use a new protected function of RelyingParty that would extend call and return the callRequest that is asserted.
   const callRequest = decodeCallRequest(contentMap);

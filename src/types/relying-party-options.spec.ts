@@ -1,3 +1,4 @@
+import {describe, expect, it} from 'vitest';
 import {RelyingPartyOptionsSchema} from './relying-party-options';
 
 describe('RelyingPartyOptions', () => {
@@ -183,5 +184,60 @@ describe('RelyingPartyOptions', () => {
 
     const result = RelyingPartyOptionsSchema.safeParse(invalidData);
     expect(result.success).toBe(false);
+  });
+
+  describe('host', () => {
+    const validData = {
+      url: 'https://example.com'
+    };
+
+    it('should validate with a valid localhost URL (http)', () => {
+      const result = RelyingPartyOptionsSchema.safeParse({
+        ...validData,
+        host: 'http://localhost:4943'
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('should validate with a valid localhost URL (https)', () => {
+      const result = RelyingPartyOptionsSchema.safeParse({
+        ...validData,
+        host: 'https://localhost:4943'
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('should validate with a valid https URL', () => {
+      const result = RelyingPartyOptionsSchema.safeParse({
+        ...validData,
+        host: 'https://example.com'
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('should invalidate with an http URL for non-localhost', () => {
+      const result = RelyingPartyOptionsSchema.safeParse({
+        ...validData,
+        host: 'http://example.com'
+      });
+      expect(result.success).toBe(false);
+      expect(result.error?.errors[0]?.message).toBe('Invalid URL.');
+    });
+
+    it('should validate without host (host optional)', () => {
+      const result = RelyingPartyOptionsSchema.safeParse({
+        ...validData
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('should invalidate with an incorrect URL format', () => {
+      const result = RelyingPartyOptionsSchema.safeParse({
+        ...validData,
+        host: 'not-a-url'
+      });
+      expect(result.success).toBe(false);
+      expect(result.error?.errors[0]?.message).toBe('Invalid url');
+    });
   });
 });

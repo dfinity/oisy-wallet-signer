@@ -11,7 +11,7 @@ import {
 } from './mocks/call-utils.mocks';
 import {mockLocalIcRootKey} from './mocks/custom-http-agent-responses.mocks';
 import {mockCanisterId} from './mocks/icrc-accounts.mocks';
-import {RelyingPartyWalletOptions} from './types/relying-party-wallet-options';
+import {RelyingPartyOptions} from './types/relying-party-options';
 import {JSON_RPC_VERSION_2} from './types/rpc';
 import * as callUtils from './utils/call.utils';
 
@@ -41,7 +41,7 @@ vi.mock('@dfinity/agent', async (importOriginal) => {
 });
 
 describe('icp-wallet', () => {
-  const mockParameters: RelyingPartyWalletOptions = {
+  const mockParameters: RelyingPartyOptions = {
     url: 'https://test.com',
     host: 'http://localhost:8080'
   };
