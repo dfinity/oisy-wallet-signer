@@ -1,6 +1,9 @@
 import {assertNonNullish, isNullish, nonNullish} from '@dfinity/utils';
 import {
   ICRC21_CALL_CONSENT_MESSAGE,
+  ICRC25_PERMISSION_ASK_ON_USE,
+  ICRC25_PERMISSION_DENIED,
+  ICRC25_PERMISSION_GRANTED,
   ICRC25_REQUEST_PERMISSIONS,
   ICRC27_ACCOUNTS,
   ICRC49_CALL_CANISTER
@@ -618,14 +621,14 @@ export class Signer {
       });
 
       switch (permission) {
-        case 'denied': {
+        case ICRC25_PERMISSION_DENIED: {
           notifyErrorPermissionNotGranted({
             id: requestId ?? null,
             origin
           });
           break;
         }
-        case 'granted': {
+        case ICRC25_PERMISSION_GRANTED: {
           await notifyAccounts();
           break;
         }
@@ -711,7 +714,7 @@ export class Signer {
         origin
       });
 
-      if (permission === 'denied') {
+      if (permission === ICRC25_PERMISSION_DENIED) {
         notifyErrorPermissionNotGranted({
           id: requestId ?? null,
           origin
@@ -783,7 +786,7 @@ export class Signer {
     });
 
     switch (currentPermission) {
-      case 'ask_on_use': {
+      case ICRC25_PERMISSION_ASK_ON_USE: {
         const promise = new Promise<Omit<IcrcPermissionState, 'ask_on_use'>>((resolve, reject) => {
           const promptFn = async (): Promise<void> => {
             const requestedScopes: IcrcScopesArray = [
@@ -791,7 +794,7 @@ export class Signer {
                 scope: {
                   method
                 },
-                state: 'denied'
+                state: ICRC25_PERMISSION_DENIED
               }
             ];
 
@@ -804,15 +807,15 @@ export class Signer {
 
             const approved =
               confirmedScopes.find(
-                ({scope: {method: m}, state}) => m === method && state === 'granted'
+                ({scope: {method: m}, state}) => m === method && state === ICRC25_PERMISSION_GRANTED
               ) !== undefined;
 
             if (approved) {
-              resolve('granted');
+              resolve(ICRC25_PERMISSION_GRANTED);
               return;
             }
 
-            resolve('denied');
+            resolve(ICRC25_PERMISSION_DENIED);
           };
 
           this.prompt({

@@ -1,5 +1,7 @@
 import {MockInstance} from 'vitest';
 import {
+  ICRC25_PERMISSION_DENIED,
+  ICRC25_PERMISSION_GRANTED,
   ICRC25_PERMISSIONS,
   ICRC25_REQUEST_PERMISSIONS,
   ICRC25_SUPPORTED_STANDARDS,
@@ -548,8 +550,8 @@ describe('Relying Party', () => {
       let relyingParty: RelyingParty;
 
       const scopes = [
-        {scope: {method: ICRC27_ACCOUNTS}, state: 'granted'},
-        {scope: {method: ICRC49_CALL_CANISTER}, state: 'denied'}
+        {scope: {method: ICRC27_ACCOUNTS}, state: ICRC25_PERMISSION_GRANTED},
+        {scope: {method: ICRC49_CALL_CANISTER}, state: ICRC25_PERMISSION_DENIED}
       ];
 
       beforeEach(async () => {
