@@ -44,13 +44,18 @@ export class IcpWallet extends RelyingParty {
    * @param {RelyingPartyWalletOptions} options - The options to initialize the ICP Wallet signer.
    * @returns {Promise<IcpWallet>} A promise that resolves to an object, which can be used to interact with the ICP Wallet when it is connected.
    */
-  static async connect({onDisconnect, ...rest}: RelyingPartyWalletOptions): Promise<IcpWallet> {
+  static async connect({
+    onDisconnect,
+    host,
+    ...rest
+  }: RelyingPartyWalletOptions): Promise<IcpWallet> {
     return await this.connectSigner({
       options: rest,
       init: (params: {origin: Origin; popup: Window}) =>
         new IcpWallet({
           ...params,
-          onDisconnect
+          onDisconnect,
+          host
         })
     });
   }
