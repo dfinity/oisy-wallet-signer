@@ -336,6 +336,17 @@ const wallet = await IcpWallet.connect({
 });
 ```
 
+> [!TIP]
+> When developing locally, you can initialize the signer with a parameter `host` that points to your local replica.
+> Useful to decode responses if it runs on another port than the default.
+
+```typescript
+const wallet = await IcpWallet.connect({
+    url: 'https://staging.oisy.com/sign',
+    host: 'http://localhost:6666'
+});
+```
+
 The `url` is the URL of the signer to which you would like to connect. In the case of OISY, the production URL is `https://staging.oisy.com/sign`. If you wish to connect to a local wallet or project, you can, for example, specify a URL like `http://localhost:5174/sign`.
 
 In addition to this parameter, the connection can also be established with various additional parameters:
