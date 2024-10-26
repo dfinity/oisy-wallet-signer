@@ -49,11 +49,11 @@ Additionally, it includes opinionated clients that enable interactions with the 
 
 ```bash
 # with npm
-npm install --save-dev @dfinity/oisy-wallet-signer
+npm install @dfinity/oisy-wallet-signer
 # with pnpm
-pnpm add --save-dev @dfinity/oisy-wallet-signer
+pnpm add @dfinity/oisy-wallet-signer
 # with yarn
-yarn add -D @dfinity/oisy-wallet-signer
+yarn add @dfinity/oisy-wallet-signer
 ```
 
 ## :writing_hand: Usage in a Wallet
