@@ -1,3 +1,5 @@
+import * as agent from '@dfinity/agent';
+import {AnonymousIdentity} from '@dfinity/agent';
 import {Principal} from '@dfinity/principal';
 import type {MockInstance} from 'vitest';
 import {TransferResult} from '../constants/icrc.idl.constants';
@@ -118,8 +120,14 @@ describe('call.utils', () => {
   });
 
   describe('decodeResponse', () => {
+    let createSpy: MockInstance;
+
     beforeEach(() => {
       vi.setSystemTime(mockLocalCallTime);
+
+      createSpy = vi.spyOn(agent.HttpAgent, 'create').mockResolvedValue({
+        rootKey: mockLocalIcRootKey.buffer
+      } as unknown as agent.HttpAgent);
     });
 
     afterEach(() => {
@@ -136,6 +144,27 @@ describe('call.utils', () => {
 
       expect(response).toEqual({
         Ok: mockLocalBlockHeight
+      });
+    });
+
+    it('should create agent with a custom host', async () => {
+      const host = 'http://localhost:8080';
+
+      const response = await decodeResponse({
+        params: mockLocalCallParams,
+        result: mockLocalCallResult,
+        resultRecordClass: TransferResult,
+        host
+      });
+
+      expect(response).toEqual({
+        Ok: mockLocalBlockHeight
+      });
+
+      expect(createSpy).toHaveBeenCalledWith({
+        host,
+        identity: new AnonymousIdentity(),
+        shouldFetchRootKey: true
       });
     });
 
