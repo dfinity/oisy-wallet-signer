@@ -5,6 +5,7 @@ import {SignerApi} from './api/signer.api';
 import {
   ICRC21_CALL_CONSENT_MESSAGE,
   ICRC25_PERMISSION_ASK_ON_USE,
+  ICRC25_PERMISSION_DENIED,
   ICRC25_PERMISSION_GRANTED,
   ICRC25_PERMISSIONS,
   ICRC25_REQUEST_PERMISSIONS,
@@ -2209,13 +2210,13 @@ describe('Signer', () => {
             scope: {
               method: ICRC27_ACCOUNTS
             },
-            state: 'granted'
+            state: ICRC25_PERMISSION_GRANTED
           },
           {
             scope: {
               method: ICRC49_CALL_CANISTER
             },
-            state: 'denied'
+            state: ICRC25_PERMISSION_DENIED
           }
         ];
 

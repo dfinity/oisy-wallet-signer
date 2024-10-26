@@ -1,5 +1,6 @@
 import {
   ICRC21_CALL_CONSENT_MESSAGE,
+  ICRC25_PERMISSION_DENIED,
   ICRC25_PERMISSIONS,
   ICRC25_REQUEST_PERMISSIONS,
   ICRC25_SUPPORTED_STANDARDS,
@@ -75,7 +76,7 @@ describe('SignerPrompts', () => {
         scope: {
           method: ICRC27_ACCOUNTS
         },
-        state: 'denied'
+        state: ICRC25_PERMISSION_DENIED
       }
     ];
 
