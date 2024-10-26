@@ -1557,6 +1557,85 @@ describe('Relying Party', () => {
         });
       });
     });
+
+    describe('Opinionated functions', () => {
+      describe('RequestPermissionsNotGranted', () => {
+        let relyingParty: RelyingParty;
+
+        beforeEach(async () => {
+          const promise = RelyingParty.connect(mockParameters);
+
+          window.dispatchEvent(messageEventReady);
+
+          relyingParty = await promise;
+
+          vi.spyOn(relyingParty, 'permissions').mockResolvedValue([
+            {scope: {method: ICRC27_ACCOUNTS}, state: ICRC25_PERMISSION_GRANTED},
+            {scope: {method: ICRC49_CALL_CANISTER}, state: ICRC25_PERMISSION_DENIED}
+          ]);
+
+          vi.spyOn(relyingParty, 'requestPermissions').mockResolvedValue([
+            {scope: {method: ICRC27_ACCOUNTS}, state: ICRC25_PERMISSION_GRANTED},
+            {scope: {method: ICRC49_CALL_CANISTER}, state: ICRC25_PERMISSION_GRANTED}
+          ]);
+        });
+
+        afterEach(async () => {
+          await relyingParty.disconnect();
+
+          vi.restoreAllMocks();
+        });
+
+        it('should return allPermissionsGranted: true if all permissions are already granted', async () => {
+          vi.spyOn(relyingParty, 'permissions').mockResolvedValue([
+            {scope: {method: ICRC27_ACCOUNTS}, state: ICRC25_PERMISSION_GRANTED},
+            {scope: {method: ICRC49_CALL_CANISTER}, state: ICRC25_PERMISSION_GRANTED}
+          ]);
+
+          const result = await relyingParty.requestPermissionsNotGranted();
+          expect(result).toEqual({allPermissionsGranted: true});
+          expect(relyingParty.requestPermissions).not.toHaveBeenCalled();
+        });
+
+        it('should request only missing permissions if some are not granted', async () => {
+          const result = await relyingParty.requestPermissionsNotGranted();
+          expect(result).toEqual({allPermissionsGranted: true});
+          expect(relyingParty.requestPermissions).toHaveBeenCalledWith({
+            params: {scopes: [{method: ICRC49_CALL_CANISTER}]}
+          });
+        });
+
+        it('should return allPermissionsGranted: false if permissions remain ungranted after request', async () => {
+          vi.spyOn(relyingParty, 'requestPermissions').mockResolvedValue([
+            {scope: {method: ICRC27_ACCOUNTS}, state: ICRC25_PERMISSION_GRANTED},
+            {scope: {method: ICRC49_CALL_CANISTER}, state: ICRC25_PERMISSION_DENIED}
+          ]);
+
+          const result = await relyingParty.requestPermissionsNotGranted();
+          expect(result).toEqual({allPermissionsGranted: false});
+        });
+
+        it('should handle errors from permissions check gracefully', async () => {
+          vi.spyOn(relyingParty, 'permissions').mockRejectedValue(
+            new Error('Permissions check failed')
+          );
+
+          await expect(relyingParty.requestPermissionsNotGranted()).rejects.toThrow(
+            'Permissions check failed'
+          );
+        });
+
+        it('should handle errors from requesting permissions gracefully', async () => {
+          vi.spyOn(relyingParty, 'requestPermissions').mockRejectedValue(
+            new Error('Request permissions failed')
+          );
+
+          await expect(relyingParty.requestPermissionsNotGranted()).rejects.toThrow(
+            'Request permissions failed'
+          );
+        });
+      });
+    });
   });
 
   describe('Window failure', () => {
