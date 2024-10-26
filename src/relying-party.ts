@@ -733,7 +733,11 @@ export class RelyingParty {
 
     const permissions = await this.permissions({options});
 
-    const notGrantedScopes = findNotGranted(permissions ?? []);
+    if (permissions.length === 0) {
+      throw new Error('The signer did not provide any data about the current set of permissions.');
+    }
+
+    const notGrantedScopes = findNotGranted(permissions);
 
     if (notGrantedScopes.length === 0) {
       return {allPermissionsGranted: true};
@@ -746,7 +750,13 @@ export class RelyingParty {
       }
     });
 
-    const remainingNotGrantedScopes = findNotGranted(result ?? []);
+    if (result.length === 0) {
+      throw new Error(
+        'The signer did not provide any data about the current set of permissions following the request.'
+      );
+    }
+
+    const remainingNotGrantedScopes = findNotGranted(result);
 
     return {allPermissionsGranted: remainingNotGrantedScopes.length === 0};
   };

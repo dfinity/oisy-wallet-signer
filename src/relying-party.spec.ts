@@ -1615,6 +1615,22 @@ describe('Relying Party', () => {
           expect(result).toEqual({allPermissionsGranted: false});
         });
 
+        it('should throw an error if no permissions data is returned by the signer', async () => {
+          vi.spyOn(relyingParty, 'permissions').mockResolvedValue([]);
+
+          await expect(relyingParty.requestPermissionsNotGranted()).rejects.toThrow(
+            'The signer did not provide any data about the current set of permissions.'
+          );
+        });
+
+        it('should throw an error if no permissions data is returned after requesting permissions', async () => {
+          vi.spyOn(relyingParty, 'requestPermissions').mockResolvedValue([]);
+
+          await expect(relyingParty.requestPermissionsNotGranted()).rejects.toThrow(
+            'The signer did not provide any data about the current set of permissions following the request.'
+          );
+        });
+
         it('should handle errors from permissions check gracefully', async () => {
           vi.spyOn(relyingParty, 'permissions').mockRejectedValue(
             new Error('Permissions check failed')
