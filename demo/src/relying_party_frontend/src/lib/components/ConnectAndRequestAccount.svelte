@@ -2,7 +2,7 @@
 	import { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
 	import { WALLET_URL } from '$core/constants/app.constants';
 	import { alertStore } from '$core/stores/alert.store';
-	import type { IcrcAccount, IcrcScopeMethod, IcrcScopesArray } from '@dfinity/oisy-wallet-signer';
+	import type { IcrcAccount } from '@dfinity/oisy-wallet-signer';
 	import IconAdd from '$lib/components/IconAdd.svelte';
 
 	type Props = {
@@ -19,41 +19,9 @@
 				url: WALLET_URL
 			});
 
-			const permissions = await wallet.permissions();
+			const { allPermissionsGranted } = await wallet.requestPermissionsNotGranted();
 
-			const requestPermissionsIfNeeded = async (): Promise<{ allScopesGranted: boolean }> => {
-				const findNotGranted = (permissions: IcrcScopesArray): IcrcScopeMethod[] =>
-					permissions.filter(({ state }) => state !== 'granted').map(({ scope }) => scope);
-
-				const notGrantedScopes = findNotGranted(permissions);
-
-				if (notGrantedScopes.length === 0) {
-					return { allScopesGranted: true };
-				}
-
-				const result = await wallet?.requestPermissions({
-					params: {
-						scopes: notGrantedScopes
-					}
-				});
-
-				const remainingNotGrantedScopes = findNotGranted(result ?? []);
-
-				if (remainingNotGrantedScopes.length === 0) {
-					return { allScopesGranted: true };
-				}
-
-				alertStore.set({
-					type: 'error',
-					message: 'The wallet requires all permissions to be approved.'
-				});
-
-				return { allScopesGranted: false };
-			};
-
-			const { allScopesGranted } = await requestPermissionsIfNeeded();
-
-			if (!allScopesGranted) {
+			if (!allPermissionsGranted) {
 				return;
 			}
 

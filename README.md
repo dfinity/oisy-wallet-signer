@@ -49,11 +49,11 @@ Additionally, it includes opinionated clients that enable interactions with the 
 
 ```bash
 # with npm
-npm install --save-dev @dfinity/oisy-wallet-signer
+npm install @dfinity/oisy-wallet-signer
 # with pnpm
-pnpm add --save-dev @dfinity/oisy-wallet-signer
+pnpm add @dfinity/oisy-wallet-signer
 # with yarn
-yarn add -D @dfinity/oisy-wallet-signer
+yarn add @dfinity/oisy-wallet-signer
 ```
 
 ## :writing_hand: Usage in a Wallet
@@ -382,9 +382,6 @@ Similarly, you might want to display information in your app about the account(s
 
 For these reasons, we recommend chaining these two operations—requesting permissions and retrieving account information—after the connection has been established.
 
-> [!NOTE]
-> In the future, we may consider incorporating this pattern directly into the opinionated clients, so you won't need to implement it manually. If this approach resonates with you while using this library, please let us know.
-
 ```typescript
 import {IcpWallet} from '@dfinity/oisy-wallet-signer/icp-wallet';
 import type {IcrcAccount, IcrcScopeMethod, IcrcScopesArray} from '@dfinity/oisy-wallet-signer';
@@ -393,38 +390,10 @@ const wallet = await IcpWallet.connect({
   url: 'https://staging.oisy.com/sign'
 });
 
-const permissions = await wallet.permissions();
+const {allPermissionsGranted} = await wallet.requestPermissionsNotGranted();
 
-const requestPermissionsIfNeeded = async (): Promise<{allScopesGranted: boolean}> => {
-  const findNotGranted = (permissions: IcrcScopesArray): IcrcScopeMethod[] =>
-    permissions.filter(({state}) => state !== 'granted').map(({scope}) => scope);
-
-  const notGrantedScopes = findNotGranted(permissions);
-
-  if (notGrantedScopes.length === 0) {
-    return {allScopesGranted: true};
-  }
-
-  const result = await wallet.requestPermissions({
-    params: {
-      scopes: notGrantedScopes
-    }
-  });
-
-  const remainingNotGrantedScopes = findNotGranted(result ?? []);
-
-  if (remainingNotGrantedScopes.length === 0) {
-    return {allScopesGranted: true};
-  }
-
-  console.error('The wallet requires all permissions to be approved.');
-
-  return {allScopesGranted: false};
-};
-
-const {allScopesGranted} = await requestPermissionsIfNeeded();
-
-if (!allScopesGranted) {
+if (!allPermissionsGranted) {
+  // Inform the user that all permissions are required to continue
   return;
 }
 
