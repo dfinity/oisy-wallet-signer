@@ -20,9 +20,7 @@
 		"check:wallet": "npm run check -w src/wallet_frontend",
 		"check": "npm run check:party && npm run check:wallet",
 		"lint": "prettier --check . && eslint .",
-		"format": "prettier --write .",
-		"generate": "scripts/did.sh && dfx generate && node scripts/did.update.types.mjs && node scripts/did.delete.types.mjs && npm run format",
-		"deploy": "scripts/deploy.sh"
+		"format": "prettier --write ."
 	},
 	"devDependencies": {
 		"@junobuild/config": "^0.0.14",
