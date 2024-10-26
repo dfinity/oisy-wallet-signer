@@ -1,5 +1,5 @@
 import type {Mock} from 'vitest';
-import {ICRC27_ACCOUNTS} from '../constants/icrc.constants';
+import {ICRC25_PERMISSION_GRANTED, ICRC27_ACCOUNTS} from '../constants/icrc.constants';
 import {SIGNER_SUPPORTED_STANDARDS} from '../constants/signer.constants';
 import {mockCallCanisterSuccess} from '../mocks/call-canister.mocks';
 import {mockAccounts} from '../mocks/icrc-accounts.mocks';
@@ -78,7 +78,7 @@ describe('Signer-success.handlers', () => {
           scope: {
             method: ICRC27_ACCOUNTS
           },
-          state: 'granted'
+          state: ICRC25_PERMISSION_GRANTED
         }
       ];
 
