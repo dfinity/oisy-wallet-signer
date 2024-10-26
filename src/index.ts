@@ -21,6 +21,7 @@ export type * from './types/post-message';
 export type * from './types/principal';
 export type * from './types/relying-party-options';
 export type * from './types/relying-party-requests';
+export type * from './types/relying-party-wallet-options';
 export type * from './types/rpc';
 export type * from './types/signer-options';
 export type * from './types/signer-prompts';
