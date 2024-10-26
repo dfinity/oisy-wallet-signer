@@ -1,4 +1,5 @@
 import {assertNonNullish, nonNullish, notEmptyString} from '@dfinity/utils';
+import {ICRC25_PERMISSION_GRANTED} from './constants/icrc.constants';
 import {
   RELYING_PARTY_CHECK_WALLET_STATUS_INTERVAL,
   RELYING_PARTY_CONNECT_TIMEOUT_IN_MILLISECONDS,
@@ -29,6 +30,7 @@ import {
   IcrcScopesResponseSchema,
   IcrcSupportedStandardsResponseSchema,
   type IcrcCallCanisterResult,
+  type IcrcScopeMethod,
   type IcrcScopesArray,
   type IcrcSupportedStandards
 } from './types/icrc-responses';
@@ -711,5 +713,51 @@ export class RelyingParty {
       valid: false,
       error: new RelyingPartyResponseError(errorData.error)
     };
+  };
+
+  /**
+   * Checks the current set of permissions and automatically requests any that have not yet been granted.
+   * This is useful for dApps that wish to request all necessary permissions up-front.
+   *
+   * @async
+   * @param {RelyingPartyRequestOptions} options - The options for the signer request, which may include parameters such as timeout settings and other request-specific configurations.
+   * @returns {Promise<{allPermissionsGranted: boolean}>} - A promise resolving to an object indicating whether all required permissions have been granted.
+   */
+  requestPermissionsNotGranted = async ({
+    options
+  }: {
+    options?: RelyingPartyRequestOptions;
+  } = {}): Promise<{allPermissionsGranted: boolean}> => {
+    const findNotGranted = (permissions: IcrcScopesArray): IcrcScopeMethod[] =>
+      permissions.filter(({state}) => state !== ICRC25_PERMISSION_GRANTED).map(({scope}) => scope);
+
+    const permissions = await this.permissions({options});
+
+    if (permissions.length === 0) {
+      throw new Error('The signer did not provide any data about the current set of permissions.');
+    }
+
+    const notGrantedScopes = findNotGranted(permissions);
+
+    if (notGrantedScopes.length === 0) {
+      return {allPermissionsGranted: true};
+    }
+
+    const result = await this.requestPermissions({
+      options,
+      params: {
+        scopes: notGrantedScopes
+      }
+    });
+
+    if (result.length === 0) {
+      throw new Error(
+        'The signer did not provide any data about the current set of permissions following the request.'
+      );
+    }
+
+    const remainingNotGrantedScopes = findNotGranted(result);
+
+    return {allPermissionsGranted: remainingNotGrantedScopes.length === 0};
   };
 }
