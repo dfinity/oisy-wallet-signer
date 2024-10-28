@@ -50,6 +50,10 @@ const OnDisconnectSchema = z.function().args().returns(z.void()).optional();
 
 export type OnDisconnect = z.infer<typeof OnDisconnectSchema>;
 
+const RelyingPartyHostSchema = UrlSchema.optional();
+
+export type RelyingPartyHost = z.infer<typeof RelyingPartyHostSchema>;
+
 export const RelyingPartyOptionsSchema = z.object({
   /**
    * The URL of the signer.
@@ -70,7 +74,14 @@ export const RelyingPartyOptionsSchema = z.object({
   /**
    * Optional callback function that is triggered when the relying party disconnects from the wallet.
    */
-  onDisconnect: OnDisconnectSchema
+  onDisconnect: OnDisconnectSchema,
+
+  /**
+   * The host of the replica to which the relying party wallet might be connected.
+   * This is useful for local development if your local replica runs on a port other than the default, as an agent must be created to decode the response.
+   * If "localhost" or "127.0.0.1" is provided, it will automatically connect to a local replica and fetch the root key for the agent.
+   */
+  host: RelyingPartyHostSchema
 });
 
 export type RelyingPartyOptions = z.infer<typeof RelyingPartyOptionsSchema>;

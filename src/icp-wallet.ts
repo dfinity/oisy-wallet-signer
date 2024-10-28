@@ -11,7 +11,7 @@ import type {IcrcAccount} from './types/icrc-accounts';
 import type {IcrcCallCanisterRequestParams} from './types/icrc-requests';
 import type {Origin} from './types/post-message';
 import type {PrincipalText} from './types/principal';
-import type {RelyingPartyOptions} from './types/relying-party-options';
+import {RelyingPartyOptions} from './types/relying-party-options';
 import type {RelyingPartyRequestOptions} from './types/relying-party-requests';
 import {decodeResponse} from './utils/call.utils';
 import {encodeArg} from './utils/idl.utils';
@@ -27,13 +27,14 @@ export class IcpWallet extends RelyingParty {
    * @param {RelyingPartyOptions} options - The options to initialize the ICP Wallet signer.
    * @returns {Promise<IcpWallet>} A promise that resolves to an object, which can be used to interact with the ICP Wallet when it is connected.
    */
-  static async connect({onDisconnect, ...rest}: RelyingPartyOptions): Promise<IcpWallet> {
+  static async connect({onDisconnect, host, ...rest}: RelyingPartyOptions): Promise<IcpWallet> {
     return await this.connectSigner({
       options: rest,
       init: (params: {origin: Origin; popup: Window}) =>
         new IcpWallet({
           ...params,
-          onDisconnect
+          onDisconnect,
+          host
         })
     });
   }
@@ -88,7 +89,8 @@ export class IcpWallet extends RelyingParty {
     const response = await decodeResponse<Icrc1TransferResult>({
       params: callParams,
       result: callResult,
-      resultRecordClass: TransferResult
+      resultRecordClass: TransferResult,
+      host: this.host
     });
 
     if ('Err' in response) {

@@ -27,13 +27,14 @@ export class IcrcWallet extends RelyingParty {
    * @param {RelyingPartyOptions} options - The options to initialize the ICRC Wallet signer.
    * @returns {Promise<IcrcWallet>} A promise that resolves to an object, which can be used to interact with the ICRC Wallet when it is connected.
    */
-  static async connect({onDisconnect, ...rest}: RelyingPartyOptions): Promise<IcrcWallet> {
+  static async connect({onDisconnect, host, ...rest}: RelyingPartyOptions): Promise<IcrcWallet> {
     return await this.connectSigner({
       options: rest,
       init: (params: {origin: Origin; popup: Window}) =>
         new IcrcWallet({
           ...params,
-          onDisconnect
+          onDisconnect,
+          host
         })
     });
   }
@@ -83,7 +84,8 @@ export class IcrcWallet extends RelyingParty {
     const response = await decodeResponse<TransferResult>({
       params: callParams,
       result: callResult,
-      resultRecordClass: TransferResult
+      resultRecordClass: TransferResult,
+      host: this.host
     });
 
     if ('Err' in response) {

@@ -11,7 +11,7 @@ import {
 } from './mocks/call-utils.mocks';
 import {mockLocalIcRootKey} from './mocks/custom-http-agent-responses.mocks';
 import {mockCanisterId} from './mocks/icrc-accounts.mocks';
-import type {RelyingPartyOptions} from './types/relying-party-options';
+import {RelyingPartyOptions} from './types/relying-party-options';
 import {JSON_RPC_VERSION_2} from './types/rpc';
 import * as callUtils from './utils/call.utils';
 
@@ -41,7 +41,10 @@ vi.mock('@dfinity/agent', async (importOriginal) => {
 });
 
 describe('icp-wallet', () => {
-  const mockParameters: RelyingPartyOptions = {url: 'https://test.com'};
+  const mockParameters: RelyingPartyOptions = {
+    url: 'https://test.com',
+    host: 'http://localhost:8080'
+  };
 
   const messageEventReady = new MessageEvent('message', {
     origin: mockParameters.url,
@@ -168,6 +171,25 @@ describe('icp-wallet', () => {
         params: mockLocalCallParams,
         options
       });
+    });
+
+    it('should call decode response with the specific host', async () => {
+      const mockCall = vi.fn().mockResolvedValue({});
+
+      // @ts-expect-error we mock call for testing purposes
+      icpWallet.call = mockCall;
+
+      const spy = vi
+        .spyOn(callUtils, 'decodeResponse')
+        .mockResolvedValue({Ok: mockLocalBlockHeight});
+
+      await icpWallet.icrc1Transfer({request, owner: sender});
+
+      expect(spy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          host: mockParameters.host
+        })
+      );
     });
   });
 });
