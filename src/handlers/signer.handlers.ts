@@ -9,7 +9,8 @@ import type {Notify} from '../types/signer-handlers';
 export const notifyError = ({
   id,
   error,
-  origin
+  origin,
+  source
 }: {
   error: RpcResponseError;
 } & Notify): void => {
@@ -19,11 +20,11 @@ export const notifyError = ({
     error
   };
 
-  notify({msg, origin});
+  notify({msg, origin, source});
 };
 
-// TODO: instead of window.opener try to sent the message to MessageEvent.source first.
-// This is safer in case the signer is opened with redirect in the future.
-// e.g. per user canister pattern
-export const notify = ({msg, origin}: {msg: RpcResponse} & Pick<Notify, 'origin'>): void =>
-  window.opener.postMessage(msg, origin);
+export const notify = ({
+  msg,
+  origin,
+  source
+}: {msg: RpcResponse} & Pick<Notify, 'origin' | 'source'>): void => source.postMessage(msg);
