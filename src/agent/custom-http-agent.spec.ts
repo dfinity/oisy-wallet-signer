@@ -99,7 +99,7 @@ describe('CustomHttpAgent', () => {
     await CustomHttpAgent.create(agentOptions);
 
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    expect(httpAgent.HttpAgent.create).toHaveBeenCalledTimes(1);
+    expect(httpAgent.HttpAgent.create).toHaveBeenCalledOnce();
     // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(httpAgent.HttpAgent.create).toHaveBeenCalledWith(agentOptions);
   });
@@ -143,7 +143,7 @@ describe('CustomHttpAgent', () => {
         it('should call agent on request', async () => {
           await agent.request(mockRequestPayload);
 
-          expect(spyCall).toHaveBeenCalledTimes(1);
+          expect(spyCall).toHaveBeenCalledOnce();
           expect(spyCall).toHaveBeenCalledWith(mockCanisterId, {
             arg: base64ToUint8Array(mockRequestPayload.arg),
             effectiveCanisterId: mockCanisterId,
@@ -308,7 +308,7 @@ describe('CustomHttpAgent', () => {
           it('should call agent on request', async () => {
             await agent.request(mockRequestPayload);
 
-            expect(spyCall).toHaveBeenCalledTimes(1);
+            expect(spyCall).toHaveBeenCalledOnce();
             expect(spyCall).toHaveBeenCalledWith(mockCanisterId, {
               arg: base64ToUint8Array(mockRequestPayload.arg),
               effectiveCanisterId: mockCanisterId,
@@ -326,7 +326,7 @@ describe('CustomHttpAgent', () => {
           it('should poll for response when status is 202 and no certificate is returned by v3 call', async () => {
             await agent.request(mockRequestPayload);
 
-            expect(spyPollForResponse).toHaveBeenCalledTimes(1);
+            expect(spyPollForResponse).toHaveBeenCalledOnce();
           });
         });
 
