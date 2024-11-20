@@ -438,7 +438,9 @@ describe('Signer services', () => {
         prompt
       });
 
-      expect(spySignerApiCall).toHaveBeenNthCalledWith(1, {
+      expect(spySignerApiCall).toHaveBeenCalledTimes(1);
+
+      expect(spySignerApiCall).toHaveBeenCalledWith({
         ...signerOptions,
         params
       });

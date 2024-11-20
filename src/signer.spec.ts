@@ -800,8 +800,9 @@ describe('Signer', () => {
             const messageEvent = new MessageEvent('message', requestPermissionsMsg);
             window.dispatchEvent(messageEvent);
 
-            expect(postMessageMock).toHaveBeenNthCalledWith(
-              1,
+            expect(postMessageMock).toHaveBeenCalledTimes(1);
+
+            expect(postMessageMock).toHaveBeenCalledWith(
               {
                 jsonrpc: JSON_RPC_VERSION_2,
                 id: testId,
@@ -824,7 +825,9 @@ describe('Signer', () => {
             const messageEvent = new MessageEvent('message', requestPermissionsMsg);
             window.dispatchEvent(messageEvent);
 
-            expect(promptSpy).toHaveBeenNthCalledWith(1, {
+            expect(promptSpy).toHaveBeenCalledTimes(1);
+
+            expect(promptSpy).toHaveBeenCalledWith({
               requestedScopes: requestPermissionsDataSortedScopes.map((scope) => ({
                 scope: {...scope},
                 state: IcrcPermissionStateSchema.enum.denied
@@ -847,7 +850,9 @@ describe('Signer', () => {
             const messageEvent = new MessageEvent('message', requestPermissionsMsg);
             window.dispatchEvent(messageEvent);
 
-            expect(promptSpy).toHaveBeenNthCalledWith(1, {
+            expect(promptSpy).toHaveBeenCalledTimes(1);
+
+            expect(promptSpy).toHaveBeenCalledWith({
               requestedScopes: requestPermissionsDataSortedScopes.map((scope) => ({
                 scope: {...scope},
                 state: IcrcPermissionStateSchema.enum.denied
@@ -884,7 +889,9 @@ describe('Signer', () => {
             const messageEvent = new MessageEvent('message', requestPermissionsMsg);
             window.dispatchEvent(messageEvent);
 
-            expect(promptSpy).toHaveBeenNthCalledWith(1, {
+            expect(promptSpy).toHaveBeenCalledTimes(1);
+
+            expect(promptSpy).toHaveBeenCalledWith({
               requestedScopes: requestPermissionsDataSortedScopes.map((scope) => ({
                 scope: {...scope},
                 state: IcrcPermissionStateSchema.enum.denied
@@ -2078,7 +2085,9 @@ describe('Signer', () => {
                   });
 
                   it('should call canister and notify success', () => {
-                    expect(spyCanisterCall).toHaveBeenNthCalledWith(1, {
+                    expect(spyCanisterCall).toHaveBeenCalledTimes(1);
+
+                    expect(spyCanisterCall).toHaveBeenCalledWith({
                       ...signerOptions,
                       params: {
                         ...mockCallCanisterParams,
@@ -2114,7 +2123,9 @@ describe('Signer', () => {
                   });
 
                   it('should call canister and notify error', () => {
-                    expect(spyCanisterCall).toHaveBeenNthCalledWith(1, {
+                    expect(spyCanisterCall).toHaveBeenCalledTimes(1);
+
+                    expect(spyCanisterCall).toHaveBeenCalledWith({
                       ...signerOptions,
                       params: {
                         ...mockCallCanisterParams,
