@@ -170,7 +170,7 @@ describe('Relying Party', () => {
             'relyingPartyWindow',
             expectedOptions
           );
-          expect(window.open).toHaveBeenCalledTimes(1);
+          expect(window.open).toHaveBeenCalledOnce();
 
           expect(addEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
           expect(removeEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
@@ -182,7 +182,7 @@ describe('Relying Party', () => {
 
           const promise = RelyingParty.connect(mockParameters);
 
-          expect(spy).toHaveBeenCalledTimes(1);
+          expect(spy).toHaveBeenCalledOnce();
 
           expect(spyPostMessage).toHaveBeenCalledWith(
             expect.objectContaining({
@@ -239,7 +239,7 @@ describe('Relying Party', () => {
 
           expect(relyingParty).toBeInstanceOf(RelyingParty);
 
-          expect(window.open).toHaveBeenCalledTimes(1);
+          expect(window.open).toHaveBeenCalledOnce();
           expect(window.close).not.toHaveBeenCalled();
         });
 
@@ -251,8 +251,8 @@ describe('Relying Party', () => {
             RelyingParty.connect(mockParameters).catch((err: Error) => {
               expect(err.message).toBe('Connection timeout. Unable to connect to the signer.');
 
-              expect(window.open).toHaveBeenCalledTimes(1);
-              expect(window.close).toHaveBeenCalledTimes(1);
+              expect(window.open).toHaveBeenCalledOnce();
+              expect(window.close).toHaveBeenCalledOnce();
 
               vi.useRealTimers();
 
@@ -274,7 +274,7 @@ describe('Relying Party', () => {
 
           const {disconnect} = await promise;
 
-          expect(window.open).toHaveBeenCalledTimes(1);
+          expect(window.open).toHaveBeenCalledOnce();
           expect(window.close).not.toHaveBeenCalled();
 
           await disconnect();
@@ -291,7 +291,7 @@ describe('Relying Party', () => {
 
           await connectAndDisconnect();
 
-          expect(clearIntervalSpy).toHaveBeenCalledTimes(1);
+          expect(clearIntervalSpy).toHaveBeenCalledOnce();
 
           clearIntervalSpy.mockRestore();
         });
@@ -301,7 +301,7 @@ describe('Relying Party', () => {
 
           await connectAndDisconnect(spyOnDisconnect);
 
-          expect(spyOnDisconnect).toHaveBeenCalledTimes(1);
+          expect(spyOnDisconnect).toHaveBeenCalledOnce();
         });
       });
     });
@@ -382,7 +382,7 @@ describe('Relying Party', () => {
                 `Request to signer timed out after ${RELYING_PARTY_TIMEOUT_REQUEST_SUPPORTED_STANDARD} milliseconds.`
               );
 
-              expect(spy).toHaveBeenCalledTimes(1);
+              expect(spy).toHaveBeenCalledOnce();
 
               vi.useRealTimers();
 
@@ -505,8 +505,8 @@ describe('Relying Party', () => {
 
           await promise;
 
-          expect(spy).toHaveBeenCalledTimes(1);
-          expect(spyPostMessage).toHaveBeenCalledTimes(1);
+          expect(spy).toHaveBeenCalledOnce();
+          expect(spyPostMessage).toHaveBeenCalledOnce();
 
           expect(spyPostMessage).toHaveBeenCalledWith(
             expect.objectContaining({
@@ -620,7 +620,7 @@ describe('Relying Party', () => {
                   `Request to signer timed out after ${RELYING_PARTY_TIMEOUT_PERMISSIONS} milliseconds.`
                 );
 
-                expect(spy).toHaveBeenCalledTimes(1);
+                expect(spy).toHaveBeenCalledOnce();
 
                 vi.useRealTimers();
 
@@ -743,8 +743,8 @@ describe('Relying Party', () => {
 
             await promise;
 
-            expect(spy).toHaveBeenCalledTimes(1);
-            expect(spyPostMessage).toHaveBeenCalledTimes(1);
+            expect(spy).toHaveBeenCalledOnce();
+            expect(spyPostMessage).toHaveBeenCalledOnce();
 
             expect(spyPostMessage).toHaveBeenCalledWith(
               expect.objectContaining({
@@ -839,7 +839,7 @@ describe('Relying Party', () => {
                   `Request to signer timed out after ${RELYING_PARTY_TIMEOUT_REQUEST_PERMISSIONS} milliseconds.`
                 );
 
-                expect(spy).toHaveBeenCalledTimes(1);
+                expect(spy).toHaveBeenCalledOnce();
 
                 vi.useRealTimers();
 
@@ -962,8 +962,8 @@ describe('Relying Party', () => {
 
             await promise;
 
-            expect(spy).toHaveBeenCalledTimes(1);
-            expect(spyPostMessage).toHaveBeenCalledTimes(1);
+            expect(spy).toHaveBeenCalledOnce();
+            expect(spyPostMessage).toHaveBeenCalledOnce();
 
             expect(spyPostMessage).toHaveBeenCalledWith(
               expect.objectContaining({
@@ -990,8 +990,8 @@ describe('Relying Party', () => {
 
             await promise;
 
-            expect(spy).toHaveBeenCalledTimes(1);
-            expect(spyPostMessage).toHaveBeenCalledTimes(1);
+            expect(spy).toHaveBeenCalledOnce();
+            expect(spyPostMessage).toHaveBeenCalledOnce();
 
             expect(spyPostMessage).toHaveBeenCalledWith(
               expect.objectContaining({
@@ -1101,7 +1101,7 @@ describe('Relying Party', () => {
                 `Request to signer timed out after ${RELYING_PARTY_TIMEOUT_ACCOUNTS} milliseconds.`
               );
 
-              expect(spy).toHaveBeenCalledTimes(1);
+              expect(spy).toHaveBeenCalledOnce();
 
               vi.useRealTimers();
 
@@ -1224,8 +1224,8 @@ describe('Relying Party', () => {
 
           await promise;
 
-          expect(spy).toHaveBeenCalledTimes(1);
-          expect(spyPostMessage).toHaveBeenCalledTimes(1);
+          expect(spy).toHaveBeenCalledOnce();
+          expect(spyPostMessage).toHaveBeenCalledOnce();
 
           expect(spyPostMessage).toHaveBeenCalledWith(
             expect.objectContaining({
@@ -1361,7 +1361,7 @@ describe('Relying Party', () => {
                 `Request to signer timed out after ${RELYING_PARTY_TIMEOUT_CALL_CANISTER} milliseconds.`
               );
 
-              expect(spy).toHaveBeenCalledTimes(1);
+              expect(spy).toHaveBeenCalledOnce();
 
               vi.useRealTimers();
 
@@ -1494,8 +1494,8 @@ describe('Relying Party', () => {
 
           await promise;
 
-          expect(spy).toHaveBeenCalledTimes(1);
-          expect(spyPostMessage).toHaveBeenCalledTimes(1);
+          expect(spy).toHaveBeenCalledOnce();
+          expect(spyPostMessage).toHaveBeenCalledOnce();
 
           expect(spyPostMessage).toHaveBeenCalledWith(
             expect.objectContaining({
@@ -1530,7 +1530,7 @@ describe('Relying Party', () => {
 
           const callResult = await promise;
 
-          expect(spyAssertCallResponse).toHaveBeenCalledTimes(1);
+          expect(spyAssertCallResponse).toHaveBeenCalledOnce();
 
           expect(spyAssertCallResponse).toHaveBeenCalledWith({
             result: callResult,

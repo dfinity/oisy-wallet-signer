@@ -800,7 +800,7 @@ describe('Signer', () => {
             const messageEvent = new MessageEvent('message', requestPermissionsMsg);
             window.dispatchEvent(messageEvent);
 
-            expect(postMessageMock).toHaveBeenCalledTimes(1);
+            expect(postMessageMock).toHaveBeenCalledOnce();
 
             expect(postMessageMock).toHaveBeenCalledWith(
               {
@@ -825,7 +825,7 @@ describe('Signer', () => {
             const messageEvent = new MessageEvent('message', requestPermissionsMsg);
             window.dispatchEvent(messageEvent);
 
-            expect(promptSpy).toHaveBeenCalledTimes(1);
+            expect(promptSpy).toHaveBeenCalledOnce();
 
             expect(promptSpy).toHaveBeenCalledWith({
               requestedScopes: requestPermissionsDataSortedScopes.map((scope) => ({
@@ -850,7 +850,7 @@ describe('Signer', () => {
             const messageEvent = new MessageEvent('message', requestPermissionsMsg);
             window.dispatchEvent(messageEvent);
 
-            expect(promptSpy).toHaveBeenCalledTimes(1);
+            expect(promptSpy).toHaveBeenCalledOnce();
 
             expect(promptSpy).toHaveBeenCalledWith({
               requestedScopes: requestPermissionsDataSortedScopes.map((scope) => ({
@@ -889,7 +889,7 @@ describe('Signer', () => {
             const messageEvent = new MessageEvent('message', requestPermissionsMsg);
             window.dispatchEvent(messageEvent);
 
-            expect(promptSpy).toHaveBeenCalledTimes(1);
+            expect(promptSpy).toHaveBeenCalledOnce();
 
             expect(promptSpy).toHaveBeenCalledWith({
               requestedScopes: requestPermissionsDataSortedScopes.map((scope) => ({
@@ -1107,7 +1107,7 @@ describe('Signer', () => {
               }
             ]);
 
-            await vi.waitFor(() => expect(spy).toHaveBeenCalledTimes(1));
+            await vi.waitFor(() => expect(spy).toHaveBeenCalledOnce());
           });
         });
       });
@@ -1650,7 +1650,7 @@ describe('Signer', () => {
 
               approve?.(mockAccounts);
 
-              await vi.waitFor(() => expect(spy).toHaveBeenCalledTimes(1));
+              await vi.waitFor(() => expect(spy).toHaveBeenCalledOnce());
             });
           });
         });
@@ -1886,7 +1886,7 @@ describe('Signer', () => {
                     });
                   });
 
-                  expect(promptSpy).not.toHaveBeenCalledTimes(1);
+                  expect(promptSpy).not.toHaveBeenCalledOnce();
                 });
               });
             });
@@ -2085,7 +2085,7 @@ describe('Signer', () => {
                   });
 
                   it('should call canister and notify success', () => {
-                    expect(spyCanisterCall).toHaveBeenCalledTimes(1);
+                    expect(spyCanisterCall).toHaveBeenCalledOnce();
 
                     expect(spyCanisterCall).toHaveBeenCalledWith({
                       ...signerOptions,
@@ -2123,7 +2123,7 @@ describe('Signer', () => {
                   });
 
                   it('should call canister and notify error', () => {
-                    expect(spyCanisterCall).toHaveBeenCalledTimes(1);
+                    expect(spyCanisterCall).toHaveBeenCalledOnce();
 
                     expect(spyCanisterCall).toHaveBeenCalledWith({
                       ...signerOptions,
