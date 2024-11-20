@@ -57,7 +57,7 @@ describe('AgentApi', () => {
       await agentApi.getAgentTest(signerOptions);
 
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(CustomHttpAgent.create).toHaveBeenCalledTimes(1);
+      expect(CustomHttpAgent.create).toHaveBeenCalledOnce();
     });
 
     it('should create and cache a new agent for a different identity', async () => {
@@ -82,7 +82,7 @@ describe('AgentApi', () => {
       await agentApi.getAgentTest(signerOptions);
 
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(CustomHttpAgent.create).toHaveBeenCalledTimes(1);
+      expect(CustomHttpAgent.create).toHaveBeenCalledOnce();
     });
   });
 
