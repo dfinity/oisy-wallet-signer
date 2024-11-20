@@ -1530,7 +1530,9 @@ describe('Relying Party', () => {
 
           const callResult = await promise;
 
-          expect(spyAssertCallResponse).toHaveBeenNthCalledWith(1, {
+          expect(spyAssertCallResponse).toHaveBeenCalledTimes(1);
+
+          expect(spyAssertCallResponse).toHaveBeenCalledWith({
             result: callResult,
             params: mockCallCanisterParams
           });
