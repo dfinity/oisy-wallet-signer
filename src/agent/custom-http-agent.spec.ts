@@ -130,7 +130,6 @@ describe('CustomHttpAgent', () => {
         ...mockSubmitRestResponse,
         response: {
           ...mockResponse,
-          // @ts-expect-error: Agent-js is not typed correctly.
           body: mockRepliedBody
         },
         requestId: mockRepliedLocalRequestId.buffer as RequestId
@@ -250,7 +249,6 @@ describe('CustomHttpAgent', () => {
           ...mockSubmitRestResponse,
           response: {
             ...mockResponse,
-            // @ts-expect-error: Agent-js is not typed correctly.
             body: mockBody
           }
         };
