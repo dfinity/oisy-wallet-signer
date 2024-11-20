@@ -342,8 +342,8 @@ const wallet = await IcpWallet.connect({
 
 ```typescript
 const wallet = await IcpWallet.connect({
-    url: 'https://staging.oisy.com/sign',
-    host: 'http://localhost:6666'
+  url: 'https://staging.oisy.com/sign',
+  host: 'http://localhost:6666'
 });
 ```
 
