@@ -1,0 +1,26 @@
+# Please see the documentation for all configuration options:
+# https://docs.github.com/en/enterprise-cloud@latest/code-security/dependabot/dependabot-version-updates
+
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+    allow:
+      - dependency-type: development
+    ignore:
+      - dependency-name: "@types/*"
+      - dependency-name: "@typescript-eslint/*"
+      - dependency-name: "eslint"
+      - dependency-name: "eslint-*"
+
+  - package-ecosystem: npm
+    directory: "/demo"
+    schedule:
+      interval: weekly
+    ignore:
+      - dependency-name: "@types/*"
+      - dependency-name: "@typescript-eslint/*"
+      - dependency-name: "eslint"
+      - dependency-name: "eslint-*"
