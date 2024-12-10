@@ -477,7 +477,7 @@ npm run test
 
 While the test suite covers most cases, the library is also covered by some E2E tests that focus more on "happy path" scenarios rather than "extended edge cases".
 
-To run these those locally, you'll need to install the Juno CLI. Follow the steps below:
+To run those locally, you'll need to install the Juno CLI. Follow the steps below:
 
 1. Install Docker:
 
