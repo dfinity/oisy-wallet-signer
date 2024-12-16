@@ -29,7 +29,7 @@
 		"@rollup/plugin-inject": "^5.0.5",
 		"@sveltejs/adapter-static": "^3.0.6",
 		"@sveltejs/kit": "^2.10.1",
-		"@sveltejs/vite-plugin-svelte": "^4.0.2",
+		"@sveltejs/vite-plugin-svelte": "^4.0.3",
 		"@types/eslint": "^8.56.0",
 		"@types/node": "^22.10.2",
 		"@typescript-eslint/eslint-plugin": "^7.0.0",
