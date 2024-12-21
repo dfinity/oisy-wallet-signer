@@ -13,7 +13,11 @@ export const buildContentMessageIcrc1Transfer = async ({
   owner: Principal;
 }): Promise<SignerBuildersResult> => {
   try {
-    const {amount, from_subaccount} = decodeIdl<IcrcTransferArg>({
+    const {
+      amount,
+      from_subaccount: fromSubaccount,
+      to: {owner: toOwner, subaccount: toSubaccount}
+    } = decodeIdl<IcrcTransferArg>({
       recordClass: TransferArgs,
       bytes: arg
     });
@@ -22,7 +26,7 @@ export const buildContentMessageIcrc1Transfer = async ({
     const {default: en} = await import('../i18n/en.json');
 
     const {
-      core: {amount: amountLabel, from},
+      core: {amount: amountLabel, from, to},
       icrc1_transfer: {title, from_subaccount: fromSubaccountLabel}
     } = en;
 
@@ -32,14 +36,20 @@ export const buildContentMessageIcrc1Transfer = async ({
 
     message.push(`${section(amountLabel)}\n${amount}`);
 
-    const fromSubaccount = fromNullable(from_subaccount);
+    const fromNullishSubaccount = fromNullable(fromSubaccount);
     const fromAccount = encodeIcrcAccount({
       owner,
-      subaccount: fromSubaccount
+      subaccount: fromNullishSubaccount
     });
     message.push(
-      `${section(isNullish(fromSubaccount) ? from : fromSubaccountLabel)}\n${fromAccount}`
+      `${section(isNullish(fromNullishSubaccount) ? from : fromSubaccountLabel)}\n${fromAccount}`
     );
+
+    const toAccount = encodeIcrcAccount({
+      owner: toOwner,
+      subaccount: fromNullable(toSubaccount)
+    });
+    message.push(`${section(to)}\n${toAccount}`);
 
     return {success: true, message: message.join('\n\n')};
   } catch (err: unknown) {

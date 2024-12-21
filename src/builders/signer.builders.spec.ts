@@ -1,6 +1,7 @@
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {encodeIcrcAccount} from '@dfinity/ledger-icrc';
 import {Principal} from '@dfinity/principal';
+import {fromNullable} from '@dfinity/utils';
 import {TransferArgs} from '../constants/icrc.idl.constants';
 import {TransferArgs as TransferArgsType} from '../declarations/icrc-1';
 import {mockCallCanisterParams} from '../mocks/call-canister.mocks';
@@ -44,7 +45,10 @@ describe('Signer builders', () => {
 5000000
 
 **From:**
-${mockPrincipalText}`);
+${mockPrincipalText}
+
+**To:**
+s3oqv-3j7id-xjhbm-3owbe-fvwly-oso6u-vej6n-bexck-koyu2-bxb6y-wae`);
     });
 
     it('should build a consent message with a from subaccount', async () => {
@@ -74,7 +78,46 @@ ${mockPrincipalText}`);
 ${rawArgs.amount}
 
 **From subaccount:**
-${encodeIcrcAccount({owner: owner.getPrincipal(), subaccount: subaccount})}`);
+${encodeIcrcAccount({owner: owner.getPrincipal(), subaccount: subaccount})}
+
+**To:**
+${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.to.subaccount)})}`);
+    });
+
+    it('should build a consent message with a to subaccount', async () => {
+      const subaccount = [1, 2, 3];
+
+      const arg = encodeIdl({
+        recordClass: TransferArgs,
+        rawArgs: {
+          ...rawArgs,
+          to: {
+            ...rawArgs.to,
+            subaccount: [subaccount]
+          }
+        }
+      });
+
+      const result = await buildContentMessageIcrc1Transfer({
+        arg: base64ToUint8Array(arg),
+        owner: owner.getPrincipal()
+      });
+
+      expect(result.success).toBeTruthy();
+
+      const {message} = result as SignerBuildersResultSuccess;
+
+      expect(message).not.toBeUndefined();
+      expect(message).toEqual(`# Approve the transfer of funds
+
+**Amount:**
+${rawArgs.amount}
+
+**From:**
+${encodeIcrcAccount({owner: owner.getPrincipal()})}
+
+**To:**
+${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount})}`);
     });
 
     it('should not build a consent message for invalid arg', async () => {
