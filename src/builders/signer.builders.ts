@@ -1,6 +1,12 @@
 import {encodeIcrcAccount, IcrcTransferArg} from '@dfinity/ledger-icrc';
 import {Principal} from '@dfinity/principal';
-import {fromNullable, isNullish} from '@dfinity/utils';
+import {
+  arrayOfNumberToUint8Array,
+  fromNullable,
+  isNullish,
+  nonNullish,
+  uint8ArrayToHexString
+} from '@dfinity/utils';
 import {TransferArgs} from '../constants/icrc.idl.constants';
 import {SignerBuildersResult} from '../types/signer-builders';
 import {decodeIdl} from '../utils/idl.utils';
@@ -17,7 +23,8 @@ export const buildContentMessageIcrc1Transfer = async ({
       amount,
       from_subaccount: fromSubaccount,
       to: {owner: toOwner, subaccount: toSubaccount},
-        fee
+      fee,
+      memo
     } = decodeIdl<IcrcTransferArg>({
       recordClass: TransferArgs,
       bytes: arg
@@ -27,7 +34,7 @@ export const buildContentMessageIcrc1Transfer = async ({
     const {default: en} = await import('../i18n/en.json');
 
     const {
-      core: {amount: amountLabel, from, to, fee: feeLabel},
+      core: {amount: amountLabel, from, to, fee: feeLabel, memo: memoLabel},
       icrc1_transfer: {title, from_subaccount: fromSubaccountLabel}
     } = en;
 
@@ -58,6 +65,14 @@ export const buildContentMessageIcrc1Transfer = async ({
 
     // - Fee
     message.push(`${section(feeLabel)}\n${fee}`);
+
+    // - Memo
+    const nullishMemo = fromNullable(memo);
+    if (nonNullish(nullishMemo)) {
+      message.push(
+        `${section(memoLabel)}\n0x${uint8ArrayToHexString(nullishMemo instanceof Uint8Array ? nullishMemo : arrayOfNumberToUint8Array(nullishMemo))}`
+      );
+    }
 
     return {success: true, message: message.join('\n\n')};
   } catch (err: unknown) {

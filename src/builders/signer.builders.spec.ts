@@ -1,7 +1,7 @@
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {encodeIcrcAccount} from '@dfinity/ledger-icrc';
 import {Principal} from '@dfinity/principal';
-import {fromNullable} from '@dfinity/utils';
+import {asciiStringToByteArray, fromNullable, hexStringToUint8Array} from '@dfinity/utils';
 import {TransferArgs} from '../constants/icrc.idl.constants';
 import {TransferArgs as TransferArgsType} from '../declarations/icrc-1';
 import {mockCallCanisterParams} from '../mocks/call-canister.mocks';
@@ -127,6 +127,47 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount})}
 
 **Fee:**
 10330`);
+    });
+
+    it('should build a consent message with a memo', async () => {
+      const memo = asciiStringToByteArray("PUPT"); // Reverse top-up memo
+
+      console.log(memo)
+
+      const arg = encodeIdl({
+        recordClass: TransferArgs,
+        rawArgs: {
+          ...rawArgs,
+          memo: [memo]
+        }
+      });
+
+      const result = await buildContentMessageIcrc1Transfer({
+        arg: base64ToUint8Array(arg),
+        owner: owner.getPrincipal()
+      });
+
+      expect(result.success).toBeTruthy();
+
+      const {message} = result as SignerBuildersResultSuccess;
+
+      expect(message).not.toBeUndefined();
+      expect(message).toEqual(`# Approve the transfer of funds
+
+**Amount:**
+${rawArgs.amount}
+
+**From:**
+${encodeIcrcAccount({owner: owner.getPrincipal()})}
+
+**To:**
+${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.to.subaccount)})}
+
+**Fee:**
+10330
+
+**Memo:**
+0x50555054`);
     });
 
     it('should not build a consent message for invalid arg', async () => {

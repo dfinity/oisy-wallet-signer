@@ -3,7 +3,8 @@
     "amount": "Amount",
     "from": "From",
     "to": "To",
-    "fee": "Fee"
+    "fee": "Fee",
+    "memo": "Memo"
   },
   "icrc1_transfer": {
     "title": "Approve the transfer of funds",

@@ -6,7 +6,8 @@ export const i18nCoreSchema = z
     amount: z.string(),
     from: z.string(),
     to: z.string(),
-    fee: z.string()
+    fee: z.string(),
+    memo: z.string()
   })
   .strict();
 
