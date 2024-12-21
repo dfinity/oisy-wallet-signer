@@ -16,7 +16,7 @@ import type {
 } from './index';
 import {RelyingParty} from './relying-party';
 import {decodeResponse} from './utils/call.utils';
-import {encodeArg} from './utils/idl.utils';
+import {encodeIdl} from './utils/idl.utils';
 
 export class IcrcWallet extends RelyingParty {
   /**
@@ -62,7 +62,7 @@ export class IcrcWallet extends RelyingParty {
   } & Pick<IcrcAccount, 'owner'>): Promise<IcrcBlockIndex> => {
     const rawArgs = toTransferArg(params);
 
-    const arg = encodeArg({
+    const arg = encodeIdl({
       recordClass: TransferArgs,
       rawArgs
     });
