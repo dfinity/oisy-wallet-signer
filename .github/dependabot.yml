@@ -4,23 +4,23 @@
 version: 2
 updates:
   - package-ecosystem: npm
-    directory: "/"
+    directory: '/'
     schedule:
       interval: weekly
     allow:
       - dependency-type: development
     ignore:
-      - dependency-name: "@types/*"
-      - dependency-name: "@typescript-eslint/*"
-      - dependency-name: "eslint"
-      - dependency-name: "eslint-*"
+      - dependency-name: '@types/*'
+      - dependency-name: '@typescript-eslint/*'
+      - dependency-name: 'eslint'
+      - dependency-name: 'eslint-*'
 
   - package-ecosystem: npm
-    directory: "/demo"
+    directory: '/demo'
     schedule:
       interval: weekly
     ignore:
-      - dependency-name: "@types/*"
-      - dependency-name: "@typescript-eslint/*"
-      - dependency-name: "eslint"
-      - dependency-name: "eslint-*"
+      - dependency-name: '@types/*'
+      - dependency-name: '@typescript-eslint/*'
+      - dependency-name: 'eslint'
+      - dependency-name: 'eslint-*'
