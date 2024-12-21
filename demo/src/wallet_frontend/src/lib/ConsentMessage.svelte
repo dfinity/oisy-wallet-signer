@@ -1,6 +1,4 @@
 <script lang="ts">
-	import type { Signer } from '@dfinity/oisy-wallet-signer/signer';
-	import { isNullish, nonNullish } from '@dfinity/utils';
 	import {
 		type ConsentMessageApproval,
 		type ConsentMessagePromptPayload,
@@ -9,13 +7,15 @@
 		ICRC21_CALL_CONSENT_MESSAGE,
 		type Rejection
 	} from '@dfinity/oisy-wallet-signer';
-	import Button from '$core/components/Button.svelte';
-	import Article from '$core/components/Article.svelte';
+	import type { Signer } from '@dfinity/oisy-wallet-signer/signer';
+	import { isNullish, nonNullish } from '@dfinity/utils';
 	import { fade } from 'svelte/transition';
+	import Article from '$core/components/Article.svelte';
+	import Button from '$core/components/Button.svelte';
 
-	type Props = {
+	interface Props {
 		signer: Signer | undefined;
-	};
+	}
 
 	let { signer }: Props = $props();
 

@@ -1,14 +1,14 @@
 <script lang="ts">
-	import { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
-	import Button from '$core/components/Button.svelte';
-	import { authStore } from '$core/stores/auth.store';
-	import { createAgent, isNullish } from '@dfinity/utils';
 	import { LedgerCanister } from '@dfinity/ledger-icp';
+	import { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
+	import { Principal } from '@dfinity/principal';
+	import { createAgent, isNullish } from '@dfinity/utils';
+	import Button from '$core/components/Button.svelte';
+	import { DEV, LOCAL_REPLICA_URL, WALLET_URL } from '$core/constants/app.constants';
 	import { alertStore } from '$core/stores/alert.store';
+	import { authStore } from '$core/stores/auth.store';
 	import { emit } from '$core/utils/events.utils';
 	import { getTransferRequest } from '$lib/utils/transfer.utils';
-	import { Principal } from '@dfinity/principal';
-	import { DEV, LOCAL_REPLICA_URL, WALLET_URL } from '$core/constants/app.constants';
 
 	let wallet = $state<IcpWallet | undefined>(undefined);
 

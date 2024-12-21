@@ -6,7 +6,7 @@ export interface Alert {
 	duration?: number;
 }
 
-export type AlertData = Alert | undefined | null;
+export type AlertData = Option<Alert>;
 
 export interface AlertStore extends Readable<AlertData> {
 	set: (alert: Alert) => void;

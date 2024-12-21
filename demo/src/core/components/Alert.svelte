@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { alertStore } from '$core/stores/alert.store';
-	import { fly } from 'svelte/transition';
 	import { isNullish, nonNullish } from '@dfinity/utils';
+	import { fly } from 'svelte/transition';
+	import { alertStore } from '$core/stores/alert.store';
 
 	$effect(() => {
 		if (isNullish($alertStore)) {

@@ -1,18 +1,18 @@
 <script lang="ts">
+	import type { BlockHeight, Icrc1TransferRequest } from '@dfinity/ledger-icp';
 	import type { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
 	import { isNullish, nonNullish } from '@dfinity/utils';
 	import { fade } from 'svelte/transition';
 	import Button from '$core/components/Button.svelte';
 	import Value from '$core/components/Value.svelte';
-	import { accountsStore } from '$lib/stores/accounts.store';
-	import { authStore } from '$core/stores/auth.store';
-	import type { BlockHeight, Icrc1TransferRequest } from '@dfinity/ledger-icp';
 	import { E8S_PER_ICP } from '$core/constants/app.constants';
+	import { authStore } from '$core/stores/auth.store';
 	import { emit } from '$core/utils/events.utils';
+	import { accountsStore } from '$lib/stores/accounts.store';
 
-	type Props = {
+	interface Props {
 		wallet: IcpWallet | undefined;
-	};
+	}
 
 	let { wallet }: Props = $props();
 
@@ -54,7 +54,7 @@
 		}, 2000);
 	};
 
-	const onreset = async () => {
+	const onreset = () => {
 		result = undefined;
 	};
 </script>

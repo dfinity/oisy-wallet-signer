@@ -1,11 +1,11 @@
 <script lang="ts">
+	import type { Snippet } from 'svelte';
 	import Layout from '$core/components/Layout.svelte';
 	import '$core/styles/app.scss';
-	import type { Snippet } from 'svelte';
 
-	type Props = {
+	interface Props {
 		children: Snippet;
-	};
+	}
 
 	let { children }: Props = $props();
 </script>

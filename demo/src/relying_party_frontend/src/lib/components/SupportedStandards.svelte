@@ -1,13 +1,13 @@
 <script lang="ts">
+	import type { IcrcSupportedStandards } from '@dfinity/oisy-wallet-signer';
 	import type { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
 	import { isNullish, nonNullish } from '@dfinity/utils';
-	import type { IcrcSupportedStandards } from '@dfinity/oisy-wallet-signer';
-	import Value from '$core/components/Value.svelte';
 	import { fade } from 'svelte/transition';
+	import Value from '$core/components/Value.svelte';
 
-	type Props = {
+	interface Props {
 		wallet: IcpWallet | undefined;
-	};
+	}
 
 	let { wallet }: Props = $props();
 

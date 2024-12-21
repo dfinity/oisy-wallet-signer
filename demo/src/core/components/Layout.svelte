@@ -1,15 +1,15 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
+	import type { Snippet } from 'svelte';
+	import { fade } from 'svelte/transition';
 	import { authStore } from '../stores/auth.store';
-	import { signedIn } from '$core/derived/auth.derived';
+	import { browser } from '$app/environment';
+	import Alert from '$core/components/Alert.svelte';
+	import Footer from '$core/components/Footer.svelte';
 	import SignIn from '$core/components/SignIn.svelte';
 	import SignOut from '$core/components/SignOut.svelte';
-	import { fade } from 'svelte/transition';
-	import type { Snippet } from 'svelte';
-	import Footer from '$core/components/Footer.svelte';
-	import Alert from '$core/components/Alert.svelte';
+	import { signedIn } from '$core/derived/auth.derived';
 
-	type Props = {
+	interface Props {
 		size?: {
 			width: number;
 			height: number;
@@ -17,7 +17,7 @@
 		children: Snippet;
 		title: Snippet;
 		description: Snippet;
-	};
+	}
 
 	let { size, children, title, description }: Props = $props();
 

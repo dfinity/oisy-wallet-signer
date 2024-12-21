@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
-	import Button from '$core/components/Button.svelte';
-	import { authStore } from '$core/stores/auth.store';
 	import { isNullish, notEmptyString } from '@dfinity/utils';
+	import Button from '$core/components/Button.svelte';
+	import { WALLET_URL } from '$core/constants/app.constants';
 	import { alertStore } from '$core/stores/alert.store';
+	import { authStore } from '$core/stores/auth.store';
 	import { emit } from '$core/utils/events.utils';
 	import { getTransferRequest } from '$lib/utils/transfer.utils';
-	import { WALLET_URL } from '$core/constants/app.constants';
 
 	let wallet = $state<IcpWallet | undefined>(undefined);
 

@@ -6,9 +6,9 @@
 	import Value from '$core/components/Value.svelte';
 	import { accountsStore } from '$lib/stores/accounts.store';
 
-	type Props = {
+	interface Props {
 		wallet: IcpWallet | undefined;
-	};
+	}
 
 	let { wallet }: Props = $props();
 
@@ -17,7 +17,7 @@
 		accountsStore.set(accounts);
 	};
 
-	const onreset = async () => {
+	const onreset = () => {
 		accountsStore.set(null);
 	};
 </script>

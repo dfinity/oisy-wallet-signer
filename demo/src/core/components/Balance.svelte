@@ -1,21 +1,21 @@
 <script lang="ts">
-	import { createAgent, isNullish } from '@dfinity/utils';
-	import { AccountIdentifier, LedgerCanister } from '@dfinity/ledger-icp';
-	import { formatE8sICP } from '../utils/icp.utils';
 	import { AnonymousIdentity } from '@dfinity/agent';
+	import { AccountIdentifier, LedgerCanister } from '@dfinity/ledger-icp';
 	import type { Principal } from '@dfinity/principal';
+	import { createAgent, isNullish } from '@dfinity/utils';
+	import { formatE8sICP } from '../utils/icp.utils';
 	import Value from '$core/components/Value.svelte';
 	import { DEV, LOCAL_REPLICA_URL } from '$core/constants/app.constants';
 
-	type Props = {
-		owner: Principal | undefined | null;
-	};
+	interface Props {
+		owner: Option<Principal>;
+	}
 
 	let { owner }: Props = $props();
 
 	let balance = $state(0n);
 
-	const loadBalance = async (owner: Principal | undefined | null) => {
+	const loadBalance = async (owner: Option<Principal>) => {
 		if (isNullish(owner)) {
 			balance = 0n;
 			return;

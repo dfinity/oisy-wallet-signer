@@ -1,14 +1,14 @@
 <script lang="ts">
-	import { authStore } from '$core/stores/auth.store';
 	import Button from '$core/components/Button.svelte';
 	import IconSignIn from '$core/components/IconSignIn.svelte';
+	import { authStore } from '$core/stores/auth.store';
 
-	type Props = {
+	interface Props {
 		size?: {
 			width: number;
 			height: number;
 		};
-	};
+	}
 
 	let { size }: Props = $props();
 
