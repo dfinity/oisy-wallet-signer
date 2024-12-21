@@ -20,9 +20,11 @@
 		"check:wallet": "npm run check -w src/wallet_frontend",
 		"check": "npm run check:party && npm run check:wallet",
 		"lint": "prettier --check . && eslint .",
-		"format": "prettier --write ."
+		"format-imports": "eslint --fix --rule 'import/no-duplicates: [error, { prefer-inline: true }]' ./src/**/src/**/*.svelte",
+		"format": "prettier --write . && npm run format-imports"
 	},
 	"devDependencies": {
+		"@dfinity/eslint-config-oisy-wallet": "^0.0.6",
 		"@junobuild/config": "^0.0.17",
 		"@junobuild/vite-plugin": "^0.0.19",
 		"@playwright/test": "^1.49.1",
@@ -30,14 +32,8 @@
 		"@sveltejs/adapter-static": "^3.0.6",
 		"@sveltejs/kit": "^2.10.1",
 		"@sveltejs/vite-plugin-svelte": "^4.0.2",
-		"@types/eslint": "^8.56.0",
 		"@types/node": "^22.10.2",
-		"@typescript-eslint/eslint-plugin": "^7.0.0",
-		"@typescript-eslint/parser": "^7.0.0",
 		"autoprefixer": "^10.4.20",
-		"eslint": "^8.56.0",
-		"eslint-config-prettier": "^9.1.0",
-		"eslint-plugin-svelte": "^2.46.0",
 		"postcss": "^8.4.49",
 		"prettier": "^3.4.2",
 		"prettier-plugin-organize-imports": "^4.1.0",

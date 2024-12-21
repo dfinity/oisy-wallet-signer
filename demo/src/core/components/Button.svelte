@@ -1,13 +1,13 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 
-	type Props = {
+	interface Props {
 		onclick?: () => void;
 		children: Snippet;
 		testId: string;
 		type?: 'button' | 'submit' | 'reset';
 		disabled?: boolean;
-	};
+	}
 
 	let { onclick, children, testId, disabled = false, type = 'button' }: Props = $props();
 </script>

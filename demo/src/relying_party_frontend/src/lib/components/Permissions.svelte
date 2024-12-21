@@ -1,14 +1,14 @@
 <script lang="ts">
+	import type { IcrcScopesArray } from '@dfinity/oisy-wallet-signer';
 	import type { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
 	import { isNullish, nonNullish } from '@dfinity/utils';
-	import type { IcrcScopesArray } from '@dfinity/oisy-wallet-signer';
 	import { fade } from 'svelte/transition';
 	import Value from '$core/components/Value.svelte';
 	import PermissionsScopes from '$lib/components/PermissionsScopes.svelte';
 
-	type Props = {
+	interface Props {
 		wallet: IcpWallet | undefined;
-	};
+	}
 
 	let { wallet }: Props = $props();
 

@@ -1,13 +1,13 @@
 <script lang="ts">
+	import type { IcrcAccount } from '@dfinity/oisy-wallet-signer';
 	import { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
 	import { WALLET_URL } from '$core/constants/app.constants';
 	import { alertStore } from '$core/stores/alert.store';
-	import type { IcrcAccount } from '@dfinity/oisy-wallet-signer';
 	import IconAdd from '$lib/components/IconAdd.svelte';
 
-	type Props = {
+	interface Props {
 		account: IcrcAccount | undefined;
-	};
+	}
 
 	let { account = $bindable() }: Props = $props();
 

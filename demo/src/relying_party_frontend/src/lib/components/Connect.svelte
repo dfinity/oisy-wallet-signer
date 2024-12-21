@@ -1,13 +1,13 @@
 <script lang="ts">
-	import Button from '$core/components/Button.svelte';
-	import { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
-	import { WALLET_URL } from '$core/constants/app.constants';
 	import type { OnDisconnect } from '@dfinity/oisy-wallet-signer';
+	import { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
+	import Button from '$core/components/Button.svelte';
+	import { WALLET_URL } from '$core/constants/app.constants';
 
-	type Props = {
+	interface Props {
 		wallet: IcpWallet | undefined;
 		onDisconnect: OnDisconnect;
-	};
+	}
 
 	let { wallet = $bindable(), onDisconnect }: Props = $props();
 

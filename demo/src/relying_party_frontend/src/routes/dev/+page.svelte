@@ -1,17 +1,17 @@
 <script lang="ts">
-	import { fade } from 'svelte/transition';
 	import { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
 	import { isNullish } from '@dfinity/utils';
+	import { fade } from 'svelte/transition';
+	import Balance from '$core/components/Balance.svelte';
 	import UserId from '$core/components/UserId.svelte';
 	import Value from '$core/components/Value.svelte';
-	import SupportedStandards from '$lib/components/SupportedStandards.svelte';
-	import RequestPermissions from '$lib/components/RequestPermissions.svelte';
-	import Permissions from '$lib/components/Permissions.svelte';
+	import { authStore } from '$core/stores/auth.store';
 	import Accounts from '$lib/components/Accounts.svelte';
 	import CallCanister from '$lib/components/CallCanister.svelte';
-	import Balance from '$core/components/Balance.svelte';
 	import Connect from '$lib/components/Connect.svelte';
-	import { authStore } from '$core/stores/auth.store';
+	import Permissions from '$lib/components/Permissions.svelte';
+	import RequestPermissions from '$lib/components/RequestPermissions.svelte';
+	import SupportedStandards from '$lib/components/SupportedStandards.svelte';
 
 	let wallet = $state<IcpWallet | undefined>(undefined);
 
