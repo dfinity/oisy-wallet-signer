@@ -19,9 +19,9 @@ jobs:
         with:
           folder: 'demo'
       - name: Lint
-        env:
-          NODE_OPTIONS: "--max_old_space_size=4096"
-        run: npm run lint -- --max-warnings 0
+        run: |
+          export NODE_OPTIONS="--max_old_space_size=4096"
+          npm run lint -- --max-warnings 0
         working-directory: 'demo'
 
   check:
