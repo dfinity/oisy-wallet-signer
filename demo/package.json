@@ -19,7 +19,7 @@
 		"check:party": "npm run check -w src/relying_party_frontend",
 		"check:wallet": "npm run check -w src/wallet_frontend",
 		"check": "npm run check:party && npm run check:wallet",
-		"lint": "prettier --check . && eslint .",
+		"lint": "prettier --check './**/*.{ts,js,mjs,json,scss,css,svelte,html,md}' && eslint .",
 		"format-imports": "eslint --fix --rule 'import/no-duplicates: [error, { prefer-inline: true }]' ./src/**/src/**/*.svelte",
 		"format": "prettier --write . && npm run format-imports"
 	},
