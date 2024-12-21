@@ -12,7 +12,8 @@ export const i18nCoreSchema = z
 
 export const i18nIcrc1_transferSchema = z
   .object({
-    title: z.string()
+    title: z.string(),
+    from_subaccount: z.string()
   })
   .strict();
 

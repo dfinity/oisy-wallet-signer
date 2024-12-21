@@ -6,7 +6,8 @@
     "fee": "Fee"
   },
   "icrc1_transfer": {
-    "title": "Approve the transfer of funds"
+    "title": "Approve the transfer of funds",
+    "from_subaccount": "From subaccount"
   },
   "icrc2_approve": {
     "title": "Authorize another address to withdraw from your account",
