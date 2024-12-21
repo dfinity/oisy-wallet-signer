@@ -2,22 +2,24 @@ import {encodeIcrcAccount, IcrcTransferArg} from '@dfinity/ledger-icrc';
 import {Principal} from '@dfinity/principal';
 import {fromNullable, isNullish} from '@dfinity/utils';
 import {TransferArgs} from '../constants/icrc.idl.constants';
-import en from '../i18n/en.json';
 import {SignerBuildersResult} from '../types/signer-builders';
 import {decodeIdl} from '../utils/idl.utils';
 
-export const buildContentMessageIcrc1Transfer = ({
+export const buildContentMessageIcrc1Transfer = async ({
   arg,
   owner
 }: {
   arg: ArrayBuffer;
   owner: Principal;
-}): SignerBuildersResult => {
+}): Promise<SignerBuildersResult> => {
   try {
     const {amount, from_subaccount} = decodeIdl<IcrcTransferArg>({
       recordClass: TransferArgs,
       bytes: arg
     });
+
+    // eslint-disable-next-line import/no-relative-parent-imports
+    const {default: en} = await import('../i18n/en.json');
 
     const {
       core: {amount: amountLabel, from},

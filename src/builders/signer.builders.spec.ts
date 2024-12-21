@@ -27,8 +27,8 @@ describe('Signer builders', () => {
   };
 
   describe('icrc1_transfer', () => {
-    it('should build a consent message for a defined arg', () => {
-      const result = buildContentMessageIcrc1Transfer({
+    it('should build a consent message for a defined arg', async () => {
+      const result = await buildContentMessageIcrc1Transfer({
         arg: base64ToUint8Array(mockIcrcLocalCallParams.arg),
         owner: Principal.fromText(mockPrincipalText)
       });
@@ -47,7 +47,7 @@ describe('Signer builders', () => {
 ${mockPrincipalText}`);
     });
 
-    it('should build a consent message with a from subaccount', () => {
+    it('should build a consent message with a from subaccount', async () => {
       const subaccount = [1, 2, 3];
 
       const arg = encodeIdl({
@@ -58,7 +58,7 @@ ${mockPrincipalText}`);
         }
       });
 
-      const result = buildContentMessageIcrc1Transfer({
+      const result = await buildContentMessageIcrc1Transfer({
         arg: base64ToUint8Array(arg),
         owner: owner.getPrincipal()
       });
@@ -77,8 +77,8 @@ ${rawArgs.amount}
 ${encodeIcrcAccount({owner: owner.getPrincipal(), subaccount: subaccount})}`);
     });
 
-    it('should not build a consent message for invalid arg', () => {
-      const result = buildContentMessageIcrc1Transfer({
+    it('should not build a consent message for invalid arg', async () => {
+      const result = await buildContentMessageIcrc1Transfer({
         arg: base64ToUint8Array(mockCallCanisterParams.arg),
         owner: owner.getPrincipal()
       });
