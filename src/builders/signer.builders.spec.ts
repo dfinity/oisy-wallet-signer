@@ -18,7 +18,7 @@ describe('Signer builders', () => {
   const rawArgs: TransferArgsType = {
     amount: 6660000n,
     created_at_time: [1727696940356000000n],
-    fee: [10000n],
+    fee: [10330n],
     from_subaccount: [],
     memo: [],
     to: {
@@ -28,7 +28,7 @@ describe('Signer builders', () => {
   };
 
   describe('icrc1_transfer', () => {
-    it('should build a consent message for a defined arg', async () => {
+    it('should build a consent message for a defined arg (without fee)', async () => {
       const result = await buildContentMessageIcrc1Transfer({
         arg: base64ToUint8Array(mockIcrcLocalCallParams.arg),
         owner: Principal.fromText(mockPrincipalText)
@@ -48,7 +48,10 @@ describe('Signer builders', () => {
 ${mockPrincipalText}
 
 **To:**
-s3oqv-3j7id-xjhbm-3owbe-fvwly-oso6u-vej6n-bexck-koyu2-bxb6y-wae`);
+s3oqv-3j7id-xjhbm-3owbe-fvwly-oso6u-vej6n-bexck-koyu2-bxb6y-wae
+
+**Fee:**
+`);
     });
 
     it('should build a consent message with a from subaccount', async () => {
@@ -81,7 +84,10 @@ ${rawArgs.amount}
 ${encodeIcrcAccount({owner: owner.getPrincipal(), subaccount: subaccount})}
 
 **To:**
-${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.to.subaccount)})}`);
+${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.to.subaccount)})}
+
+**Fee:**
+10330`);
     });
 
     it('should build a consent message with a to subaccount', async () => {
@@ -117,7 +123,10 @@ ${rawArgs.amount}
 ${encodeIcrcAccount({owner: owner.getPrincipal()})}
 
 **To:**
-${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount})}`);
+${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount})}
+
+**Fee:**
+10330`);
     });
 
     it('should not build a consent message for invalid arg', async () => {
