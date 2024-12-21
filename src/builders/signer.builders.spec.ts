@@ -6,7 +6,7 @@ import {buildContentMessageIcrc1Transfer} from './signer.builders';
 
 describe('Signer builders', () => {
   describe('icrc1_transfer', () => {
-    it('should build a consent message for valid arg', () => {
+    it('should build a consent message for a defined arg', () => {
       const result = buildContentMessageIcrc1Transfer(
         base64ToUint8Array(mockIcrcLocalCallParams.arg)
       );
@@ -16,7 +16,10 @@ describe('Signer builders', () => {
       const {message} = result as SignerBuildersResultSuccess;
 
       expect(message).not.toBeUndefined();
-      // TODO: test formatted message
+      expect(message).toEqual(`# Approve the transfer of funds
+
+**Amount:**
+5000000`);
     });
 
     it('should not build a consent message for invalid arg', () => {
