@@ -1,7 +1,7 @@
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {encodeIcrcAccount} from '@dfinity/ledger-icrc';
 import {Principal} from '@dfinity/principal';
-import {asciiStringToByteArray, fromNullable, hexStringToUint8Array} from '@dfinity/utils';
+import {asciiStringToByteArray, fromNullable} from '@dfinity/utils';
 import {TransferArgs} from '../constants/icrc.idl.constants';
 import {TransferArgs as TransferArgsType} from '../declarations/icrc-1';
 import {mockCallCanisterParams} from '../mocks/call-canister.mocks';
@@ -130,9 +130,7 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount})}
     });
 
     it('should build a consent message with a memo', async () => {
-      const memo = asciiStringToByteArray("PUPT"); // Reverse top-up memo
-
-      console.log(memo)
+      const memo = asciiStringToByteArray('PUPT'); // Reverse top-up memo
 
       const arg = encodeIdl({
         recordClass: TransferArgs,
