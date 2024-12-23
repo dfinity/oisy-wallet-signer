@@ -102,6 +102,6 @@
     "zod": "^3.23.8"
   },
   "dependencies": {
-    "@dfinity/ledger-icrc": "^2.6.4-next-2024-12-23"
+    "@dfinity/ledger-icrc": "^2.6.4-next-2024-12-23.1"
   }
 }
