@@ -1,3 +1,6 @@
+import {IcrcLedgerCanister} from '@dfinity/ledger-icrc';
+import type {IcrcTokenMetadataResponse} from '@dfinity/ledger-icrc/dist/types/types/ledger.responses';
+import {Principal} from '@dfinity/principal';
 import {arrayBufferToUint8Array} from '@dfinity/utils';
 import {encode} from '../agent/agentjs-cbor-copy';
 import type {CustomHttpAgentResponse} from '../agent/custom-http-agent';
@@ -24,6 +27,21 @@ export class SignerApi extends Icrc21Canister {
     });
 
     return this.encodeResult(result);
+  }
+
+  async ledgerMetadata({
+    host,
+    owner,
+    canisterId
+  }: {canisterId: string | Principal} & SignerOptions): Promise<IcrcTokenMetadataResponse> {
+    const agent = await this.getAgent({host, owner});
+
+    const {metadata} = IcrcLedgerCanister.create({
+      agent: agent.agent,
+      canisterId: canisterId instanceof Principal ? canisterId : Principal.fromText(canisterId)
+    });
+
+    return await metadata({certified: true});
   }
 
   private encodeResult({

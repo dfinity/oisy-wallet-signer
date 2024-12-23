@@ -7,7 +7,7 @@ import {TransferArgs as TransferArgsType} from '../declarations/icrc-1';
 import {mockCallCanisterParams} from '../mocks/call-canister.mocks';
 import {mockPrincipalText} from '../mocks/icrc-accounts.mocks';
 import {mockIcrcLocalCallParams} from '../mocks/icrc-call-utils.mocks';
-import {SignerBuildersResultError, SignerBuildersResultSuccess} from '../types/signer-builders';
+import {SignerBuildersResultError, SignerBuildersResultOk} from '../types/signer-builders';
 import {base64ToUint8Array} from '../utils/base64.utils';
 import {encodeIdl} from '../utils/idl.utils';
 import {buildContentMessageIcrc1Transfer} from './signer.builders';
@@ -43,9 +43,9 @@ describe('Signer builders', () => {
         token
       });
 
-      expect(result.success).toBeTruthy();
+      expect('Ok' in result).toBeTruthy();
 
-      const {message} = result as SignerBuildersResultSuccess;
+      const {Ok: message} = result as SignerBuildersResultOk;
 
       expect(message).not.toBeUndefined();
       expect(message).toEqual(`# Approve the transfer of funds
@@ -80,9 +80,9 @@ s3oqv-3j7id-xjhbm-3owbe-fvwly-oso6u-vej6n-bexck-koyu2-bxb6y-wae
         token
       });
 
-      expect(result.success).toBeTruthy();
+      expect('Ok' in result).toBeTruthy();
 
-      const {message} = result as SignerBuildersResultSuccess;
+      const {Ok: message} = result as SignerBuildersResultOk;
 
       expect(message).not.toBeUndefined();
       expect(message).toEqual(`# Approve the transfer of funds
@@ -120,9 +120,9 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.t
         token
       });
 
-      expect(result.success).toBeTruthy();
+      expect('Ok' in result).toBeTruthy();
 
-      const {message} = result as SignerBuildersResultSuccess;
+      const {Ok: message} = result as SignerBuildersResultOk;
 
       expect(message).not.toBeUndefined();
       expect(message).toEqual(`# Approve the transfer of funds
@@ -157,9 +157,9 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount})}
         token
       });
 
-      expect(result.success).toBeTruthy();
+      expect('Ok' in result).toBeTruthy();
 
-      const {message} = result as SignerBuildersResultSuccess;
+      const {Ok: message} = result as SignerBuildersResultOk;
 
       expect(message).not.toBeUndefined();
       expect(message).toEqual(`# Approve the transfer of funds
@@ -187,9 +187,9 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.t
         token
       });
 
-      expect(result.success).toBeFalsy();
+      expect('Ok' in result).toBeFalsy();
 
-      const {err} = result as SignerBuildersResultError;
+      const {Err: err} = result as SignerBuildersResultError;
 
       expect(err).not.toBeUndefined();
       expect((err as Error).message).toContain('Wrong magic number');
@@ -210,9 +210,9 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.t
         token
       });
 
-      expect(result.success).toBeTruthy();
+      expect('Ok' in result).toBeTruthy();
 
-      const {message} = result as SignerBuildersResultSuccess;
+      const {Ok: message} = result as SignerBuildersResultOk;
 
       expect(message).not.toBeUndefined();
       expect(message).toEqual(`# Approve the transfer of funds

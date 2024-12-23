@@ -1,5 +1,4 @@
-import {encodeIcrcAccount, IcrcTokenMetadata, IcrcTransferArg} from '@dfinity/ledger-icrc';
-import {Principal} from '@dfinity/principal';
+import {encodeIcrcAccount, IcrcTransferArg} from '@dfinity/ledger-icrc';
 import {
   arrayOfNumberToUint8Array,
   fromNullable,
@@ -8,18 +7,14 @@ import {
   uint8ArrayToHexString
 } from '@dfinity/utils';
 import {TransferArgs} from '../constants/icrc.idl.constants';
-import {SignerBuildersResult} from '../types/signer-builders';
+import {SignerBuilderFn, SignerBuildersResult} from '../types/signer-builders';
 import {formatAmount} from '../utils/format.utils';
 import {decodeIdl} from '../utils/idl.utils';
 
-export const buildContentMessageIcrc1Transfer = async ({
+export const buildContentMessageIcrc1Transfer: SignerBuilderFn = async ({
   arg,
   owner,
   token: {symbol: tokenSymbol, decimals: tokenDecimals, fee: tokenFee}
-}: {
-  arg: ArrayBuffer;
-  owner: Principal;
-  token: IcrcTokenMetadata;
 }): Promise<SignerBuildersResult> => {
   try {
     const {
@@ -81,8 +76,8 @@ export const buildContentMessageIcrc1Transfer = async ({
       );
     }
 
-    return {success: true, message: message.join('\n\n')};
+    return {Ok: message.join('\n\n')};
   } catch (err: unknown) {
-    return {success: false, err};
+    return {Err: err};
   }
 };
