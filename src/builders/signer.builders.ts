@@ -12,6 +12,20 @@ import type {SignerBuilderFn, SignerBuildersResult} from '../types/signer-builde
 import {formatAmount} from '../utils/format.utils';
 import {decodeIdl} from '../utils/idl.utils';
 
+/**
+ * Builds a content message for an ICRC-1 transfer by decoding the arguments for a potential call.
+ * This is used as a workaround when the targeted canister does not comply with the ICRC-21 standard — i.e. it has not implemented the related endpoints.
+ *
+ * @param {Object} params - Parameters for building the consent message.
+ * @param {Uint8Array} params.arg - Encoded arguments for the ICRC-1 transfer.
+ * @param {Principal} params.owner - Principal ID of the sender (owner) account.
+ * @param {Object} params.token - Token metadata including symbol, decimals, and fee.
+ * @param {string} params.token.symbol - The symbol of the token.
+ * @param {number} params.token.decimals - The number of decimals for the token.
+ * @param {bigint} params.token.fee - Default fee for the token transfer.
+ * @returns {Promise<SignerBuildersResult>} - A result containing either the consent message or an error.
+ *
+ **/
 export const buildContentMessageIcrc1Transfer: SignerBuilderFn = async ({
   arg,
   owner,
