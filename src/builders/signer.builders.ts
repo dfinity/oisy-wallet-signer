@@ -1,4 +1,4 @@
-import {encodeIcrcAccount, IcrcTransferArg} from '@dfinity/ledger-icrc';
+import {encodeIcrcAccount, type IcrcTransferArg} from '@dfinity/ledger-icrc';
 import {
   arrayOfNumberToUint8Array,
   fromNullable,
@@ -7,8 +7,8 @@ import {
   uint8ArrayToHexString
 } from '@dfinity/utils';
 import {TransferArgs} from '../constants/icrc.idl.constants';
-import {icrc21_consent_info} from '../declarations/icrc-21';
-import {SignerBuilderFn, SignerBuildersResult} from '../types/signer-builders';
+import type {icrc21_consent_info} from '../declarations/icrc-21';
+import type {SignerBuilderFn, SignerBuildersResult} from '../types/signer-builders';
 import {formatAmount} from '../utils/format.utils';
 import {decodeIdl} from '../utils/idl.utils';
 
