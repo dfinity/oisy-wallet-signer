@@ -1,9 +1,13 @@
 import {IcrcTokenMetadata} from '@dfinity/ledger-icrc';
 import {Principal} from '@dfinity/principal';
 
-export interface SignerBuildersResultOk {Ok: string}
+export interface SignerBuildersResultOk {
+  Ok: string;
+}
 
-export interface SignerBuildersResultError {Err: unknown}
+export interface SignerBuildersResultError {
+  Err: unknown;
+}
 
 export type SignerBuildersResult = SignerBuildersResultOk | SignerBuildersResultError;
 

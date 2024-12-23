@@ -8,7 +8,7 @@ const PATH_TO_EN_JSON = join(PATH_FROM_ROOT, 'i18n', 'en.json');
 const PATH_TO_OUTPUT = join(PATH_FROM_ROOT, 'types', 'i18n.ts');
 
 /**
- * Generates TypeScript interfaces from the English translation file.
+ * Generates Zod schema from the English translation file.
  */
 const generateTypes = async () => {
   const {default: en} = await import(PATH_TO_EN_JSON, {with: {type: 'json'}});
