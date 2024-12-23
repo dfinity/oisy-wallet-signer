@@ -14,7 +14,7 @@ import type {PrincipalText} from './types/principal';
 import {RelyingPartyOptions} from './types/relying-party-options';
 import type {RelyingPartyRequestOptions} from './types/relying-party-requests';
 import {decodeResponse} from './utils/call.utils';
-import {encodeArg} from './utils/idl.utils';
+import {encodeIdl} from './utils/idl.utils';
 
 const ICP_LEDGER_CANISTER_ID = 'ryjl3-tyaaa-aaaaa-aaaba-cai';
 
@@ -63,7 +63,7 @@ export class IcpWallet extends RelyingParty {
     // TODO: should we convert ic-js to zod? or should we map Icrc1TransferRequest to zod?
     const rawArgs = toIcrc1TransferRawRequest(request);
 
-    const arg = encodeArg({
+    const arg = encodeIdl({
       recordClass: TransferArgs,
       rawArgs
     });
