@@ -103,6 +103,11 @@ export class SignerService {
 
       const {Ok: consentInfo} = response;
 
+      // TODO: change consent message
+      // {
+      //    {Ok: consentInfo} | {Warn: {consentInfo?: string, method, arg, canisterId, owner}}
+      // }
+
       const {result} = await this.promptConsentMessage({consentInfo, prompt, origin});
 
       if (result === 'rejected') {
