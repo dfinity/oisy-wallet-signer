@@ -36,10 +36,11 @@ export class SignerApi extends Icrc21Canister {
   }: {
     params: Pick<IcrcCallCanisterRequestParams, 'canisterId'>;
   } & SignerOptions): Promise<IcrcTokenMetadataResponse> {
-    const agent = await this.getAgent({host, owner});
+    const {agent} = await this.getAgent({host, owner});
 
+    // TODO: improve performance by caching the IcrcLedgerCanister?
     const {metadata} = IcrcLedgerCanister.create({
-      agent: agent.agent,
+      agent,
       canisterId: Principal.fromText(canisterId)
     });
 
