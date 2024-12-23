@@ -1,4 +1,4 @@
-import {encodeIcrcAccount, IcrcTransferArg} from '@dfinity/ledger-icrc';
+import {encodeIcrcAccount, IcrcTokenMetadata, IcrcTransferArg} from '@dfinity/ledger-icrc';
 import {Principal} from '@dfinity/principal';
 import {
   arrayOfNumberToUint8Array,
@@ -9,14 +9,17 @@ import {
 } from '@dfinity/utils';
 import {TransferArgs} from '../constants/icrc.idl.constants';
 import {SignerBuildersResult} from '../types/signer-builders';
+import {formatAmount} from '../utils/format.utils';
 import {decodeIdl} from '../utils/idl.utils';
 
 export const buildContentMessageIcrc1Transfer = async ({
   arg,
-  owner
+  owner,
+  token: {name: tokenName, decimals: tokenDecimals}
 }: {
   arg: ArrayBuffer;
   owner: Principal;
+  token: IcrcTokenMetadata;
 }): Promise<SignerBuildersResult> => {
   try {
     const {
@@ -44,7 +47,7 @@ export const buildContentMessageIcrc1Transfer = async ({
     const section = (text: string): string => `**${text}:**`;
 
     // - Amount
-    message.push(`${section(amountLabel)}\n${amount}`);
+    message.push(`${section(amountLabel)}\n${formatAmount({amount, decimals: tokenDecimals})}`);
 
     // - From
     const fromNullishSubaccount = fromNullable(fromSubaccount);

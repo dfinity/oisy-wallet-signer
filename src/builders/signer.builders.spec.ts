@@ -15,8 +15,16 @@ import {buildContentMessageIcrc1Transfer} from './signer.builders';
 describe('Signer builders', () => {
   const owner = Ed25519KeyIdentity.generate();
 
+  const token = {
+    name: 'Token',
+    symbol: 'TKN',
+    fee: 11_100n,
+    decimals: 8,
+    icon: 'a-logo'
+  };
+
   const rawArgs: TransferArgsType = {
-    amount: 6660000n,
+    amount: 320_000_000_001n,
     created_at_time: [1727696940356000000n],
     fee: [10330n],
     from_subaccount: [],
@@ -31,7 +39,8 @@ describe('Signer builders', () => {
     it('should build a consent message for a defined arg (without fee)', async () => {
       const result = await buildContentMessageIcrc1Transfer({
         arg: base64ToUint8Array(mockIcrcLocalCallParams.arg),
-        owner: Principal.fromText(mockPrincipalText)
+        owner: Principal.fromText(mockPrincipalText),
+        token
       });
 
       expect(result.success).toBeTruthy();
@@ -42,7 +51,7 @@ describe('Signer builders', () => {
       expect(message).toEqual(`# Approve the transfer of funds
 
 **Amount:**
-5000000
+0.05
 
 **From:**
 ${mockPrincipalText}
@@ -67,7 +76,8 @@ s3oqv-3j7id-xjhbm-3owbe-fvwly-oso6u-vej6n-bexck-koyu2-bxb6y-wae
 
       const result = await buildContentMessageIcrc1Transfer({
         arg: base64ToUint8Array(arg),
-        owner: owner.getPrincipal()
+        owner: owner.getPrincipal(),
+        token
       });
 
       expect(result.success).toBeTruthy();
@@ -78,7 +88,7 @@ s3oqv-3j7id-xjhbm-3owbe-fvwly-oso6u-vej6n-bexck-koyu2-bxb6y-wae
       expect(message).toEqual(`# Approve the transfer of funds
 
 **Amount:**
-${rawArgs.amount}
+3,200.00000001
 
 **From subaccount:**
 ${encodeIcrcAccount({owner: owner.getPrincipal(), subaccount: subaccount})}
@@ -106,7 +116,8 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.t
 
       const result = await buildContentMessageIcrc1Transfer({
         arg: base64ToUint8Array(arg),
-        owner: owner.getPrincipal()
+        owner: owner.getPrincipal(),
+        token
       });
 
       expect(result.success).toBeTruthy();
@@ -117,7 +128,7 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.t
       expect(message).toEqual(`# Approve the transfer of funds
 
 **Amount:**
-${rawArgs.amount}
+3,200.00000001
 
 **From:**
 ${encodeIcrcAccount({owner: owner.getPrincipal()})}
@@ -142,7 +153,8 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount})}
 
       const result = await buildContentMessageIcrc1Transfer({
         arg: base64ToUint8Array(arg),
-        owner: owner.getPrincipal()
+        owner: owner.getPrincipal(),
+        token
       });
 
       expect(result.success).toBeTruthy();
@@ -153,7 +165,7 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount})}
       expect(message).toEqual(`# Approve the transfer of funds
 
 **Amount:**
-${rawArgs.amount}
+3,200.00000001
 
 **From:**
 ${encodeIcrcAccount({owner: owner.getPrincipal()})}
@@ -171,7 +183,8 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.t
     it('should not build a consent message for invalid arg', async () => {
       const result = await buildContentMessageIcrc1Transfer({
         arg: base64ToUint8Array(mockCallCanisterParams.arg),
-        owner: owner.getPrincipal()
+        owner: owner.getPrincipal(),
+        token
       });
 
       expect(result.success).toBeFalsy();
