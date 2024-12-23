@@ -1,6 +1,7 @@
 import {Principal} from '@dfinity/principal';
 import {isNullish, notEmptyString} from '@dfinity/utils';
 import {SignerApi} from '../api/signer.api';
+import {icrc21_consent_message_response} from '../declarations/icrc-21';
 import {
   notifyErrorActionAborted,
   notifyErrorMissingPrompt,
@@ -25,7 +26,7 @@ export class SignerService {
   readonly #signerApi = new SignerApi();
 
   async assertAndPromptConsentMessage({
-    params: {canisterId, method, arg, sender},
+    params: {sender, ...params},
     prompt,
     notify,
     options: {owner, host}
@@ -52,22 +53,9 @@ export class SignerService {
     prompt({origin, status: 'loading'});
 
     try {
-      const response = await this.#signerApi.consentMessage({
-        owner,
-        host,
-        canisterId,
-        request: {
-          method,
-          arg: base64ToUint8Array(arg),
-          // TODO: consumer should be able to define user_preferences
-          user_preferences: {
-            metadata: {
-              language: 'en',
-              utc_offset_minutes: []
-            },
-            device_spec: []
-          }
-        }
+      const response = await this.callConsentMessage({
+        params,
+        options: {host, owner}
       });
 
       if ('Err' in response) {
@@ -169,6 +157,32 @@ export class SignerService {
     notifyErrorSenderNotAllowed(notify);
 
     return {result: 'invalid'};
+  }
+
+  private async callConsentMessage({
+    params: {canisterId, method, arg},
+    options: {owner, host}
+  }: {
+    params: Omit<IcrcCallCanisterRequestParams, 'sender'>;
+    options: SignerOptions;
+  }): Promise<icrc21_consent_message_response> {
+    return await this.#signerApi.consentMessage({
+      owner,
+      host,
+      canisterId,
+      request: {
+        method,
+        arg: base64ToUint8Array(arg),
+        // TODO: consumer should be able to define user_preferences
+        user_preferences: {
+          metadata: {
+            language: 'en',
+            utc_offset_minutes: []
+          },
+          device_spec: []
+        }
+      }
+    });
   }
 
   private async promptConsentMessage({
