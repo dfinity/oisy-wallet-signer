@@ -4,6 +4,8 @@ describe('formatAmount', () => {
   it('formats amounts with the specified decimals', () => {
     expect(formatAmount({amount: 123456n, decimals: 2})).toBe('1,234.56');
     expect(formatAmount({amount: 1000000n, decimals: 6})).toBe('1.00');
+    expect(formatAmount({amount: 123456n, decimals: 1})).toBe('12,345.6');
+    expect(formatAmount({amount: 123456n, decimals: 0})).toBe('123,456');
   });
 
   it('formats zero amount with decimals', () => {
