@@ -18,7 +18,7 @@ describe('Signer builders', () => {
   const token = {
     name: 'Token',
     symbol: 'TKN',
-    fee: 11_100n,
+    fee: 10_000n,
     decimals: 8,
     icon: 'a-logo'
   };
@@ -26,7 +26,7 @@ describe('Signer builders', () => {
   const rawArgs: TransferArgsType = {
     amount: 320_000_000_001n,
     created_at_time: [1727696940356000000n],
-    fee: [10330n],
+    fee: [100_330n],
     from_subaccount: [],
     memo: [],
     to: {
@@ -60,7 +60,7 @@ ${mockPrincipalText}
 s3oqv-3j7id-xjhbm-3owbe-fvwly-oso6u-vej6n-bexck-koyu2-bxb6y-wae
 
 **Fee:**
-`);
+0.0001`);
     });
 
     it('should build a consent message with a from subaccount', async () => {
@@ -97,7 +97,7 @@ ${encodeIcrcAccount({owner: owner.getPrincipal(), subaccount: subaccount})}
 ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.to.subaccount)})}
 
 **Fee:**
-10330`);
+0.0010033`);
     });
 
     it('should build a consent message with a to subaccount', async () => {
@@ -137,7 +137,7 @@ ${encodeIcrcAccount({owner: owner.getPrincipal()})}
 ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount})}
 
 **Fee:**
-10330`);
+0.0010033`);
     });
 
     it('should build a consent message with a memo', async () => {
@@ -174,7 +174,7 @@ ${encodeIcrcAccount({owner: owner.getPrincipal()})}
 ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.to.subaccount)})}
 
 **Fee:**
-10330
+0.0010033
 
 **Memo:**
 0x50555054`);
@@ -193,6 +193,41 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.t
 
       expect(err).not.toBeUndefined();
       expect((err as Error).message).toContain('Wrong magic number');
+    });
+
+    it('should build a consent message with token fee if no fee as arg', async () => {
+      const arg = encodeIdl({
+        recordClass: TransferArgs,
+        rawArgs: {
+          ...rawArgs,
+          fee: []
+        }
+      });
+
+      const result = await buildContentMessageIcrc1Transfer({
+        arg: base64ToUint8Array(arg),
+        owner: owner.getPrincipal(),
+        token
+      });
+
+      expect(result.success).toBeTruthy();
+
+      const {message} = result as SignerBuildersResultSuccess;
+
+      expect(message).not.toBeUndefined();
+      expect(message).toEqual(`# Approve the transfer of funds
+
+**Amount:**
+3,200.00000001
+
+**From:**
+${encodeIcrcAccount({owner: owner.getPrincipal()})}
+
+**To:**
+${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.to.subaccount)})}
+
+**Fee:**
+0.0001`);
     });
   });
 });
