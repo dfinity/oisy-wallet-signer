@@ -32,13 +32,15 @@ export class SignerApi extends Icrc21Canister {
   async ledgerMetadata({
     host,
     owner,
-    canisterId
-  }: {canisterId: string | Principal} & SignerOptions): Promise<IcrcTokenMetadataResponse> {
+    params: {canisterId}
+  }: {
+    params: Pick<IcrcCallCanisterRequestParams, 'canisterId'>;
+  } & SignerOptions): Promise<IcrcTokenMetadataResponse> {
     const agent = await this.getAgent({host, owner});
 
     const {metadata} = IcrcLedgerCanister.create({
       agent: agent.agent,
-      canisterId: canisterId instanceof Principal ? canisterId : Principal.fromText(canisterId)
+      canisterId: Principal.fromText(canisterId)
     });
 
     return await metadata({certified: true});

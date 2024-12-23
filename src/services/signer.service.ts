@@ -272,7 +272,7 @@ export class SignerService {
 
     try {
       const tokenResponse = await this.#signerApi.ledgerMetadata({
-        canisterId,
+        params: {canisterId},
         host,
         owner
       });

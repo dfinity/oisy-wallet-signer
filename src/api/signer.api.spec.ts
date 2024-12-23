@@ -1,5 +1,8 @@
 import * as httpAgent from '@dfinity/agent';
 import {Ed25519KeyIdentity} from '@dfinity/identity';
+import {IcrcLedgerCanister} from '@dfinity/ledger-icrc';
+import {Principal} from '@dfinity/principal';
+import {beforeEach, expect} from 'vitest';
 import {mockCallCanisterSuccess} from '../mocks/call-canister.mocks';
 import {mockRepliedLocalCertificate} from '../mocks/custom-http-agent-responses.mocks';
 import {mockRequestDetails, mockRequestPayload} from '../mocks/custom-http-agent.mocks';
@@ -45,15 +48,77 @@ describe('Signer-api', () => {
     vi.clearAllMocks();
   });
 
-  it('should call request and return the properly encoded result', async () => {
-    const result = await signerApi.call({
-      params: {
-        ...mockRequestPayload,
-        sender: identity.getPrincipal().toText()
-      },
-      ...signerOptions
+  describe('call', () => {
+    it('should call request and return the properly encoded result', async () => {
+      const result = await signerApi.call({
+        params: {
+          ...mockRequestPayload,
+          sender: identity.getPrincipal().toText()
+        },
+        ...signerOptions
+      });
+
+      expect(result).toEqual(mockCallCanisterSuccess);
+    });
+  });
+
+  describe('ledgerMetadata', () => {
+    const mockMetadata = [
+      ['icrc1:name', {Text: 'Token'}],
+      ['icrc1:symbol', {Text: 'TKN'}],
+      ['icrc1:decimals', {Nat: 11n}],
+      ['icrc1:fee', {Nat: 12_987n}]
+    ];
+
+    const ledgerCanisterMock = {
+      metadata: () => Promise.resolve(mockMetadata)
+    } as unknown as IcrcLedgerCanister;
+
+    beforeEach(() => {
+      vi.spyOn(IcrcLedgerCanister, 'create').mockImplementation(() => ledgerCanisterMock);
     });
 
-    expect(result).toEqual(mockCallCanisterSuccess);
+    it('should call ledger metadata with a certified call', async () => {
+      const spy = vi.spyOn(ledgerCanisterMock, 'metadata');
+
+      await signerApi.ledgerMetadata({
+        params: {
+          canisterId: mockRequestPayload.canisterId
+        },
+        ...signerOptions
+      });
+
+      expect(spy).toHaveBeenCalledWith({
+        certified: true
+      });
+    });
+
+    it('should init ledger with canister ID', async () => {
+      const spy = vi.spyOn(IcrcLedgerCanister, 'create');
+
+      await signerApi.ledgerMetadata({
+        params: {
+          canisterId: mockRequestPayload.canisterId
+        },
+        ...signerOptions
+      });
+
+      expect(spy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          canisterId: Principal.fromText(mockRequestPayload.canisterId)
+        })
+      );
+    });
+
+    it('should respond with metadata', async () => {
+      const result = await signerApi.ledgerMetadata({
+        params: {
+          canisterId: mockRequestPayload.canisterId
+        },
+        ...signerOptions
+      });
+
+      expect(result).toEqual(mockMetadata);
+    });
   });
 });
