@@ -2,7 +2,6 @@ import * as httpAgent from '@dfinity/agent';
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {IcrcLedgerCanister} from '@dfinity/ledger-icrc';
 import {Principal} from '@dfinity/principal';
-import {beforeEach, expect} from 'vitest';
 import {mockCallCanisterSuccess} from '../mocks/call-canister.mocks';
 import {mockRepliedLocalCertificate} from '../mocks/custom-http-agent-responses.mocks';
 import {mockRequestDetails, mockRequestPayload} from '../mocks/custom-http-agent.mocks';

@@ -2,7 +2,6 @@ import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {encodeIcrcAccount} from '@dfinity/ledger-icrc';
 import {Principal} from '@dfinity/principal';
 import {asciiStringToByteArray, fromNullable} from '@dfinity/utils';
-import {expect} from 'vitest';
 import {TransferArgs} from '../constants/icrc.idl.constants';
 import {TransferArgs as TransferArgsType} from '../declarations/icrc-1';
 import {mockCallCanisterParams} from '../mocks/call-canister.mocks';
