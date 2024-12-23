@@ -1,0 +1,28 @@
+{
+  "core": {
+    "amount": "Amount",
+    "from": "From",
+    "to": "To",
+    "fee": "Fee"
+  },
+  "icrc1_transfer": {
+    "title": "Approve the transfer of funds"
+  },
+  "icrc2_approve": {
+    "title": "Authorize another address to withdraw from your account",
+    "address_is_allowed": "The following address is allowed to withdraw from your account:",
+    "your_subaccount": "Your subaccount",
+    "your_account": "Your account",
+    "requested_withdrawal_allowance": "Requested withdrawal allowance",
+    "withdrawal_allowance": {
+      "some": "Current withdrawal allowance",
+      "none": "The allowance will be set to {} {} independently of any previous allowance. Until this transaction has been executed the spender can still exercise the previous allowance (if any) to it's full amount."
+    },
+    "expiration_date": "Expiration date",
+    "approval_fee": "Approval fee",
+    "approver_account_transaction_fees": {
+      "anonymous": "Transaction fees to be paid by your subaccount",
+      "owner": "Transaction fees to be paid by:"
+    }
+  }
+}
