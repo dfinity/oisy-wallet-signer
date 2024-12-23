@@ -15,7 +15,7 @@ import {decodeIdl} from '../utils/idl.utils';
 export const buildContentMessageIcrc1Transfer = async ({
   arg,
   owner,
-  token: {name: tokenName, decimals: tokenDecimals, fee: tokenFee}
+  token: {symbol: tokenSymbol, decimals: tokenDecimals, fee: tokenFee}
 }: {
   arg: ArrayBuffer;
   owner: Principal;
@@ -47,7 +47,9 @@ export const buildContentMessageIcrc1Transfer = async ({
     const section = (text: string): string => `**${text}:**`;
 
     // - Amount
-    message.push(`${section(amountLabel)}\n${formatAmount({amount, decimals: tokenDecimals})}`);
+    message.push(
+      `${section(amountLabel)}\n${formatAmount({amount, decimals: tokenDecimals})} ${tokenSymbol}`
+    );
 
     // - From
     const fromNullishSubaccount = fromNullable(fromSubaccount);
@@ -68,7 +70,7 @@ export const buildContentMessageIcrc1Transfer = async ({
 
     // - Fee
     message.push(
-      `${section(feeLabel)}\n${formatAmount({amount: fromNullable(fee) ?? tokenFee, decimals: tokenDecimals})}`
+      `${section(feeLabel)}\n${formatAmount({amount: fromNullable(fee) ?? tokenFee, decimals: tokenDecimals})} ${tokenSymbol}`
     );
 
     // - Memo

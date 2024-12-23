@@ -51,7 +51,7 @@ describe('Signer builders', () => {
       expect(message).toEqual(`# Approve the transfer of funds
 
 **Amount:**
-0.05
+0.05 TKN
 
 **From:**
 ${mockPrincipalText}
@@ -60,7 +60,7 @@ ${mockPrincipalText}
 s3oqv-3j7id-xjhbm-3owbe-fvwly-oso6u-vej6n-bexck-koyu2-bxb6y-wae
 
 **Fee:**
-0.0001`);
+0.0001 TKN`);
     });
 
     it('should build a consent message with a from subaccount', async () => {
@@ -88,7 +88,7 @@ s3oqv-3j7id-xjhbm-3owbe-fvwly-oso6u-vej6n-bexck-koyu2-bxb6y-wae
       expect(message).toEqual(`# Approve the transfer of funds
 
 **Amount:**
-3,200.00000001
+3,200.00000001 TKN
 
 **From subaccount:**
 ${encodeIcrcAccount({owner: owner.getPrincipal(), subaccount: subaccount})}
@@ -97,7 +97,7 @@ ${encodeIcrcAccount({owner: owner.getPrincipal(), subaccount: subaccount})}
 ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.to.subaccount)})}
 
 **Fee:**
-0.0010033`);
+0.0010033 TKN`);
     });
 
     it('should build a consent message with a to subaccount', async () => {
@@ -128,7 +128,7 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.t
       expect(message).toEqual(`# Approve the transfer of funds
 
 **Amount:**
-3,200.00000001
+3,200.00000001 TKN
 
 **From:**
 ${encodeIcrcAccount({owner: owner.getPrincipal()})}
@@ -137,7 +137,7 @@ ${encodeIcrcAccount({owner: owner.getPrincipal()})}
 ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount})}
 
 **Fee:**
-0.0010033`);
+0.0010033 TKN`);
     });
 
     it('should build a consent message with a memo', async () => {
@@ -165,7 +165,7 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount})}
       expect(message).toEqual(`# Approve the transfer of funds
 
 **Amount:**
-3,200.00000001
+3,200.00000001 TKN
 
 **From:**
 ${encodeIcrcAccount({owner: owner.getPrincipal()})}
@@ -174,7 +174,7 @@ ${encodeIcrcAccount({owner: owner.getPrincipal()})}
 ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.to.subaccount)})}
 
 **Fee:**
-0.0010033
+0.0010033 TKN
 
 **Memo:**
 0x50555054`);
@@ -218,7 +218,7 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.t
       expect(message).toEqual(`# Approve the transfer of funds
 
 **Amount:**
-3,200.00000001
+3,200.00000001 TKN
 
 **From:**
 ${encodeIcrcAccount({owner: owner.getPrincipal()})}
@@ -227,7 +227,7 @@ ${encodeIcrcAccount({owner: owner.getPrincipal()})}
 ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.to.subaccount)})}
 
 **Fee:**
-0.0001`);
+0.0001 TKN`);
     });
   });
 });
