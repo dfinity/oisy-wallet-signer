@@ -4,12 +4,12 @@ import {toNullable} from '@dfinity/utils';
 import {IcrcWallet} from './icrc-wallet';
 import {
   mockLocalBlockHeight,
-  mockLocalCallParams,
   mockLocalCallResult,
   mockLocalCallTime,
   mockLocalRelyingPartyPrincipal
 } from './mocks/call-utils.mocks';
 import {mockLocalIcRootKey} from './mocks/custom-http-agent-responses.mocks';
+import {mockIcrcLocalCallParams, mockLedgerCanisterId} from './mocks/icrc-call-utils.mocks';
 import {RelyingPartyOptions} from './types/relying-party-options';
 import {JSON_RPC_VERSION_2} from './types/rpc';
 import * as callUtils from './utils/call.utils';
@@ -44,8 +44,6 @@ describe('icrc-wallet', () => {
     url: 'https://test.com',
     host: 'http://localhost:8080'
   };
-
-  const mockCanisterId = 'ryjl3-tyaaa-aaaaa-aaaba-cai';
 
   const messageEventReady = new MessageEvent('message', {
     origin: mockParameters.url,
@@ -98,12 +96,6 @@ describe('icrc-wallet', () => {
       amount: 5000000n
     };
 
-    const mockIcrcLocalCallParams = {
-      ...mockLocalCallParams,
-      canisterId: mockCanisterId,
-      arg: 'RElETAZte24AbAKzsNrDA2ithsqDBQFufW54bAb7ygECxvy2AgO6ieXCBAGi3pTrBgGC8/ORDATYo4yoDX0BBQEdP0Duk4WbdYJC1svDpO9SpE+aElxKU7FNBuH2LAIAAAAAAMCWsQI='
-    };
-
     const {sender} = mockIcrcLocalCallParams;
 
     it('should call `call` with the correct parameters when transfer is invoked', async () => {
@@ -115,7 +107,7 @@ describe('icrc-wallet', () => {
       const result = await icrcWallet.transfer({
         params,
         owner: sender,
-        ledgerCanisterId: mockCanisterId
+        ledgerCanisterId: mockLedgerCanisterId
       });
 
       expect(result).toEqual(mockLocalBlockHeight);
@@ -137,7 +129,7 @@ describe('icrc-wallet', () => {
 
       const owner = Ed25519KeyIdentity.generate().getPrincipal().toText();
 
-      await icrcWallet.transfer({params, owner, ledgerCanisterId: mockCanisterId});
+      await icrcWallet.transfer({params, owner, ledgerCanisterId: mockLedgerCanisterId});
 
       expect(mockCall).toHaveBeenCalledWith({
         params: {
@@ -160,7 +152,12 @@ describe('icrc-wallet', () => {
         timeoutInMilliseconds: 120000
       };
 
-      await icrcWallet.transfer({params, owner: sender, options, ledgerCanisterId: mockCanisterId});
+      await icrcWallet.transfer({
+        params,
+        owner: sender,
+        options,
+        ledgerCanisterId: mockLedgerCanisterId
+      });
 
       expect(mockCall).toHaveBeenCalledWith({
         params: mockIcrcLocalCallParams,
@@ -181,7 +178,7 @@ describe('icrc-wallet', () => {
       await icrcWallet.transfer({
         params,
         owner: sender,
-        ledgerCanisterId: mockCanisterId
+        ledgerCanisterId: mockLedgerCanisterId
       });
 
       expect(spy).toHaveBeenCalledWith(
