@@ -283,29 +283,11 @@ export class SignerService {
         return {Err: new Error('Incomplete token metadata.')};
       }
 
-      const message = await fn({
+      return await fn({
         arg: base64ToUint8Array(arg),
         token,
         owner: owner.getPrincipal()
       });
-
-      if ('Err' in message) {
-        return message;
-      }
-
-      const {Ok: GenericDisplayMessage} = message;
-
-      const consentMessage: icrc21_consent_info = {
-        metadata: {
-          language: 'en',
-          utc_offset_minutes: []
-        },
-        consent_message: {
-          GenericDisplayMessage
-        }
-      };
-
-      return {Ok: consentMessage};
     } catch (err: unknown) {
       return {Err: err};
     }

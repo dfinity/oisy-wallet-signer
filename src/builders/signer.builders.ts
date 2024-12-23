@@ -7,6 +7,7 @@ import {
   uint8ArrayToHexString
 } from '@dfinity/utils';
 import {TransferArgs} from '../constants/icrc.idl.constants';
+import {icrc21_consent_info} from '../declarations/icrc-21';
 import {SignerBuilderFn, SignerBuildersResult} from '../types/signer-builders';
 import {formatAmount} from '../utils/format.utils';
 import {decodeIdl} from '../utils/idl.utils';
@@ -76,7 +77,17 @@ export const buildContentMessageIcrc1Transfer: SignerBuilderFn = async ({
       );
     }
 
-    return {Ok: message.join('\n\n')};
+    const consentMessage: icrc21_consent_info = {
+      metadata: {
+        language: 'en',
+        utc_offset_minutes: []
+      },
+      consent_message: {
+        GenericDisplayMessage: message.join('\n\n')
+      }
+    };
+
+    return {Ok: consentMessage};
   } catch (err: unknown) {
     return {Err: err};
   }

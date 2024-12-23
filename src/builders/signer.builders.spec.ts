@@ -2,12 +2,17 @@ import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {encodeIcrcAccount} from '@dfinity/ledger-icrc';
 import {Principal} from '@dfinity/principal';
 import {asciiStringToByteArray, fromNullable} from '@dfinity/utils';
+import {expect} from 'vitest';
 import {TransferArgs} from '../constants/icrc.idl.constants';
 import {TransferArgs as TransferArgsType} from '../declarations/icrc-1';
 import {mockCallCanisterParams} from '../mocks/call-canister.mocks';
 import {mockPrincipalText} from '../mocks/icrc-accounts.mocks';
 import {mockIcrcLocalCallParams} from '../mocks/icrc-call-utils.mocks';
-import {SignerBuildersResultError, SignerBuildersResultOk} from '../types/signer-builders';
+import {
+  SignerBuildersResult,
+  SignerBuildersResultError,
+  SignerBuildersResultOk
+} from '../types/signer-builders';
 import {base64ToUint8Array} from '../utils/base64.utils';
 import {encodeIdl} from '../utils/idl.utils';
 import {buildContentMessageIcrc1Transfer} from './signer.builders';
@@ -36,6 +41,26 @@ describe('Signer builders', () => {
   };
 
   describe('icrc1_transfer', () => {
+    const expectMessage = ({
+      result,
+      expectedMessage
+    }: {
+      result: SignerBuildersResult;
+      expectedMessage: string;
+    }) => {
+      expect('Ok' in result).toBeTruthy();
+
+      const {Ok} = result as SignerBuildersResultOk;
+
+      expect('GenericDisplayMessage' in Ok.consent_message).toBeTruthy();
+
+      const {GenericDisplayMessage: message} = Ok.consent_message as {
+        GenericDisplayMessage: string;
+      };
+
+      expect(message).toEqual(expectedMessage);
+    };
+
     it('should build a consent message for a defined arg (without fee)', async () => {
       const result = await buildContentMessageIcrc1Transfer({
         arg: base64ToUint8Array(mockIcrcLocalCallParams.arg),
@@ -43,12 +68,9 @@ describe('Signer builders', () => {
         token
       });
 
-      expect('Ok' in result).toBeTruthy();
-
-      const {Ok: message} = result as SignerBuildersResultOk;
-
-      expect(message).not.toBeUndefined();
-      expect(message).toEqual(`# Approve the transfer of funds
+      expectMessage({
+        result,
+        expectedMessage: `# Approve the transfer of funds
 
 **Amount:**
 0.05 TKN
@@ -60,7 +82,46 @@ ${mockPrincipalText}
 s3oqv-3j7id-xjhbm-3owbe-fvwly-oso6u-vej6n-bexck-koyu2-bxb6y-wae
 
 **Fee:**
-0.0001 TKN`);
+0.0001 TKN`
+      });
+    });
+
+    it('should build a consent message in english', async () => {
+      const arg = encodeIdl({
+        recordClass: TransferArgs,
+        rawArgs
+      });
+
+      const result = await buildContentMessageIcrc1Transfer({
+        arg: base64ToUint8Array(arg),
+        owner: owner.getPrincipal(),
+        token
+      });
+
+      expect('Ok' in result);
+
+      const {Ok} = result as SignerBuildersResultOk;
+
+      expect(Ok.metadata.language).toEqual('en');
+    });
+
+    it('should build a consent message with no utc time information', async () => {
+      const arg = encodeIdl({
+        recordClass: TransferArgs,
+        rawArgs
+      });
+
+      const result = await buildContentMessageIcrc1Transfer({
+        arg: base64ToUint8Array(arg),
+        owner: owner.getPrincipal(),
+        token
+      });
+
+      expect('Ok' in result);
+
+      const {Ok} = result as SignerBuildersResultOk;
+
+      expect(fromNullable(Ok.metadata.utc_offset_minutes)).toBeUndefined();
     });
 
     it('should build a consent message with a from subaccount', async () => {
@@ -80,12 +141,9 @@ s3oqv-3j7id-xjhbm-3owbe-fvwly-oso6u-vej6n-bexck-koyu2-bxb6y-wae
         token
       });
 
-      expect('Ok' in result).toBeTruthy();
-
-      const {Ok: message} = result as SignerBuildersResultOk;
-
-      expect(message).not.toBeUndefined();
-      expect(message).toEqual(`# Approve the transfer of funds
+      expectMessage({
+        result,
+        expectedMessage: `# Approve the transfer of funds
 
 **Amount:**
 3,200.00000001 TKN
@@ -97,7 +155,8 @@ ${encodeIcrcAccount({owner: owner.getPrincipal(), subaccount: subaccount})}
 ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.to.subaccount)})}
 
 **Fee:**
-0.0010033 TKN`);
+0.0010033 TKN`
+      });
     });
 
     it('should build a consent message with a to subaccount', async () => {
@@ -120,12 +179,9 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.t
         token
       });
 
-      expect('Ok' in result).toBeTruthy();
-
-      const {Ok: message} = result as SignerBuildersResultOk;
-
-      expect(message).not.toBeUndefined();
-      expect(message).toEqual(`# Approve the transfer of funds
+      expectMessage({
+        result,
+        expectedMessage: `# Approve the transfer of funds
 
 **Amount:**
 3,200.00000001 TKN
@@ -137,7 +193,8 @@ ${encodeIcrcAccount({owner: owner.getPrincipal()})}
 ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount})}
 
 **Fee:**
-0.0010033 TKN`);
+0.0010033 TKN`
+      });
     });
 
     it('should build a consent message with a memo', async () => {
@@ -157,12 +214,9 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount})}
         token
       });
 
-      expect('Ok' in result).toBeTruthy();
-
-      const {Ok: message} = result as SignerBuildersResultOk;
-
-      expect(message).not.toBeUndefined();
-      expect(message).toEqual(`# Approve the transfer of funds
+      expectMessage({
+        result,
+        expectedMessage: `# Approve the transfer of funds
 
 **Amount:**
 3,200.00000001 TKN
@@ -177,7 +231,8 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.t
 0.0010033 TKN
 
 **Memo:**
-0x50555054`);
+0x50555054`
+      });
     });
 
     it('should not build a consent message for invalid arg', async () => {
@@ -210,12 +265,9 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.t
         token
       });
 
-      expect('Ok' in result).toBeTruthy();
-
-      const {Ok: message} = result as SignerBuildersResultOk;
-
-      expect(message).not.toBeUndefined();
-      expect(message).toEqual(`# Approve the transfer of funds
+      expectMessage({
+        result,
+        expectedMessage: `# Approve the transfer of funds
 
 **Amount:**
 3,200.00000001 TKN
@@ -227,7 +279,8 @@ ${encodeIcrcAccount({owner: owner.getPrincipal()})}
 ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.to.subaccount)})}
 
 **Fee:**
-0.0001 TKN`);
+0.0001 TKN`
+      });
     });
   });
 });

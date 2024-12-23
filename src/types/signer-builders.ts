@@ -1,8 +1,9 @@
 import {IcrcTokenMetadata} from '@dfinity/ledger-icrc';
 import {Principal} from '@dfinity/principal';
+import {icrc21_consent_info} from '../declarations/icrc-21';
 
 export interface SignerBuildersResultOk {
-  Ok: string;
+  Ok: icrc21_consent_info;
 }
 
 export interface SignerBuildersResultError {
