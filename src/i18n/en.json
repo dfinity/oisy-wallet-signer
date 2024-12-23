@@ -24,10 +24,7 @@
     "approval_fee": "Approval fee",
     "approver_account_transaction_fees": {
       "anonymous": "Transaction fees to be paid by your subaccount",
-      "owner": "Transaction fees to be paid by:",
-      "test": {
-        "yolo": "hello"
-      }
+      "owner": "Transaction fees to be paid by:"
     }
   }
 }
