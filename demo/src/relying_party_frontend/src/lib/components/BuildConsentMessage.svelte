@@ -16,7 +16,7 @@
 	let { wallet }: Props = $props();
 
 	const INVALID_LEDGER_CANISTER_ID = import.meta.env.VITE_SATELLITE_ID;
-	console.log(INVALID_LEDGER_CANISTER_ID)
+	console.log(INVALID_LEDGER_CANISTER_ID);
 
 	const onclick = async () => {
 		// TODO: handle errors
