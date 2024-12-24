@@ -55,38 +55,10 @@ export class SignerService {
     prompt({origin, status: 'loading'});
 
     try {
-      const loadParams = {
+      const response = await this.loadConsentMessage({
         params,
         options: {host, owner}
-      };
-
-      /**
-       * If the ICRC-21 call to fetch the consent message fails, it might be due to the fact
-       * that the targeted canister does not implement the ICRC-21 specification.
-       *
-       * To address the potential lack of support for the most common types of calls for ledgers,
-       * namely transfer and approve, we use custom builders. Those builders construct
-       * messages similar to those that would be implemented by the canisters.
-       *
-       * @returns {Promise<icrc21_consent_message_response>} - The consent message response.
-       * @throws The potential original error from the ICRC-21 call. The errors related to
-       *         the custom builder is ignored.
-       **/
-      const loadConsentMessage = async (): Promise<icrc21_consent_message_response> => {
-        try {
-          return await this.callConsentMessage(loadParams);
-        } catch (err: unknown) {
-          const fallbackMessage = await this.tryFallbackOnError(loadParams);
-
-          if ('Ok' in fallbackMessage) {
-            return fallbackMessage;
-          }
-
-          throw err;
-        }
-      };
-
-      const response = await loadConsentMessage();
+      });
 
       if ('Err' in response) {
         const {Err} = response;
@@ -258,7 +230,39 @@ export class SignerService {
     return await promise;
   }
 
-  private async tryFallbackOnError({
+  /**
+   * If the ICRC-21 call to fetch the consent message fails, it might be due to the fact
+   * that the targeted canister does not implement the ICRC-21 specification.
+   *
+   * To address the potential lack of support for the most common types of calls for ledgers,
+   * namely transfer and approve, we use custom builders. Those builders construct
+   * messages similar to those that would be implemented by the canisters.
+   *
+   * @param {Object} params - The parameters for loading the consent message.
+   * @param {Omit<IcrcCallCanisterRequestParams, 'sender'>} params.params - The ICRC call canister parameters minus the sender.
+   * @param {SignerOptions} params.options - The signer options - host and owner.
+   * @returns {Promise<icrc21_consent_message_response>} - The consent message response.
+   * @throws The potential original error from the ICRC-21 call. The errors related to
+   *         the custom builder is ignored.
+   **/
+  private async loadConsentMessage(params: {
+    params: Omit<IcrcCallCanisterRequestParams, 'sender'>;
+    options: SignerOptions;
+  }): Promise<icrc21_consent_message_response> {
+    try {
+      return await this.callConsentMessage(params);
+    } catch (err: unknown) {
+      const fallbackMessage = await this.tryBuildConsentMessageOnError(params);
+
+      if ('Ok' in fallbackMessage) {
+        return fallbackMessage;
+      }
+
+      throw err;
+    }
+  }
+
+  private async tryBuildConsentMessageOnError({
     params: {method, arg, canisterId},
     options: {owner, host}
   }: {
