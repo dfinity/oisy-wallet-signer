@@ -164,7 +164,21 @@ export class PartyPage extends IdentityPage {
 
     await this.#walletPage?.assertConsentMessageLoading();
 
-    await this.#walletPage?.assertConsentMessage(partyUserId);
+    await this.#walletPage?.assertConsentMessage({partyUserId, tokenSymbol: 'ICP'});
+  }
+
+  async approvePermissionsBuildConsentMessage(): Promise<void> {
+    const partyUserId = await this.getUserId();
+
+    await expect(this.page.getByTestId('build-consent-message-button')).toBeVisible();
+
+    await this.page.getByTestId('build-consent-message-button').click();
+
+    await this.#walletPage?.approveCallCanisterPermission();
+
+    await this.#walletPage?.assertConsentMessageLoading();
+
+    await this.#walletPage?.assertConsentMessage({partyUserId, tokenSymbol: 'TKN'});
   }
 
   async callCanister(): Promise<void> {
