@@ -176,6 +176,7 @@ export class SignerService {
         // TODO: consumer should be able to define user_preferences
         user_preferences: {
           metadata: {
+            // TODO: support i18n
             language: 'en',
             utc_offset_minutes: []
           },

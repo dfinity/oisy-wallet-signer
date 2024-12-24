@@ -46,6 +46,7 @@ export const buildContentMessageIcrc1Transfer: SignerBuilderFn = async ({
       bytes: arg
     });
 
+    // TODO: support i18n
     // eslint-disable-next-line import/no-relative-parent-imports
     const {default: en} = await import('../i18n/en.json');
 
