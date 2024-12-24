@@ -8,6 +8,7 @@ import * as signerHandlers from '../handlers/signer.handlers';
 import {mockCallCanisterParams} from '../mocks/call-canister.mocks';
 import {mockCanisterCallSuccess, mockConsentInfo} from '../mocks/consent-message.mocks';
 import {mockPrincipalText} from '../mocks/icrc-accounts.mocks';
+import {mockIcrcLocalCallParams} from '../mocks/icrc-call-utils.mocks';
 import {mockIcrcLedgerMetadata} from '../mocks/icrc-ledger.mocks';
 import {mockErrorNotify} from '../mocks/signer-error.mocks';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
@@ -91,40 +92,6 @@ describe('Signer services', () => {
       expect(prompt).toHaveBeenCalledWith({
         origin: testOrigin,
         status: 'loading'
-      });
-    });
-
-    it('should return approved when user approves the consent message', async () => {
-      spyIcrc21CanisterConsentMessage.mockResolvedValue({
-        Ok: mockConsentInfo
-      });
-
-      const prompt = ({status, ...rest}: ConsentMessagePromptPayload): void => {
-        if (status === 'result' && 'approve' in rest) {
-          rest.approve();
-        }
-      };
-
-      const result = await signerService.assertAndPromptConsentMessage({
-        notify,
-        params,
-        prompt,
-        options: signerOptions
-      });
-
-      expect(result).toEqual({result: 'approved'});
-
-      expect(spyIcrc21CanisterConsentMessage).toHaveBeenCalledWith({
-        ...signerOptions,
-        canisterId: params.canisterId,
-        request: {
-          method: params.method,
-          arg: base64ToUint8Array(params.arg),
-          user_preferences: {
-            metadata: {language: 'en', utc_offset_minutes: []},
-            device_spec: []
-          }
-        }
       });
     });
 
@@ -334,6 +301,40 @@ describe('Signer services', () => {
     });
 
     describe('Without consent message fallback', () => {
+      it('should return approved when user approves the consent message', async () => {
+        spyIcrc21CanisterConsentMessage.mockResolvedValue({
+          Ok: mockConsentInfo
+        });
+
+        const prompt = ({status, ...rest}: ConsentMessagePromptPayload): void => {
+          if (status === 'result' && 'approve' in rest) {
+            rest.approve();
+          }
+        };
+
+        const result = await signerService.assertAndPromptConsentMessage({
+          notify,
+          params,
+          prompt,
+          options: signerOptions
+        });
+
+        expect(result).toEqual({result: 'approved'});
+
+        expect(spyIcrc21CanisterConsentMessage).toHaveBeenCalledWith({
+          ...signerOptions,
+          canisterId: params.canisterId,
+          request: {
+            method: params.method,
+            arg: base64ToUint8Array(params.arg),
+            user_preferences: {
+              metadata: {language: 'en', utc_offset_minutes: []},
+              device_spec: []
+            }
+          }
+        });
+      });
+
       it('should return error if consentMessage throws', async () => {
         spyIcrc21CanisterConsentMessage.mockRejectedValue(new Error('Test Error'));
 
@@ -376,6 +377,45 @@ describe('Signer services', () => {
 
       beforeEach(() => {
         spySignerApiLedgerMedatada = vi.spyOn(SignerApi.prototype, 'ledgerMetadata');
+      });
+
+      it('should return approved when user approves the consent message that was built', async () => {
+        spyIcrc21CanisterConsentMessage.mockRejectedValue(new Error('Test Error'));
+        spySignerApiLedgerMedatada.mockResolvedValue(mockIcrcLedgerMetadata);
+
+        const prompt = ({status, ...rest}: ConsentMessagePromptPayload): void => {
+          if (status === 'result' && 'approve' in rest) {
+            rest.approve();
+          }
+        };
+
+        const method = 'icrc1_transfer';
+
+        const result = await signerService.assertAndPromptConsentMessage({
+          notify,
+          params: {
+            ...params,
+            method,
+            arg: mockIcrcLocalCallParams.arg
+          },
+          prompt,
+          options: signerOptions
+        });
+
+        expect(result).toEqual({result: 'approved'});
+
+        expect(spyIcrc21CanisterConsentMessage).toHaveBeenCalledWith({
+          ...signerOptions,
+          canisterId: params.canisterId,
+          request: {
+            method,
+            arg: base64ToUint8Array(mockIcrcLocalCallParams.arg),
+            user_preferences: {
+              metadata: {language: 'en', utc_offset_minutes: []},
+              device_spec: []
+            }
+          }
+        });
       });
 
       it('should return error if consentMessage throws and no matching fallback', async () => {
