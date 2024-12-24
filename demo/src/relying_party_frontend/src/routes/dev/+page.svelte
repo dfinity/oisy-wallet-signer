@@ -12,6 +12,7 @@
 	import Balance from '$core/components/Balance.svelte';
 	import Connect from '$lib/components/Connect.svelte';
 	import { authStore } from '$core/stores/auth.store';
+	import BuildConsentMessage from "$lib/components/BuildConsentMessage.svelte";
 
 	let wallet = $state<IcpWallet | undefined>(undefined);
 
@@ -59,3 +60,5 @@
 <Accounts {wallet} />
 
 <CallCanister {wallet} />
+
+<BuildConsentMessage {wallet} />
