@@ -8,6 +8,7 @@ import * as signerHandlers from '../handlers/signer.handlers';
 import {mockCallCanisterParams} from '../mocks/call-canister.mocks';
 import {mockCanisterCallSuccess, mockConsentInfo} from '../mocks/consent-message.mocks';
 import {mockPrincipalText} from '../mocks/icrc-accounts.mocks';
+import {mockIcrcLedgerMetadata} from '../mocks/icrc-ledger.mocks';
 import {mockErrorNotify} from '../mocks/signer-error.mocks';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import {JSON_RPC_VERSION_2, type RpcId, type RpcResponseWithError} from '../types/rpc';
@@ -365,6 +366,110 @@ describe('Signer services', () => {
         origin: testOrigin,
         status: 'error',
         details: error
+      });
+    });
+
+    describe('Without consent message fallback', () => {
+      it('should trigger prompt "error" if consentMessage throws', async () => {
+        const error = new Error('Test Error');
+
+        spyIcrc21CanisterConsentMessage.mockRejectedValue(error);
+
+        const prompt = vi.fn();
+
+        await signerService.assertAndPromptConsentMessage({
+          notify,
+          params,
+          prompt,
+          options: signerOptions
+        });
+
+        expect(prompt).toHaveBeenCalledWith({
+          origin: testOrigin,
+          status: 'error',
+          details: error
+        });
+      });
+    });
+
+    describe('With consent message fallback', () => {
+      let spySignerApiLedgerMedatada: MockInstance;
+
+      beforeEach(() => {
+        spySignerApiLedgerMedatada = vi.spyOn(SignerApi.prototype, 'ledgerMetadata');
+      });
+
+      it('should trigger prompt "error" if consentMessage throws and no matching fallback', async () => {
+        const error = new Error('Test Error');
+
+        spyIcrc21CanisterConsentMessage.mockRejectedValue(error);
+
+        const prompt = vi.fn();
+
+        await signerService.assertAndPromptConsentMessage({
+          notify,
+          params,
+          prompt,
+          options: signerOptions
+        });
+
+        expect(prompt).toHaveBeenCalledWith({
+          origin: testOrigin,
+          status: 'error',
+          details: error
+        });
+      });
+
+      it('should trigger prompt "error" if consentMessage throws and ledger metadata throws', async () => {
+        const error = new Error('Test Error');
+        const ledgerError = new Error('Test Error');
+
+        spyIcrc21CanisterConsentMessage.mockRejectedValue(error);
+        spySignerApiLedgerMedatada.mockRejectedValue(ledgerError);
+
+        const prompt = vi.fn();
+
+        await signerService.assertAndPromptConsentMessage({
+          notify,
+          params: {
+            ...params,
+            method: 'icrc1_transfer'
+          },
+          prompt,
+          options: signerOptions
+        });
+
+        expect(prompt).toHaveBeenCalledWith({
+          origin: testOrigin,
+          status: 'error',
+          details: error
+        });
+      });
+
+      it('should trigger prompt "error" if consentMessage throws and builder throws', async () => {
+        const error = new Error('Test Error');
+
+        spyIcrc21CanisterConsentMessage.mockRejectedValue(error);
+        spySignerApiLedgerMedatada.mockResolvedValue(mockIcrcLedgerMetadata);
+        // Signer builder error with arg lead to "Wrong magic number". Similar test in signer.builder.spec.ts
+
+        const prompt = vi.fn();
+
+        await signerService.assertAndPromptConsentMessage({
+          notify,
+          params: {
+            ...params,
+            method: 'icrc1_transfer'
+          },
+          prompt,
+          options: signerOptions
+        });
+
+        expect(prompt).toHaveBeenCalledWith({
+          origin: testOrigin,
+          status: 'error',
+          details: error
+        });
       });
     });
 
