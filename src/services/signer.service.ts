@@ -81,22 +81,7 @@ export class SignerService {
 
       return {result};
     } catch (err: unknown) {
-      // TODO: 2001 for not supported consent message - i.e. method is not implemented.
-      // see https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_49_call_canister.md#errors
-
-      // TODO: Likewise for example if canister is out of cycles or stopped etc. it should not throw 4000.
-
-      prompt({origin, status: 'error', details: err});
-
-      notifyNetworkError({
-        ...notify,
-        message:
-          err instanceof Error && notEmptyString(err.message)
-            ? err.message
-            : 'An unknown error occurred'
-      });
-
-      return {result: 'error'};
+      return this.notifyError({err, prompt, notify});
     }
   }
 
@@ -184,6 +169,35 @@ export class SignerService {
         }
       }
     });
+  }
+
+  private notifyError({
+    err,
+    notify,
+    prompt
+  }: {
+    err: unknown;
+    notify: Notify;
+    prompt: ConsentMessagePrompt;
+  }): {result: 'error'} {
+    // TODO: 2001 for not supported consent message - i.e. method is not implemented.
+    // see https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_49_call_canister.md#errors
+
+    // TODO: Likewise for example if canister is out of cycles or stopped etc. it should not throw 4000.
+
+    const {origin} = notify;
+
+    prompt({origin, status: 'error', details: err});
+
+    notifyNetworkError({
+      ...notify,
+      message:
+        err instanceof Error && notEmptyString(err.message)
+          ? err.message
+          : 'An unknown error occurred'
+    });
+
+    return {result: 'error'};
   }
 
   private async promptConsentMessage({
