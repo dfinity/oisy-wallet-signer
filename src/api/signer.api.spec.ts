@@ -5,6 +5,7 @@ import {Principal} from '@dfinity/principal';
 import {mockCallCanisterSuccess} from '../mocks/call-canister.mocks';
 import {mockRepliedLocalCertificate} from '../mocks/custom-http-agent-responses.mocks';
 import {mockRequestDetails, mockRequestPayload} from '../mocks/custom-http-agent.mocks';
+import {mockIcrcLedgerMetadata} from '../mocks/icrc-ledger.mocks';
 import type {SignerOptions} from '../types/signer-options';
 import {SignerApi} from './signer.api';
 
@@ -63,15 +64,8 @@ describe('Signer-api', () => {
 
   describe('ledgerMetadata', () => {
     describe('success', () => {
-      const mockMetadata = [
-        ['icrc1:name', {Text: 'Token'}],
-        ['icrc1:symbol', {Text: 'TKN'}],
-        ['icrc1:decimals', {Nat: 11n}],
-        ['icrc1:fee', {Nat: 12_987n}]
-      ];
-
       const ledgerCanisterMock = {
-        metadata: () => Promise.resolve(mockMetadata)
+        metadata: () => Promise.resolve(mockIcrcLedgerMetadata)
       } as unknown as IcrcLedgerCanister;
 
       beforeEach(() => {
@@ -118,7 +112,7 @@ describe('Signer-api', () => {
           ...signerOptions
         });
 
-        expect(result).toEqual(mockMetadata);
+        expect(result).toEqual(mockIcrcLedgerMetadata);
       });
     });
 
