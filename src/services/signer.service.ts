@@ -75,7 +75,7 @@ export class SignerService {
 
       const {Ok: consentInfo} = response;
 
-      // TODO: change consent message
+      // TODO: change consent message prompt payload
       // {
       //    {Ok: consentInfo} | {Warn: {consentInfo?: string, method, arg, canisterId, owner}}
       // }
