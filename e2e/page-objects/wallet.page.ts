@@ -61,7 +61,10 @@ export class WalletPage extends IdentityPage {
     await expect(this.page.getByTestId('loading-consent-message')).toBeVisible();
   }
 
-  async assertConsentMessage(partyUserId: string): Promise<void> {
+  async assertConsentMessage(params: {
+    partyUserId: string;
+    tokenSymbol: 'ICP' | 'TKN';
+  }): Promise<void> {
     const walletUserId = await this.getUserId();
 
     await expect(this.page.getByTestId('consent-message')).toBeVisible();
@@ -70,8 +73,8 @@ export class WalletPage extends IdentityPage {
 
     await expect(p).toContainText(
       mockConsentMessage({
-        partyUserId,
-        walletUserId
+        walletUserId,
+        ...params
       })
     );
   }
