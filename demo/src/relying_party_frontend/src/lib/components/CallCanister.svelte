@@ -24,10 +24,6 @@
 			return;
 		}
 
-		if (isNullish($accountsStore)) {
-			return;
-		}
-
 		const account = $accountsStore?.[0];
 
 		if (isNullish(account)) {
