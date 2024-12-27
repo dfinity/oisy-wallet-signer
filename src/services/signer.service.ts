@@ -1,7 +1,9 @@
+import {mapTokenMetadata} from '@dfinity/ledger-icrc';
 import {Principal} from '@dfinity/principal';
 import {isNullish, notEmptyString} from '@dfinity/utils';
 import {SignerApi} from '../api/signer.api';
-import {icrc21_consent_message_response} from '../declarations/icrc-21';
+import {SIGNER_BUILDERS} from '../constants/signer.builders.constants';
+import {icrc21_consent_info, icrc21_consent_message_response} from '../declarations/icrc-21';
 import {
   notifyErrorActionAborted,
   notifyErrorMissingPrompt,
@@ -53,7 +55,7 @@ export class SignerService {
     prompt({origin, status: 'loading'});
 
     try {
-      const response = await this.callConsentMessage({
+      const response = await this.loadConsentMessage({
         params,
         options: {host, owner}
       });
@@ -73,6 +75,11 @@ export class SignerService {
 
       const {Ok: consentInfo} = response;
 
+      // TODO: change consent message prompt payload
+      // {
+      //    {Ok: consentInfo} | {Warn: {consentInfo?: string, method, arg, canisterId, owner}}
+      // }
+
       const {result} = await this.promptConsentMessage({consentInfo, prompt, origin});
 
       if (result === 'rejected') {
@@ -81,22 +88,7 @@ export class SignerService {
 
       return {result};
     } catch (err: unknown) {
-      // TODO: 2001 for not supported consent message - i.e. method is not implemented.
-      // see https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_49_call_canister.md#errors
-
-      // TODO: Likewise for example if canister is out of cycles or stopped etc. it should not throw 4000.
-
-      prompt({origin, status: 'error', details: err});
-
-      notifyNetworkError({
-        ...notify,
-        message:
-          err instanceof Error && notEmptyString(err.message)
-            ? err.message
-            : 'An unknown error occurred'
-      });
-
-      return {result: 'error'};
+      return this.notifyError({err, prompt, notify});
     }
   }
 
@@ -186,6 +178,35 @@ export class SignerService {
     });
   }
 
+  private notifyError({
+    err,
+    notify,
+    prompt
+  }: {
+    err: unknown;
+    notify: Notify;
+    prompt: ConsentMessagePrompt;
+  }): {result: 'error'} {
+    // TODO: 2001 for not supported consent message - i.e. method is not implemented.
+    // see https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_49_call_canister.md#errors
+
+    // TODO: Likewise for example if canister is out of cycles or stopped etc. it should not throw 4000.
+
+    const {origin} = notify;
+
+    prompt({origin, status: 'error', details: err});
+
+    notifyNetworkError({
+      ...notify,
+      message:
+        err instanceof Error && notEmptyString(err.message)
+          ? err.message
+          : 'An unknown error occurred'
+    });
+
+    return {result: 'error'};
+  }
+
   private async promptConsentMessage({
     prompt,
     ...payload
@@ -207,5 +228,73 @@ export class SignerService {
     });
 
     return await promise;
+  }
+
+  /**
+   * If the ICRC-21 call to fetch the consent message fails, it might be due to the fact
+   * that the targeted canister does not implement the ICRC-21 specification.
+   *
+   * To address the potential lack of support for the most common types of calls for ledgers,
+   * namely transfer and approve, we use custom builders. Those builders construct
+   * messages similar to those that would be implemented by the canisters.
+   *
+   * @param {Object} params - The parameters for loading the consent message.
+   * @param {Omit<IcrcCallCanisterRequestParams, 'sender'>} params.params - The ICRC call canister parameters minus the sender.
+   * @param {SignerOptions} params.options - The signer options - host and owner.
+   * @returns {Promise<icrc21_consent_message_response>} - The consent message response.
+   * @throws The potential original error from the ICRC-21 call. The errors related to
+   *         the custom builder is ignored.
+   **/
+  private async loadConsentMessage(params: {
+    params: Omit<IcrcCallCanisterRequestParams, 'sender'>;
+    options: SignerOptions;
+  }): Promise<icrc21_consent_message_response> {
+    try {
+      return await this.callConsentMessage(params);
+    } catch (err: unknown) {
+      const fallbackMessage = await this.tryBuildConsentMessageOnError(params);
+
+      if ('Ok' in fallbackMessage) {
+        return fallbackMessage;
+      }
+
+      throw err;
+    }
+  }
+
+  private async tryBuildConsentMessageOnError({
+    params: {method, arg, canisterId},
+    options: {owner, host}
+  }: {
+    params: Omit<IcrcCallCanisterRequestParams, 'sender'>;
+    options: SignerOptions;
+  }): Promise<{NoFallback: null} | {Ok: icrc21_consent_info} | {Err: unknown}> {
+    const fn = SIGNER_BUILDERS[method];
+
+    if (isNullish(fn)) {
+      return {NoFallback: null};
+    }
+
+    try {
+      const tokenResponse = await this.#signerApi.ledgerMetadata({
+        params: {canisterId},
+        host,
+        owner
+      });
+
+      const token = mapTokenMetadata(tokenResponse);
+
+      if (isNullish(token)) {
+        return {Err: new Error('Incomplete token metadata.')};
+      }
+
+      return await fn({
+        arg: base64ToUint8Array(arg),
+        token,
+        owner: owner.getPrincipal()
+      });
+    } catch (err: unknown) {
+      return {Err: err};
+    }
   }
 }

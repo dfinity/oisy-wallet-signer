@@ -1,13 +1,15 @@
 export const mockConsentMessage = ({
   walletUserId,
-  partyUserId
+  partyUserId,
+  tokenSymbol
 }: {
   walletUserId: string;
   partyUserId: string;
+  tokenSymbol: 'ICP' | 'TKN';
 }): string => `# Approve the transfer of funds
 
 **Amount:**
-0.5 ICP
+0.5 ${tokenSymbol}
 
 **From:**
 ${walletUserId}
@@ -16,4 +18,4 @@ ${walletUserId}
 ${partyUserId}
 
 **Fee:**
-0.0001 ICP`;
+0.0001 ${tokenSymbol}`;
