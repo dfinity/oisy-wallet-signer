@@ -9,3 +9,21 @@ export const formatAmount = ({amount, decimals}: {amount: bigint; decimals: numb
     maximumFractionDigits: decimals
   }).format(converted);
 };
+
+export const formatDate = (nanoseconds: bigint): string => {
+  const options: Intl.DateTimeFormatOptions = {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+    timeZone: 'UTC',
+    timeZoneName: 'short'
+  };
+
+  const date = new Date(Number(nanoseconds / 1_000_000n));
+  return date.toLocaleDateString('en', options);
+};
