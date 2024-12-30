@@ -20,10 +20,7 @@
       "some": "Current withdrawal allowance",
       "none": "The allowance will be set to {amount} {symbol} independently of any previous allowance. Until this transaction has been executed the spender can still exercise the previous allowance (if any) to it's full amount."
     },
-    "expiration_date": {
-      "title": "Expiration date",
-      "none": "No expiration."
-    },
+    "expiration_date": "Expiration date",
     "approval_fee": "Approval fee",
     "approver_account_transaction_fees": {
       "subaccount": "Transaction fees to be paid by your subaccount",
