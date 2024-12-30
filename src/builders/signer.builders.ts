@@ -1,5 +1,4 @@
-import {encodeIcrcAccount, type IcrcTransferArg} from '@dfinity/ledger-icrc';
-import type {ApproveArgs as IcrcApproveArgs} from '@dfinity/ledger-icrc/dist/candid/icrc_ledger';
+import {encodeIcrcAccount} from '@dfinity/ledger-icrc';
 import {
   arrayOfNumberToUint8Array,
   fromNullable,
@@ -9,6 +8,8 @@ import {
 } from '@dfinity/utils';
 import {ApproveArgs} from '../constants/icrc-2.idl.constants';
 import {TransferArgs} from '../constants/icrc.idl.constants';
+import {TransferArgs as IcrcTransferArg} from '../declarations/icrc-1';
+import {ApproveArgs as IcrcApproveArgs} from '../declarations/icrc-2';
 import type {icrc21_consent_info} from '../declarations/icrc-21';
 import {I18n} from '../types/i18n';
 import {SignerBuilderFn, SignerBuildersResult} from '../types/signer-builders';
