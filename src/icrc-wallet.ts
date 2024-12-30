@@ -5,7 +5,7 @@ import {
   TransferParams,
   toTransferArg
 } from '@dfinity/ledger-icrc';
-import {TransferArgs, TransferResult} from './constants/icrc.idl.constants';
+import {TransferArgs, TransferResult} from './constants/icrc-1.idl.constants';
 import type {
   IcrcAccount,
   IcrcCallCanisterRequestParams,
