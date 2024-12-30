@@ -379,42 +379,138 @@ describe('Signer services', () => {
         spySignerApiLedgerMedatada = vi.spyOn(SignerApi.prototype, 'ledgerMetadata');
       });
 
-      it('should return approved when user approves the consent message that was built', async () => {
-        spyIcrc21CanisterConsentMessage.mockRejectedValue(new Error('Test Error'));
-        spySignerApiLedgerMedatada.mockResolvedValue(mockIcrcLedgerMetadata);
+      describe.each(['icrc1_transfer', 'icrc2_approve'])('With fallback for $method', (method) => {
+        it('should return approved when user approves the consent message that was built', async () => {
+          spyIcrc21CanisterConsentMessage.mockRejectedValue(new Error('Test Error'));
+          spySignerApiLedgerMedatada.mockResolvedValue(mockIcrcLedgerMetadata);
 
-        const prompt = ({status, ...rest}: ConsentMessagePromptPayload): void => {
-          if (status === 'result' && 'approve' in rest) {
-            rest.approve();
-          }
-        };
+          const prompt = ({status, ...rest}: ConsentMessagePromptPayload): void => {
+            if (status === 'result' && 'approve' in rest) {
+              rest.approve();
+            }
+          };
 
-        const method = 'icrc1_transfer';
+          const result = await signerService.assertAndPromptConsentMessage({
+            notify,
+            params: {
+              ...params,
+              method,
+              arg: mockIcrcLocalCallParams.arg
+            },
+            prompt,
+            options: signerOptions
+          });
 
-        const result = await signerService.assertAndPromptConsentMessage({
-          notify,
-          params: {
-            ...params,
-            method,
-            arg: mockIcrcLocalCallParams.arg
-          },
-          prompt,
-          options: signerOptions
+          expect(result).toEqual({result: 'approved'});
+
+          expect(spyIcrc21CanisterConsentMessage).toHaveBeenCalledWith({
+            ...signerOptions,
+            canisterId: params.canisterId,
+            request: {
+              method,
+              arg: base64ToUint8Array(mockIcrcLocalCallParams.arg),
+              user_preferences: {
+                metadata: {language: 'en', utc_offset_minutes: []},
+                device_spec: []
+              }
+            }
+          });
         });
 
-        expect(result).toEqual({result: 'approved'});
+        it('should return error if consentMessage throws and ledger metadata throws', async () => {
+          const error = new Error('Test Error');
+          const ledgerError = new Error('Test Error');
 
-        expect(spyIcrc21CanisterConsentMessage).toHaveBeenCalledWith({
-          ...signerOptions,
-          canisterId: params.canisterId,
-          request: {
-            method,
-            arg: base64ToUint8Array(mockIcrcLocalCallParams.arg),
-            user_preferences: {
-              metadata: {language: 'en', utc_offset_minutes: []},
-              device_spec: []
-            }
-          }
+          spyIcrc21CanisterConsentMessage.mockRejectedValue(error);
+          spySignerApiLedgerMedatada.mockRejectedValue(ledgerError);
+
+          const prompt = vi.fn();
+
+          const result = await signerService.assertAndPromptConsentMessage({
+            notify,
+            params: {
+              ...params,
+              method
+            },
+            prompt,
+            options: signerOptions
+          });
+
+          expect(result).toEqual({result: 'error'});
+        });
+
+        it('should return error if consentMessage throws and build throws', async () => {
+          const error = new Error('Test Error');
+
+          spyIcrc21CanisterConsentMessage.mockRejectedValue(error);
+          spySignerApiLedgerMedatada.mockResolvedValue(mockIcrcLedgerMetadata);
+          // Signer builder error with arg lead to "Wrong magic number". Similar test in signer.builder.spec.ts
+
+          const prompt = vi.fn();
+
+          const result = await signerService.assertAndPromptConsentMessage({
+            notify,
+            params: {
+              ...params,
+              method
+            },
+            prompt,
+            options: signerOptions
+          });
+
+          expect(result).toEqual({result: 'error'});
+        });
+
+        it('should trigger prompt "error" if consentMessage throws and ledger metadata throws', async () => {
+          const error = new Error('Test Error');
+          const ledgerError = new Error('Test Error');
+
+          spyIcrc21CanisterConsentMessage.mockRejectedValue(error);
+          spySignerApiLedgerMedatada.mockRejectedValue(ledgerError);
+
+          const prompt = vi.fn();
+
+          await signerService.assertAndPromptConsentMessage({
+            notify,
+            params: {
+              ...params,
+              method
+            },
+            prompt,
+            options: signerOptions
+          });
+
+          expect(prompt).toHaveBeenCalledWith({
+            origin: testOrigin,
+            status: 'error',
+            details: error
+          });
+        });
+
+        it('should trigger prompt "error" if consentMessage throws and builder throws', async () => {
+          const error = new Error('Test Error');
+
+          spyIcrc21CanisterConsentMessage.mockRejectedValue(error);
+          spySignerApiLedgerMedatada.mockResolvedValue(mockIcrcLedgerMetadata);
+          // Signer builder error with arg lead to "Wrong magic number". Similar test in signer.builder.spec.ts
+
+          const prompt = vi.fn();
+
+          await signerService.assertAndPromptConsentMessage({
+            notify,
+            params: {
+              ...params,
+              method
+            },
+            prompt,
+            options: signerOptions
+          });
+
+          expect(prompt).toHaveBeenCalledWith({
+            origin: testOrigin,
+            status: 'error',
+            details: error
+          });
         });
       });
 
@@ -433,50 +529,6 @@ describe('Signer services', () => {
         expect(result).toEqual({result: 'error'});
       });
 
-      it('should return error if consentMessage throws and ledger metadata throws', async () => {
-        const error = new Error('Test Error');
-        const ledgerError = new Error('Test Error');
-
-        spyIcrc21CanisterConsentMessage.mockRejectedValue(error);
-        spySignerApiLedgerMedatada.mockRejectedValue(ledgerError);
-
-        const prompt = vi.fn();
-
-        const result = await signerService.assertAndPromptConsentMessage({
-          notify,
-          params: {
-            ...params,
-            method: 'icrc1_transfer'
-          },
-          prompt,
-          options: signerOptions
-        });
-
-        expect(result).toEqual({result: 'error'});
-      });
-
-      it('should return error if consentMessage throws and build throws', async () => {
-        const error = new Error('Test Error');
-
-        spyIcrc21CanisterConsentMessage.mockRejectedValue(error);
-        spySignerApiLedgerMedatada.mockResolvedValue(mockIcrcLedgerMetadata);
-        // Signer builder error with arg lead to "Wrong magic number". Similar test in signer.builder.spec.ts
-
-        const prompt = vi.fn();
-
-        const result = await signerService.assertAndPromptConsentMessage({
-          notify,
-          params: {
-            ...params,
-            method: 'icrc1_transfer'
-          },
-          prompt,
-          options: signerOptions
-        });
-
-        expect(result).toEqual({result: 'error'});
-      });
-
       it('should trigger prompt "error" if consentMessage throws and no matching fallback', async () => {
         const error = new Error('Test Error');
 
@@ -487,58 +539,6 @@ describe('Signer services', () => {
         await signerService.assertAndPromptConsentMessage({
           notify,
           params,
-          prompt,
-          options: signerOptions
-        });
-
-        expect(prompt).toHaveBeenCalledWith({
-          origin: testOrigin,
-          status: 'error',
-          details: error
-        });
-      });
-
-      it('should trigger prompt "error" if consentMessage throws and ledger metadata throws', async () => {
-        const error = new Error('Test Error');
-        const ledgerError = new Error('Test Error');
-
-        spyIcrc21CanisterConsentMessage.mockRejectedValue(error);
-        spySignerApiLedgerMedatada.mockRejectedValue(ledgerError);
-
-        const prompt = vi.fn();
-
-        await signerService.assertAndPromptConsentMessage({
-          notify,
-          params: {
-            ...params,
-            method: 'icrc1_transfer'
-          },
-          prompt,
-          options: signerOptions
-        });
-
-        expect(prompt).toHaveBeenCalledWith({
-          origin: testOrigin,
-          status: 'error',
-          details: error
-        });
-      });
-
-      it('should trigger prompt "error" if consentMessage throws and builder throws', async () => {
-        const error = new Error('Test Error');
-
-        spyIcrc21CanisterConsentMessage.mockRejectedValue(error);
-        spySignerApiLedgerMedatada.mockResolvedValue(mockIcrcLedgerMetadata);
-        // Signer builder error with arg lead to "Wrong magic number". Similar test in signer.builder.spec.ts
-
-        const prompt = vi.fn();
-
-        await signerService.assertAndPromptConsentMessage({
-          notify,
-          params: {
-            ...params,
-            method: 'icrc1_transfer'
-          },
           prompt,
           options: signerOptions
         });
