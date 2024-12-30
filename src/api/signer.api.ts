@@ -57,6 +57,9 @@ export class SignerApi extends Icrc21Canister {
 
     const encodedContentMap = uint8ArrayToBase64(arrayBufferToUint8Array(encode(contentMap)));
 
+
+    console.log(encodedCertificate, encodedContentMap)
+
     return {
       certificate: encodedCertificate,
       contentMap: encodedContentMap
