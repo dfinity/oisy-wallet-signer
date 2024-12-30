@@ -3,12 +3,12 @@ import {
   arrayOfNumberToUint8Array,
   fromNullable,
   isNullish,
-  nonNullish,
   uint8ArrayToHexString
 } from '@dfinity/utils';
-import {TransferArgs} from '../constants/icrc.idl.constants';
+import {TransferArgs} from '../constants/icrc-1.idl.constants';
 import type {TransferArgs as IcrcTransferArg} from '../declarations/icrc-1';
 import type {icrc21_consent_info} from '../declarations/icrc-21';
+import type {I18n} from '../types/i18n';
 import type {SignerBuilderFn, SignerBuildersResult} from '../types/signer-builders';
 import {formatAmount} from '../utils/format.utils';
 import {decodeIdl} from '../utils/idl.utils';
@@ -35,7 +35,7 @@ export const buildContentMessageIcrc1Transfer: SignerBuilderFn = async ({
   owner,
   token: {symbol: tokenSymbol, decimals: tokenDecimals, fee: tokenFee}
 }): Promise<SignerBuildersResult> => {
-  try {
+  const build = (en: I18n): {message: string[]} => {
     const {
       amount,
       from_subaccount: fromSubaccount,
@@ -47,19 +47,13 @@ export const buildContentMessageIcrc1Transfer: SignerBuilderFn = async ({
       bytes: arg
     });
 
-    // TODO: support i18n
-    // eslint-disable-next-line import/no-relative-parent-imports
-    const {default: en} = await import('../i18n/en.json');
-
     const {
-      core: {amount: amountLabel, from, to, fee: feeLabel, memo: memoLabel},
+      core: {amount: amountLabel, from, to, fee: feeLabel},
       icrc1_transfer: {title, from_subaccount: fromSubaccountLabel}
     } = en;
 
     // Title
     const message = [`# ${title}`];
-
-    const section = (text: string): string => `**${text}:**`;
 
     // - Amount
     message.push(
@@ -89,12 +83,44 @@ export const buildContentMessageIcrc1Transfer: SignerBuilderFn = async ({
     );
 
     // - Memo
-    const nullishMemo = fromNullable(memo);
-    if (nonNullish(nullishMemo)) {
-      message.push(
-        `${section(memoLabel)}\n0x${uint8ArrayToHexString(nullishMemo instanceof Uint8Array ? nullishMemo : arrayOfNumberToUint8Array(nullishMemo))}`
-      );
-    }
+    const memoMessage = buildMemo({
+      memo,
+      en
+    });
+
+    return {message: [...message, ...memoMessage]};
+  };
+
+  return await buildContentMessage(build);
+};
+
+const section = (text: string): string => `**${text}:**`;
+
+const buildMemo = ({memo, en}: {memo: [] | [Uint8Array | number[]]; en: I18n}): [] | [string] => {
+  const nullishMemo = fromNullable(memo);
+
+  if (isNullish(nullishMemo)) {
+    return [];
+  }
+
+  const {
+    core: {memo: memoLabel}
+  } = en;
+
+  return [
+    `${section(memoLabel)}\n0x${uint8ArrayToHexString(nullishMemo instanceof Uint8Array ? nullishMemo : arrayOfNumberToUint8Array(nullishMemo))}`
+  ];
+};
+
+const buildContentMessage = async (
+  fn: (en: I18n) => {message: string[]}
+): Promise<SignerBuildersResult> => {
+  try {
+    // TODO: support i18n
+    // eslint-disable-next-line import/no-relative-parent-imports
+    const {default: en} = await import('../i18n/en.json');
+
+    const {message} = fn(en);
 
     const consentMessage: icrc21_consent_info = {
       metadata: {
