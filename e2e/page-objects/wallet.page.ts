@@ -1,6 +1,7 @@
 import {InternetIdentityPage} from '@dfinity/internet-identity-playwright';
 import {assertNonNullish} from '@dfinity/utils';
 import {expect} from '@playwright/test';
+import {mockConsentMessage} from '../mocks/consent-message.mocks';
 import {IdentityPage, IdentityPageParams} from './identity.page';
 
 export class WalletPage extends IdentityPage {
@@ -60,13 +61,9 @@ export class WalletPage extends IdentityPage {
     await expect(this.page.getByTestId('loading-consent-message')).toBeVisible();
   }
 
-  async assertConsentMessage({
-    fn,
-    ...params
-  }: {
+  async assertConsentMessage(params: {
     partyUserId: string;
     tokenSymbol: 'ICP' | 'TKN';
-    fn: (params: {walletUserId: string; partyUserId: string; tokenSymbol: 'ICP' | 'TKN'}) => string;
   }): Promise<void> {
     const walletUserId = await this.getUserId();
 
@@ -75,7 +72,7 @@ export class WalletPage extends IdentityPage {
     const p = this.page.getByTestId('consent-message');
 
     await expect(p).toContainText(
-      fn({
+      mockConsentMessage({
         walletUserId,
         ...params
       })

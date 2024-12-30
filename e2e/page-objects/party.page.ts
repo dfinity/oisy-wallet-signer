@@ -1,10 +1,6 @@
 import {InternetIdentityPage} from '@dfinity/internet-identity-playwright';
 import {expect} from '@playwright/test';
 import {IcrcPermissionState, IcrcScopedMethod} from '../../src';
-import {
-  mockConsentMessageIcrc1Transfer,
-  mockConsentMessageIcrc2Approve
-} from '../mocks/consent-message.mocks';
 import {waitForFadeAnimation} from '../utils/test.utils';
 import {IdentityPage, IdentityPageParams} from './identity.page';
 import {WalletPage} from './wallet.page';
@@ -157,79 +153,35 @@ export class PartyPage extends IdentityPage {
     // TODO: check principal
   }
 
-  async approvePermissionsConsentMessageIcrc1Transfer(): Promise<void> {
+  async approvePermissionsConsentMessage(): Promise<void> {
     const partyUserId = await this.getUserId();
 
-    await expect(this.page.getByTestId('call-icrc1-transfer-button')).toBeVisible();
+    await expect(this.page.getByTestId('call-canister-button')).toBeVisible();
 
-    await this.page.getByTestId('call-icrc1-transfer-button').click();
+    await this.page.getByTestId('call-canister-button').click();
 
     await this.#walletPage?.approveCallCanisterPermission();
 
     await this.#walletPage?.assertConsentMessageLoading();
 
-    await this.#walletPage?.assertConsentMessage({
-      partyUserId,
-      tokenSymbol: 'ICP',
-      fn: mockConsentMessageIcrc1Transfer
-    });
+    await this.#walletPage?.assertConsentMessage({partyUserId, tokenSymbol: 'ICP'});
   }
 
-  async approvePermissionsConsentMessageIcrc2Approve(): Promise<void> {
+  async approvePermissionsBuildConsentMessage(): Promise<void> {
     const partyUserId = await this.getUserId();
 
-    await expect(this.page.getByTestId('call-icrc2-approve-button')).toBeVisible();
+    await expect(this.page.getByTestId('build-consent-message-button')).toBeVisible();
 
-    await this.page.getByTestId('call-icrc2-approve-button').click();
+    await this.page.getByTestId('build-consent-message-button').click();
 
     await this.#walletPage?.approveCallCanisterPermission();
 
     await this.#walletPage?.assertConsentMessageLoading();
 
-    await this.#walletPage?.assertConsentMessage({
-      partyUserId,
-      tokenSymbol: 'ICP',
-      fn: mockConsentMessageIcrc2Approve
-    });
+    await this.#walletPage?.assertConsentMessage({partyUserId, tokenSymbol: 'TKN'});
   }
 
-  async approvePermissionsBuildConsentMessageIcrc1Transfer(): Promise<void> {
-    const partyUserId = await this.getUserId();
-
-    await expect(this.page.getByTestId('build-icrc1-transfer-button')).toBeVisible();
-
-    await this.page.getByTestId('build-icrc1-transfer-button').click();
-
-    await this.#walletPage?.approveCallCanisterPermission();
-
-    await this.#walletPage?.assertConsentMessageLoading();
-
-    await this.#walletPage?.assertConsentMessage({
-      partyUserId,
-      tokenSymbol: 'TKN',
-      fn: mockConsentMessageIcrc1Transfer
-    });
-  }
-
-  async approvePermissionsBuildConsentMessageIcrc2Approve(): Promise<void> {
-    const partyUserId = await this.getUserId();
-
-    await expect(this.page.getByTestId('build-icrc2-approve-button')).toBeVisible();
-
-    await this.page.getByTestId('build-icrc2-approve-button').click();
-
-    await this.#walletPage?.approveCallCanisterPermission();
-
-    await this.#walletPage?.assertConsentMessageLoading();
-
-    await this.#walletPage?.assertConsentMessage({
-      partyUserId,
-      tokenSymbol: 'TKN',
-      fn: mockConsentMessageIcrc2Approve
-    });
-  }
-
-  async icrc1Transfer(): Promise<void> {
+  async callCanister(): Promise<void> {
     await this.#walletPage?.getICP();
 
     await this.#walletPage?.assertBalance('55.0001');
@@ -239,18 +191,6 @@ export class PartyPage extends IdentityPage {
     await this.#walletPage?.assertBalance('54.5000');
 
     await this.assertBalance('0.5000');
-  }
-
-  async icrc2Approve(): Promise<void> {
-    await this.#walletPage?.getICP();
-
-    await this.#walletPage?.assertBalance('55.0001');
-
-    await this.#walletPage?.approveConsentMessage();
-
-    await this.#walletPage?.assertBalance('55.0001');
-
-    await this.assertBalance('0.0000');
   }
 
   async closeWalletWindow(): Promise<void> {

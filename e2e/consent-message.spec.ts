@@ -8,5 +8,5 @@ testWithII('should requests permissions and present consent message', async () =
 
   await partyPage.approvePermissionsAccounts();
 
-  await partyPage.approvePermissionsConsentMessageIcrc1Transfer();
+  await partyPage.approvePermissionsConsentMessage();
 });
