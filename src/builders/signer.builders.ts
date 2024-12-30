@@ -6,8 +6,8 @@ import {
   nonNullish,
   uint8ArrayToHexString
 } from '@dfinity/utils';
+import {TransferArgs} from '../constants/icrc-1.idl.constants';
 import {ApproveArgs} from '../constants/icrc-2.idl.constants';
-import {TransferArgs} from '../constants/icrc.idl.constants';
 import {TransferArgs as IcrcTransferArg} from '../declarations/icrc-1';
 import {ApproveArgs as IcrcApproveArgs} from '../declarations/icrc-2';
 import type {icrc21_consent_info} from '../declarations/icrc-21';

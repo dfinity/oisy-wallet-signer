@@ -5,7 +5,7 @@ import {
   type Icrc1TransferRequest
 } from '@dfinity/ledger-icp';
 import {Icrc1TransferResult} from '@dfinity/ledger-icp/dist/candid/ledger';
-import {TransferArgs, TransferResult} from './constants/icrc.idl.constants';
+import {TransferArgs, TransferResult} from './constants/icrc-1.idl.constants';
 import {RelyingParty} from './relying-party';
 import type {IcrcAccount} from './types/icrc-accounts';
 import type {IcrcCallCanisterRequestParams} from './types/icrc-requests';

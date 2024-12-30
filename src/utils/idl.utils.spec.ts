@@ -1,6 +1,6 @@
 import {IDL} from '@dfinity/candid';
 import {Principal} from '@dfinity/principal';
-import {TransferArgs} from '../constants/icrc.idl.constants';
+import {TransferArgs} from '../constants/icrc-1.idl.constants';
 import {TransferArgs as TransferArgsType} from '../declarations/icrc-1';
 import {decodeIdl, encodeIdl} from './idl.utils';
 
