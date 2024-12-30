@@ -18,7 +18,7 @@
     "requested_withdrawal_allowance": "Requested withdrawal allowance",
     "withdrawal_allowance": {
       "some": "Current withdrawal allowance",
-      "none": "The allowance will be set to {0} {1} independently of any previous allowance. Until this transaction has been executed the spender can still exercise the previous allowance (if any) to it's full amount."
+      "none": "The allowance will be set to {amount} {symbol} independently of any previous allowance. Until this transaction has been executed the spender can still exercise the previous allowance (if any) to it's full amount."
     },
     "expiration_date": "Expiration date",
     "approval_fee": "Approval fee",
