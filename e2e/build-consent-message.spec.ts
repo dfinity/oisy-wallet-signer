@@ -15,12 +15,12 @@ testWithII.skip(
 );
 
 testWithII(
-    'should requests permissions and present consent message for icrc2 approve build by the library',
-    async () => {
-        const partyPage = getPartyPage();
+  'should requests permissions and present consent message for icrc2 approve build by the library',
+  async () => {
+    const partyPage = getPartyPage();
 
-        await partyPage.approvePermissionsAccounts();
+    await partyPage.approvePermissionsAccounts();
 
-        await partyPage.approvePermissionsBuildConsentMessageIcrc2Approve();
-    }
+    await partyPage.approvePermissionsBuildConsentMessageIcrc2Approve();
+  }
 );
