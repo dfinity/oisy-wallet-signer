@@ -363,7 +363,7 @@ ${encodeIcrcAccount({owner: owner.getPrincipal()})}
 **Requested withdrawal allowance:**
 3,200.00000001 TKN
 
-⚠️  The allowance will be set to 3,200.00000001 TKN independently of any previous allowance. Until this transaction has been executed the spender can still exercise the previous allowance (if any) to it's full amount.
+⚠ The allowance will be set to 3,200.00000001 TKN independently of any previous allowance. Until this transaction has been executed the spender can still exercise the previous allowance (if any) to it's full amount.
 
 **Approval fee:**
 0.0010033 TKN
@@ -403,7 +403,7 @@ ${encodeIcrcAccount({owner: owner.getPrincipal(), subaccount: subaccount})}
 **Requested withdrawal allowance:**
 3,200.00000001 TKN
 
-⚠️  The allowance will be set to 3,200.00000001 TKN independently of any previous allowance. Until this transaction has been executed the spender can still exercise the previous allowance (if any) to it's full amount.
+⚠ The allowance will be set to 3,200.00000001 TKN independently of any previous allowance. Until this transaction has been executed the spender can still exercise the previous allowance (if any) to it's full amount.
 
 **Approval fee:**
 0.0010033 TKN
@@ -443,7 +443,7 @@ ${encodeIcrcAccount({owner: owner.getPrincipal()})}
 **Requested withdrawal allowance:**
 3,200.00000001 TKN
 
-⚠️  The allowance will be set to 3,200.00000001 TKN independently of any previous allowance. Until this transaction has been executed the spender can still exercise the previous allowance (if any) to it's full amount.
+⚠ The allowance will be set to 3,200.00000001 TKN independently of any previous allowance. Until this transaction has been executed the spender can still exercise the previous allowance (if any) to it's full amount.
 
 **Approval fee:**
 0.0010033 TKN
@@ -542,7 +542,7 @@ ${encodeIcrcAccount({owner: owner.getPrincipal()})}
 **Requested withdrawal allowance:**
 3,200.00000001 TKN
 
-⚠️  The allowance will be set to 3,200.00000001 TKN independently of any previous allowance. Until this transaction has been executed the spender can still exercise the previous allowance (if any) to it's full amount.
+⚠ The allowance will be set to 3,200.00000001 TKN independently of any previous allowance. Until this transaction has been executed the spender can still exercise the previous allowance (if any) to it's full amount.
 
 **Expiration date:**
 Mon, Dec 30, 2024, 08:30:16 UTC
