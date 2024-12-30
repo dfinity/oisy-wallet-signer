@@ -12,7 +12,7 @@
   },
   "icrc2_approve": {
     "title": "Authorize another address to withdraw from your account",
-    "address_is_allowed": "The following address is allowed to withdraw from your account:",
+    "address_is_allowed": "The following address is allowed to withdraw from your account",
     "your_subaccount": "Your subaccount",
     "your_account": "Your account",
     "requested_withdrawal_allowance": "Requested withdrawal allowance",
@@ -24,7 +24,7 @@
     "approval_fee": "Approval fee",
     "approver_account_transaction_fees": {
       "subaccount": "Transaction fees to be paid by your subaccount",
-      "owner": "Transaction fees to be paid by:"
+      "owner": "Transaction fees to be paid by"
     }
   }
 }

@@ -183,7 +183,7 @@ export const buildContentMessageIcrc2Approve: SignerBuilderFn = async ({
       );
     } else {
       message.push(
-        `\n⚠️ ${withdrawalAllowanceNone
+        `⚠️  ${withdrawalAllowanceNone
           .replace('{0}', formatAmount({amount, decimals: tokenDecimals}))
           .replace('{1}', tokenSymbol)}`
       );
