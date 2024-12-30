@@ -6,7 +6,7 @@ import {
   nonNullish,
   uint8ArrayToHexString
 } from '@dfinity/utils';
-import {TransferArgs} from '../constants/icrc.idl.constants';
+import {TransferArgs} from '../constants/icrc-1.idl.constants';
 import type {icrc21_consent_info} from '../declarations/icrc-21';
 import type {SignerBuilderFn, SignerBuildersResult} from '../types/signer-builders';
 import {formatAmount} from '../utils/format.utils';
