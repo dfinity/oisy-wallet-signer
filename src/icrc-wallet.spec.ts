@@ -22,9 +22,7 @@ import {RelyingPartyOptions} from './types/relying-party-options';
 import {JSON_RPC_VERSION_2} from './types/rpc';
 import * as callUtils from './utils/call.utils';
 
-const mocks = vi.hoisted(() => {
-  return {getRootKey: vi.fn()};
-});
+const mocks = vi.hoisted(() => ({getRootKey: vi.fn()}));
 
 vi.mock('@dfinity/agent', async (importOriginal) => {
   // eslint-disable-next-line @typescript-eslint/consistent-type-imports
