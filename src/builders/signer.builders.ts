@@ -141,7 +141,7 @@ export const buildContentMessageIcrc2Approve: SignerBuilderFn = async ({
         your_subaccount,
         requested_withdrawal_allowance,
         withdrawal_allowance: {none: withdrawalAllowanceNone, some: withdrawalAllowanceSome},
-        expiration_date,
+        expiration_date: {title: expirationDateTitle, none: noExpirationDate},
         approval_fee,
         approver_account_transaction_fees: {
           subaccount: approverFeeSubaccount,
@@ -191,9 +191,9 @@ export const buildContentMessageIcrc2Approve: SignerBuilderFn = async ({
 
     // - Expires at
     const expiresAt = fromNullable(expires_at);
-    if (nonNullish(expiresAt)) {
-      message.push(`${section(expiration_date)}\n${formatDate(expiresAt)}`);
-    }
+    message.push(
+      `${section(expirationDateTitle)}\n${nonNullish(expiresAt) ? formatDate(expiresAt) : noExpirationDate}`
+    );
 
     // - Fee
     const fee = fromNullable(approveFee);
