@@ -193,12 +193,12 @@ export class PartyPage extends IdentityPage {
     });
   }
 
-  async approvePermissionsBuildConsentMessage(): Promise<void> {
+  async approvePermissionsBuildConsentMessageIcrc1Transfer(): Promise<void> {
     const partyUserId = await this.getUserId();
 
-    await expect(this.page.getByTestId('build-consent-message-button')).toBeVisible();
+    await expect(this.page.getByTestId('build-icrc1-transfer-button')).toBeVisible();
 
-    await this.page.getByTestId('build-consent-message-button').click();
+    await this.page.getByTestId('build-icrc1-transfer-button').click();
 
     await this.#walletPage?.approveCallCanisterPermission();
 
@@ -208,6 +208,24 @@ export class PartyPage extends IdentityPage {
       partyUserId,
       tokenSymbol: 'TKN',
       fn: mockConsentMessageIcrc1Transfer
+    });
+  }
+
+  async approvePermissionsBuildConsentMessageIcrc2Approve(): Promise<void> {
+    const partyUserId = await this.getUserId();
+
+    await expect(this.page.getByTestId('build-icrc2-approve-button')).toBeVisible();
+
+    await this.page.getByTestId('build-icrc2-approve-button').click();
+
+    await this.#walletPage?.approveCallCanisterPermission();
+
+    await this.#walletPage?.assertConsentMessageLoading();
+
+    await this.#walletPage?.assertConsentMessage({
+      partyUserId,
+      tokenSymbol: 'TKN',
+      fn: mockConsentMessageIcrc2Approve
     });
   }
 
