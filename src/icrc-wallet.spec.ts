@@ -14,7 +14,8 @@ import {
   mockIcrc2ApproveLocalBlockHeight,
   mockIcrc2ApproveLocalCallParams,
   mockIcrc2ApproveLocalCallResult,
-  mockIcrc2ApproveLocalCallTime, mockIcrc2ApproveLocalIcRootKey,
+  mockIcrc2ApproveLocalCallTime,
+  mockIcrc2ApproveLocalIcRootKey,
   mockIcrc2ApproveLocalRelyingPartyPrincipal
 } from './mocks/icrc2-approve-call-utils.mocks';
 import {RelyingPartyOptions} from './types/relying-party-options';
@@ -140,7 +141,9 @@ describe('icrc-wallet', () => {
       // @ts-expect-error we mock call for testing purposes
       icrcWallet.call = mockCall;
 
-      vi.spyOn(callUtils, 'decodeResponse').mockResolvedValue({Ok: mockLocalBlockHeight});
+      const spy = vi
+        .spyOn(callUtils, 'decodeResponse')
+        .mockResolvedValue({Ok: mockLocalBlockHeight});
 
       const owner = Ed25519KeyIdentity.generate().getPrincipal().toText();
 
@@ -152,6 +155,8 @@ describe('icrc-wallet', () => {
           sender: owner
         }
       });
+
+      spy.mockRestore();
     });
 
     it('should call `call` with the specific options', async () => {
@@ -160,7 +165,9 @@ describe('icrc-wallet', () => {
       // @ts-expect-error we mock call for testing purposes
       icrcWallet.call = mockCall;
 
-      vi.spyOn(callUtils, 'decodeResponse').mockResolvedValue({Ok: mockLocalBlockHeight});
+      const spy = vi
+        .spyOn(callUtils, 'decodeResponse')
+        .mockResolvedValue({Ok: mockLocalBlockHeight});
 
       const options = {
         pollingIntervalInMilliseconds: 600,
@@ -178,6 +185,8 @@ describe('icrc-wallet', () => {
         params: mockIcrcLocalCallParams,
         options
       });
+
+      spy.mockRestore();
     });
 
     it('should call decode response with the specific host', async () => {
@@ -201,6 +210,8 @@ describe('icrc-wallet', () => {
           host: mockParameters.host
         })
       );
+
+      spy.mockRestore();
     });
   });
 
@@ -249,7 +260,7 @@ describe('icrc-wallet', () => {
       // @ts-expect-error we mock call for testing purposes
       icrcWallet.call = mockCall;
 
-      vi.spyOn(callUtils, 'decodeResponse').mockResolvedValue({
+      const spy = vi.spyOn(callUtils, 'decodeResponse').mockResolvedValue({
         Ok: mockIcrc2ApproveLocalBlockHeight
       });
 
@@ -263,6 +274,8 @@ describe('icrc-wallet', () => {
           sender: owner
         }
       });
+
+      spy.mockRestore();
     });
 
     it('should call `call` with the specific options', async () => {
@@ -271,7 +284,7 @@ describe('icrc-wallet', () => {
       // @ts-expect-error we mock call for testing purposes
       icrcWallet.call = mockCall;
 
-      vi.spyOn(callUtils, 'decodeResponse').mockResolvedValue({
+      const spy = vi.spyOn(callUtils, 'decodeResponse').mockResolvedValue({
         Ok: mockIcrc2ApproveLocalBlockHeight
       });
 
@@ -291,6 +304,8 @@ describe('icrc-wallet', () => {
         params: mockIcrc2ApproveLocalCallParams,
         options
       });
+
+      spy.mockRestore();
     });
 
     it('should call decode response with the specific host', async () => {
@@ -314,6 +329,8 @@ describe('icrc-wallet', () => {
           host: mockParameters.host
         })
       );
+
+      spy.mockRestore();
     });
   });
 });
