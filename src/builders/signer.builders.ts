@@ -51,14 +51,12 @@ export const buildContentMessageIcrc1Transfer: SignerBuilderFn = async ({
     });
 
     const {
-      core: {amount: amountLabel, from, to, fee: feeLabel, memo: memoLabel},
+      core: {amount: amountLabel, from, to, fee: feeLabel},
       icrc1_transfer: {title, from_subaccount: fromSubaccountLabel}
     } = en;
 
     // Title
     const message = [`# ${title}`];
-
-    const section = (text: string): string => `**${text}:**`;
 
     // - Amount
     message.push(
@@ -88,14 +86,12 @@ export const buildContentMessageIcrc1Transfer: SignerBuilderFn = async ({
     );
 
     // - Memo
-    const nullishMemo = fromNullable(memo);
-    if (nonNullish(nullishMemo)) {
-      message.push(
-        `${section(memoLabel)}\n0x${uint8ArrayToHexString(nullishMemo instanceof Uint8Array ? nullishMemo : arrayOfNumberToUint8Array(nullishMemo))}`
-      );
-    }
+    const memoMessage = buildMemo({
+      memo,
+      en
+    });
 
-    return {message};
+    return {message: [...message, ...memoMessage]};
   };
 
   return await buildContentMessage(build);
@@ -121,7 +117,7 @@ export const buildContentMessageIcrc1Transfer: SignerBuilderFn = async ({
 export const buildContentMessageIcrc2Approve: SignerBuilderFn = async ({
   arg,
   owner,
-  token: {symbol: tokenSymbol, decimals: tokenDecimals, fee: tokenFee}
+  token: {symbol: tokenSymbol, decimals: tokenDecimals}
 }): Promise<SignerBuildersResult> => {
   const build = (en: I18n): {message: string[]} => {
     const {
@@ -130,7 +126,8 @@ export const buildContentMessageIcrc2Approve: SignerBuilderFn = async ({
       amount,
       expected_allowance,
       expires_at,
-      fee: approveFee
+      fee: approveFee,
+      memo
     } = decodeIdl<IcrcApproveArgs>({
       recordClass: ApproveArgs,
       bytes: arg
@@ -155,8 +152,6 @@ export const buildContentMessageIcrc2Approve: SignerBuilderFn = async ({
 
     // Title
     const message = [`# ${title}`];
-
-    const section = (text: string): string => `**${text}:**`;
 
     // - Spender
     const spenderAccount = encodeIcrcAccount({
@@ -213,12 +208,34 @@ export const buildContentMessageIcrc2Approve: SignerBuilderFn = async ({
       `${section(isNullish(fromNullishSubaccount) ? approverFeeOwner : approverFeeSubaccount)}\n${fromAccount}`
     );
 
-    // TODO: memo
+    // - Memo
+    const memoMessage = buildMemo({
+      memo,
+      en
+    });
 
-    return {message};
+    return {message: [...message, ...memoMessage]};
   };
 
   return await buildContentMessage(build);
+};
+
+const section = (text: string): string => `**${text}:**`;
+
+const buildMemo = ({memo, en}: {memo: [] | [Uint8Array | number[]]; en: I18n}): [] | [string] => {
+  const nullishMemo = fromNullable(memo);
+
+  if (isNullish(nullishMemo)) {
+    return [];
+  }
+
+  const {
+    core: {memo: memoLabel}
+  } = en;
+
+  return [
+    `${section(memoLabel)}\n0x${uint8ArrayToHexString(nullishMemo instanceof Uint8Array ? nullishMemo : arrayOfNumberToUint8Array(nullishMemo))}`
+  ];
 };
 
 const buildContentMessage = async (
