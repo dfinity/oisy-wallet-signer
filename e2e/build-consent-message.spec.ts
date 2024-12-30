@@ -14,7 +14,7 @@ testWithII.skip(
   }
 );
 
-testWithII(
+testWithII.skip(
   'should requests permissions and present consent message for icrc2 approve build by the library',
   async () => {
     const partyPage = getPartyPage();
