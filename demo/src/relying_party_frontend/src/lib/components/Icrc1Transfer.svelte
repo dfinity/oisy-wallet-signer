@@ -56,7 +56,7 @@
 </script>
 
 {#if nonNullish(result)}
-	<Button onclick={onreset} testId="reset-call-canister-button">Reset icrc1_transfer</Button>
+	<Button onclick={onreset} testId="reset-icrc1-transfer-button">Reset icrc1_transfer</Button>
 {:else}
-	<Button {onclick} testId="call-canister-button">icrc1_transfer</Button>
+	<Button {onclick} testId="call-icrc1-transfer-button">icrc1_transfer</Button>
 {/if}
