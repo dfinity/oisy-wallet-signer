@@ -279,7 +279,7 @@ describe('icrc-wallet', () => {
           .spyOn(callUtils, 'decodeResponse')
           .mockResolvedValue({Ok: mockLocalBlockHeight});
 
-      await icrcWallet.transfer({
+      await icrcWallet.approve({
         params,
         owner: sender,
         ledgerCanisterId: mockLedgerCanisterId

@@ -7,9 +7,9 @@ import {
   toApproveArgs,
   toTransferArg
 } from '@dfinity/ledger-icrc';
+import {ApproveError} from '@dfinity/ledger-icrc/dist/candid/icrc_ledger';
 import {TransferArgs, TransferResult} from './constants/icrc-1.idl.constants';
 import {ApproveArgs, ApproveResult} from './constants/icrc-2.idl.constants';
-import {ApproveError} from './declarations/icrc-2';
 import type {
   IcrcAccount,
   IcrcCallCanisterRequestParams,
