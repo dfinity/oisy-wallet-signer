@@ -6,9 +6,8 @@
 	import Value from '$core/components/Value.svelte';
 	import { accountsStore } from '$lib/stores/accounts.store';
 	import { authStore } from '$core/stores/auth.store';
-	import type { BlockHeight, Icrc1TransferRequest } from '@dfinity/ledger-icp';
+	import type { Icrc1TransferRequest } from '@dfinity/ledger-icp';
 	import { E8S_PER_ICP } from '$core/constants/app.constants';
-	import { emit } from '$core/utils/events.utils';
 
 	type Props = {
 		wallet: IcpWallet | undefined;
@@ -16,7 +15,8 @@
 
 	let { wallet }: Props = $props();
 
-	let result = $state<BlockHeight | undefined>(undefined);
+	const INVALID_LEDGER_CANISTER_ID = import.meta.env.VITE_SATELLITE_ID;
+	console.log(INVALID_LEDGER_CANISTER_ID);
 
 	const onclick = async () => {
 		// TODO: handle errors
@@ -38,31 +38,18 @@
 			amount: 1n * (E8S_PER_ICP / 2n)
 		};
 
-		result = await wallet?.icrc1Transfer({
+		await wallet?.icrc1Transfer({
 			owner: account.owner,
-			request
+			request,
+			ledgerCanisterId: INVALID_LEDGER_CANISTER_ID
 		});
-
-		setTimeout(() => {
-			emit({
-				message: 'oisyDemoReloadBalance'
-			});
-		}, 2000);
-	};
-
-	const onreset = async () => {
-		result = undefined;
 	};
 </script>
 
 {#if nonNullish(wallet) && nonNullish($accountsStore)}
 	<div in:fade class="mt-4">
-		<Value id="call-canister" testId="call-canister" title="Call Canister">
-			{#if nonNullish(result)}
-				<Button onclick={onreset} testId="reset-call-canister-button">Reset result</Button>
-			{:else}
-				<Button {onclick} testId="call-canister-button">Execute</Button>
-			{/if}
+		<Value id="build-consent-message" testId="build-consent-message" title="Build Consent Message">
+			<Button {onclick} testId="build-consent-message-button">Build</Button>
 		</Value>
 	</div>
 {/if}
