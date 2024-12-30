@@ -8,6 +8,7 @@ import * as signerHandlers from '../handlers/signer.handlers';
 import {mockCallCanisterParams} from '../mocks/call-canister.mocks';
 import {mockCanisterCallSuccess, mockConsentInfo} from '../mocks/consent-message.mocks';
 import {mockPrincipalText} from '../mocks/icrc-accounts.mocks';
+import {mockIcrcApproveArg} from '../mocks/icrc-approve.mocks';
 import {mockIcrcLocalCallParams} from '../mocks/icrc-call-utils.mocks';
 import {mockIcrcLedgerMetadata} from '../mocks/icrc-ledger.mocks';
 import {mockErrorNotify} from '../mocks/signer-error.mocks';
@@ -379,7 +380,10 @@ describe('Signer services', () => {
         spySignerApiLedgerMedatada = vi.spyOn(SignerApi.prototype, 'ledgerMetadata');
       });
 
-      describe.each(['icrc1_transfer', 'icrc2_approve'])('With fallback for $method', (method) => {
+      describe.each([
+        {method: 'icrc1_transfer', arg: mockIcrcLocalCallParams.arg},
+        {method: 'icrc2_approve', arg: mockIcrcApproveArg}
+      ])('With fallback for $method', ({method, arg}) => {
         it('should return approved when user approves the consent message that was built', async () => {
           spyIcrc21CanisterConsentMessage.mockRejectedValue(new Error('Test Error'));
           spySignerApiLedgerMedatada.mockResolvedValue(mockIcrcLedgerMetadata);
@@ -395,7 +399,7 @@ describe('Signer services', () => {
             params: {
               ...params,
               method,
-              arg: mockIcrcLocalCallParams.arg
+              arg
             },
             prompt,
             options: signerOptions
@@ -408,7 +412,7 @@ describe('Signer services', () => {
             canisterId: params.canisterId,
             request: {
               method,
-              arg: base64ToUint8Array(mockIcrcLocalCallParams.arg),
+              arg: base64ToUint8Array(arg),
               user_preferences: {
                 metadata: {language: 'en', utc_offset_minutes: []},
                 device_spec: []
