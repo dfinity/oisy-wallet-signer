@@ -3,12 +3,12 @@ import {initTestSuite} from './utils/init.utils';
 
 const getPartyPage = initTestSuite();
 
-testWithII('should call canister to transfer some ICP', async () => {
+testWithII('should call canister to request an approval of some ICP', async () => {
   const partyPage = getPartyPage();
 
   await partyPage.approvePermissionsAccounts();
 
-  await partyPage.approvePermissionsConsentMessage();
+  await partyPage.approvePermissionsConsentMessageIcrc2Approve();
 
-  await partyPage.callCanister();
+  await partyPage.icrc2Approve();
 });
