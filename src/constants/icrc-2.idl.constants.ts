@@ -20,6 +20,16 @@ export const ApproveArgs = IDL.Record({
   spender: Account
 });
 
+export const TransferFromArgs = IDL.Record({
+  to: Account,
+  fee: IDL.Opt(IDL.Nat),
+  spender_subaccount: IDL.Opt(IDL.Vec(IDL.Nat8)),
+  from: Account,
+  memo: IDL.Opt(IDL.Vec(IDL.Nat8)),
+  created_at_time: IDL.Opt(IDL.Nat64),
+  amount: IDL.Nat
+});
+
 const ApproveError = IDL.Variant({
   GenericError: IDL.Record({
     message: IDL.Text,
@@ -35,4 +45,20 @@ const ApproveError = IDL.Variant({
   InsufficientFunds: IDL.Record({balance: IDL.Nat})
 });
 
+const TransferFromError = IDL.Variant({
+  GenericError: IDL.Record({
+    message: IDL.Text,
+    error_code: IDL.Nat
+  }),
+  TemporarilyUnavailable: IDL.Null,
+  InsufficientAllowance: IDL.Record({allowance: IDL.Nat}),
+  BadBurn: IDL.Record({min_burn_amount: IDL.Nat}),
+  Duplicate: IDL.Record({duplicate_of: IDL.Nat}),
+  BadFee: IDL.Record({expected_fee: IDL.Nat}),
+  CreatedInFuture: IDL.Record({ledger_time: IDL.Nat64}),
+  TooOld: IDL.Null,
+  InsufficientFunds: IDL.Record({balance: IDL.Nat})
+});
+
 export const ApproveResult = IDL.Variant({Ok: IDL.Nat, Err: ApproveError});
+export const TransferFromResult = IDL.Variant({Ok: IDL.Nat, Err: TransferFromError});

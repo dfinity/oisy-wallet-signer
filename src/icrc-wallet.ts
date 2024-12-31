@@ -3,13 +3,20 @@ import {
   IcrcBlockIndex,
   IcrcTransferError,
   IcrcTransferVariatError,
+  TransferFromParams,
   TransferParams,
   toApproveArgs,
-  toTransferArg
+  toTransferArg,
+  toTransferFromArgs
 } from '@dfinity/ledger-icrc';
-import {ApproveError} from '@dfinity/ledger-icrc/dist/candid/icrc_ledger';
+import type {ApproveError, TransferFromError} from '@dfinity/ledger-icrc/dist/candid/icrc_ledger';
 import {TransferArgs, TransferResult} from './constants/icrc-1.idl.constants';
-import {ApproveArgs, ApproveResult} from './constants/icrc-2.idl.constants';
+import {
+  ApproveArgs,
+  ApproveResult,
+  TransferFromArgs,
+  TransferFromResult
+} from './constants/icrc-2.idl.constants';
 import type {
   IcrcAccount,
   IcrcCallCanisterRequestParams,
@@ -83,7 +90,7 @@ export class IcrcWallet extends RelyingParty {
       options
     });
 
-    type TransferResult = {Ok: IcrcBlockIndex} | {Err: ApproveError};
+    type TransferResult = {Ok: IcrcBlockIndex} | {Err: IcrcTransferVariatError};
 
     const response = await decodeResponse<TransferResult>({
       params: callParams,
@@ -131,7 +138,7 @@ export class IcrcWallet extends RelyingParty {
       options
     });
 
-    type ApproveResult = {Ok: IcrcBlockIndex} | {Err: IcrcTransferVariatError};
+    type ApproveResult = {Ok: IcrcBlockIndex} | {Err: ApproveError};
 
     const response = await decodeResponse<ApproveResult>({
       params: callParams,
@@ -144,6 +151,54 @@ export class IcrcWallet extends RelyingParty {
       throw new IcrcTransferError({
         errorType: response.Err,
         msg: 'Failed to entitle the spender to transfer the amount'
+      });
+    }
+
+    return response.Ok;
+  };
+
+  transferFrom = async ({
+    params,
+    owner,
+    ledgerCanisterId: canisterId,
+    options
+  }: {
+    params: TransferFromParams;
+    ledgerCanisterId: PrincipalText;
+    options?: RelyingPartyRequestOptions;
+  } & Pick<IcrcAccount, 'owner'>): Promise<IcrcBlockIndex> => {
+    const rawArgs = toTransferFromArgs(params);
+
+    const arg = encodeIdl({
+      recordClass: TransferFromArgs,
+      rawArgs
+    });
+
+    const callParams: IcrcCallCanisterRequestParams = {
+      sender: owner,
+      method: 'icrc2_transfer_from',
+      canisterId,
+      arg
+    };
+
+    const callResult = await this.call({
+      params: callParams,
+      options
+    });
+
+    type TransferFromResult = {Ok: IcrcBlockIndex} | {Err: TransferFromError};
+
+    const response = await decodeResponse<TransferFromResult>({
+      params: callParams,
+      result: callResult,
+      resultRecordClass: TransferFromResult,
+      host: this.host
+    });
+
+    if ('Err' in response) {
+      throw new IcrcTransferError({
+        errorType: response.Err,
+        msg: 'Failed to transfer from'
       });
     }
 
