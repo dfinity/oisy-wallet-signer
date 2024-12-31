@@ -156,9 +156,9 @@ export class PartyPage extends IdentityPage {
   async approvePermissionsConsentMessage(): Promise<void> {
     const partyUserId = await this.getUserId();
 
-    await expect(this.page.getByTestId('call-canister-button')).toBeVisible();
+    await expect(this.page.getByTestId('call-icrc1-transfer-button')).toBeVisible();
 
-    await this.page.getByTestId('call-canister-button').click();
+    await this.page.getByTestId('call-icrc1-transfer-button').click();
 
     await this.#walletPage?.approveCallCanisterPermission();
 
