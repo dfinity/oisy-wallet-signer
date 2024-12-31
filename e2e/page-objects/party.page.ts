@@ -3,7 +3,8 @@ import {expect} from '@playwright/test';
 import {IcrcPermissionState, IcrcScopedMethod} from '../../src';
 import {
   mockConsentMessageIcrc1Transfer,
-  mockConsentMessageIcrc2Approve
+  mockConsentMessageIcrc2Approve,
+  mockConsentMessageIcrc2TransferFrom
 } from '../mocks/consent-message.mocks';
 import {waitForFadeAnimation} from '../utils/test.utils';
 import {IdentityPage, IdentityPageParams} from './identity.page';
@@ -193,6 +194,22 @@ export class PartyPage extends IdentityPage {
     });
   }
 
+  async approveConsentMessageIcrc2TransferFrom(): Promise<void> {
+    const partyUserId = await this.getUserId();
+
+    await expect(this.page.getByTestId('call-icrc2-transfer-from-button')).toBeVisible();
+
+    await this.page.getByTestId('call-icrc2-transfer-from-button').click();
+
+    await this.#walletPage?.assertConsentMessageLoading();
+
+    await this.#walletPage?.assertConsentMessage({
+      partyUserId,
+      tokenSymbol: 'ICP',
+      fn: mockConsentMessageIcrc2TransferFrom
+    });
+  }
+
   async approvePermissionsBuildConsentMessageIcrc1Transfer(): Promise<void> {
     const partyUserId = await this.getUserId();
 
@@ -242,15 +259,21 @@ export class PartyPage extends IdentityPage {
   }
 
   async icrc2Approve(): Promise<void> {
+    await this.#walletPage?.approveConsentMessage();
+
+    await this.assertBalance('0.0000');
+  }
+
+  async icrc2TransferFrom(): Promise<void> {
     await this.#walletPage?.getICP();
 
     await this.#walletPage?.assertBalance('55.0001');
 
     await this.#walletPage?.approveConsentMessage();
 
-    await this.#walletPage?.assertBalance('55.0001');
+    await this.#walletPage?.assertBalance('54.7500');
 
-    await this.assertBalance('0.0000');
+    await this.assertBalance('0.2500');
   }
 
   async closeWalletWindow(): Promise<void> {

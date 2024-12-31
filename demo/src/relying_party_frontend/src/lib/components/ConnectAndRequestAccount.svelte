@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
+	import { IcrcWallet } from '@dfinity/oisy-wallet-signer/icrc-wallet';
 	import { WALLET_URL } from '$core/constants/app.constants';
 	import { alertStore } from '$core/stores/alert.store';
 	import type { IcrcAccount } from '@dfinity/oisy-wallet-signer';
@@ -12,10 +12,10 @@
 	let { account = $bindable() }: Props = $props();
 
 	const onclick = async () => {
-		let wallet: IcpWallet | undefined;
+		let wallet: IcrcWallet | undefined;
 
 		try {
-			wallet = await IcpWallet.connect({
+			wallet = await IcrcWallet.connect({
 				url: WALLET_URL
 			});
 

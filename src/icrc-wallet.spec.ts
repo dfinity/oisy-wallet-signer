@@ -1,5 +1,5 @@
 import {Ed25519KeyIdentity} from '@dfinity/identity';
-import {ApproveParams, TransferParams} from '@dfinity/ledger-icrc';
+import {ApproveParams, TransferFromParams, TransferParams} from '@dfinity/ledger-icrc';
 import {toNullable} from '@dfinity/utils';
 import {IcrcWallet} from './icrc-wallet';
 import {
@@ -15,9 +15,14 @@ import {
   mockIcrc2ApproveLocalCallParams,
   mockIcrc2ApproveLocalCallResult,
   mockIcrc2ApproveLocalCallTime,
-  mockIcrc2ApproveLocalIcRootKey,
-  mockIcrc2ApproveLocalRelyingPartyPrincipal
-} from './mocks/icrc2-approve-call-utils.mocks';
+  mockIcrc2LocalIcRootKey,
+  mockIcrc2LocalRelyingPartyPrincipal,
+  mockIcrc2LocalWalletPrincipal,
+  mockIcrc2TransferFromLocalBlockHeight,
+  mockIcrc2TransferFromLocalCallParams,
+  mockIcrc2TransferFromLocalCallResult,
+  mockIcrc2TransferFromLocalCallTime
+} from './mocks/icrc2-call-utils.mocks';
 import {RelyingPartyOptions} from './types/relying-party-options';
 import {JSON_RPC_VERSION_2} from './types/rpc';
 import * as callUtils from './utils/call.utils';
@@ -216,7 +221,7 @@ describe('icrc-wallet', () => {
   describe('approve', () => {
     const params: ApproveParams = {
       spender: {
-        owner: mockIcrc2ApproveLocalRelyingPartyPrincipal,
+        owner: mockIcrc2LocalRelyingPartyPrincipal,
         subaccount: toNullable()
       },
       amount: 50000000n,
@@ -228,7 +233,7 @@ describe('icrc-wallet', () => {
     beforeEach(() => {
       vi.setSystemTime(mockIcrc2ApproveLocalCallTime);
 
-      mocks.getRootKey.mockReturnValue(mockIcrc2ApproveLocalIcRootKey);
+      mocks.getRootKey.mockReturnValue(mockIcrc2LocalIcRootKey);
     });
 
     it('should call `call` with the correct parameters when approve is invoked', async () => {
@@ -317,6 +322,128 @@ describe('icrc-wallet', () => {
         .mockResolvedValue({Ok: mockIcrc2ApproveLocalBlockHeight});
 
       await icrcWallet.approve({
+        params,
+        owner: sender,
+        ledgerCanisterId: mockLedgerCanisterId
+      });
+
+      expect(spy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          host: mockParameters.host
+        })
+      );
+
+      spy.mockRestore();
+    });
+  });
+
+  describe('transferFrom', () => {
+    const params: TransferFromParams = {
+      from: {
+        owner: mockIcrc2LocalWalletPrincipal,
+        subaccount: toNullable()
+      },
+      to: {
+        owner: mockIcrc2LocalRelyingPartyPrincipal,
+        subaccount: toNullable()
+      },
+      amount: 25000000n
+    };
+
+    const {sender} = mockIcrc2TransferFromLocalCallParams;
+
+    beforeEach(() => {
+      vi.setSystemTime(mockIcrc2TransferFromLocalCallTime);
+
+      mocks.getRootKey.mockReturnValue(mockIcrc2LocalIcRootKey);
+    });
+
+    it('should call `call` with the correct parameters when transferFrom is invoked', async () => {
+      const mockCall = vi.fn().mockResolvedValue(mockIcrc2TransferFromLocalCallResult);
+
+      // @ts-expect-error we mock call for testing purposes
+      icrcWallet.call = mockCall;
+
+      const result = await icrcWallet.transferFrom({
+        params,
+        owner: sender,
+        ledgerCanisterId: mockLedgerCanisterId
+      });
+
+      expect(result).toEqual(mockIcrc2TransferFromLocalBlockHeight);
+
+      expect(mockCall).toHaveBeenCalledWith({
+        params: {
+          ...mockIcrc2TransferFromLocalCallParams
+        }
+      });
+    });
+
+    it('should call `call` with the specific sender', async () => {
+      const mockCall = vi.fn().mockResolvedValue({});
+
+      // @ts-expect-error we mock call for testing purposes
+      icrcWallet.call = mockCall;
+
+      const spy = vi.spyOn(callUtils, 'decodeResponse').mockResolvedValue({
+        Ok: mockIcrc2TransferFromLocalBlockHeight
+      });
+
+      const owner = Ed25519KeyIdentity.generate().getPrincipal().toText();
+
+      await icrcWallet.transferFrom({params, owner, ledgerCanisterId: mockLedgerCanisterId});
+
+      expect(mockCall).toHaveBeenCalledWith({
+        params: {
+          ...mockIcrc2TransferFromLocalCallParams,
+          sender: owner
+        }
+      });
+
+      spy.mockRestore();
+    });
+
+    it('should call `call` with the specific options', async () => {
+      const mockCall = vi.fn().mockResolvedValue({});
+
+      // @ts-expect-error we mock call for testing purposes
+      icrcWallet.call = mockCall;
+
+      const spy = vi.spyOn(callUtils, 'decodeResponse').mockResolvedValue({
+        Ok: mockIcrc2TransferFromLocalBlockHeight
+      });
+
+      const options = {
+        pollingIntervalInMilliseconds: 600,
+        timeoutInMilliseconds: 120000
+      };
+
+      await icrcWallet.transferFrom({
+        params,
+        owner: sender,
+        options,
+        ledgerCanisterId: mockLedgerCanisterId
+      });
+
+      expect(mockCall).toHaveBeenCalledWith({
+        params: mockIcrc2TransferFromLocalCallParams,
+        options
+      });
+
+      spy.mockRestore();
+    });
+
+    it('should call decode response with the specific host', async () => {
+      const mockCall = vi.fn().mockResolvedValue({});
+
+      // @ts-expect-error we mock call for testing purposes
+      icrcWallet.call = mockCall;
+
+      const spy = vi
+        .spyOn(callUtils, 'decodeResponse')
+        .mockResolvedValue({Ok: mockIcrc2TransferFromLocalBlockHeight});
+
+      await icrcWallet.transferFrom({
         params,
         owner: sender,
         ledgerCanisterId: mockLedgerCanisterId

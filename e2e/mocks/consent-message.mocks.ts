@@ -49,3 +49,28 @@ No expiration.
  
 **Transaction fees to be paid by:**
 ${walletUserId}`;
+
+export const mockConsentMessageIcrc2TransferFrom = ({
+  walletUserId,
+  partyUserId,
+  tokenSymbol
+}: {
+  walletUserId: string;
+  partyUserId: string;
+  tokenSymbol: 'ICP' | 'TKN';
+}): string => `# Transfer from a withdrawal account
+
+**Withdrawal account:**
+${walletUserId}
+
+**Account sending the transfer request:**
+${walletUserId}
+
+**Amount to withdraw:**
+0.25 ${tokenSymbol}
+
+**To:**
+${partyUserId}
+
+**Fee paid by withdrawal account:**
+0.0001 ${tokenSymbol}`;

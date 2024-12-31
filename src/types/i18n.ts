@@ -32,11 +32,22 @@ export const i18nIcrc2_approveSchema = z
   })
   .strict();
 
+export const i18nIcrc2_transfer_fromSchema = z
+  .object({
+    title: z.string(),
+    withdrawal_account: z.string(),
+    sending_the_transfer_request: z.object({subaccount: z.string(), account: z.string()}),
+    amount_to_withdraw: z.string(),
+    fee_paid_by_withdrawal_account: z.string()
+  })
+  .strict();
+
 export const i18Schema = z
   .object({
     core: i18nCoreSchema,
     icrc1_transfer: i18nIcrc1_transferSchema,
-    icrc2_approve: i18nIcrc2_approveSchema
+    icrc2_approve: i18nIcrc2_approveSchema,
+    icrc2_transfer_from: i18nIcrc2_transfer_fromSchema
   })
   .strict();
 

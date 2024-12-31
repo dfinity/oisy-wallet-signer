@@ -29,5 +29,15 @@
       "subaccount": "Transaction fees to be paid by your subaccount",
       "owner": "Transaction fees to be paid by"
     }
+  },
+  "icrc2_transfer_from": {
+    "title": "Transfer from a withdrawal account",
+    "withdrawal_account": "Withdrawal account",
+    "sending_the_transfer_request": {
+      "subaccount": "Subaccount sending the transfer request",
+      "account": "Account sending the transfer request"
+    },
+    "amount_to_withdraw": "Amount to withdraw",
+    "fee_paid_by_withdrawal_account": "Fee paid by withdrawal account"
   }
 }

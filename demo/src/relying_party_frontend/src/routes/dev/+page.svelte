@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
-	import { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
+	import { IcrcWallet } from '@dfinity/oisy-wallet-signer/icrc-wallet';
 	import { isNullish } from '@dfinity/utils';
 	import UserId from '$core/components/UserId.svelte';
 	import Value from '$core/components/Value.svelte';
@@ -14,7 +14,7 @@
 	import { authStore } from '$core/stores/auth.store';
 	import BuildConsentMessage from '$lib/components/BuildConsentMessage.svelte';
 
-	let wallet = $state<IcpWallet | undefined>(undefined);
+	let wallet = $state<IcrcWallet | undefined>(undefined);
 
 	$effect(() => {
 		disconnected = false;

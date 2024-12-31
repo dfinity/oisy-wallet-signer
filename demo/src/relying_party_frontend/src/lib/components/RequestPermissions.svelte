@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
+	import type { IcrcWallet } from '@dfinity/oisy-wallet-signer/icrc-wallet';
 	import { nonNullish } from '@dfinity/utils';
 	import { fade } from 'svelte/transition';
 	import Button from '$core/components/Button.svelte';
@@ -9,7 +9,7 @@
 	import { emit } from '$core/utils/events.utils';
 
 	type Props = {
-		wallet: IcpWallet | undefined;
+		wallet: IcrcWallet | undefined;
 	};
 
 	let { wallet }: Props = $props();
