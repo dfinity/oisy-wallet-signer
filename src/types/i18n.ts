@@ -26,7 +26,7 @@ export const i18nIcrc2_approveSchema = z
     your_account: z.string(),
     requested_withdrawal_allowance: z.string(),
     withdrawal_allowance: z.object({some: z.string(), none: z.string()}),
-    expiration_date: z.string(),
+    expiration_date: z.object({title: z.string(), none: z.string()}),
     approval_fee: z.string(),
     approver_account_transaction_fees: z.object({subaccount: z.string(), owner: z.string()})
   })

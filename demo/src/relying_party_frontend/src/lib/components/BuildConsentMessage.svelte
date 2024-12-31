@@ -6,7 +6,7 @@
 	import Value from '$core/components/Value.svelte';
 	import { accountsStore } from '$lib/stores/accounts.store';
 	import { authStore } from '$core/stores/auth.store';
-	import type { Icrc1TransferRequest } from '@dfinity/ledger-icp';
+	import type { Icrc1TransferRequest, Icrc2ApproveRequest } from '@dfinity/ledger-icp';
 	import { E8S_PER_ICP } from '$core/constants/app.constants';
 
 	type Props = {
@@ -16,9 +16,8 @@
 	let { wallet }: Props = $props();
 
 	const INVALID_LEDGER_CANISTER_ID = import.meta.env.VITE_SATELLITE_ID;
-	console.log(INVALID_LEDGER_CANISTER_ID);
 
-	const onclick = async () => {
+	const icrc1Transfer = async () => {
 		// TODO: handle errors
 		if (isNullish($authStore.identity)) {
 			return;
@@ -44,12 +43,43 @@
 			ledgerCanisterId: INVALID_LEDGER_CANISTER_ID
 		});
 	};
+
+	const icrc2Approve = async () => {
+		// TODO: handle errors
+		if (isNullish($authStore.identity)) {
+			return;
+		}
+
+		const account = $accountsStore?.[0];
+
+		if (isNullish(account)) {
+			return;
+		}
+
+		const request: Icrc2ApproveRequest = {
+			spender: {
+				owner: $authStore.identity.getPrincipal(),
+				subaccount: []
+			},
+			amount: 1n * (E8S_PER_ICP / 2n)
+		};
+
+		await wallet?.icrc2Approve({
+			owner: account.owner,
+			request,
+			ledgerCanisterId: INVALID_LEDGER_CANISTER_ID
+		});
+	};
 </script>
 
 {#if nonNullish(wallet) && nonNullish($accountsStore)}
 	<div in:fade class="mt-4">
 		<Value id="build-consent-message" testId="build-consent-message" title="Build Consent Message">
-			<Button {onclick} testId="build-consent-message-button">Build</Button>
+			<div class="flex flex-col gap-2 w-fit">
+				<Button onclick={icrc1Transfer} testId="build-icrc1-transfer-button">icrc1_transfer</Button>
+
+				<Button onclick={icrc2Approve} testId="build-icrc2-approve-button">icrc2_approve</Button>
+			</div>
 		</Value>
 	</div>
 {/if}
