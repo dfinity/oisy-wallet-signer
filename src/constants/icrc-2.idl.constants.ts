@@ -20,6 +20,16 @@ export const ApproveArgs = IDL.Record({
   spender: Account
 });
 
+export const TransferFromArgs = IDL.Record({
+  to: Account,
+  fee: IDL.Opt(IDL.Nat),
+  spender_subaccount: IDL.Opt(IDL.Vec(IDL.Nat8)),
+  from: Account,
+  memo: IDL.Opt(IDL.Vec(IDL.Nat8)),
+  created_at_time: IDL.Opt(IDL.Nat64),
+  amount: IDL.Nat
+});
+
 const ApproveError = IDL.Variant({
   GenericError: IDL.Record({
     message: IDL.Text,

@@ -3,12 +3,16 @@ import {encodeIcrcAccount} from '@dfinity/ledger-icrc';
 import {Principal} from '@dfinity/principal';
 import {asciiStringToByteArray, fromNullable} from '@dfinity/utils';
 import {TransferArgs} from '../constants/icrc-1.idl.constants';
-import {ApproveArgs} from '../constants/icrc-2.idl.constants';
+import {ApproveArgs, TransferFromArgs} from '../constants/icrc-2.idl.constants';
 import {TransferArgs as TransferArgsType} from '../declarations/icrc-1';
 import {mockCallCanisterParams} from '../mocks/call-canister.mocks';
 import {mockPrincipalText} from '../mocks/icrc-accounts.mocks';
 import {mockIcrcApproveArg, mockIcrcApproveRawArgs} from '../mocks/icrc-approve.mocks';
 import {mockIcrcLocalCallParams} from '../mocks/icrc-call-utils.mocks';
+import {
+  mockIcrcTransferFromArg,
+  mockIcrcTransferFromRawArgs
+} from '../mocks/icrc-transfer-from.mocks';
 import {
   SignerBuildersResult,
   SignerBuildersResultError,
@@ -16,7 +20,11 @@ import {
 } from '../types/signer-builders';
 import {base64ToUint8Array} from '../utils/base64.utils';
 import {encodeIdl} from '../utils/idl.utils';
-import {buildContentMessageIcrc1Transfer, buildContentMessageIcrc2Approve} from './signer.builders';
+import {
+  buildContentMessageIcrc1Transfer,
+  buildContentMessageIcrc2Approve,
+  buildContentMessageIcrc2TransferFrom
+} from './signer.builders';
 
 describe('Signer builders', () => {
   const owner = Ed25519KeyIdentity.generate();
@@ -535,6 +543,276 @@ Mon, Dec 30, 2024, 08:30:16 UTC
 
 **Transaction fees to be paid by:**
 ${encodeIcrcAccount({owner: owner.getPrincipal()})}`
+      });
+    });
+  });
+
+  describe('icrc2_transfer_from', () => {
+    it('should build a consent message in english', async () => {
+      const result = await buildContentMessageIcrc2TransferFrom({
+        arg: base64ToUint8Array(mockIcrcTransferFromArg),
+        owner: owner.getPrincipal(),
+        token
+      });
+
+      expect('Ok' in result);
+
+      const {Ok} = result as SignerBuildersResultOk;
+
+      expect(Ok.metadata.language).toEqual('en');
+    });
+
+    it('should build a consent message with no utc time information', async () => {
+      const result = await buildContentMessageIcrc2TransferFrom({
+        arg: base64ToUint8Array(mockIcrcTransferFromArg),
+        owner: owner.getPrincipal(),
+        token
+      });
+
+      expect('Ok' in result);
+
+      const {Ok} = result as SignerBuildersResultOk;
+
+      expect(fromNullable(Ok.metadata.utc_offset_minutes)).toBeUndefined();
+    });
+
+    it('should build a consent message for owner', async () => {
+      const result = await buildContentMessageIcrc2TransferFrom({
+        arg: base64ToUint8Array(mockIcrcTransferFromArg),
+        owner: owner.getPrincipal(),
+        token
+      });
+
+      expectMessage({
+        result,
+        expectedMessage: `# Transfer from a withdrawal account
+
+**Withdrawal account:**
+${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.from.owner, subaccount: fromNullable(mockIcrcTransferFromRawArgs.from.subaccount)})}
+
+**Account sending the transfer request:**
+${encodeIcrcAccount({owner: owner.getPrincipal()})}
+
+**Amount to withdraw:**
+3.20678001 TKN
+
+**To:**
+${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.to.owner, subaccount: fromNullable(mockIcrcTransferFromRawArgs.to.subaccount)})}
+
+**Fee paid by withdrawal account:**
+0.0010044 TKN`
+      });
+    });
+
+    it('should build a consent message with a spender subaccount', async () => {
+      const subaccount = [1, 2, 3];
+
+      const arg = encodeIdl({
+        recordClass: TransferFromArgs,
+        rawArgs: {
+          ...mockIcrcTransferFromRawArgs,
+          spender_subaccount: [subaccount]
+        }
+      });
+
+      const result = await buildContentMessageIcrc2TransferFrom({
+        arg: base64ToUint8Array(arg),
+        owner: owner.getPrincipal(),
+        token
+      });
+
+      expectMessage({
+        result,
+        expectedMessage: `# Transfer from a withdrawal account
+
+**Withdrawal account:**
+${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.from.owner, subaccount: fromNullable(mockIcrcTransferFromRawArgs.from.subaccount)})}
+
+**Subaccount sending the transfer request:**
+${encodeIcrcAccount({owner: owner.getPrincipal(), subaccount})}
+
+**Amount to withdraw:**
+3.20678001 TKN
+
+**To:**
+${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.to.owner, subaccount: fromNullable(mockIcrcTransferFromRawArgs.to.subaccount)})}
+
+**Fee paid by withdrawal account:**
+0.0010044 TKN`
+      });
+    });
+
+    it('should build a consent message with a from subaccount', async () => {
+      const subaccount = [1, 2, 3];
+
+      const arg = encodeIdl({
+        recordClass: TransferFromArgs,
+        rawArgs: {
+          ...mockIcrcTransferFromRawArgs,
+          from: {
+            owner: mockIcrcTransferFromRawArgs.from.owner,
+            subaccount: [subaccount]
+          }
+        }
+      });
+
+      const result = await buildContentMessageIcrc2TransferFrom({
+        arg: base64ToUint8Array(arg),
+        owner: owner.getPrincipal(),
+        token
+      });
+
+      expectMessage({
+        result,
+        expectedMessage: `# Transfer from a withdrawal account
+
+**Withdrawal account:**
+${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.from.owner, subaccount})}
+
+**Account sending the transfer request:**
+${encodeIcrcAccount({owner: owner.getPrincipal()})}
+
+**Amount to withdraw:**
+3.20678001 TKN
+
+**To:**
+${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.to.owner, subaccount: fromNullable(mockIcrcTransferFromRawArgs.to.subaccount)})}
+
+**Fee paid by withdrawal account:**
+0.0010044 TKN`
+      });
+    });
+
+    it('should build a consent message with a to subaccount', async () => {
+      const subaccount = [1, 2, 3];
+
+      const arg = encodeIdl({
+        recordClass: TransferFromArgs,
+        rawArgs: {
+          ...mockIcrcTransferFromRawArgs,
+          to: {
+            owner: mockIcrcTransferFromRawArgs.to.owner,
+            subaccount: [subaccount]
+          }
+        }
+      });
+
+      const result = await buildContentMessageIcrc2TransferFrom({
+        arg: base64ToUint8Array(arg),
+        owner: owner.getPrincipal(),
+        token
+      });
+
+      expectMessage({
+        result,
+        expectedMessage: `# Transfer from a withdrawal account
+
+**Withdrawal account:**
+${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.from.owner, subaccount: fromNullable(mockIcrcTransferFromRawArgs.from.subaccount)})}
+
+**Account sending the transfer request:**
+${encodeIcrcAccount({owner: owner.getPrincipal()})}
+
+**Amount to withdraw:**
+3.20678001 TKN
+
+**To:**
+${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.to.owner, subaccount})}
+
+**Fee paid by withdrawal account:**
+0.0010044 TKN`
+      });
+    });
+
+    it('should build a consent message with a memo', async () => {
+      const memo = asciiStringToByteArray('PUPT'); // Reverse top-up memo
+
+      const arg = encodeIdl({
+        recordClass: TransferFromArgs,
+        rawArgs: {
+          ...mockIcrcTransferFromRawArgs,
+          memo: [memo]
+        }
+      });
+
+      const result = await buildContentMessageIcrc2TransferFrom({
+        arg: base64ToUint8Array(arg),
+        owner: owner.getPrincipal(),
+        token
+      });
+
+      expectMessage({
+        result,
+        expectedMessage: `# Transfer from a withdrawal account
+
+**Withdrawal account:**
+${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.from.owner, subaccount: fromNullable(mockIcrcTransferFromRawArgs.from.subaccount)})}
+
+**Account sending the transfer request:**
+${encodeIcrcAccount({owner: owner.getPrincipal()})}
+
+**Amount to withdraw:**
+3.20678001 TKN
+
+**To:**
+${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.to.owner, subaccount: fromNullable(mockIcrcTransferFromRawArgs.to.subaccount)})}
+
+**Fee paid by withdrawal account:**
+0.0010044 TKN
+
+**Memo:**
+0x50555054`
+      });
+    });
+
+    it('should not build a consent message for invalid arg', async () => {
+      const result = await buildContentMessageIcrc2TransferFrom({
+        arg: base64ToUint8Array(mockCallCanisterParams.arg),
+        owner: owner.getPrincipal(),
+        token
+      });
+
+      expect('Ok' in result).toBeFalsy();
+
+      const {Err: err} = result as SignerBuildersResultError;
+
+      expect(err).not.toBeUndefined();
+      expect((err as Error).message).toContain('Wrong magic number');
+    });
+
+    it('should build a consent message with token fee if no fee as arg', async () => {
+      const arg = encodeIdl({
+        recordClass: TransferFromArgs,
+        rawArgs: {
+          ...mockIcrcTransferFromRawArgs,
+          fee: []
+        }
+      });
+
+      const result = await buildContentMessageIcrc2TransferFrom({
+        arg: base64ToUint8Array(arg),
+        owner: owner.getPrincipal(),
+        token
+      });
+
+      expectMessage({
+        result,
+        expectedMessage: `# Transfer from a withdrawal account
+
+**Withdrawal account:**
+${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.from.owner, subaccount: fromNullable(mockIcrcTransferFromRawArgs.from.subaccount)})}
+
+**Account sending the transfer request:**
+${encodeIcrcAccount({owner: owner.getPrincipal()})}
+
+**Amount to withdraw:**
+3.20678001 TKN
+
+**To:**
+${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.to.owner, subaccount: fromNullable(mockIcrcTransferFromRawArgs.to.subaccount)})}
+
+**Fee paid by withdrawal account:**
+0.0001 TKN`
       });
     });
   });
