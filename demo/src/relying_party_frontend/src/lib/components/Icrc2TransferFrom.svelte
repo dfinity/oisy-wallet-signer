@@ -60,7 +60,9 @@
 </script>
 
 {#if nonNullish(result)}
-	<Button onclick={onreset} testId="reset-icrc2-transfer-from-button">Reset icrc2_transfer_from</Button>
+	<Button onclick={onreset} testId="reset-icrc2-transfer-from-button"
+		>Reset icrc2_transfer_from</Button
+	>
 {:else}
 	<Button {onclick} testId="call-icrc2-transfer-from-button">icrc2_transfer_from</Button>
 {/if}
