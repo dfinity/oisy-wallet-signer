@@ -14,3 +14,5 @@ export const E8S_PER_ICP = 100_000_000n;
 
 export const NANO_SECONDS_IN_MILLISECOND = 1_000_000n;
 export const NANO_SECONDS_IN_MINUTE = NANO_SECONDS_IN_MILLISECOND * 1_000n * 60n;
+
+export const ICP_LEDGER_CANISTER_ID = import.meta.env.VITE_ICP_LEDGER_ID;

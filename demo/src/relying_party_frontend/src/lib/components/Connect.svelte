@@ -1,20 +1,20 @@
 <script lang="ts">
 	import Button from '$core/components/Button.svelte';
-	import { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
+	import { IcrcWallet } from '@dfinity/oisy-wallet-signer/icrc-wallet';
 	import { WALLET_URL } from '$core/constants/app.constants';
 	import type { OnDisconnect } from '@dfinity/oisy-wallet-signer';
 
 	type Props = {
-		wallet: IcpWallet | undefined;
+		wallet: IcrcWallet | undefined;
 		onDisconnect: OnDisconnect;
 	};
 
 	let { wallet = $bindable(), onDisconnect }: Props = $props();
 
-	let walletState = $state<IcpWallet | undefined>(undefined);
+	let walletState = $state<IcrcWallet | undefined>(undefined);
 
 	const onclick = async () => {
-		walletState = await IcpWallet.connect({
+		walletState = await IcrcWallet.connect({
 			url: WALLET_URL,
 			onDisconnect
 		});

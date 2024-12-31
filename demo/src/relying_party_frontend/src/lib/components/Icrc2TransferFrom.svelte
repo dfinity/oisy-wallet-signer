@@ -4,8 +4,9 @@
 	import Button from '$core/components/Button.svelte';
 	import { accountsStore } from '$lib/stores/accounts.store';
 	import { authStore } from '$core/stores/auth.store';
-	import type { IcrcBlockIndex, TransferParams } from '@dfinity/ledger-icrc';
+	import type { IcrcBlockIndex, TransferFromParams } from '@dfinity/ledger-icrc';
 	import { E8S_PER_ICP, ICP_LEDGER_CANISTER_ID } from '$core/constants/app.constants';
+	import { Principal } from '@dfinity/principal';
 	import { emit } from '$core/utils/events.utils';
 
 	type Props = {
@@ -28,15 +29,19 @@
 			return;
 		}
 
-		const params: TransferParams = {
+		const params: TransferFromParams = {
+			from: {
+				owner: Principal.fromText(account.owner),
+				subaccount: []
+			},
 			to: {
 				owner: $authStore.identity.getPrincipal(),
 				subaccount: []
 			},
-			amount: 1n * (E8S_PER_ICP / 2n)
+			amount: 1n * (E8S_PER_ICP / 4n)
 		};
 
-		result = await wallet?.transfer({
+		result = await wallet?.transferFrom({
 			ledgerCanisterId: ICP_LEDGER_CANISTER_ID,
 			owner: account.owner,
 			params
@@ -55,7 +60,7 @@
 </script>
 
 {#if nonNullish(result)}
-	<Button onclick={onreset} testId="reset-icrc1-transfer-button">Reset icrc1_transfer</Button>
+	<Button onclick={onreset} testId="reset-icrc2-approve-button">Reset icrc2_transfer_from</Button>
 {:else}
-	<Button {onclick} testId="call-icrc1-transfer-button">icrc1_transfer</Button>
+	<Button {onclick} testId="call-icrc2-approve-button">icrc2_transfer_from</Button>
 {/if}
