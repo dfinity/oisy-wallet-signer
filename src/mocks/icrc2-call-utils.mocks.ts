@@ -2,7 +2,7 @@ import {Principal} from '@dfinity/principal';
 import {IcrcCallCanisterResult} from '../types/icrc-responses';
 import {mockLedgerCanisterId} from './icrc-call-utils.mocks';
 
-export const mockIcrc2ApproveLocalIcRootKey = new Uint8Array([
+export const mockIcrc2LocalIcRootKey = new Uint8Array([
   48, 129, 130, 48, 29, 6, 13, 43, 6, 1, 4, 1, 130, 220, 124, 5, 3, 1, 2, 1, 6, 12, 43, 6, 1, 4, 1,
   130, 220, 124, 5, 3, 2, 1, 3, 97, 0, 129, 6, 102, 63, 3, 53, 55, 129, 51, 203, 97, 190, 30, 2, 63,
   141, 246, 99, 241, 69, 17, 4, 47, 59, 149, 227, 251, 110, 34, 153, 69, 131, 245, 236, 6, 182, 218,
@@ -11,7 +11,7 @@ export const mockIcrc2ApproveLocalIcRootKey = new Uint8Array([
   34, 211, 123, 123, 177, 221, 227, 169, 81, 74, 250, 113, 141, 109, 138, 176
 ]);
 
-export const mockIcrc2ApproveLocalRelyingPartyPrincipal = Principal.fromText(
+export const mockIcrc2LocalRelyingPartyPrincipal = Principal.fromText(
   '6ngla-7dqvy-l73ju-54jt5-a4gvm-itu47-4dpih-e2h55-vtbzn-24yem-sae'
 );
 
