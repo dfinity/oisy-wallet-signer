@@ -1,11 +1,18 @@
 import {
   BlockHeight,
+  Icrc2ApproveRequest,
   mapIcrc1TransferError,
+  mapIcrc2ApproveError,
   toIcrc1TransferRawRequest,
+  toIcrc2ApproveRawRequest,
   type Icrc1TransferRequest
 } from '@dfinity/ledger-icp';
-import {Icrc1TransferResult} from '@dfinity/ledger-icp/dist/candid/ledger';
+import {
+  Icrc1TransferResult,
+  ApproveResult as Icrc2ApproveResult
+} from '@dfinity/ledger-icp/dist/candid/ledger';
 import {TransferArgs, TransferResult} from './constants/icrc-1.idl.constants';
+import {ApproveArgs, ApproveResult} from './constants/icrc-2.idl.constants';
 import {RelyingParty} from './relying-party';
 import type {IcrcAccount} from './types/icrc-accounts';
 import type {IcrcCallCanisterRequestParams} from './types/icrc-requests';
@@ -95,6 +102,55 @@ export class IcpWallet extends RelyingParty {
 
     if ('Err' in response) {
       throw mapIcrc1TransferError(response.Err);
+    }
+
+    return response.Ok;
+  };
+
+  public icrc2Approve = async ({
+    request,
+    owner,
+    ledgerCanisterId,
+    options
+  }: {
+    options?: RelyingPartyRequestOptions;
+    request: Icrc2ApproveRequest;
+    ledgerCanisterId?: PrincipalText;
+  } & Pick<IcrcAccount, 'owner'>): Promise<BlockHeight> => {
+    const rawArgs = toIcrc2ApproveRawRequest(request);
+
+    const arg = encodeIdl({
+      recordClass: ApproveArgs,
+      rawArgs
+    });
+
+    const canisterId = ledgerCanisterId ?? ICP_LEDGER_CANISTER_ID;
+
+    const method = 'icrc2_approve' as const;
+
+    const callParams: IcrcCallCanisterRequestParams = {
+      sender: owner,
+      method,
+      canisterId,
+      arg
+    };
+
+    // TODO: uncomment nonce and add TODO - not yet supported by agent-js
+
+    const callResult = await this.call({
+      params: callParams,
+      options
+    });
+
+    const response = await decodeResponse<Icrc2ApproveResult>({
+      params: callParams,
+      result: callResult,
+      resultRecordClass: ApproveResult,
+      host: this.host
+    });
+
+    if ('Err' in response) {
+      throw mapIcrc2ApproveError(response.Err);
     }
 
     return response.Ok;

@@ -1,11 +1,15 @@
 import {
+  ApproveParams,
   IcrcBlockIndex,
   IcrcTransferError,
   IcrcTransferVariatError,
   TransferParams,
+  toApproveArgs,
   toTransferArg
 } from '@dfinity/ledger-icrc';
+import {ApproveError} from '@dfinity/ledger-icrc/dist/candid/icrc_ledger';
 import {TransferArgs, TransferResult} from './constants/icrc-1.idl.constants';
+import {ApproveArgs, ApproveResult} from './constants/icrc-2.idl.constants';
 import type {
   IcrcAccount,
   IcrcCallCanisterRequestParams,
@@ -79,7 +83,7 @@ export class IcrcWallet extends RelyingParty {
       options
     });
 
-    type TransferResult = {Ok: IcrcBlockIndex} | {Err: IcrcTransferVariatError};
+    type TransferResult = {Ok: IcrcBlockIndex} | {Err: ApproveError};
 
     const response = await decodeResponse<TransferResult>({
       params: callParams,
@@ -92,6 +96,54 @@ export class IcrcWallet extends RelyingParty {
       throw new IcrcTransferError({
         errorType: response.Err,
         msg: 'Failed to transfer'
+      });
+    }
+
+    return response.Ok;
+  };
+
+  approve = async ({
+    params,
+    owner,
+    ledgerCanisterId: canisterId,
+    options
+  }: {
+    params: ApproveParams;
+    ledgerCanisterId: PrincipalText;
+    options?: RelyingPartyRequestOptions;
+  } & Pick<IcrcAccount, 'owner'>): Promise<IcrcBlockIndex> => {
+    const rawArgs = toApproveArgs(params);
+
+    const arg = encodeIdl({
+      recordClass: ApproveArgs,
+      rawArgs
+    });
+
+    const callParams: IcrcCallCanisterRequestParams = {
+      sender: owner,
+      method: 'icrc2_approve',
+      canisterId,
+      arg
+    };
+
+    const callResult = await this.call({
+      params: callParams,
+      options
+    });
+
+    type ApproveResult = {Ok: IcrcBlockIndex} | {Err: IcrcTransferVariatError};
+
+    const response = await decodeResponse<ApproveResult>({
+      params: callParams,
+      result: callResult,
+      resultRecordClass: ApproveResult,
+      host: this.host
+    });
+
+    if ('Err' in response) {
+      throw new IcrcTransferError({
+        errorType: response.Err,
+        msg: 'Failed to entitle the spender to transfer the amount'
       });
     }
 
