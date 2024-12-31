@@ -5,9 +5,9 @@ import {asciiStringToByteArray, fromNullable} from '@dfinity/utils';
 import {TransferArgs} from '../constants/icrc-1.idl.constants';
 import {ApproveArgs} from '../constants/icrc-2.idl.constants';
 import {TransferArgs as TransferArgsType} from '../declarations/icrc-1';
-import {ApproveArgs as ApproveArgsType} from '../declarations/icrc-2';
 import {mockCallCanisterParams} from '../mocks/call-canister.mocks';
 import {mockPrincipalText} from '../mocks/icrc-accounts.mocks';
+import {mockIcrcApproveArg, mockIcrcApproveRawArgs} from '../mocks/icrc-approve.mocks';
 import {mockIcrcLocalCallParams} from '../mocks/icrc-call-utils.mocks';
 import {
   SignerBuildersResult,
@@ -286,28 +286,9 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.t
   });
 
   describe('icrc2_approve', () => {
-    const rawArgs: ApproveArgsType = {
-      amount: 320_000_000_001n,
-      created_at_time: [1727696940356000000n],
-      fee: [100_330n],
-      from_subaccount: [],
-      memo: [],
-      spender: {
-        owner: Principal.fromText(mockPrincipalText),
-        subaccount: []
-      },
-      expected_allowance: [],
-      expires_at: []
-    };
-
     it('should build a consent message in english', async () => {
-      const arg = encodeIdl({
-        recordClass: ApproveArgs,
-        rawArgs
-      });
-
       const result = await buildContentMessageIcrc2Approve({
-        arg: base64ToUint8Array(arg),
+        arg: base64ToUint8Array(mockIcrcApproveArg),
         owner: owner.getPrincipal(),
         token
       });
@@ -320,13 +301,8 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.t
     });
 
     it('should build a consent message with no utc time information', async () => {
-      const arg = encodeIdl({
-        recordClass: ApproveArgs,
-        rawArgs
-      });
-
       const result = await buildContentMessageIcrc2Approve({
-        arg: base64ToUint8Array(arg),
+        arg: base64ToUint8Array(mockIcrcApproveArg),
         owner: owner.getPrincipal(),
         token
       });
@@ -339,13 +315,8 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.t
     });
 
     it('should build a consent message for owner', async () => {
-      const arg = encodeIdl({
-        recordClass: ApproveArgs,
-        rawArgs
-      });
-
       const result = await buildContentMessageIcrc2Approve({
-        arg: base64ToUint8Array(arg),
+        arg: base64ToUint8Array(mockIcrcApproveArg),
         owner: owner.getPrincipal(),
         token
       });
@@ -355,7 +326,7 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.t
         expectedMessage: `# Authorize another address to withdraw from your account
 
 **The following address is allowed to withdraw from your account:**
-${encodeIcrcAccount({owner: rawArgs.spender.owner, subaccount: fromNullable(rawArgs.spender.subaccount)})}
+${encodeIcrcAccount({owner: mockIcrcApproveRawArgs.spender.owner, subaccount: fromNullable(mockIcrcApproveRawArgs.spender.subaccount)})}
 
 **Your account:**
 ${encodeIcrcAccount({owner: owner.getPrincipal()})}
@@ -379,7 +350,7 @@ ${encodeIcrcAccount({owner: owner.getPrincipal()})}`
       const arg = encodeIdl({
         recordClass: ApproveArgs,
         rawArgs: {
-          ...rawArgs,
+          ...mockIcrcApproveRawArgs,
           from_subaccount: [subaccount]
         }
       });
@@ -395,7 +366,7 @@ ${encodeIcrcAccount({owner: owner.getPrincipal()})}`
         expectedMessage: `# Authorize another address to withdraw from your account
 
 **The following address is allowed to withdraw from your account:**
-${encodeIcrcAccount({owner: rawArgs.spender.owner, subaccount: fromNullable(rawArgs.spender.subaccount)})}
+${encodeIcrcAccount({owner: mockIcrcApproveRawArgs.spender.owner, subaccount: fromNullable(mockIcrcApproveRawArgs.spender.subaccount)})}
 
 **Your subaccount:**
 ${encodeIcrcAccount({owner: owner.getPrincipal(), subaccount: subaccount})}
@@ -419,7 +390,7 @@ ${encodeIcrcAccount({owner: owner.getPrincipal(), subaccount: subaccount})}`
       const arg = encodeIdl({
         recordClass: ApproveArgs,
         rawArgs: {
-          ...rawArgs,
+          ...mockIcrcApproveRawArgs,
           memo: [memo]
         }
       });
@@ -435,7 +406,7 @@ ${encodeIcrcAccount({owner: owner.getPrincipal(), subaccount: subaccount})}`
         expectedMessage: `# Authorize another address to withdraw from your account
 
 **The following address is allowed to withdraw from your account:**
-${encodeIcrcAccount({owner: rawArgs.spender.owner, subaccount: fromNullable(rawArgs.spender.subaccount)})}
+${encodeIcrcAccount({owner: mockIcrcApproveRawArgs.spender.owner, subaccount: fromNullable(mockIcrcApproveRawArgs.spender.subaccount)})}
 
 **Your account:**
 ${encodeIcrcAccount({owner: owner.getPrincipal()})}
@@ -477,7 +448,7 @@ ${encodeIcrcAccount({owner: owner.getPrincipal()})}
       const arg = encodeIdl({
         recordClass: ApproveArgs,
         rawArgs: {
-          ...rawArgs,
+          ...mockIcrcApproveRawArgs,
           expected_allowance: [expectedAllowance]
         }
       });
@@ -493,7 +464,7 @@ ${encodeIcrcAccount({owner: owner.getPrincipal()})}
         expectedMessage: `# Authorize another address to withdraw from your account
 
 **The following address is allowed to withdraw from your account:**
-${encodeIcrcAccount({owner: rawArgs.spender.owner, subaccount: fromNullable(rawArgs.spender.subaccount)})}
+${encodeIcrcAccount({owner: mockIcrcApproveRawArgs.spender.owner, subaccount: fromNullable(mockIcrcApproveRawArgs.spender.subaccount)})}
 
 **Your account:**
 ${encodeIcrcAccount({owner: owner.getPrincipal()})}
@@ -518,7 +489,7 @@ ${encodeIcrcAccount({owner: owner.getPrincipal()})}`
       const arg = encodeIdl({
         recordClass: ApproveArgs,
         rawArgs: {
-          ...rawArgs,
+          ...mockIcrcApproveRawArgs,
           expires_at: [expiresAt]
         }
       });
@@ -534,7 +505,7 @@ ${encodeIcrcAccount({owner: owner.getPrincipal()})}`
         expectedMessage: `# Authorize another address to withdraw from your account
 
 **The following address is allowed to withdraw from your account:**
-${encodeIcrcAccount({owner: rawArgs.spender.owner, subaccount: fromNullable(rawArgs.spender.subaccount)})}
+${encodeIcrcAccount({owner: mockIcrcApproveRawArgs.spender.owner, subaccount: fromNullable(mockIcrcApproveRawArgs.spender.subaccount)})}
 
 **Your account:**
 ${encodeIcrcAccount({owner: owner.getPrincipal()})}
