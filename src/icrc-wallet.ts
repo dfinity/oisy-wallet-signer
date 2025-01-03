@@ -59,7 +59,7 @@ export class IcrcWallet extends RelyingParty {
    * @param {Object} params - The transfer parameters.
    * @param {TransferParams} params.params - The object containing transfer details, such as amount and destination.
    * @param {string} params.owner - The owner of the wallet.
-   * @param {PrincipalText} [params.ledgerCanisterId] - Optional ledger canister ID, defaults to the Icrc ledger if not provided.
+   * @param {PrincipalText} [params.ledgerCanisterId] - The ledger canister ID.
    * @param {RelyingPartyRequestOptions} [params.options] - Optional parameters for the request, such as request ID, authorization, or timeout.
    *
    * @returns {Promise<IcrcBlockIndex>} A promise that resolves to the block index of the transfer transaction if successful.
@@ -160,6 +160,19 @@ export class IcrcWallet extends RelyingParty {
     return response.Ok;
   };
 
+  /**
+   * Transfers ICRC tokens from one account to another using an approved allowance.
+   *
+   * @param {Object} params - The transfer-from parameters.
+   * @param {TransferFromParams} params.params - The details of the transfer, including the source, destination, and amount.
+   * @param {string} params.owner - The owner of the wallet initiating the transfer.
+   * @param {PrincipalText} [params.ledgerCanisterId] - Optional ledger canister ID, defaults to the ICRC ledger if not provided.
+   * @param {RelyingPartyRequestOptions} [params.options] - Optional parameters for the request, such as request ID, authorization, or timeout.
+   *
+   * @throws {IcrcTransferError} Throws an error if the transfer fails.
+   *
+   * @returns {Promise<IcrcBlockIndex>} A promise that resolves to the block index of the transfer transaction if successful.
+   */
   transferFrom = async ({
     params,
     owner,
