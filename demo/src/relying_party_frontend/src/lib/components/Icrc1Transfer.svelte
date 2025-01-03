@@ -1,20 +1,20 @@
 <script lang="ts">
-	import type { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
+	import type { IcrcWallet } from '@dfinity/oisy-wallet-signer/icrc-wallet';
 	import { isNullish, nonNullish } from '@dfinity/utils';
 	import Button from '$core/components/Button.svelte';
 	import { accountsStore } from '$lib/stores/accounts.store';
 	import { authStore } from '$core/stores/auth.store';
-	import type { BlockHeight, Icrc1TransferRequest } from '@dfinity/ledger-icp';
-	import { E8S_PER_ICP } from '$core/constants/app.constants';
+	import type { IcrcBlockIndex, TransferParams } from '@dfinity/ledger-icrc';
+	import { E8S_PER_ICP, ICP_LEDGER_CANISTER_ID } from '$core/constants/app.constants';
 	import { emit } from '$core/utils/events.utils';
 
 	type Props = {
-		wallet: IcpWallet | undefined;
+		wallet: IcrcWallet | undefined;
 	};
 
 	let { wallet }: Props = $props();
 
-	let result = $state<BlockHeight | undefined>(undefined);
+	let result = $state<IcrcBlockIndex | undefined>(undefined);
 
 	const onclick = async () => {
 		// TODO: handle errors
@@ -28,7 +28,7 @@
 			return;
 		}
 
-		const request: Icrc1TransferRequest = {
+		const params: TransferParams = {
 			to: {
 				owner: $authStore.identity.getPrincipal(),
 				subaccount: []
@@ -36,9 +36,10 @@
 			amount: 1n * (E8S_PER_ICP / 2n)
 		};
 
-		result = await wallet?.icrc1Transfer({
+		result = await wallet?.transfer({
+			ledgerCanisterId: ICP_LEDGER_CANISTER_ID,
 			owner: account.owner,
-			request
+			params
 		});
 
 		setTimeout(() => {
