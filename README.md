@@ -319,7 +319,7 @@ The flow works as follows:
 As mentioned in the introduction, this library is primarily developed for OISY. However, it also includes opinionated clients that enable interactions with the ICP or ICRC ledgers in any JavaScript application.
 
 > [!IMPORTANT]
-> These clients are not yet used by any known dApps, which is why they currently only support ICRC-1 transfers. If you wish to use other ICRC methods or ICP transfers, please reach out.
+> These clients currently only support ICRC-1 and ICRC-2 methods. If you wish to use other features or ICP transfers, please reach out.
 
 ### 1. Initialize a Wallet
 
