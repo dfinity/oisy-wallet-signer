@@ -101,6 +101,19 @@ export class IcrcWallet extends RelyingParty {
     return response.Ok;
   };
 
+  /**
+   * Approves a spender to transfer a specified amount of ICRC tokens from the owner's account.
+   *
+   * @param {Object} params - The approve parameters.
+   * @param {ApproveParams} params.params - The details of the approval, including the spender's account and amount.
+   * @param {string} params.owner - The owner of the wallet authorizing the spender.
+   * @param {PrincipalText} [params.ledgerCanisterId] - The ledger canister ID.
+   * @param {RelyingPartyRequestOptions} [params.options] - Optional parameters for the request, such as request ID, authorization, or timeout.
+   *
+   * @throws {IcrcTransferError} Throws an error if the approval fails.
+   *
+   * @returns {Promise<IcrcBlockIndex>} A promise that resolves to the block index of the approval transaction if successful.
+   */
   approve = async ({
     params,
     owner,
