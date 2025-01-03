@@ -15,9 +15,9 @@ import {
   mockIcrc2ApproveLocalCallParams,
   mockIcrc2ApproveLocalCallResult,
   mockIcrc2ApproveLocalCallTime,
-  mockIcrc2ApproveLocalIcRootKey,
-  mockIcrc2ApproveLocalRelyingPartyPrincipal
-} from './mocks/icrc2-approve-call-utils.mocks';
+  mockIcrc2LocalIcRootKey,
+  mockIcrc2LocalRelyingPartyPrincipal
+} from './mocks/icrc2-call-utils.mocks';
 import {RelyingPartyOptions} from './types/relying-party-options';
 import {JSON_RPC_VERSION_2} from './types/rpc';
 import * as callUtils from './utils/call.utils';
@@ -216,7 +216,7 @@ describe('icrc-wallet', () => {
   describe('approve', () => {
     const params: ApproveParams = {
       spender: {
-        owner: mockIcrc2ApproveLocalRelyingPartyPrincipal,
+        owner: mockIcrc2LocalRelyingPartyPrincipal,
         subaccount: toNullable()
       },
       amount: 50000000n,
@@ -228,7 +228,7 @@ describe('icrc-wallet', () => {
     beforeEach(() => {
       vi.setSystemTime(mockIcrc2ApproveLocalCallTime);
 
-      mocks.getRootKey.mockReturnValue(mockIcrc2ApproveLocalIcRootKey);
+      mocks.getRootKey.mockReturnValue(mockIcrc2LocalIcRootKey);
     });
 
     it('should call `call` with the correct parameters when approve is invoked', async () => {
