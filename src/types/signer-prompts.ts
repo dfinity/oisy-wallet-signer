@@ -127,6 +127,8 @@ const ConsentInfoOkSchema = z.object({
   Ok: ConsentInfoSchema
 });
 
+export type ConsentInfoOk = z.infer<typeof ConsentInfoOkSchema>;
+
 const ConsentInfoWarnSchema = z.object({
   Warn: IcrcCallCanisterRequestParamsSchema.pick({
     canisterId: true,
@@ -140,6 +142,8 @@ const ConsentInfoWarnSchema = z.object({
 export type ConsentInfoWarn = z.infer<typeof ConsentInfoWarnSchema>;
 
 const ResultConsentInfoSchema = z.union([ConsentInfoOkSchema, ConsentInfoWarnSchema]);
+
+export type ResultConsentInfo = z.infer<typeof ResultConsentInfoSchema>;
 
 const ResultConsentMessageSchema = PayloadOriginSchema.extend({
   status: z.literal(StatusSchema.enum.result),
