@@ -13,17 +13,17 @@ import {JSON_RPC_VERSION_2} from '../types/rpc';
 import type {Notify} from '../types/signer-handlers';
 import {notify} from './signer.handlers';
 
-export const notifyReady = ({id, origin}: Notify): void => {
+export const notifyReady = ({id, origin, source}: Notify): void => {
   const msg: IcrcReadyResponse = {
     jsonrpc: JSON_RPC_VERSION_2,
     id,
     result: 'ready'
   };
 
-  notify({msg, origin});
+  notify({msg, origin, source});
 };
 
-export const notifySupportedStandards = ({id, origin}: Notify): void => {
+export const notifySupportedStandards = ({id, origin, source}: Notify): void => {
   const msg: IcrcSupportedStandardsResponse = {
     jsonrpc: JSON_RPC_VERSION_2,
     id,
@@ -32,41 +32,41 @@ export const notifySupportedStandards = ({id, origin}: Notify): void => {
     }
   };
 
-  notify({msg, origin});
+  notify({msg, origin, source});
 };
 
 export type NotifyPermissions = Notify & {scopes: IcrcScopesArray};
 
-export const notifyPermissionScopes = ({id, origin, scopes}: NotifyPermissions): void => {
+export const notifyPermissionScopes = ({id, origin, scopes, source}: NotifyPermissions): void => {
   const msg: IcrcScopesResponse = {
     jsonrpc: JSON_RPC_VERSION_2,
     id,
     result: {scopes}
   };
 
-  notify({msg, origin});
+  notify({msg, origin, source});
 };
 
 export type NotifyAccounts = Notify & {accounts: IcrcAccounts};
 
-export const notifyAccounts = ({id, origin, accounts}: NotifyAccounts): void => {
+export const notifyAccounts = ({id, origin, accounts, source}: NotifyAccounts): void => {
   const msg: IcrcAccountsResponse = {
     jsonrpc: JSON_RPC_VERSION_2,
     id,
     result: {accounts}
   };
 
-  notify({msg, origin});
+  notify({msg, origin, source});
 };
 
 export type NotifyCallCanister = Notify & {result: IcrcCallCanisterResult};
 
-export const notifyCallCanister = ({id, origin, result}: NotifyCallCanister): void => {
+export const notifyCallCanister = ({id, origin, result, source}: NotifyCallCanister): void => {
   const msg: IcrcCallCanisterResponse = {
     jsonrpc: JSON_RPC_VERSION_2,
     id,
     result
   };
 
-  notify({msg, origin});
+  notify({msg, origin, source});
 };
