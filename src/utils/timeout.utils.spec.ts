@@ -36,7 +36,7 @@ describe('retryUntilReady', () => {
     const result = await retryUntilReady({retries: 3, isReady, fn});
 
     expect(result).toBe('ready');
-    expect(isReady).toHaveBeenCalledTimes(1);
+    expect(isReady).toHaveBeenCalledOnce();
     expect(fn).not.toHaveBeenCalled();
   });
 
@@ -49,7 +49,7 @@ describe('retryUntilReady', () => {
     const result = await retryUntilReady({retries: 3, isReady, fn});
 
     expect(result).toBe('error');
-    expect(isReady).toHaveBeenCalledTimes(1);
+    expect(isReady).toHaveBeenCalledOnce();
     expect(fn).not.toHaveBeenCalled();
   });
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
-	import { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
+	import { IcrcWallet } from '@dfinity/oisy-wallet-signer/icrc-wallet';
 	import { isNullish } from '@dfinity/utils';
 	import UserId from '$core/components/UserId.svelte';
 	import Value from '$core/components/Value.svelte';
@@ -12,8 +12,9 @@
 	import Balance from '$core/components/Balance.svelte';
 	import Connect from '$lib/components/Connect.svelte';
 	import { authStore } from '$core/stores/auth.store';
+	import BuildConsentMessage from '$lib/components/BuildConsentMessage.svelte';
 
-	let wallet = $state<IcpWallet | undefined>(undefined);
+	let wallet = $state<IcrcWallet | undefined>(undefined);
 
 	$effect(() => {
 		disconnected = false;
@@ -40,12 +41,14 @@
 	</div>
 {:else if !disconnected}
 	<div in:fade>
-		<Value id="wallet-connected" testId="wallet-connected" title="Wallet status">Connected</Value>
+		<Value id="wallet-connected" testId="wallet-connected" title="Wallet status">
+			<span data-tid="wallet-connected-value">Connected</span>
+		</Value>
 	</div>
 {:else}
 	<div in:fade>
 		<Value id="wallet-disconnected" testId="wallet-disconnected" title="Wallet status"
-			>Disconnected</Value
+			><span data-tid="wallet-connected-value">Disconnected</span></Value
 		>
 	</div>
 {/if}
@@ -59,3 +62,5 @@
 <Accounts {wallet} />
 
 <CallCanister {wallet} />
+
+<BuildConsentMessage {wallet} />

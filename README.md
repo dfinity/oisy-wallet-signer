@@ -319,7 +319,7 @@ The flow works as follows:
 As mentioned in the introduction, this library is primarily developed for OISY. However, it also includes opinionated clients that enable interactions with the ICP or ICRC ledgers in any JavaScript application.
 
 > [!IMPORTANT]
-> These clients are not yet used by any known dApps, which is why they currently only support ICRC-1 transfers. If you wish to use other ICRC methods or ICP transfers, please reach out.
+> These clients currently only support ICRC-1 and ICRC-2 methods. If you wish to use other features or ICP transfers, please reach out.
 
 ### 1. Initialize a Wallet
 
@@ -342,8 +342,8 @@ const wallet = await IcpWallet.connect({
 
 ```typescript
 const wallet = await IcpWallet.connect({
-    url: 'https://staging.oisy.com/sign',
-    host: 'http://localhost:6666'
+  url: 'https://staging.oisy.com/sign',
+  host: 'http://localhost:6666'
 });
 ```
 
@@ -477,7 +477,7 @@ npm run test
 
 While the test suite covers most cases, the library is also covered by some E2E tests that focus more on "happy path" scenarios rather than "extended edge cases".
 
-To run these those locally, you'll need to install the Juno CLI. Follow the steps below:
+To run those locally, you'll need to install the Juno CLI. Follow the steps below:
 
 1. Install Docker:
 
@@ -501,6 +501,7 @@ Navigate to the [demo](./demo) directory and start the environment:
 
 ```bash
 cd demo
+npm ci
 juno dev start
 npm run dev:party
 npm run dev:wallet

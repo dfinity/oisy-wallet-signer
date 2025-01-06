@@ -2,7 +2,7 @@ import * as agent from '@dfinity/agent';
 import {AnonymousIdentity} from '@dfinity/agent';
 import {Principal} from '@dfinity/principal';
 import type {MockInstance} from 'vitest';
-import {TransferResult} from '../constants/icrc.idl.constants';
+import {TransferResult} from '../constants/icrc-1.idl.constants';
 import {
   mockLocalBlockHeight,
   mockLocalCallParams,

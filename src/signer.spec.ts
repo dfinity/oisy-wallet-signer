@@ -808,8 +808,9 @@ describe('Signer', () => {
             const messageEvent = new MessageEvent('message', requestPermissionsMsg);
             window.dispatchEvent(messageEvent);
 
-            expect(postMessageMock).toHaveBeenNthCalledWith(
-              1,
+            expect(postMessageMock).toHaveBeenCalledOnce();
+
+            expect(postMessageMock).toHaveBeenCalledWith(
               {
                 jsonrpc: JSON_RPC_VERSION_2,
                 id: testId,
@@ -832,7 +833,9 @@ describe('Signer', () => {
             const messageEvent = new MessageEvent('message', requestPermissionsMsg);
             window.dispatchEvent(messageEvent);
 
-            expect(promptSpy).toHaveBeenNthCalledWith(1, {
+            expect(promptSpy).toHaveBeenCalledOnce();
+
+            expect(promptSpy).toHaveBeenCalledWith({
               requestedScopes: requestPermissionsDataSortedScopes.map((scope) => ({
                 scope: {...scope},
                 state: IcrcPermissionStateSchema.enum.denied
@@ -855,7 +858,9 @@ describe('Signer', () => {
             const messageEvent = new MessageEvent('message', requestPermissionsMsg);
             window.dispatchEvent(messageEvent);
 
-            expect(promptSpy).toHaveBeenNthCalledWith(1, {
+            expect(promptSpy).toHaveBeenCalledOnce();
+
+            expect(promptSpy).toHaveBeenCalledWith({
               requestedScopes: requestPermissionsDataSortedScopes.map((scope) => ({
                 scope: {...scope},
                 state: IcrcPermissionStateSchema.enum.denied
@@ -892,7 +897,9 @@ describe('Signer', () => {
             const messageEvent = new MessageEvent('message', requestPermissionsMsg);
             window.dispatchEvent(messageEvent);
 
-            expect(promptSpy).toHaveBeenNthCalledWith(1, {
+            expect(promptSpy).toHaveBeenCalledOnce();
+
+            expect(promptSpy).toHaveBeenCalledWith({
               requestedScopes: requestPermissionsDataSortedScopes.map((scope) => ({
                 scope: {...scope},
                 state: IcrcPermissionStateSchema.enum.denied
@@ -1108,7 +1115,7 @@ describe('Signer', () => {
               }
             ]);
 
-            await vi.waitFor(() => expect(spy).toHaveBeenCalledTimes(1));
+            await vi.waitFor(() => expect(spy).toHaveBeenCalledOnce());
           });
         });
       });
@@ -1651,7 +1658,7 @@ describe('Signer', () => {
 
               approve?.(mockAccounts);
 
-              await vi.waitFor(() => expect(spy).toHaveBeenCalledTimes(1));
+              await vi.waitFor(() => expect(spy).toHaveBeenCalledOnce());
             });
           });
         });
@@ -1887,7 +1894,7 @@ describe('Signer', () => {
                     });
                   });
 
-                  expect(promptSpy).not.toHaveBeenCalledTimes(1);
+                  expect(promptSpy).not.toHaveBeenCalledOnce();
                 });
               });
             });
@@ -2086,7 +2093,9 @@ describe('Signer', () => {
                   });
 
                   it('should call canister and notify success', () => {
-                    expect(spyCanisterCall).toHaveBeenNthCalledWith(1, {
+                    expect(spyCanisterCall).toHaveBeenCalledOnce();
+
+                    expect(spyCanisterCall).toHaveBeenCalledWith({
                       ...signerOptions,
                       params: {
                         ...mockCallCanisterParams,
@@ -2122,7 +2131,9 @@ describe('Signer', () => {
                   });
 
                   it('should call canister and notify error', () => {
-                    expect(spyCanisterCall).toHaveBeenNthCalledWith(1, {
+                    expect(spyCanisterCall).toHaveBeenCalledOnce();
+
+                    expect(spyCanisterCall).toHaveBeenCalledWith({
                       ...signerOptions,
                       params: {
                         ...mockCallCanisterParams,

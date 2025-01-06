@@ -226,7 +226,7 @@ describe('Relying Party handlers', () => {
     it('should bring the popup in front with focus', () => {
       requestPermissions({id: testId, popup, origin: testOrigin, params});
 
-      expect(focusMock).toHaveBeenCalledTimes(1);
+      expect(focusMock).toHaveBeenCalledOnce();
     });
   });
 
@@ -247,7 +247,7 @@ describe('Relying Party handlers', () => {
     it('should bring the popup in front with focus', () => {
       requestAccounts({id: testId, popup, origin: testOrigin});
 
-      expect(focusMock).toHaveBeenCalledTimes(1);
+      expect(focusMock).toHaveBeenCalledOnce();
     });
   });
 
@@ -269,7 +269,7 @@ describe('Relying Party handlers', () => {
     it('should bring the popup in front with focus', () => {
       requestCallCanister({id: testId, popup, origin: testOrigin, params: mockCallCanisterParams});
 
-      expect(focusMock).toHaveBeenCalledTimes(1);
+      expect(focusMock).toHaveBeenCalledOnce();
     });
   });
 });
