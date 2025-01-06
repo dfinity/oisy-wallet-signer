@@ -49,9 +49,12 @@
 			prompt: ({ status, ...rest }: ConsentMessagePromptPayload) => {
 				switch (status) {
 					case 'result': {
-						approve = (rest as ResultConsentMessage).approve;
-						reject = (rest as ResultConsentMessage).reject;
-						consentInfo = (rest as ResultConsentMessage).consentInfo;
+						const result = rest as ResultConsentMessage;
+
+						approve = result.approve;
+						reject = result.reject;
+						consentInfo = "Warn" in result.consentInfo ? result.consentInfo.Warn.consentInfo : result.consentInfo.Ok;
+
 						loading = false;
 						break;
 					}
