@@ -208,7 +208,8 @@ export class PartyPage extends IdentityPage {
     await this.#walletPage?.assertConsentMessage({
       partyUserId,
       tokenSymbol: 'ICP',
-      fn: mockConsentMessageIcrc2TransferFrom
+      fn: mockConsentMessageIcrc2TransferFrom,
+      level: 'Ok'
     });
   }
 
