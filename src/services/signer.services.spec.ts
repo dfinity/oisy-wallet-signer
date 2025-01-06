@@ -11,6 +11,7 @@ import {mockPrincipalText} from '../mocks/icrc-accounts.mocks';
 import {mockIcrcApproveArg} from '../mocks/icrc-approve.mocks';
 import {mockIcrcLocalCallParams} from '../mocks/icrc-call-utils.mocks';
 import {mockIcrcLedgerMetadata} from '../mocks/icrc-ledger.mocks';
+import {mockIcrcTransferFromArg} from '../mocks/icrc-transfer-from.mocks';
 import {mockErrorNotify} from '../mocks/signer-error.mocks';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import {JSON_RPC_VERSION_2, type RpcId, type RpcResponseWithError} from '../types/rpc';
@@ -382,7 +383,8 @@ describe('Signer services', () => {
 
       describe.each([
         {method: 'icrc1_transfer', arg: mockIcrcLocalCallParams.arg},
-        {method: 'icrc2_approve', arg: mockIcrcApproveArg}
+        {method: 'icrc2_approve', arg: mockIcrcApproveArg},
+        {method: 'icrc2_transfer_from', arg: mockIcrcTransferFromArg}
       ])('With fallback for $method', ({method, arg}) => {
         it('should return approved when user approves the consent message that was built', async () => {
           spyIcrc21CanisterConsentMessage.mockRejectedValue(new Error('Test Error'));
