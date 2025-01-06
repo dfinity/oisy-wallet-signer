@@ -41,12 +41,14 @@
 	</div>
 {:else if !disconnected}
 	<div in:fade>
-		<Value id="wallet-connected" testId="wallet-connected" title="Wallet status">Connected</Value>
+		<Value id="wallet-connected" testId="wallet-connected" title="Wallet status">
+			<span data-tid="wallet-connected-value">Connected</span>
+		</Value>
 	</div>
 {:else}
 	<div in:fade>
 		<Value id="wallet-disconnected" testId="wallet-disconnected" title="Wallet status"
-			>Disconnected</Value
+			><span data-tid="wallet-connected-value">Disconnected</span></Value
 		>
 	</div>
 {/if}
