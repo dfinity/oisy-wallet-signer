@@ -45,7 +45,7 @@ ${walletUserId}
 No expiration.
 
 **Approval fee:**
-0.0001 ${tokenSymbol}
- 
+0.00012 ${tokenSymbol}
+
 **Transaction fees to be paid by:**
 ${walletUserId}`;
