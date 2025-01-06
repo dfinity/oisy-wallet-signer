@@ -1,7 +1,10 @@
 import {Ed25519KeyIdentity} from '@dfinity/identity';
+import {IcrcTokenMetadata, mapTokenMetadata} from '@dfinity/ledger-icrc';
+import {assertNonNullish} from '@dfinity/utils';
 import type {Mock, MockInstance} from 'vitest';
 import {Icrc21Canister} from '../api/icrc21-canister.api';
 import {SignerApi} from '../api/signer.api';
+import {SIGNER_BUILDERS} from '../constants/signer.builders.constants';
 import {SignerErrorCode} from '../constants/signer.constants';
 import * as signerSuccessHandlers from '../handlers/signer-success.handlers';
 import * as signerHandlers from '../handlers/signer.handlers';
@@ -336,6 +339,28 @@ describe('Signer services', () => {
         });
       });
 
+      it('should provide a valid consent message with Ok', () =>
+        new Promise<void>(async (done) => {
+          spyIcrc21CanisterConsentMessage.mockResolvedValue({
+            Ok: mockConsentInfo
+          });
+
+          const prompt = ({status, ...rest}: ConsentMessagePromptPayload): void => {
+            if (status === 'result' && 'consentInfo' in rest && 'Ok' in rest.consentInfo) {
+              expect(rest.consentInfo.Ok).toEqual(mockConsentInfo);
+
+              done();
+            }
+          };
+
+          await signerService.assertAndPromptConsentMessage({
+            notify,
+            params,
+            prompt,
+            options: signerOptions
+          });
+        }));
+
       it('should return error if consentMessage throws', async () => {
         spyIcrc21CanisterConsentMessage.mockRejectedValue(new Error('Test Error'));
 
@@ -420,6 +445,53 @@ describe('Signer services', () => {
             }
           });
         });
+
+        it('should provide a valid consent message with Warn', () =>
+          new Promise<void>(async (done) => {
+            spyIcrc21CanisterConsentMessage.mockRejectedValue(new Error('Test Error'));
+            spySignerApiLedgerMedatada.mockResolvedValue(mockIcrcLedgerMetadata);
+
+            const prompt = async ({
+              status,
+              ...rest
+            }: ConsentMessagePromptPayload): Promise<void> => {
+              if (status === 'result' && 'consentInfo' in rest && 'Warn' in rest.consentInfo) {
+                expect(rest.consentInfo.Warn.method).toEqual(method);
+                expect(rest.consentInfo.Warn.arg).toEqual(arg);
+                expect(rest.consentInfo.Warn.canisterId).toEqual(params.canisterId);
+
+                const fn = SIGNER_BUILDERS[method];
+
+                assertNonNullish(fn);
+
+                const result = await fn({
+                  arg: base64ToUint8Array(arg),
+                  token: mapTokenMetadata(mockIcrcLedgerMetadata) as IcrcTokenMetadata,
+                  owner: owner.getPrincipal()
+                });
+
+                if ('Err' in result) {
+                  expect(true).toBeFalsy();
+                  return;
+                }
+
+                expect(rest.consentInfo.Warn.consentInfo).toEqual(result.Ok);
+
+                done();
+              }
+            };
+
+            await signerService.assertAndPromptConsentMessage({
+              notify,
+              params: {
+                ...params,
+                method,
+                arg
+              },
+              prompt,
+              options: signerOptions
+            });
+          }));
 
         it('should return error if consentMessage throws and ledger metadata throws', async () => {
           const error = new Error('Test Error');

@@ -3,7 +3,7 @@ import {Principal} from '@dfinity/principal';
 import {isNullish, notEmptyString} from '@dfinity/utils';
 import {SignerApi} from '../api/signer.api';
 import {SIGNER_BUILDERS} from '../constants/signer.builders.constants';
-import {icrc21_consent_info, icrc21_consent_message_response} from '../declarations/icrc-21';
+import {icrc21_consent_message_response} from '../declarations/icrc-21';
 import {
   notifyErrorActionAborted,
   notifyErrorMissingPrompt,
@@ -15,8 +15,9 @@ import {notifyCallCanister} from '../handlers/signer-success.handlers';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import type {Notify} from '../types/signer-handlers';
 import type {SignerOptions} from '../types/signer-options';
-import type {
+import {
   CallCanisterPrompt,
+  ConsentInfoWarn,
   ConsentMessageApproval,
   ConsentMessagePrompt,
   ResultConsentMessage
@@ -73,14 +74,11 @@ export class SignerService {
         return {result: 'error'};
       }
 
-      const {Ok: consentInfo} = response;
-
-      // TODO: change consent message prompt payload
-      // {
-      //    {Ok: consentInfo} | {Warn: {consentInfo?: string, method, arg, canisterId, owner}}
-      // }
-
-      const {result} = await this.promptConsentMessage({consentInfo, prompt, origin});
+      const {result} = await this.promptConsentMessage({
+        consentInfo: response,
+        prompt,
+        origin
+      });
 
       if (result === 'rejected') {
         notifyErrorActionAborted(notify);
@@ -241,20 +239,20 @@ export class SignerService {
    * @param {Object} params - The parameters for loading the consent message.
    * @param {Omit<IcrcCallCanisterRequestParams, 'sender'>} params.params - The ICRC call canister parameters minus the sender.
    * @param {SignerOptions} params.options - The signer options - host and owner.
-   * @returns {Promise<icrc21_consent_message_response>} - The consent message response.
+   * @returns {Promise<icrc21_consent_message_response | ConsentInfoWarn>} - A consent message response. Returns "Ok" if the message was decoded by the targeted canister, or "Warn" if the fallback builder was used.
    * @throws The potential original error from the ICRC-21 call. The errors related to
    *         the custom builder is ignored.
    **/
   private async loadConsentMessage(params: {
     params: Omit<IcrcCallCanisterRequestParams, 'sender'>;
     options: SignerOptions;
-  }): Promise<icrc21_consent_message_response> {
+  }): Promise<icrc21_consent_message_response | ConsentInfoWarn> {
     try {
       return await this.callConsentMessage(params);
     } catch (err: unknown) {
       const fallbackMessage = await this.tryBuildConsentMessageOnError(params);
 
-      if ('Ok' in fallbackMessage) {
+      if ('Warn' in fallbackMessage) {
         return fallbackMessage;
       }
 
@@ -268,7 +266,7 @@ export class SignerService {
   }: {
     params: Omit<IcrcCallCanisterRequestParams, 'sender'>;
     options: SignerOptions;
-  }): Promise<{NoFallback: null} | {Ok: icrc21_consent_info} | {Err: unknown}> {
+  }): Promise<{NoFallback: null} | ConsentInfoWarn | {Err: unknown}> {
     const fn = SIGNER_BUILDERS[method];
 
     if (isNullish(fn)) {
@@ -288,11 +286,24 @@ export class SignerService {
         return {Err: new Error('Incomplete token metadata.')};
       }
 
-      return await fn({
+      const result = await fn({
         arg: base64ToUint8Array(arg),
         token,
         owner: owner.getPrincipal()
       });
+
+      if ('Err' in result) {
+        return {Err: result.Err};
+      }
+
+      return {
+        Warn: {
+          consentInfo: result.Ok,
+          method,
+          arg,
+          canisterId
+        }
+      };
     } catch (err: unknown) {
       return {Err: err};
     }
