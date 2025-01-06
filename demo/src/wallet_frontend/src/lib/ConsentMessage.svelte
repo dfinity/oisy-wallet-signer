@@ -53,7 +53,10 @@
 
 						approve = result.approve;
 						reject = result.reject;
-						consentInfo = "Warn" in result.consentInfo ? result.consentInfo.Warn.consentInfo : result.consentInfo.Ok;
+						consentInfo =
+							'Warn' in result.consentInfo
+								? result.consentInfo.Warn.consentInfo
+								: result.consentInfo.Ok;
 
 						loading = false;
 						break;
