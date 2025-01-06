@@ -260,6 +260,32 @@ export class SignerService {
     }
   }
 
+  /**
+   * Attempts to build a consent message when the signer cannot decode the arguments
+   * with the targeted canister. When decoding is attempted locally, user must be warned
+   * as specified by the ICRC-49 standards.
+   *
+   * Instead of returning "Ok" upon success, this function returns "Warn" to indicate
+   * that the signer performed the decoding rather than the canister.
+   *
+   * @see {@link https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_49_call_canister.md#message-processing ICRC-49 Message Processing}
+   *
+   * @param {Object} params - The parameters for building the consent message.
+   * @param {Object} params.params - The ICRC call canister parameters excluding the sender.
+   * @param {string} params.params.method - The method being called on the canister.
+   * @param {string} params.params.arg - The encoded arguments for the canister call.
+   * @param {string} params.params.canisterId - The ID of the targeted canister.
+   * @param {Object} params.options - The signer options including host and owner.
+   * @param {string} params.options.owner - The principal ID of the signer (caller).
+   * @param {string} params.options.host - The host URL for the signer environment.
+   *
+   * @returns {Promise<{NoFallback: null} | ConsentInfoWarn | {Err: unknown}>} -
+   *          - `{NoFallback: null}` if no fallback method is available.
+   *          - `ConsentInfoWarn` if a warning response is built successfully.
+   *          - `{Err: unknown}` if an error occurs during processing.
+   *
+   * @throws {Error} - Throws an error if building the consent message fails completely.
+   */
   private async tryBuildConsentMessageOnError({
     params: {method, arg, canisterId},
     options: {owner, host}
