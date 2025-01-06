@@ -12,6 +12,7 @@
 	import Button from '$core/components/Button.svelte';
 	import Article from '$core/components/Article.svelte';
 	import { fade } from 'svelte/transition';
+	import Value from '$core/components/Value.svelte';
 
 	type Props = {
 		signer: Signer | undefined;
@@ -24,6 +25,7 @@
 	let approve = $state<ConsentMessageApproval | undefined>(undefined);
 	let reject = $state<Rejection | undefined>(undefined);
 	let consentInfo = $state<icrc21_consent_info | undefined>(undefined);
+	let consentInfoLevel: 'Warning' | 'Ok' | undefined = $state(undefined);
 
 	let displayMessage: string | undefined = $derived(
 		nonNullish(consentInfo)
@@ -57,6 +59,7 @@
 							'Warn' in result.consentInfo
 								? result.consentInfo.Warn.consentInfo
 								: result.consentInfo.Ok;
+						consentInfoLevel = 'Warn' in result.consentInfo ? 'Warning' : 'Ok';
 
 						loading = false;
 						break;
@@ -102,6 +105,10 @@
 				<p class="mb-2 break-words" data-tid="consent-message">
 					{displayMessage}
 				</p>
+
+				<Value id="consent-message-level-block" title="Level">
+					<span data-tid="consent-message-level">{consentInfoLevel ?? 'Unknown'}</span>
+				</Value>
 
 				<div class="flex gap-4">
 					<Button type="button" onclick={onReject} testId="reject-consent-message-button"

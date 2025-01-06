@@ -62,11 +62,13 @@ export class WalletPage extends IdentityPage {
 
   async assertConsentMessage({
     fn,
+    level,
     ...params
   }: {
     partyUserId: string;
     tokenSymbol: 'ICP' | 'TKN';
     fn: (params: {walletUserId: string; partyUserId: string; tokenSymbol: 'ICP' | 'TKN'}) => string;
+    level: 'Warning' | 'Ok';
   }): Promise<void> {
     const walletUserId = await this.getUserId();
 
@@ -80,6 +82,12 @@ export class WalletPage extends IdentityPage {
         ...params
       })
     );
+
+    await expect(this.page.getByTestId('consent-message-level')).toBeVisible();
+
+    const span = this.page.getByTestId('consent-message-level');
+
+    await expect(span).toHaveText(level);
   }
 
   async getICP(): Promise<void> {
