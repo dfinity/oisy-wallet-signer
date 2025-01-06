@@ -172,7 +172,8 @@ export class PartyPage extends IdentityPage {
     await this.#walletPage?.assertConsentMessage({
       partyUserId,
       tokenSymbol: 'ICP',
-      fn: mockConsentMessageIcrc1Transfer
+      fn: mockConsentMessageIcrc1Transfer,
+      level: 'Ok'
     });
   }
 
@@ -190,7 +191,8 @@ export class PartyPage extends IdentityPage {
     await this.#walletPage?.assertConsentMessage({
       partyUserId,
       tokenSymbol: 'ICP',
-      fn: mockConsentMessageIcrc2Approve
+      fn: mockConsentMessageIcrc2Approve,
+      level: 'Ok'
     });
   }
 
@@ -206,7 +208,8 @@ export class PartyPage extends IdentityPage {
     await this.#walletPage?.assertConsentMessage({
       partyUserId,
       tokenSymbol: 'ICP',
-      fn: mockConsentMessageIcrc2TransferFrom
+      fn: mockConsentMessageIcrc2TransferFrom,
+      level: 'Ok'
     });
   }
 
@@ -224,7 +227,8 @@ export class PartyPage extends IdentityPage {
     await this.#walletPage?.assertConsentMessage({
       partyUserId,
       tokenSymbol: 'TKN',
-      fn: mockConsentMessageIcrc1Transfer
+      fn: mockConsentMessageIcrc1Transfer,
+      level: 'Warning'
     });
   }
 
@@ -242,7 +246,8 @@ export class PartyPage extends IdentityPage {
     await this.#walletPage?.assertConsentMessage({
       partyUserId,
       tokenSymbol: 'TKN',
-      fn: mockConsentMessageIcrc2Approve
+      fn: mockConsentMessageIcrc2Approve,
+      level: 'Warning'
     });
   }
 
