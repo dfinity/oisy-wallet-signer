@@ -32,7 +32,8 @@
 				owner: $authStore.identity.getPrincipal(),
 				subaccount: []
 			},
-			amount: 1n * (E8S_PER_ICP / 2n)
+			amount: 1n * (E8S_PER_ICP / 2n),
+			fee: 12_000n
 		};
 
 		result = await wallet?.approve({
