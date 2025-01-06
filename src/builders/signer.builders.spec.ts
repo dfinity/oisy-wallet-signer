@@ -459,6 +459,47 @@ ${encodeIcrcAccount({owner: owner.getPrincipal()})}
       expect((err as Error).message).toContain('Wrong magic number');
     });
 
+    it('should build a consent message with token fee if no fee as arg', async () => {
+      const arg = encodeIdl({
+        recordClass: ApproveArgs,
+        rawArgs: {
+          ...mockIcrcApproveRawArgs,
+          fee: []
+        }
+      });
+
+      const result = await buildContentMessageIcrc2Approve({
+        arg: base64ToUint8Array(arg),
+        owner: owner.getPrincipal(),
+        token
+      });
+
+      expectMessage({
+        result,
+        expectedMessage: `# Authorize another address to withdraw from your account
+
+**The following address is allowed to withdraw from your account:**
+${encodeIcrcAccount({owner: mockIcrcApproveRawArgs.spender.owner, subaccount: fromNullable(mockIcrcApproveRawArgs.spender.subaccount)})}
+
+**Your account:**
+${encodeIcrcAccount({owner: owner.getPrincipal()})}
+
+**Requested withdrawal allowance:**
+3,200.00000001 TKN
+
+⚠ The allowance will be set to 3,200.00000001 TKN independently of any previous allowance. Until this transaction has been executed the spender can still exercise the previous allowance (if any) to it's full amount.
+
+**Expiration date:**
+No expiration.
+
+**Approval fee:**
+0.0001 TKN
+
+**Transaction fees to be paid by:**
+${encodeIcrcAccount({owner: owner.getPrincipal()})}`
+      });
+    });
+
     it('should build a consent message with expected allowance', async () => {
       const expectedAllowance = 1234567n;
 

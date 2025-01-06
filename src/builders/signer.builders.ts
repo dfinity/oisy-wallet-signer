@@ -120,7 +120,7 @@ export const buildContentMessageIcrc1Transfer: SignerBuilderFn = async ({
 export const buildContentMessageIcrc2Approve: SignerBuilderFn = async ({
   arg,
   owner,
-  token: {symbol: tokenSymbol, decimals: tokenDecimals}
+  token: {symbol: tokenSymbol, decimals: tokenDecimals, fee: tokenFee}
 }): Promise<SignerBuildersResult> => {
   const build = (en: I18n): {message: string[]} => {
     const {
@@ -145,7 +145,7 @@ export const buildContentMessageIcrc2Approve: SignerBuilderFn = async ({
         requested_withdrawal_allowance,
         withdrawal_allowance: {none: withdrawalAllowanceNone, some: withdrawalAllowanceSome},
         expiration_date: {title: expirationDateTitle, none: noExpirationDate},
-        approval_fee,
+        approval_fee: approvalFeeLabel,
         approver_account_transaction_fees: {
           subaccount: approverFeeSubaccount,
           owner: approverFeeOwner
@@ -199,12 +199,9 @@ export const buildContentMessageIcrc2Approve: SignerBuilderFn = async ({
     );
 
     // - Fee
-    const fee = fromNullable(approveFee);
-    if (nonNullish(fee)) {
-      message.push(
-        `${section(approval_fee)}\n${formatAmount({amount: fee, decimals: tokenDecimals})} ${tokenSymbol}`
-      );
-    }
+    message.push(
+      `${section(approvalFeeLabel)}\n${formatAmount({amount: fromNullable(approveFee) ?? tokenFee, decimals: tokenDecimals})} ${tokenSymbol}`
+    );
 
     // - Fee paid by
     message.push(
