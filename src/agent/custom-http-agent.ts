@@ -111,7 +111,7 @@ export class CustomHttpAgent {
     'canisterId'
   >): Promise<CustomHttpAgentResponse | undefined> {
     // Certificate is only support in v3.
-    if (isNullish(body) || isNullish(body.certificate)) {
+    if (isNullish(body) || !('certificate' in body)) {
       return undefined;
     }
 

@@ -184,11 +184,11 @@ describe('icrc-21.canister.api', () => {
 
       // Ensure that the `CustomHttpAgent.create` is only called once
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(CustomHttpAgent.create).toHaveBeenCalledTimes(1);
+      expect(CustomHttpAgent.create).toHaveBeenCalledOnce();
 
       // TODO: spyOn nor function does work with vitest and Actor.createActor. Not against a better idea than disabling eslint for next line.
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(Actor.createActor).toHaveBeenCalledTimes(1);
+      expect(Actor.createActor).toHaveBeenCalledOnce();
     });
 
     it('should create a new actor when canisterId changes', async () => {

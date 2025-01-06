@@ -1,8 +1,8 @@
 import {IDL} from '@dfinity/candid';
 import {Principal} from '@dfinity/principal';
-import {TransferArgs} from '../constants/icrc.idl.constants';
+import {TransferArgs} from '../constants/icrc-1.idl.constants';
 import {TransferArgs as TransferArgsType} from '../declarations/icrc-1';
-import {decodeResult, encodeArg} from './idl.utils';
+import {decodeIdl, encodeIdl} from './idl.utils';
 
 describe('idl.utils', () => {
   beforeEach(() => {
@@ -25,7 +25,7 @@ describe('idl.utils', () => {
         }
       };
 
-      const arg = encodeArg({
+      const arg = encodeIdl({
         recordClass: TransferArgs,
         rawArgs
       });
@@ -39,13 +39,13 @@ describe('idl.utils', () => {
   describe('decodeResult', () => {
     const mockRecordClass = IDL.Record({someField: IDL.Text});
 
-    it('should decode the reply and return the result', () => {
+    it('should decode the bytes and return the result', () => {
       const mockExpectedObject = {someField: 'test value'};
       const mockReply = IDL.encode([mockRecordClass], [mockExpectedObject]);
 
-      const result = decodeResult<{someField: string}>({
+      const result = decodeIdl<{someField: string}>({
         recordClass: mockRecordClass,
-        reply: mockReply
+        bytes: mockReply
       });
 
       expect(result).toEqual(mockExpectedObject);
@@ -55,9 +55,9 @@ describe('idl.utils', () => {
       const invalidReply = new ArrayBuffer(10);
 
       expect(() =>
-        decodeResult({
+        decodeIdl({
           recordClass: mockRecordClass,
-          reply: invalidReply
+          bytes: invalidReply
         })
       ).toThrowError(/Wrong magic number/);
     });
@@ -71,9 +71,9 @@ describe('idl.utils', () => {
       vi.spyOn(IDL, 'decode').mockReturnValue([{someField: 'value1'}, {someField: 'value2'}]);
 
       expect(() =>
-        decodeResult({
+        decodeIdl({
           recordClass: mockRecordClass,
-          reply: mockReply
+          bytes: mockReply
         })
       ).toThrow('More than one object returned. This is unexpected.');
     });

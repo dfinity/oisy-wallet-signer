@@ -20,7 +20,7 @@ import {
   assertCallMethod,
   assertCallSender
 } from './call.assert.utils';
-import {decodeResult} from './idl.utils';
+import {decodeIdl} from './idl.utils';
 
 export const assertCallResponse = ({
   params: {method, arg, canisterId, sender},
@@ -97,8 +97,8 @@ export const decodeResponse = async <T>({
     'A reply cannot be resolved within the provided certificate. This is unexpected; it should have been known at this point.'
   );
 
-  return decodeResult<T>({
+  return decodeIdl<T>({
     recordClass: resultRecordClass,
-    reply
+    bytes: reply
   });
 };
