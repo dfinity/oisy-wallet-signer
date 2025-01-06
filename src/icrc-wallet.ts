@@ -2,14 +2,17 @@ import {
   ApproveParams,
   IcrcBlockIndex,
   IcrcTransferError,
-  IcrcTransferVariatError,
   TransferFromParams,
   TransferParams,
   toApproveArgs,
   toTransferArg,
   toTransferFromArgs
 } from '@dfinity/ledger-icrc';
-import type {ApproveError, TransferFromError} from '@dfinity/ledger-icrc/dist/candid/icrc_ledger';
+import type {
+  ApproveError,
+  TransferError,
+  TransferFromError
+} from '@dfinity/ledger-icrc/dist/candid/icrc_ledger';
 import {TransferArgs, TransferResult} from './constants/icrc-1.idl.constants';
 import {
   ApproveArgs,
@@ -56,7 +59,7 @@ export class IcrcWallet extends RelyingParty {
    * @param {Object} params - The transfer parameters.
    * @param {TransferParams} params.params - The object containing transfer details, such as amount and destination.
    * @param {string} params.owner - The owner of the wallet.
-   * @param {PrincipalText} [params.ledgerCanisterId] - Optional ledger canister ID, defaults to the Icrc ledger if not provided.
+   * @param {PrincipalText} [params.ledgerCanisterId] - The ledger canister ID.
    * @param {RelyingPartyRequestOptions} [params.options] - Optional parameters for the request, such as request ID, authorization, or timeout.
    *
    * @returns {Promise<IcrcBlockIndex>} A promise that resolves to the block index of the transfer transaction if successful.
@@ -90,7 +93,7 @@ export class IcrcWallet extends RelyingParty {
       options
     });
 
-    type TransferResult = {Ok: IcrcBlockIndex} | {Err: IcrcTransferVariatError};
+    type TransferResult = {Ok: IcrcBlockIndex} | {Err: TransferError};
 
     const response = await decodeResponse<TransferResult>({
       params: callParams,
@@ -109,6 +112,19 @@ export class IcrcWallet extends RelyingParty {
     return response.Ok;
   };
 
+  /**
+   * Approves a spender to transfer a specified amount of ICRC tokens from the owner's account.
+   *
+   * @param {Object} params - The approve parameters.
+   * @param {ApproveParams} params.params - The details of the approval, including the spender's account and amount.
+   * @param {string} params.owner - The owner of the wallet authorizing the spender.
+   * @param {PrincipalText} [params.ledgerCanisterId] - The ledger canister ID.
+   * @param {RelyingPartyRequestOptions} [params.options] - Optional parameters for the request, such as request ID, authorization, or timeout.
+   *
+   * @throws {IcrcTransferError} Throws an error if the approval fails.
+   *
+   * @returns {Promise<IcrcBlockIndex>} A promise that resolves to the block index of the approval transaction if successful.
+   */
   approve = async ({
     params,
     owner,
@@ -157,6 +173,19 @@ export class IcrcWallet extends RelyingParty {
     return response.Ok;
   };
 
+  /**
+   * Transfers ICRC tokens from one account to another using an approved allowance.
+   *
+   * @param {Object} params - The transfer-from parameters.
+   * @param {TransferFromParams} params.params - The details of the transfer, including the source, destination, and amount.
+   * @param {string} params.owner - The owner of the wallet initiating the transfer.
+   * @param {PrincipalText} [params.ledgerCanisterId] - Optional ledger canister ID, defaults to the ICRC ledger if not provided.
+   * @param {RelyingPartyRequestOptions} [params.options] - Optional parameters for the request, such as request ID, authorization, or timeout.
+   *
+   * @throws {IcrcTransferError} Throws an error if the transfer fails.
+   *
+   * @returns {Promise<IcrcBlockIndex>} A promise that resolves to the block index of the transfer transaction if successful.
+   */
   transferFrom = async ({
     params,
     owner,
