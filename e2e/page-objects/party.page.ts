@@ -69,7 +69,7 @@ export class PartyPage extends IdentityPage {
   }
 
   async assertConnected(): Promise<void> {
-    await expect(this.page.getByTestId('wallet-connected')).toHaveScreenshot();
+    await expect(this.page.getByTestId('wallet-connected-value')).toHaveText('Connected');
   }
 
   async assertDisconnected(): Promise<void> {
