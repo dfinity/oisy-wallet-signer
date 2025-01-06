@@ -6,6 +6,7 @@
 	import { accountsStore } from '$lib/stores/accounts.store';
 	import Icrc1Transfer from '$lib/components/Icrc1Transfer.svelte';
 	import Icrc2Approve from '$lib/components/Icrc2Approve.svelte';
+	import Icrc2TransferFrom from '$lib/components/Icrc2TransferFrom.svelte';
 
 	type Props = {
 		wallet: IcrcWallet | undefined;
@@ -21,6 +22,8 @@
 				<Icrc1Transfer {wallet} />
 
 				<Icrc2Approve {wallet} />
+
+				<Icrc2TransferFrom {wallet} />
 			</div>
 		</Value>
 	</div>
