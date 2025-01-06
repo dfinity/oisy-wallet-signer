@@ -340,6 +340,7 @@ describe('Signer services', () => {
       });
 
       it('should provide a valid consent message with Ok', () =>
+        // eslint-disable-next-line no-async-promise-executor
         new Promise<void>(async (done) => {
           spyIcrc21CanisterConsentMessage.mockResolvedValue({
             Ok: mockConsentInfo
@@ -447,6 +448,7 @@ describe('Signer services', () => {
         });
 
         it('should provide a valid consent message with Warn', () =>
+          // eslint-disable-next-line no-async-promise-executor
           new Promise<void>(async (done) => {
             spyIcrc21CanisterConsentMessage.mockRejectedValue(new Error('Test Error'));
             spySignerApiLedgerMedatada.mockResolvedValue(mockIcrcLedgerMetadata);
