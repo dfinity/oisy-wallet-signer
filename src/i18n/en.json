@@ -7,13 +7,11 @@
     "memo": "Memo"
   },
   "icrc1_transfer": {
-    "title": "Approve the transfer of funds",
-    "from_subaccount": "From subaccount"
+    "title": "Approve the transfer of funds"
   },
   "icrc2_approve": {
     "title": "Authorize another address to withdraw from your account",
     "address_is_allowed": "The following address is allowed to withdraw from your account",
-    "your_subaccount": "Your subaccount",
     "your_account": "Your account",
     "requested_withdrawal_allowance": "Requested withdrawal allowance",
     "withdrawal_allowance": {
@@ -25,18 +23,12 @@
       "none": "No expiration."
     },
     "approval_fee": "Approval fee",
-    "approver_account_transaction_fees": {
-      "subaccount": "Transaction fees to be paid by your subaccount",
-      "owner": "Transaction fees to be paid by"
-    }
+    "approver_account_transaction_fees": "Transaction fees to be paid by"
   },
   "icrc2_transfer_from": {
     "title": "Transfer from a withdrawal account",
     "withdrawal_account": "Withdrawal account",
-    "sending_the_transfer_request": {
-      "subaccount": "Subaccount sending the transfer request",
-      "account": "Account sending the transfer request"
-    },
+    "sending_the_transfer_request": "Account sending the transfer request",
     "amount_to_withdraw": "Amount to withdraw",
     "fee_paid_by_withdrawal_account": "Fee paid by withdrawal account"
   }
