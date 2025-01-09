@@ -55,7 +55,7 @@ export const buildContentMessageIcrc1Transfer: SignerBuilderFn = async ({
 
     const {
       core: {amount: amountLabel, from, to, fee: feeLabel},
-      icrc1_transfer: {title, from_subaccount: fromSubaccountLabel}
+      icrc1_transfer: {title}
     } = en;
 
     // Title
@@ -72,9 +72,7 @@ export const buildContentMessageIcrc1Transfer: SignerBuilderFn = async ({
       owner,
       subaccount: fromNullishSubaccount
     });
-    message.push(
-      `${section(isNullish(fromNullishSubaccount) ? from : fromSubaccountLabel)}\n${fromAccount}`
-    );
+    message.push(`${section(from)}\n${fromAccount}`);
 
     // - To
     const toAccount = encodeIcrcAccount({
@@ -141,15 +139,11 @@ export const buildContentMessageIcrc2Approve: SignerBuilderFn = async ({
         title,
         address_is_allowed,
         your_account,
-        your_subaccount,
         requested_withdrawal_allowance,
         withdrawal_allowance: {none: withdrawalAllowanceNone, some: withdrawalAllowanceSome},
         expiration_date: {title: expirationDateTitle, none: noExpirationDate},
         approval_fee: approvalFeeLabel,
-        approver_account_transaction_fees: {
-          subaccount: approverFeeSubaccount,
-          owner: approverFeeOwner
-        }
+        approver_account_transaction_fees
       }
     } = en;
 
@@ -169,9 +163,7 @@ export const buildContentMessageIcrc2Approve: SignerBuilderFn = async ({
       owner,
       subaccount: fromNullishSubaccount
     });
-    message.push(
-      `${section(isNullish(fromNullishSubaccount) ? your_account : your_subaccount)}\n${fromAccount}`
-    );
+    message.push(`${section(your_account)}\n${fromAccount}`);
 
     // - Amount
     message.push(
@@ -204,9 +196,7 @@ export const buildContentMessageIcrc2Approve: SignerBuilderFn = async ({
     );
 
     // - Fee paid by
-    message.push(
-      `${section(isNullish(fromNullishSubaccount) ? approverFeeOwner : approverFeeSubaccount)}\n${fromAccount}`
-    );
+    message.push(`${section(approver_account_transaction_fees)}\n${fromAccount}`);
 
     // - Memo
     const memoMessage = buildMemo({
@@ -260,10 +250,7 @@ export const buildContentMessageIcrc2TransferFrom: SignerBuilderFn = async ({
       icrc2_transfer_from: {
         title,
         withdrawal_account,
-        sending_the_transfer_request: {
-          subaccount: subaccountSendingTransferRequest,
-          account: accountSendingTransferRequest
-        },
+        sending_the_transfer_request,
         amount_to_withdraw,
         fee_paid_by_withdrawal_account
       }
@@ -285,9 +272,7 @@ export const buildContentMessageIcrc2TransferFrom: SignerBuilderFn = async ({
       owner,
       subaccount: spenderNullishSubaccount
     });
-    message.push(
-      `${section(isNullish(spenderNullishSubaccount) ? accountSendingTransferRequest : subaccountSendingTransferRequest)}\n${spenderAccount}`
-    );
+    message.push(`${section(sending_the_transfer_request)}\n${spenderAccount}`);
 
     // - Amount
     message.push(

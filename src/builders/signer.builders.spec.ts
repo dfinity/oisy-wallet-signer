@@ -133,7 +133,7 @@ s3oqv-3j7id-xjhbm-3owbe-fvwly-oso6u-vej6n-bexck-koyu2-bxb6y-wae
       expect(fromNullable(Ok.metadata.utc_offset_minutes)).toBeUndefined();
     });
 
-    it('should build a consent message with a from subaccount', async () => {
+    it('should build a consent message with a from label even if a subaccount is used', async () => {
       const subaccount = [1, 2, 3];
 
       const arg = encodeIdl({
@@ -157,7 +157,7 @@ s3oqv-3j7id-xjhbm-3owbe-fvwly-oso6u-vej6n-bexck-koyu2-bxb6y-wae
 **Amount:**
 3,200.00000001 TKN
 
-**From subaccount:**
+**From:**
 ${encodeIcrcAccount({owner: owner.getPrincipal(), subaccount: subaccount})}
 
 **To:**
@@ -379,7 +379,7 @@ ${encodeIcrcAccount({owner: owner.getPrincipal()})}`
 **The following address is allowed to withdraw from your account:**
 ${encodeIcrcAccount({owner: mockIcrcApproveRawArgs.spender.owner, subaccount: fromNullable(mockIcrcApproveRawArgs.spender.subaccount)})}
 
-**Your subaccount:**
+**Your account:**
 ${encodeIcrcAccount({owner: owner.getPrincipal(), subaccount: subaccount})}
 
 **Requested withdrawal allowance:**
@@ -393,7 +393,7 @@ No expiration.
 **Approval fee:**
 0.0010033 TKN
 
-**Transaction fees to be paid by your subaccount:**
+**Transaction fees to be paid by:**
 ${encodeIcrcAccount({owner: owner.getPrincipal(), subaccount: subaccount})}`
       });
     });
@@ -669,7 +669,7 @@ ${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.to.owner, subaccount: fr
 **Withdrawal account:**
 ${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.from.owner, subaccount: fromNullable(mockIcrcTransferFromRawArgs.from.subaccount)})}
 
-**Subaccount sending the transfer request:**
+**Account sending the transfer request:**
 ${encodeIcrcAccount({owner: owner.getPrincipal(), subaccount})}
 
 **Amount to withdraw:**
