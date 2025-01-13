@@ -1,9 +1,11 @@
+import {IDL} from '@dfinity/candid';
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {encodeIcrcAccount} from '@dfinity/ledger-icrc';
 import {Principal} from '@dfinity/principal';
 import {asciiStringToByteArray, fromNullable} from '@dfinity/utils';
 import {TransferArgs} from '../constants/icrc-1.idl.constants';
 import {ApproveArgs, TransferFromArgs} from '../constants/icrc-2.idl.constants';
+import {MAX_CONSENT_MESSAGE_ARG_SIZE_BYTES} from '../constants/signer.builders.constants';
 import {TransferArgs as TransferArgsType} from '../declarations/icrc-1';
 import {mockCallCanisterParams} from '../mocks/call-canister.mocks';
 import {mockPrincipalText} from '../mocks/icrc-accounts.mocks';
@@ -14,6 +16,7 @@ import {
   mockIcrcTransferFromRawArgs
 } from '../mocks/icrc-transfer-from.mocks';
 import {
+  SignerBuilderFn,
   SignerBuildersResult,
   SignerBuildersResultError,
   SignerBuildersResultOk
@@ -21,6 +24,7 @@ import {
 import {base64ToUint8Array} from '../utils/base64.utils';
 import {encodeIdl} from '../utils/idl.utils';
 import {
+  ArgSizeError,
   buildContentMessageIcrc1Transfer,
   buildContentMessageIcrc2Approve,
   buildContentMessageIcrc2TransferFrom
@@ -55,6 +59,34 @@ describe('Signer builders', () => {
     };
 
     expect(message).toEqual(expectedMessage);
+  };
+
+  const assertArgSize = async (fn: SignerBuilderFn) => {
+    const TestArgs = IDL.Record({
+      test: IDL.Text
+    });
+
+    const arg = encodeIdl({
+      recordClass: TestArgs,
+      rawArgs: {
+        test: [...Array(500)].map(() => 'A').join('')
+      }
+    });
+
+    const result = await fn({
+      arg: base64ToUint8Array(arg),
+      owner: owner.getPrincipal(),
+      token
+    });
+
+    expect('Err' in result).toBeTruthy();
+
+    const {Err} = result as SignerBuildersResultError;
+
+    expect(Err).toBeInstanceOf(ArgSizeError);
+    expect((Err as ArgSizeError).message).toEqual(
+      `The argument size is too large. The maximum allowed size is ${MAX_CONSENT_MESSAGE_ARG_SIZE_BYTES} bytes.`
+    );
   };
 
   describe('icrc1_transfer', () => {
@@ -290,6 +322,38 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.t
 **Fee:**
 0.0001 TKN`
       });
+    });
+
+    it('should throw error if arg is too long', async () => {
+      const TestArgs = IDL.Record({
+        test: IDL.Text
+      });
+
+      const arg = encodeIdl({
+        recordClass: TestArgs,
+        rawArgs: {
+          test: [...Array(500)].map(() => 'A').join('')
+        }
+      });
+
+      const result = await buildContentMessageIcrc1Transfer({
+        arg: base64ToUint8Array(arg),
+        owner: owner.getPrincipal(),
+        token
+      });
+
+      expect('Err' in result).toBeTruthy();
+
+      const {Err} = result as SignerBuildersResultError;
+
+      expect(Err).toBeInstanceOf(ArgSizeError);
+      expect((Err as ArgSizeError).message).toEqual(
+        `The argument size is too large. The maximum allowed size is ${MAX_CONSENT_MESSAGE_ARG_SIZE_BYTES} bytes.`
+      );
+    });
+
+    it('should throw error if arg is too long', async () => {
+      await assertArgSize(buildContentMessageIcrc1Transfer);
     });
   });
 
@@ -586,6 +650,10 @@ Mon, Dec 30, 2024, 08:30:16 UTC
 ${encodeIcrcAccount({owner: owner.getPrincipal()})}`
       });
     });
+
+    it('should throw error if arg is too long', async () => {
+      await assertArgSize(buildContentMessageIcrc2Approve);
+    });
   });
 
   describe('icrc2_transfer_from', () => {
@@ -855,6 +923,10 @@ ${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.to.owner, subaccount: fr
 **Fee paid by withdrawal account:**
 0.0001 TKN`
       });
+    });
+
+    it('should throw error if arg is too long', async () => {
+      await assertArgSize(buildContentMessageIcrc2TransferFrom);
     });
   });
 });
