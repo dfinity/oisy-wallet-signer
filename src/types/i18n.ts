@@ -1,5 +1,5 @@
 // Auto-generated definitions file ("npm run i18n")
-import {z} from 'zod';
+import * as z from 'zod';
 
 export const i18nCoreSchema = z
   .object({
@@ -13,8 +13,7 @@ export const i18nCoreSchema = z
 
 export const i18nIcrc1_transferSchema = z
   .object({
-    title: z.string(),
-    from_subaccount: z.string()
+    title: z.string()
   })
   .strict();
 
@@ -22,13 +21,12 @@ export const i18nIcrc2_approveSchema = z
   .object({
     title: z.string(),
     address_is_allowed: z.string(),
-    your_subaccount: z.string(),
     your_account: z.string(),
     requested_withdrawal_allowance: z.string(),
     withdrawal_allowance: z.object({some: z.string(), none: z.string()}),
     expiration_date: z.object({title: z.string(), none: z.string()}),
     approval_fee: z.string(),
-    approver_account_transaction_fees: z.object({subaccount: z.string(), owner: z.string()})
+    approver_account_transaction_fees: z.string()
   })
   .strict();
 
@@ -36,7 +34,7 @@ export const i18nIcrc2_transfer_fromSchema = z
   .object({
     title: z.string(),
     withdrawal_account: z.string(),
-    sending_the_transfer_request: z.object({subaccount: z.string(), account: z.string()}),
+    sending_the_transfer_request: z.string(),
     amount_to_withdraw: z.string(),
     fee_paid_by_withdrawal_account: z.string()
   })

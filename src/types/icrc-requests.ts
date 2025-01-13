@@ -1,5 +1,5 @@
 import {isNullish} from '@dfinity/utils';
-import {z} from 'zod';
+import * as z from 'zod';
 import {
   ICRC25_PERMISSIONS,
   ICRC25_REQUEST_PERMISSIONS,

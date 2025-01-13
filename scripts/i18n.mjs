@@ -38,7 +38,7 @@ const generateTypes = async () => {
     )
     .join('\n\n');
 
-  const schema = `import { z } from 'zod';
+  const schema = `import * as z from 'zod';
 
 ${schemas}
 
