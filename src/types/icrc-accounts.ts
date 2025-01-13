@@ -1,4 +1,4 @@
-import {z} from 'zod';
+import * as z from 'zod';
 import {base64ToUint8Array} from '../utils/base64.utils';
 import {IcrcBlobSchema} from './blob';
 import {PrincipalTextSchema} from './principal';
