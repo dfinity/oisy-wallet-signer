@@ -2,30 +2,32 @@ import {asciiStringToByteArray} from '@dfinity/utils';
 import {decodeMemo} from './builders.utils';
 
 describe('builders.utils', () => {
-  const memoText = 'PUPT'; // Reverse top-up memo
+  describe('decodeMemo', () => {
+    const memoText = 'PUPT'; // Reverse top-up memo
 
-  const memo = asciiStringToByteArray(memoText);
+    const memo = asciiStringToByteArray(memoText);
 
-  it('should return memo utf-8', () => {
-    const result = decodeMemo(memo);
+    it('should return memo utf-8', () => {
+      const result = decodeMemo(memo);
 
-    expect(result).toEqual(memoText);
-  });
+      expect(result).toEqual(memoText);
+    });
 
-  it('should return memo hex', () => {
-    vi.stubGlobal(
-      'TextDecoder',
-      class {
-        decode(_buffer: ArrayBuffer): string {
-          throw new Error();
+    it('should return memo hex', () => {
+      vi.stubGlobal(
+        'TextDecoder',
+        class {
+          decode(_buffer: ArrayBuffer): string {
+            throw new Error();
+          }
         }
-      }
-    );
+      );
 
-    const result = decodeMemo(memo);
+      const result = decodeMemo(memo);
 
-    expect(result).toEqual('0x50555054');
+      expect(result).toEqual('0x50555054');
 
-    vi.unstubAllGlobals();
+      vi.unstubAllGlobals();
+    });
   });
 });
