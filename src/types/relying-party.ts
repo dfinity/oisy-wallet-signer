@@ -1,4 +1,4 @@
-import {z} from 'zod';
+import * as z from 'zod';
 import {IcrcScopesSchema, IcrcSupportedStandardsSchema} from './icrc-responses';
 
 const RelyingPartyMessageEventDataSchema = z
