@@ -1,11 +1,5 @@
 import {encodeIcrcAccount} from '@dfinity/ledger-icrc';
-import {
-  arrayOfNumberToUint8Array,
-  fromNullable,
-  isNullish,
-  nonNullish,
-  uint8ArrayToHexString
-} from '@dfinity/utils';
+import {fromNullable, isNullish, nonNullish} from '@dfinity/utils';
 import {TransferArgs} from '../constants/icrc-1.idl.constants';
 import {ApproveArgs, TransferFromArgs} from '../constants/icrc-2.idl.constants';
 import {MAX_CONSENT_MESSAGE_ARG_SIZE_BYTES} from '../constants/signer.builders.constants';
@@ -17,6 +11,7 @@ import {
 import type {icrc21_consent_info} from '../declarations/icrc-21';
 import {I18n} from '../types/i18n';
 import {SignerBuilderFn, SignerBuilderParams, SignerBuildersResult} from '../types/signer-builders';
+import {decodeMemo} from '../utils/builders.utils';
 import {formatAmount, formatDate} from '../utils/format.utils';
 import {decodeIdl} from '../utils/idl.utils';
 
@@ -317,9 +312,7 @@ const buildMemo = ({memo, en}: {memo: [] | [Uint8Array | number[]]; en: I18n}): 
     core: {memo: memoLabel}
   } = en;
 
-  return [
-    `${section(memoLabel)}\n0x${uint8ArrayToHexString(nullishMemo instanceof Uint8Array ? nullishMemo : arrayOfNumberToUint8Array(nullishMemo))}`
-  ];
+  return [`${section(memoLabel)}\n${decodeMemo(nullishMemo)}`];
 };
 
 const buildContentMessage = async ({

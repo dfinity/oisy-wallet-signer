@@ -272,7 +272,7 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.t
 0.0010033 TKN
 
 **Memo:**
-0x50555054`
+PUPT`
       });
     });
 
@@ -504,7 +504,7 @@ No expiration.
 ${encodeIcrcAccount({owner: owner.getPrincipal()})}
 
 **Memo:**
-0x50555054`
+PUPT`
       });
     });
 
@@ -870,7 +870,7 @@ ${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.to.owner, subaccount: fr
 0.0010044 TKN
 
 **Memo:**
-0x50555054`
+PUPT`
       });
     });
 
