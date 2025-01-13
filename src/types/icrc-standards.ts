@@ -1,4 +1,4 @@
-import {z} from 'zod';
+import * as z from 'zod';
 import {
   ICRC21,
   ICRC21_CALL_CONSENT_MESSAGE,

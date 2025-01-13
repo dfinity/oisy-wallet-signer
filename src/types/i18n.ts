@@ -1,5 +1,5 @@
 // Auto-generated definitions file ("npm run i18n")
-import {z} from 'zod';
+import * as z from 'zod';
 
 export const i18nCoreSchema = z
   .object({
