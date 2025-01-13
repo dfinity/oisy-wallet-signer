@@ -1,13 +1,8 @@
 import {encodeIcrcAccount} from '@dfinity/ledger-icrc';
-import {
-  arrayOfNumberToUint8Array,
-  fromNullable,
-  isNullish,
-  nonNullish,
-  uint8ArrayToHexString
-} from '@dfinity/utils';
+import {fromNullable, isNullish, nonNullish} from '@dfinity/utils';
 import {TransferArgs} from '../constants/icrc-1.idl.constants';
 import {ApproveArgs, TransferFromArgs} from '../constants/icrc-2.idl.constants';
+import {MAX_CONSENT_MESSAGE_ARG_SIZE_BYTES} from '../constants/signer.builders.constants';
 import {TransferArgs as IcrcTransferArg} from '../declarations/icrc-1';
 import {
   ApproveArgs as IcrcApproveArgs,
@@ -15,7 +10,8 @@ import {
 } from '../declarations/icrc-2';
 import type {icrc21_consent_info} from '../declarations/icrc-21';
 import {I18n} from '../types/i18n';
-import {SignerBuilderFn, SignerBuildersResult} from '../types/signer-builders';
+import {SignerBuilderFn, SignerBuilderParams, SignerBuildersResult} from '../types/signer-builders';
+import {decodeMemo} from '../utils/builders.utils';
 import {formatAmount, formatDate} from '../utils/format.utils';
 import {decodeIdl} from '../utils/idl.utils';
 
@@ -55,7 +51,7 @@ export const buildContentMessageIcrc1Transfer: SignerBuilderFn = async ({
 
     const {
       core: {amount: amountLabel, from, to, fee: feeLabel},
-      icrc1_transfer: {title, from_subaccount: fromSubaccountLabel}
+      icrc1_transfer: {title}
     } = en;
 
     // Title
@@ -72,9 +68,7 @@ export const buildContentMessageIcrc1Transfer: SignerBuilderFn = async ({
       owner,
       subaccount: fromNullishSubaccount
     });
-    message.push(
-      `${section(isNullish(fromNullishSubaccount) ? from : fromSubaccountLabel)}\n${fromAccount}`
-    );
+    message.push(`${section(from)}\n${fromAccount}`);
 
     // - To
     const toAccount = encodeIcrcAccount({
@@ -97,7 +91,7 @@ export const buildContentMessageIcrc1Transfer: SignerBuilderFn = async ({
     return {message: [...message, ...memoMessage]};
   };
 
-  return await buildContentMessage(build);
+  return await buildContentMessage({arg, fn: build});
 };
 
 /**
@@ -120,7 +114,7 @@ export const buildContentMessageIcrc1Transfer: SignerBuilderFn = async ({
 export const buildContentMessageIcrc2Approve: SignerBuilderFn = async ({
   arg,
   owner,
-  token: {symbol: tokenSymbol, decimals: tokenDecimals}
+  token: {symbol: tokenSymbol, decimals: tokenDecimals, fee: tokenFee}
 }): Promise<SignerBuildersResult> => {
   const build = (en: I18n): {message: string[]} => {
     const {
@@ -141,15 +135,11 @@ export const buildContentMessageIcrc2Approve: SignerBuilderFn = async ({
         title,
         address_is_allowed,
         your_account,
-        your_subaccount,
         requested_withdrawal_allowance,
         withdrawal_allowance: {none: withdrawalAllowanceNone, some: withdrawalAllowanceSome},
         expiration_date: {title: expirationDateTitle, none: noExpirationDate},
-        approval_fee,
-        approver_account_transaction_fees: {
-          subaccount: approverFeeSubaccount,
-          owner: approverFeeOwner
-        }
+        approval_fee: approvalFeeLabel,
+        approver_account_transaction_fees
       }
     } = en;
 
@@ -169,9 +159,7 @@ export const buildContentMessageIcrc2Approve: SignerBuilderFn = async ({
       owner,
       subaccount: fromNullishSubaccount
     });
-    message.push(
-      `${section(isNullish(fromNullishSubaccount) ? your_account : your_subaccount)}\n${fromAccount}`
-    );
+    message.push(`${section(your_account)}\n${fromAccount}`);
 
     // - Amount
     message.push(
@@ -199,17 +187,12 @@ export const buildContentMessageIcrc2Approve: SignerBuilderFn = async ({
     );
 
     // - Fee
-    const fee = fromNullable(approveFee);
-    if (nonNullish(fee)) {
-      message.push(
-        `${section(approval_fee)}\n${formatAmount({amount: fee, decimals: tokenDecimals})} ${tokenSymbol}`
-      );
-    }
+    message.push(
+      `${section(approvalFeeLabel)}\n${formatAmount({amount: fromNullable(approveFee) ?? tokenFee, decimals: tokenDecimals})} ${tokenSymbol}`
+    );
 
     // - Fee paid by
-    message.push(
-      `${section(isNullish(fromNullishSubaccount) ? approverFeeOwner : approverFeeSubaccount)}\n${fromAccount}`
-    );
+    message.push(`${section(approver_account_transaction_fees)}\n${fromAccount}`);
 
     // - Memo
     const memoMessage = buildMemo({
@@ -220,7 +203,7 @@ export const buildContentMessageIcrc2Approve: SignerBuilderFn = async ({
     return {message: [...message, ...memoMessage]};
   };
 
-  return await buildContentMessage(build);
+  return await buildContentMessage({arg, fn: build});
 };
 
 /**
@@ -263,10 +246,7 @@ export const buildContentMessageIcrc2TransferFrom: SignerBuilderFn = async ({
       icrc2_transfer_from: {
         title,
         withdrawal_account,
-        sending_the_transfer_request: {
-          subaccount: subaccountSendingTransferRequest,
-          account: accountSendingTransferRequest
-        },
+        sending_the_transfer_request,
         amount_to_withdraw,
         fee_paid_by_withdrawal_account
       }
@@ -288,9 +268,7 @@ export const buildContentMessageIcrc2TransferFrom: SignerBuilderFn = async ({
       owner,
       subaccount: spenderNullishSubaccount
     });
-    message.push(
-      `${section(isNullish(spenderNullishSubaccount) ? accountSendingTransferRequest : subaccountSendingTransferRequest)}\n${spenderAccount}`
-    );
+    message.push(`${section(sending_the_transfer_request)}\n${spenderAccount}`);
 
     // - Amount
     message.push(
@@ -318,7 +296,7 @@ export const buildContentMessageIcrc2TransferFrom: SignerBuilderFn = async ({
     return {message: [...message, ...memoMessage]};
   };
 
-  return await buildContentMessage(build);
+  return await buildContentMessage({arg, fn: build});
 };
 
 const section = (text: string): string => `**${text}:**`;
@@ -334,15 +312,18 @@ const buildMemo = ({memo, en}: {memo: [] | [Uint8Array | number[]]; en: I18n}): 
     core: {memo: memoLabel}
   } = en;
 
-  return [
-    `${section(memoLabel)}\n0x${uint8ArrayToHexString(nullishMemo instanceof Uint8Array ? nullishMemo : arrayOfNumberToUint8Array(nullishMemo))}`
-  ];
+  return [`${section(memoLabel)}\n${decodeMemo(nullishMemo)}`];
 };
 
-const buildContentMessage = async (
-  fn: (en: I18n) => {message: string[]}
-): Promise<SignerBuildersResult> => {
+const buildContentMessage = async ({
+  fn,
+  arg
+}: Pick<SignerBuilderParams, 'arg'> & {
+  fn: (en: I18n) => {message: string[]};
+}): Promise<SignerBuildersResult> => {
   try {
+    assertArgSize({arg});
+
     // TODO: support i18n
     // eslint-disable-next-line import/no-relative-parent-imports
     const {default: en} = await import('../i18n/en.json');
@@ -362,5 +343,26 @@ const buildContentMessage = async (
     return {Ok: consentMessage};
   } catch (err: unknown) {
     return {Err: err};
+  }
+};
+
+export class ArgSizeError extends Error {}
+
+/**
+ * Validates the size of the argument to prevent issues with the Candid parser.
+ *
+ * A similar assertion is implemented in the ICP ledger for building the consent message.
+ *
+ * @see {@link https://github.com/dfinity/ic/blob/master/packages/icrc-ledger-types/src/icrc21/lib.rs#L426}
+ *
+ * @param {object} params - The parameters for the function.
+ * @param {ArrayBuffer} params.arg - The argument to validate, represented as an ArrayBuffer.
+ * @throws {Error} Throws an error if the argument size exceeds the maximum allowed size.
+ */
+const assertArgSize = ({arg}: Pick<SignerBuilderParams, 'arg'>) => {
+  if (arg.byteLength > MAX_CONSENT_MESSAGE_ARG_SIZE_BYTES) {
+    throw new ArgSizeError(
+      `The argument size is too large. The maximum allowed size is ${MAX_CONSENT_MESSAGE_ARG_SIZE_BYTES} bytes.`
+    );
   }
 };

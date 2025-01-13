@@ -1,9 +1,11 @@
+import {IDL} from '@dfinity/candid';
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {encodeIcrcAccount} from '@dfinity/ledger-icrc';
 import {Principal} from '@dfinity/principal';
 import {asciiStringToByteArray, fromNullable} from '@dfinity/utils';
 import {TransferArgs} from '../constants/icrc-1.idl.constants';
 import {ApproveArgs, TransferFromArgs} from '../constants/icrc-2.idl.constants';
+import {MAX_CONSENT_MESSAGE_ARG_SIZE_BYTES} from '../constants/signer.builders.constants';
 import {TransferArgs as TransferArgsType} from '../declarations/icrc-1';
 import {mockCallCanisterParams} from '../mocks/call-canister.mocks';
 import {mockPrincipalText} from '../mocks/icrc-accounts.mocks';
@@ -14,6 +16,7 @@ import {
   mockIcrcTransferFromRawArgs
 } from '../mocks/icrc-transfer-from.mocks';
 import {
+  SignerBuilderFn,
   SignerBuildersResult,
   SignerBuildersResultError,
   SignerBuildersResultOk
@@ -21,6 +24,7 @@ import {
 import {base64ToUint8Array} from '../utils/base64.utils';
 import {encodeIdl} from '../utils/idl.utils';
 import {
+  ArgSizeError,
   buildContentMessageIcrc1Transfer,
   buildContentMessageIcrc2Approve,
   buildContentMessageIcrc2TransferFrom
@@ -55,6 +59,34 @@ describe('Signer builders', () => {
     };
 
     expect(message).toEqual(expectedMessage);
+  };
+
+  const assertArgSize = async (fn: SignerBuilderFn) => {
+    const TestArgs = IDL.Record({
+      test: IDL.Text
+    });
+
+    const arg = encodeIdl({
+      recordClass: TestArgs,
+      rawArgs: {
+        test: [...Array(500)].map(() => 'A').join('')
+      }
+    });
+
+    const result = await fn({
+      arg: base64ToUint8Array(arg),
+      owner: owner.getPrincipal(),
+      token
+    });
+
+    expect('Err' in result).toBeTruthy();
+
+    const {Err} = result as SignerBuildersResultError;
+
+    expect(Err).toBeInstanceOf(ArgSizeError);
+    expect((Err as ArgSizeError).message).toEqual(
+      `The argument size is too large. The maximum allowed size is ${MAX_CONSENT_MESSAGE_ARG_SIZE_BYTES} bytes.`
+    );
   };
 
   describe('icrc1_transfer', () => {
@@ -133,7 +165,7 @@ s3oqv-3j7id-xjhbm-3owbe-fvwly-oso6u-vej6n-bexck-koyu2-bxb6y-wae
       expect(fromNullable(Ok.metadata.utc_offset_minutes)).toBeUndefined();
     });
 
-    it('should build a consent message with a from subaccount', async () => {
+    it('should build a consent message with a from label even if a subaccount is used', async () => {
       const subaccount = [1, 2, 3];
 
       const arg = encodeIdl({
@@ -157,7 +189,7 @@ s3oqv-3j7id-xjhbm-3owbe-fvwly-oso6u-vej6n-bexck-koyu2-bxb6y-wae
 **Amount:**
 3,200.00000001 TKN
 
-**From subaccount:**
+**From:**
 ${encodeIcrcAccount({owner: owner.getPrincipal(), subaccount: subaccount})}
 
 **To:**
@@ -240,7 +272,7 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.t
 0.0010033 TKN
 
 **Memo:**
-0x50555054`
+PUPT`
       });
     });
 
@@ -290,6 +322,38 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.t
 **Fee:**
 0.0001 TKN`
       });
+    });
+
+    it('should throw error if arg is too long', async () => {
+      const TestArgs = IDL.Record({
+        test: IDL.Text
+      });
+
+      const arg = encodeIdl({
+        recordClass: TestArgs,
+        rawArgs: {
+          test: [...Array(500)].map(() => 'A').join('')
+        }
+      });
+
+      const result = await buildContentMessageIcrc1Transfer({
+        arg: base64ToUint8Array(arg),
+        owner: owner.getPrincipal(),
+        token
+      });
+
+      expect('Err' in result).toBeTruthy();
+
+      const {Err} = result as SignerBuildersResultError;
+
+      expect(Err).toBeInstanceOf(ArgSizeError);
+      expect((Err as ArgSizeError).message).toEqual(
+        `The argument size is too large. The maximum allowed size is ${MAX_CONSENT_MESSAGE_ARG_SIZE_BYTES} bytes.`
+      );
+    });
+
+    it('should throw error if arg is too long', async () => {
+      await assertArgSize(buildContentMessageIcrc1Transfer);
     });
   });
 
@@ -379,7 +443,7 @@ ${encodeIcrcAccount({owner: owner.getPrincipal()})}`
 **The following address is allowed to withdraw from your account:**
 ${encodeIcrcAccount({owner: mockIcrcApproveRawArgs.spender.owner, subaccount: fromNullable(mockIcrcApproveRawArgs.spender.subaccount)})}
 
-**Your subaccount:**
+**Your account:**
 ${encodeIcrcAccount({owner: owner.getPrincipal(), subaccount: subaccount})}
 
 **Requested withdrawal allowance:**
@@ -393,7 +457,7 @@ No expiration.
 **Approval fee:**
 0.0010033 TKN
 
-**Transaction fees to be paid by your subaccount:**
+**Transaction fees to be paid by:**
 ${encodeIcrcAccount({owner: owner.getPrincipal(), subaccount: subaccount})}`
       });
     });
@@ -440,7 +504,7 @@ No expiration.
 ${encodeIcrcAccount({owner: owner.getPrincipal()})}
 
 **Memo:**
-0x50555054`
+PUPT`
       });
     });
 
@@ -457,6 +521,47 @@ ${encodeIcrcAccount({owner: owner.getPrincipal()})}
 
       expect(err).not.toBeUndefined();
       expect((err as Error).message).toContain('Wrong magic number');
+    });
+
+    it('should build a consent message with token fee if no fee as arg', async () => {
+      const arg = encodeIdl({
+        recordClass: ApproveArgs,
+        rawArgs: {
+          ...mockIcrcApproveRawArgs,
+          fee: []
+        }
+      });
+
+      const result = await buildContentMessageIcrc2Approve({
+        arg: base64ToUint8Array(arg),
+        owner: owner.getPrincipal(),
+        token
+      });
+
+      expectMessage({
+        result,
+        expectedMessage: `# Authorize another address to withdraw from your account
+
+**The following address is allowed to withdraw from your account:**
+${encodeIcrcAccount({owner: mockIcrcApproveRawArgs.spender.owner, subaccount: fromNullable(mockIcrcApproveRawArgs.spender.subaccount)})}
+
+**Your account:**
+${encodeIcrcAccount({owner: owner.getPrincipal()})}
+
+**Requested withdrawal allowance:**
+3,200.00000001 TKN
+
+⚠ The allowance will be set to 3,200.00000001 TKN independently of any previous allowance. Until this transaction has been executed the spender can still exercise the previous allowance (if any) to it's full amount.
+
+**Expiration date:**
+No expiration.
+
+**Approval fee:**
+0.0001 TKN
+
+**Transaction fees to be paid by:**
+${encodeIcrcAccount({owner: owner.getPrincipal()})}`
+      });
     });
 
     it('should build a consent message with expected allowance', async () => {
@@ -545,6 +650,10 @@ Mon, Dec 30, 2024, 08:30:16 UTC
 ${encodeIcrcAccount({owner: owner.getPrincipal()})}`
       });
     });
+
+    it('should throw error if arg is too long', async () => {
+      await assertArgSize(buildContentMessageIcrc2Approve);
+    });
   });
 
   describe('icrc2_transfer_from', () => {
@@ -628,7 +737,7 @@ ${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.to.owner, subaccount: fr
 **Withdrawal account:**
 ${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.from.owner, subaccount: fromNullable(mockIcrcTransferFromRawArgs.from.subaccount)})}
 
-**Subaccount sending the transfer request:**
+**Account sending the transfer request:**
 ${encodeIcrcAccount({owner: owner.getPrincipal(), subaccount})}
 
 **Amount to withdraw:**
@@ -761,7 +870,7 @@ ${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.to.owner, subaccount: fr
 0.0010044 TKN
 
 **Memo:**
-0x50555054`
+PUPT`
       });
     });
 
@@ -814,6 +923,10 @@ ${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.to.owner, subaccount: fr
 **Fee paid by withdrawal account:**
 0.0001 TKN`
       });
+    });
+
+    it('should throw error if arg is too long', async () => {
+      await assertArgSize(buildContentMessageIcrc2TransferFrom);
     });
   });
 });
