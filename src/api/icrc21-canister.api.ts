@@ -2,6 +2,7 @@ import {Actor, type ActorMethod, type ActorSubclass} from '@dfinity/agent';
 import type {IDL} from '@dfinity/candid';
 import {Principal} from '@dfinity/principal';
 import {isNullish} from '@dfinity/utils';
+import type {PrincipalText} from '@dfinity/zod-schemas';
 import type {
   _SERVICE as Icrc21Actor,
   icrc21_consent_message_request,
@@ -9,7 +10,6 @@ import type {
 } from '../declarations/icrc-21';
 // eslint-disable-next-line import/no-relative-parent-imports
 import {idlFactory} from '../declarations/icrc-21.idl';
-import type {PrincipalText} from '../types/principal';
 import type {SignerOptions} from '../types/signer-options';
 import {AgentApi} from './agent.api';
 

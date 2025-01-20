@@ -1,5 +1,5 @@
+import {UrlSchema} from '@dfinity/zod-schemas';
 import * as z from 'zod';
-import {UrlSchema} from './url';
 
 export const OriginSchema = UrlSchema;
 
