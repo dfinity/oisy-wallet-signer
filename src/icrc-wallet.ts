@@ -13,6 +13,7 @@ import type {
   TransferError,
   TransferFromError
 } from '@dfinity/ledger-icrc/dist/candid/icrc_ledger';
+import type {PrincipalText} from '@dfinity/zod-schemas';
 import {TransferArgs, TransferResult} from './constants/icrc-1.idl.constants';
 import {
   ApproveArgs,
@@ -30,7 +31,6 @@ import type {
 import {RelyingParty} from './relying-party';
 import {decodeResponse} from './utils/call.utils';
 import {encodeIdl} from './utils/idl.utils';
-import type {PrincipalText} from "@dfinity/zod-schemas";
 
 export class IcrcWallet extends RelyingParty {
   /**
