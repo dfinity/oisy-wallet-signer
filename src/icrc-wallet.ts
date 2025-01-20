@@ -13,6 +13,7 @@ import type {
   TransferError,
   TransferFromError
 } from '@dfinity/ledger-icrc/dist/candid/icrc_ledger';
+import type {PrincipalText} from '@dfinity/zod-schemas';
 import {TransferArgs, TransferResult} from './constants/icrc-1.idl.constants';
 import {
   ApproveArgs,
@@ -24,7 +25,6 @@ import {RelyingParty} from './relying-party';
 import {IcrcAccount} from './types/icrc-accounts';
 import {IcrcCallCanisterRequestParams} from './types/icrc-requests';
 import {Origin} from './types/post-message';
-import {PrincipalText} from './types/principal';
 import {RelyingPartyOptions} from './types/relying-party-options';
 import {RelyingPartyRequestOptions} from './types/relying-party-requests';
 import {decodeResponse} from './utils/call.utils';

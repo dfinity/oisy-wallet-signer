@@ -1,8 +1,8 @@
 import {Principal} from '@dfinity/principal';
 import {arrayBufferToUint8Array} from '@dfinity/utils';
+import {PrincipalText} from '@dfinity/zod-schemas';
 import {IcrcBlob} from '../types/blob';
 import {Method} from '../types/icrc-requests';
-import {PrincipalText} from '../types/principal';
 import {base64ToUint8Array} from './base64.utils';
 
 export const assertCallMethod = ({
