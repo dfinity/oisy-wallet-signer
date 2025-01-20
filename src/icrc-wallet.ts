@@ -21,14 +21,12 @@ import {
   TransferFromArgs,
   TransferFromResult
 } from './constants/icrc-2.idl.constants';
-import type {
-  IcrcAccount,
-  IcrcCallCanisterRequestParams,
-  Origin,
-  RelyingPartyOptions,
-  RelyingPartyRequestOptions
-} from './index';
 import {RelyingParty} from './relying-party';
+import {IcrcAccount} from './types/icrc-accounts';
+import {IcrcCallCanisterRequestParams} from './types/icrc-requests';
+import {Origin} from './types/post-message';
+import {RelyingPartyOptions} from './types/relying-party-options';
+import {RelyingPartyRequestOptions} from './types/relying-party-requests';
 import {decodeResponse} from './utils/call.utils';
 import {encodeIdl} from './utils/idl.utils';
 
