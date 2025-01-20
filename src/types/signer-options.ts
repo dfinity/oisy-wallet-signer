@@ -1,7 +1,7 @@
 import {type Identity} from '@dfinity/agent';
 import {isNullish} from '@dfinity/utils';
+import {UrlSchema} from '@dfinity/zod-schemas';
 import * as z from 'zod';
-import {UrlSchema} from './url';
 
 const IdentitySchema = z.custom<Identity>((value: unknown): boolean => {
   if (isNullish(value)) {

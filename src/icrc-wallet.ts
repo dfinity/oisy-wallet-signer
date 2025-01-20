@@ -24,13 +24,13 @@ import type {
   IcrcAccount,
   IcrcCallCanisterRequestParams,
   Origin,
-  PrincipalText,
   RelyingPartyOptions,
   RelyingPartyRequestOptions
 } from './index';
 import {RelyingParty} from './relying-party';
 import {decodeResponse} from './utils/call.utils';
 import {encodeIdl} from './utils/idl.utils';
+import type {PrincipalText} from "@dfinity/zod-schemas";
 
 export class IcrcWallet extends RelyingParty {
   /**
