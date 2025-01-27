@@ -44,30 +44,29 @@ describe('Signer services', () => {
     host: 'http://localhost:4943'
   };
 
-  let originalOpener: typeof window.opener;
+  let sourceMock: Window;
 
   let postMessageMock: Mock;
 
   beforeEach(() => {
-    originalOpener = window.opener;
-
     postMessageMock = vi.fn();
 
-    vi.stubGlobal('opener', {postMessage: postMessageMock});
+    sourceMock = {
+      postMessage: postMessageMock
+    } as unknown as Window;
 
     requestId = crypto.randomUUID();
 
     notify = {
       id: requestId,
-      origin: testOrigin
+      origin: testOrigin,
+      source: sourceMock
     };
 
     signerService = new SignerService();
   });
 
   afterEach(() => {
-    window.opener = originalOpener;
-
     vi.clearAllMocks();
   });
 
@@ -144,7 +143,7 @@ describe('Signer services', () => {
           error: mockErrorNotify
         };
 
-        expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, testOrigin);
+        expect(postMessageMock).toHaveBeenCalledWith(expectedMessage);
       });
     });
 
@@ -187,7 +186,7 @@ describe('Signer services', () => {
           error: errorNotify
         };
 
-        expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, testOrigin);
+        expect(postMessageMock).toHaveBeenCalledWith(expectedMessage);
       });
 
       it('should trigger prompt "error" with the error', async () => {
@@ -251,7 +250,7 @@ describe('Signer services', () => {
           error: errorNotify
         };
 
-        expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, testOrigin);
+        expect(postMessageMock).toHaveBeenCalledWith(expectedMessage);
       });
 
       it('should call notifyNetworkError with an the error message when consentMessage throws an error', async () => {
@@ -279,7 +278,7 @@ describe('Signer services', () => {
           error: errorNotify
         };
 
-        expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, testOrigin);
+        expect(postMessageMock).toHaveBeenCalledWith(expectedMessage);
       });
     });
 
@@ -302,7 +301,7 @@ describe('Signer services', () => {
         error: errorNotify
       };
 
-      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, testOrigin);
+      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage);
     });
 
     describe('Without consent message fallback', () => {
@@ -671,7 +670,7 @@ describe('Signer services', () => {
           error: errorNotify
         };
 
-        expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, testOrigin);
+        expect(postMessageMock).toHaveBeenCalledWith(expectedMessage);
       });
     });
   });
@@ -711,7 +710,8 @@ describe('Signer services', () => {
       expect(notifyCallCanisterSpy).toHaveBeenCalledWith({
         id: requestId,
         origin: testOrigin,
-        result: mockCanisterCallSuccess
+        result: mockCanisterCallSuccess,
+        source: sourceMock
       });
     });
 
@@ -733,7 +733,8 @@ describe('Signer services', () => {
         error: {
           code: SignerErrorCode.NETWORK_ERROR,
           message: errorMsg
-        }
+        },
+        source: sourceMock
       });
     });
 
@@ -753,7 +754,8 @@ describe('Signer services', () => {
         error: {
           code: SignerErrorCode.NETWORK_ERROR,
           message: 'An unknown error occurred'
-        }
+        },
+        source: sourceMock
       });
     });
 
