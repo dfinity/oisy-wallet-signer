@@ -1,7 +1,8 @@
 import {
 	AUTH_MAX_TIME_TO_LIVE,
 	AUTH_POPUP_HEIGHT,
-	AUTH_POPUP_WIDTH
+	AUTH_POPUP_WIDTH,
+	LOCAL_REPLICA_URL
 } from '$core/constants/app.constants';
 import type { OptionIdentity } from '$core/types/identity';
 import { createAuthClient } from '$core/utils/auth.utils';
@@ -56,11 +57,13 @@ const initAuthStore = (): AuthStore => {
 				const container = import.meta.env.VITE_CONTAINER;
 				const iiId = import.meta.env.VITE_INTERNET_IDENTITY_ID;
 
+				const localHost = URL.parse(LOCAL_REPLICA_URL);
+
 				const identityProvider =
 					nonNullish(container) && nonNullish(iiId)
 						? /apple/i.test(navigator?.vendor)
-							? `http://localhost:4943?canisterId=${iiId}`
-							: `http://${iiId}.localhost:4943`
+							? `${LOCAL_REPLICA_URL}?canisterId=${iiId}`
+							: `http://${iiId}.${localHost?.host ?? 'localhost:4943'}`
 						: `https://identity.${domain ?? 'ic0.app'}`;
 
 				await authClient?.login({
