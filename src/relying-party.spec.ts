@@ -1,3 +1,4 @@
+import {uint8ArrayToBase64} from '@dfinity/utils';
 import {MockInstance} from 'vitest';
 import {
   ICRC25_PERMISSION_DENIED,
@@ -39,7 +40,6 @@ import {RelyingPartyResponseError} from './types/relying-party-errors';
 import type {OnDisconnect, RelyingPartyOptions} from './types/relying-party-options';
 import type {RelyingPartyRequestOptions} from './types/relying-party-requests';
 import {JSON_RPC_VERSION_2, RpcResponseWithResultOrErrorSchema} from './types/rpc';
-import {uint8ArrayToBase64} from './utils/base64.utils';
 import * as callUtils from './utils/call.utils';
 import {windowFeatures} from './utils/window.utils';
 

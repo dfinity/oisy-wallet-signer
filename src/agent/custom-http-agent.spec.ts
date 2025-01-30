@@ -1,5 +1,6 @@
 import type {RequestId, SubmitResponse} from '@dfinity/agent';
 import * as httpAgent from '@dfinity/agent';
+import {base64ToUint8Array} from '@dfinity/utils';
 import type {MockInstance} from 'vitest';
 import {
   mockLocalIcRootKey,
@@ -16,7 +17,6 @@ import {
   mockRequestPayload
 } from '../mocks/custom-http-agent.mocks';
 import {mockCanisterId} from '../mocks/icrc-accounts.mocks';
-import {base64ToUint8Array} from '../utils/base64.utils';
 import {
   CustomHttpAgent,
   InvalidCertificateReplyError,

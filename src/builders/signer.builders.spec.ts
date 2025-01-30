@@ -2,7 +2,7 @@ import {IDL} from '@dfinity/candid';
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {encodeIcrcAccount} from '@dfinity/ledger-icrc';
 import {Principal} from '@dfinity/principal';
-import {asciiStringToByteArray, fromNullable} from '@dfinity/utils';
+import {asciiStringToByteArray, base64ToUint8Array, fromNullable} from '@dfinity/utils';
 import {TransferArgs} from '../constants/icrc-1.idl.constants';
 import {ApproveArgs, TransferFromArgs} from '../constants/icrc-2.idl.constants';
 import {MAX_CONSENT_MESSAGE_ARG_SIZE_BYTES} from '../constants/signer.builders.constants';
@@ -21,7 +21,6 @@ import {
   SignerBuildersResultError,
   SignerBuildersResultOk
 } from '../types/signer-builders';
-import {base64ToUint8Array} from '../utils/base64.utils';
 import {encodeIdl} from '../utils/idl.utils';
 import {
   ArgSizeError,

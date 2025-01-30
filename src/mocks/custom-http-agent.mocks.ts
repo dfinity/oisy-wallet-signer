@@ -1,8 +1,8 @@
 import {Expiry, type Nonce} from '@dfinity/agent';
 import {SubmitRequestType, type CallRequest} from '@dfinity/agent/lib/cjs/agent/http/types';
 import {Principal} from '@dfinity/principal';
+import {uint8ArrayToBase64} from '@dfinity/utils';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
-import {uint8ArrayToBase64} from '../utils/base64.utils';
 import {mockCanisterId, mockPrincipalText} from './icrc-accounts.mocks';
 
 export const mockRequestMethod = 'test-method';

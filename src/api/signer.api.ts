@@ -1,13 +1,12 @@
 import {IcrcLedgerCanister} from '@dfinity/ledger-icrc';
 import type {IcrcTokenMetadataResponse} from '@dfinity/ledger-icrc/dist/types/types/ledger.responses';
 import {Principal} from '@dfinity/principal';
-import {arrayBufferToUint8Array} from '@dfinity/utils';
+import {arrayBufferToUint8Array, uint8ArrayToBase64} from '@dfinity/utils';
 import {encode} from '../agent/agentjs-cbor-copy';
 import type {CustomHttpAgentResponse} from '../agent/custom-http-agent';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import type {IcrcCallCanisterResult} from '../types/icrc-responses';
 import type {SignerOptions} from '../types/signer-options';
-import {uint8ArrayToBase64} from '../utils/base64.utils';
 import {Icrc21Canister} from './icrc21-canister.api';
 
 export class SignerApi extends Icrc21Canister {

@@ -1,6 +1,6 @@
 import {Principal} from '@dfinity/principal';
+import {uint8ArrayToBase64} from '@dfinity/utils';
 import type {IcrcAccounts} from '../types/icrc-accounts';
-import {uint8ArrayToBase64} from '../utils/base64.utils';
 
 export const mockCanisterId = 'doked-biaaa-aaaar-qag2a-cai';
 

@@ -10,9 +10,8 @@ import {
 } from '@dfinity/agent';
 import {bufFromBufLike} from '@dfinity/candid';
 import {Principal} from '@dfinity/principal';
-import {isNullish, nonNullish} from '@dfinity/utils';
+import {base64ToUint8Array, isNullish, nonNullish} from '@dfinity/utils';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
-import {base64ToUint8Array} from '../utils/base64.utils';
 
 export type CustomHttpAgentResponse = Pick<Required<SubmitResponse>, 'requestDetails'> & {
   certificate: Certificate;
