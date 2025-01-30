@@ -1,6 +1,6 @@
+import {uint8ArrayToBase64} from '@dfinity/utils';
 import {ICRC27_ACCOUNTS} from '../constants/icrc.constants';
 import {mockCallCanisterParams} from '../mocks/call-canister.mocks';
-import {uint8ArrayToBase64} from '../utils/base64.utils';
 import {
   IcrcAccountsRequestSchema,
   IcrcCallCanisterRequestParamsSchema,

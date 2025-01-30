@@ -1,9 +1,9 @@
 import type {CallRequest, Expiry} from '@dfinity/agent';
 import {Principal} from '@dfinity/principal';
+import {base64ToUint8Array} from '@dfinity/utils';
 import type {BigNumber} from 'bignumber.js';
 import {decode} from '../agent/agentjs-cbor-copy';
 import type {IcrcBlob} from '../types/blob';
-import {base64ToUint8Array} from './base64.utils';
 
 export const decodeCallRequest = (contentMap: IcrcBlob): CallRequest => {
   type CborCallRequest = Omit<CallRequest, 'ingress_expiry' | 'canister_id'> & {

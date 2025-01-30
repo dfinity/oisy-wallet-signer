@@ -1,9 +1,8 @@
 import {fromHex} from '@dfinity/agent';
-import {arrayBufferToUint8Array} from '@dfinity/utils';
+import {arrayBufferToUint8Array, uint8ArrayToBase64} from '@dfinity/utils';
 import {encode} from '../agent/agentjs-cbor-copy';
 import type {icrc21_consent_info} from '../declarations/icrc-21';
 import type {IcrcCallCanisterResult} from '../types/icrc-responses';
-import {uint8ArrayToBase64} from '../utils/base64.utils';
 import {mockRepliedLocalCertificate} from './custom-http-agent-responses.mocks';
 import {mockRequestDetails} from './custom-http-agent.mocks';
 
