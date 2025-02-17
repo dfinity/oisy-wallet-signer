@@ -78,6 +78,11 @@ export const decodeResponse = async <T>({
     ...(localhost && {shouldFetchRootKey: true})
   });
 
+  assertNonNullish(
+    agent.rootKey,
+    'Missing agent root key, which is required to certify the response.'
+  );
+
   const certificate = await Certificate.create({
     certificate: base64ToUint8Array(cert),
     rootKey: agent.rootKey,
