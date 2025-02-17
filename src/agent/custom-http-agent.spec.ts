@@ -1,7 +1,7 @@
-import type {RequestId, SubmitResponse} from '@dfinity/agent';
 import * as httpAgent from '@dfinity/agent';
+import {RequestId, SubmitResponse} from '@dfinity/agent';
 import {base64ToUint8Array} from '@dfinity/utils';
-import type {MockInstance} from 'vitest';
+import {MockInstance} from 'vitest';
 import {
   mockLocalIcRootKey,
   mockRejectedLocalCallTime,
@@ -22,7 +22,8 @@ import {
   InvalidCertificateReplyError,
   InvalidCertificateStatusError,
   RequestError,
-  UndefinedRequestDetailsError
+  UndefinedRequestDetailsError,
+  UndefinedRootKeyError
 } from './custom-http-agent';
 
 vi.mock('@dfinity/agent', async (importOriginal) => {
@@ -278,6 +279,11 @@ describe('CustomHttpAgent', () => {
             InvalidCertificateReplyError
           );
         });
+      });
+
+      it('should throw an exception if the agent root key is not defined', async () => {
+        vi.spyOn(agent.agent, 'rootKey', 'get').mockReturnValue(null);
+        await expect(agent.request(mockRequestPayload)).rejects.toThrow(UndefinedRootKeyError);
       });
     });
 
