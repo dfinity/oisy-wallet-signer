@@ -21,6 +21,7 @@ export class UndefinedRequestDetailsError extends Error {}
 export class RequestError extends Error {}
 export class InvalidCertificateReplyError extends Error {}
 export class InvalidCertificateStatusError extends Error {}
+export class UndefinedRootKeyError extends Error {}
 
 // To extend the HttpAgent, we would have to override the static create function.
 // While this is possible, it would require using Object.assign to clone the HttpAgent into a CustomHttpAgent, because the super function does not accept generics.
@@ -124,6 +125,10 @@ export class CustomHttpAgent {
     // @see agent-js: https://github.com/dfinity/agent-js/blob/21cf4700eff1de7f6f15304b758a16e5881afca3/packages/agent/src/actor.ts#L545
 
     const {certificate: cert} = body;
+
+    if (isNullish(this.#agent.rootKey)) {
+      throw new UndefinedRootKeyError();
+    }
 
     const certificate = await Certificate.create({
       certificate: bufFromBufLike(cert),
