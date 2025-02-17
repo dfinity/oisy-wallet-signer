@@ -6,7 +6,7 @@ updates:
   - package-ecosystem: npm
     directory: '/'
     schedule:
-      interval: weekly
+      interval: monthly
     allow:
       - dependency-type: development
     ignore:
@@ -18,7 +18,7 @@ updates:
   - package-ecosystem: npm
     directory: '/demo'
     schedule:
-      interval: weekly
+      interval: monthly
     ignore:
       - dependency-name: '@types/*'
       - dependency-name: '@typescript-eslint/*'
