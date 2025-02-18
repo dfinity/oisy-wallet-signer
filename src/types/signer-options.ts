@@ -15,7 +15,7 @@ const IdentitySchema = z.custom<Identity>((value: unknown): boolean => {
   try {
     (value as Identity).getPrincipal();
     return true;
-  } catch (err: unknown) {
+  } catch (_err: unknown) {
     return false;
   }
 }, 'The value provided is not a valid Identity.');
