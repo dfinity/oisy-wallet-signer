@@ -15,7 +15,9 @@
 		"./src/**/postcss.config.js",
 		"./playwright.config.ts",
 		"./src/**/playwright.config.ts",
-		"./juno.dev.config.js"
+		"./juno.dev.config.js",
+		"./eslint.config.mjs",
+		"./eslint-local-rules.cjs"
 	],
 	"exclude": ["./node_modules/**", "./src/**/node_modules/**", "./build/**", "./src/**/build/**"]
 }
