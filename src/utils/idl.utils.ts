@@ -1,9 +1,9 @@
 import {IDL} from '@dfinity/candid';
 import {RecordClass, VariantClass} from '@dfinity/candid/lib/cjs/idl';
+import {uint8ArrayToBase64} from '@dfinity/utils';
 import {IcrcBlob} from '../types/blob';
-import {uint8ArrayToBase64} from './base64.utils';
 
-export const encodeArg = <T>({
+export const encodeIdl = <T>({
   recordClass,
   rawArgs
 }: {
@@ -11,14 +11,14 @@ export const encodeArg = <T>({
   rawArgs: T;
 }): IcrcBlob => uint8ArrayToBase64(new Uint8Array(IDL.encode([recordClass], [rawArgs])));
 
-export const decodeResult = <T>({
+export const decodeIdl = <T>({
   recordClass,
-  reply
+  bytes
 }: {
   recordClass: RecordClass | VariantClass;
-  reply: ArrayBuffer;
+  bytes: ArrayBuffer;
 }): T => {
-  const result = IDL.decode([recordClass], reply);
+  const result = IDL.decode([recordClass], bytes);
 
   if (result.length !== 1) {
     throw new Error('More than one object returned. This is unexpected.');

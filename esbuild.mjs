@@ -50,6 +50,7 @@ const bundleFiles = () => {
         !file.includes('test') &&
         !file.includes('spec') &&
         !file.includes('mock') &&
+        !file.includes('tsconfig') &&
         statSync(join(process.cwd(), 'src', file)).isFile()
     )
     .map((file) => `src/${file}`);

@@ -1,4 +1,4 @@
-import {z} from 'zod';
+import * as z from 'zod';
 import {RpcIdSchema} from './rpc';
 
 export const RelyingPartyRequestOptionsTimeoutSchema = z.object({

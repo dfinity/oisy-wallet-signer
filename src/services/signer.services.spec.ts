@@ -1,20 +1,26 @@
 import {Ed25519KeyIdentity} from '@dfinity/identity';
+import {IcrcTokenMetadata, mapTokenMetadata} from '@dfinity/ledger-icrc';
+import {assertNonNullish, base64ToUint8Array} from '@dfinity/utils';
 import type {Mock, MockInstance} from 'vitest';
 import {Icrc21Canister} from '../api/icrc21-canister.api';
 import {SignerApi} from '../api/signer.api';
+import {SIGNER_BUILDERS} from '../constants/signer.builders.constants';
 import {SignerErrorCode} from '../constants/signer.constants';
 import * as signerSuccessHandlers from '../handlers/signer-success.handlers';
 import * as signerHandlers from '../handlers/signer.handlers';
 import {mockCallCanisterParams} from '../mocks/call-canister.mocks';
 import {mockCanisterCallSuccess, mockConsentInfo} from '../mocks/consent-message.mocks';
 import {mockPrincipalText} from '../mocks/icrc-accounts.mocks';
+import {mockIcrcApproveArg} from '../mocks/icrc-approve.mocks';
+import {mockIcrcLocalCallParams} from '../mocks/icrc-call-utils.mocks';
+import {mockIcrcLedgerMetadata} from '../mocks/icrc-ledger.mocks';
+import {mockIcrcTransferFromArg} from '../mocks/icrc-transfer-from.mocks';
 import {mockErrorNotify} from '../mocks/signer-error.mocks';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import {JSON_RPC_VERSION_2, type RpcId, type RpcResponseWithError} from '../types/rpc';
 import type {Notify} from '../types/signer-handlers';
 import type {SignerOptions} from '../types/signer-options';
 import type {ConsentMessagePromptPayload} from '../types/signer-prompts';
-import {base64ToUint8Array} from '../utils/base64.utils';
 import {mapIcrc21ErrorToString} from '../utils/icrc-21.utils';
 import {SignerService} from './signer.service';
 
@@ -90,40 +96,6 @@ describe('Signer services', () => {
       expect(prompt).toHaveBeenCalledWith({
         origin: testOrigin,
         status: 'loading'
-      });
-    });
-
-    it('should return approved when user approves the consent message', async () => {
-      spyIcrc21CanisterConsentMessage.mockResolvedValue({
-        Ok: mockConsentInfo
-      });
-
-      const prompt = ({status, ...rest}: ConsentMessagePromptPayload): void => {
-        if (status === 'result' && 'approve' in rest) {
-          rest.approve();
-        }
-      };
-
-      const result = await signerService.assertAndPromptConsentMessage({
-        notify,
-        params,
-        prompt,
-        options: signerOptions
-      });
-
-      expect(result).toEqual({result: 'approved'});
-
-      expect(spyIcrc21CanisterConsentMessage).toHaveBeenCalledWith({
-        ...signerOptions,
-        canisterId: params.canisterId,
-        request: {
-          method: params.method,
-          arg: base64ToUint8Array(params.arg),
-          user_preferences: {
-            metadata: {language: 'en', utc_offset_minutes: []},
-            device_spec: []
-          }
-        }
       });
     });
 
@@ -332,39 +304,329 @@ describe('Signer services', () => {
       expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, testOrigin);
     });
 
-    it('should return error if consentMessage throws', async () => {
-      spyIcrc21CanisterConsentMessage.mockRejectedValue(new Error('Test Error'));
+    describe('Without consent message fallback', () => {
+      it('should return approved when user approves the consent message', async () => {
+        spyIcrc21CanisterConsentMessage.mockResolvedValue({
+          Ok: mockConsentInfo
+        });
 
-      const prompt = vi.fn();
+        const prompt = ({status, ...rest}: ConsentMessagePromptPayload): void => {
+          if (status === 'result' && 'approve' in rest) {
+            rest.approve();
+          }
+        };
 
-      const result = await signerService.assertAndPromptConsentMessage({
-        notify,
-        params,
-        prompt,
-        options: signerOptions
+        const result = await signerService.assertAndPromptConsentMessage({
+          notify,
+          params,
+          prompt,
+          options: signerOptions
+        });
+
+        expect(result).toEqual({result: 'approved'});
+
+        expect(spyIcrc21CanisterConsentMessage).toHaveBeenCalledWith({
+          ...signerOptions,
+          canisterId: params.canisterId,
+          request: {
+            method: params.method,
+            arg: base64ToUint8Array(params.arg),
+            user_preferences: {
+              metadata: {language: 'en', utc_offset_minutes: []},
+              device_spec: []
+            }
+          }
+        });
       });
 
-      expect(result).toEqual({result: 'error'});
+      it('should provide a valid consent message with Ok', () =>
+        // eslint-disable-next-line no-async-promise-executor
+        new Promise<void>(async (done) => {
+          spyIcrc21CanisterConsentMessage.mockResolvedValue({
+            Ok: mockConsentInfo
+          });
+
+          const prompt = ({status, ...rest}: ConsentMessagePromptPayload): void => {
+            if (status === 'result' && 'consentInfo' in rest && 'Ok' in rest.consentInfo) {
+              expect(rest.consentInfo.Ok).toEqual(mockConsentInfo);
+
+              done();
+            }
+          };
+
+          await signerService.assertAndPromptConsentMessage({
+            notify,
+            params,
+            prompt,
+            options: signerOptions
+          });
+        }));
+
+      it('should return error if consentMessage throws', async () => {
+        spyIcrc21CanisterConsentMessage.mockRejectedValue(new Error('Test Error'));
+
+        const prompt = vi.fn();
+
+        const result = await signerService.assertAndPromptConsentMessage({
+          notify,
+          params,
+          prompt,
+          options: signerOptions
+        });
+
+        expect(result).toEqual({result: 'error'});
+      });
+
+      it('should trigger prompt "error" if consentMessage throws', async () => {
+        const error = new Error('Test Error');
+
+        spyIcrc21CanisterConsentMessage.mockRejectedValue(error);
+
+        const prompt = vi.fn();
+
+        await signerService.assertAndPromptConsentMessage({
+          notify,
+          params,
+          prompt,
+          options: signerOptions
+        });
+
+        expect(prompt).toHaveBeenCalledWith({
+          origin: testOrigin,
+          status: 'error',
+          details: error
+        });
+      });
     });
 
-    it('should trigger prompt "error" if consentMessage throws', async () => {
-      const error = new Error('Test Error');
+    describe('With consent message fallback', () => {
+      let spySignerApiLedgerMedatada: MockInstance;
 
-      spyIcrc21CanisterConsentMessage.mockRejectedValue(error);
-
-      const prompt = vi.fn();
-
-      await signerService.assertAndPromptConsentMessage({
-        notify,
-        params,
-        prompt,
-        options: signerOptions
+      beforeEach(() => {
+        spySignerApiLedgerMedatada = vi.spyOn(SignerApi.prototype, 'ledgerMetadata');
       });
 
-      expect(prompt).toHaveBeenCalledWith({
-        origin: testOrigin,
-        status: 'error',
-        details: error
+      describe.each([
+        {method: 'icrc1_transfer', arg: mockIcrcLocalCallParams.arg},
+        {method: 'icrc2_approve', arg: mockIcrcApproveArg},
+        {method: 'icrc2_transfer_from', arg: mockIcrcTransferFromArg}
+      ])('With fallback for $method', ({method, arg}) => {
+        it('should return approved when user approves the consent message that was built', async () => {
+          spyIcrc21CanisterConsentMessage.mockRejectedValue(new Error('Test Error'));
+          spySignerApiLedgerMedatada.mockResolvedValue(mockIcrcLedgerMetadata);
+
+          const prompt = ({status, ...rest}: ConsentMessagePromptPayload): void => {
+            if (status === 'result' && 'approve' in rest) {
+              rest.approve();
+            }
+          };
+
+          const result = await signerService.assertAndPromptConsentMessage({
+            notify,
+            params: {
+              ...params,
+              method,
+              arg
+            },
+            prompt,
+            options: signerOptions
+          });
+
+          expect(result).toEqual({result: 'approved'});
+
+          expect(spyIcrc21CanisterConsentMessage).toHaveBeenCalledWith({
+            ...signerOptions,
+            canisterId: params.canisterId,
+            request: {
+              method,
+              arg: base64ToUint8Array(arg),
+              user_preferences: {
+                metadata: {language: 'en', utc_offset_minutes: []},
+                device_spec: []
+              }
+            }
+          });
+        });
+
+        it('should provide a valid consent message with Warn', () =>
+          // eslint-disable-next-line no-async-promise-executor
+          new Promise<void>(async (done) => {
+            spyIcrc21CanisterConsentMessage.mockRejectedValue(new Error('Test Error'));
+            spySignerApiLedgerMedatada.mockResolvedValue(mockIcrcLedgerMetadata);
+
+            const prompt = async ({
+              status,
+              ...rest
+            }: ConsentMessagePromptPayload): Promise<void> => {
+              if (status === 'result' && 'consentInfo' in rest && 'Warn' in rest.consentInfo) {
+                expect(rest.consentInfo.Warn.method).toEqual(method);
+                expect(rest.consentInfo.Warn.arg).toEqual(arg);
+                expect(rest.consentInfo.Warn.canisterId).toEqual(params.canisterId);
+
+                const fn = SIGNER_BUILDERS[method];
+
+                assertNonNullish(fn);
+
+                const result = await fn({
+                  arg: base64ToUint8Array(arg),
+                  token: mapTokenMetadata(mockIcrcLedgerMetadata) as IcrcTokenMetadata,
+                  owner: owner.getPrincipal()
+                });
+
+                if ('Err' in result) {
+                  expect(true).toBeFalsy();
+                  return;
+                }
+
+                expect(rest.consentInfo.Warn.consentInfo).toEqual(result.Ok);
+
+                done();
+              }
+            };
+
+            await signerService.assertAndPromptConsentMessage({
+              notify,
+              params: {
+                ...params,
+                method,
+                arg
+              },
+              prompt,
+              options: signerOptions
+            });
+          }));
+
+        it('should return error if consentMessage throws and ledger metadata throws', async () => {
+          const error = new Error('Test Error');
+          const ledgerError = new Error('Test Error');
+
+          spyIcrc21CanisterConsentMessage.mockRejectedValue(error);
+          spySignerApiLedgerMedatada.mockRejectedValue(ledgerError);
+
+          const prompt = vi.fn();
+
+          const result = await signerService.assertAndPromptConsentMessage({
+            notify,
+            params: {
+              ...params,
+              method
+            },
+            prompt,
+            options: signerOptions
+          });
+
+          expect(result).toEqual({result: 'error'});
+        });
+
+        it('should return error if consentMessage throws and build throws', async () => {
+          const error = new Error('Test Error');
+
+          spyIcrc21CanisterConsentMessage.mockRejectedValue(error);
+          spySignerApiLedgerMedatada.mockResolvedValue(mockIcrcLedgerMetadata);
+          // Signer builder error with arg lead to "Wrong magic number". Similar test in signer.builder.spec.ts
+
+          const prompt = vi.fn();
+
+          const result = await signerService.assertAndPromptConsentMessage({
+            notify,
+            params: {
+              ...params,
+              method
+            },
+            prompt,
+            options: signerOptions
+          });
+
+          expect(result).toEqual({result: 'error'});
+        });
+
+        it('should trigger prompt "error" if consentMessage throws and ledger metadata throws', async () => {
+          const error = new Error('Test Error');
+          const ledgerError = new Error('Test Error');
+
+          spyIcrc21CanisterConsentMessage.mockRejectedValue(error);
+          spySignerApiLedgerMedatada.mockRejectedValue(ledgerError);
+
+          const prompt = vi.fn();
+
+          await signerService.assertAndPromptConsentMessage({
+            notify,
+            params: {
+              ...params,
+              method
+            },
+            prompt,
+            options: signerOptions
+          });
+
+          expect(prompt).toHaveBeenCalledWith({
+            origin: testOrigin,
+            status: 'error',
+            details: error
+          });
+        });
+
+        it('should trigger prompt "error" if consentMessage throws and builder throws', async () => {
+          const error = new Error('Test Error');
+
+          spyIcrc21CanisterConsentMessage.mockRejectedValue(error);
+          spySignerApiLedgerMedatada.mockResolvedValue(mockIcrcLedgerMetadata);
+          // Signer builder error with arg lead to "Wrong magic number". Similar test in signer.builder.spec.ts
+
+          const prompt = vi.fn();
+
+          await signerService.assertAndPromptConsentMessage({
+            notify,
+            params: {
+              ...params,
+              method
+            },
+            prompt,
+            options: signerOptions
+          });
+
+          expect(prompt).toHaveBeenCalledWith({
+            origin: testOrigin,
+            status: 'error',
+            details: error
+          });
+        });
+      });
+
+      it('should return error if consentMessage throws and no matching fallback', async () => {
+        spyIcrc21CanisterConsentMessage.mockRejectedValue(new Error('Test Error'));
+
+        const prompt = vi.fn();
+
+        const result = await signerService.assertAndPromptConsentMessage({
+          notify,
+          params,
+          prompt,
+          options: signerOptions
+        });
+
+        expect(result).toEqual({result: 'error'});
+      });
+
+      it('should trigger prompt "error" if consentMessage throws and no matching fallback', async () => {
+        const error = new Error('Test Error');
+
+        spyIcrc21CanisterConsentMessage.mockRejectedValue(error);
+
+        const prompt = vi.fn();
+
+        await signerService.assertAndPromptConsentMessage({
+          notify,
+          params,
+          prompt,
+          options: signerOptions
+        });
+
+        expect(prompt).toHaveBeenCalledWith({
+          origin: testOrigin,
+          status: 'error',
+          details: error
+        });
       });
     });
 

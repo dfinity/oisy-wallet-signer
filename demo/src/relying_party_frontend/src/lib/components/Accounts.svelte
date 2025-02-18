@@ -1,14 +1,14 @@
 <script lang="ts">
-	import type { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
+	import type { IcrcWallet } from '@dfinity/oisy-wallet-signer/icrc-wallet';
 	import { nonNullish } from '@dfinity/utils';
 	import { fade } from 'svelte/transition';
 	import Button from '$core/components/Button.svelte';
 	import Value from '$core/components/Value.svelte';
 	import { accountsStore } from '$lib/stores/accounts.store';
 
-	interface Props {
-		wallet: IcpWallet | undefined;
-	}
+	type Props = {
+		wallet: IcrcWallet | undefined;
+	};
 
 	let { wallet }: Props = $props();
 
@@ -17,7 +17,7 @@
 		accountsStore.set(accounts);
 	};
 
-	const onreset = () => {
+	const onreset = async () => {
 		accountsStore.set(null);
 	};
 </script>

@@ -1,10 +1,12 @@
-import {arrayBufferToUint8Array} from '@dfinity/utils';
+import {IcrcLedgerCanister} from '@dfinity/ledger-icrc';
+import type {IcrcTokenMetadataResponse} from '@dfinity/ledger-icrc/dist/types/types/ledger.responses';
+import {Principal} from '@dfinity/principal';
+import {arrayBufferToUint8Array, uint8ArrayToBase64} from '@dfinity/utils';
 import {encode} from '../agent/agentjs-cbor-copy';
 import type {CustomHttpAgentResponse} from '../agent/custom-http-agent';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import type {IcrcCallCanisterResult} from '../types/icrc-responses';
 import type {SignerOptions} from '../types/signer-options';
-import {uint8ArrayToBase64} from '../utils/base64.utils';
 import {Icrc21Canister} from './icrc21-canister.api';
 
 export class SignerApi extends Icrc21Canister {
@@ -24,6 +26,24 @@ export class SignerApi extends Icrc21Canister {
     });
 
     return this.encodeResult(result);
+  }
+
+  async ledgerMetadata({
+    host,
+    owner,
+    params: {canisterId}
+  }: {
+    params: Pick<IcrcCallCanisterRequestParams, 'canisterId'>;
+  } & SignerOptions): Promise<IcrcTokenMetadataResponse> {
+    const {agent} = await this.getAgent({host, owner});
+
+    // TODO: improve performance by caching the IcrcLedgerCanister?
+    const {metadata} = IcrcLedgerCanister.create({
+      agent,
+      canisterId: Principal.fromText(canisterId)
+    });
+
+    return await metadata({certified: true});
   }
 
   private encodeResult({

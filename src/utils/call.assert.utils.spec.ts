@@ -1,6 +1,6 @@
 import {Principal} from '@dfinity/principal';
+import {uint8ArrayToBase64} from '@dfinity/utils';
 import {mockCanisterId, mockPrincipalText} from '../mocks/icrc-accounts.mocks';
-import {uint8ArrayToBase64} from './base64.utils';
 import {
   assertCallArg,
   assertCallCanisterId,

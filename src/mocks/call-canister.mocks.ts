@@ -1,8 +1,7 @@
-import {arrayBufferToUint8Array} from '@dfinity/utils';
+import {arrayBufferToUint8Array, uint8ArrayToBase64} from '@dfinity/utils';
 import {encode} from '../agent/agentjs-cbor-copy';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import type {IcrcCallCanisterResult} from '../types/icrc-responses';
-import {uint8ArrayToBase64} from '../utils/base64.utils';
 import {mockRequestDetails} from './custom-http-agent.mocks';
 import {mockPrincipalText} from './icrc-accounts.mocks';
 

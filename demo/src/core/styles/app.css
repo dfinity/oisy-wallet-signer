@@ -1,0 +1,34 @@
+@import 'tailwindcss';
+
+@theme {
+	--color-*: initial;
+	--color-inherit: inherit;
+	--color-transparent: transparent;
+	--color-current: currentColor;
+	--color-black: rgb(0 0 0);
+	--color-white: rgb(255 255 255);
+
+	--color-lavender-blue-50: #f2f3ff;
+	--color-lavender-blue-100: #e4e7ff;
+	--color-lavender-blue-200: #c9cfff;
+	--color-lavender-blue-300: #aeb8ff;
+	--color-lavender-blue-400: #93a0ff;
+	--color-lavender-blue-500: #7888ff;
+	--color-lavender-blue-600: #606dcc;
+	--color-lavender-blue-700: #485299;
+	--color-lavender-blue-800: #303666;
+	--color-lavender-blue-900: #181b33;
+}
+
+@theme {
+	--animate-fade: fadeIn 0.25s ease-in-out;
+
+	@keyframes fadeIn {
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
+	}
+}

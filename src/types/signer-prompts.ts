@@ -1,4 +1,4 @@
-import {z} from 'zod';
+import * as z from 'zod';
 import {
   ICRC21_CALL_CONSENT_MESSAGE,
   ICRC25_REQUEST_PERMISSIONS,
@@ -7,6 +7,7 @@ import {
 } from '../constants/icrc.constants';
 import type {icrc21_consent_info} from '../declarations/icrc-21';
 import {IcrcAccountsSchema} from './icrc-accounts';
+import {IcrcCallCanisterRequestParamsSchema} from './icrc-requests';
 import {IcrcCallCanisterResultSchema, IcrcScopesArraySchema} from './icrc-responses';
 import {OriginSchema} from './post-message';
 
@@ -120,9 +121,33 @@ const LoadingConsentMessageSchema = PayloadOriginSchema.extend({
   status: z.literal(LoadingConsentMessageStatusSchema.enum.loading)
 });
 
+const ConsentInfoSchema = z.custom<icrc21_consent_info>();
+
+const ConsentInfoOkSchema = z.object({
+  Ok: ConsentInfoSchema
+});
+
+export type ConsentInfoOk = z.infer<typeof ConsentInfoOkSchema>;
+
+const ConsentInfoWarnSchema = z.object({
+  Warn: IcrcCallCanisterRequestParamsSchema.pick({
+    canisterId: true,
+    method: true,
+    arg: true
+  }).extend({
+    consentInfo: ConsentInfoSchema
+  })
+});
+
+export type ConsentInfoWarn = z.infer<typeof ConsentInfoWarnSchema>;
+
+const ResultConsentInfoSchema = z.union([ConsentInfoOkSchema, ConsentInfoWarnSchema]);
+
+export type ResultConsentInfo = z.infer<typeof ResultConsentInfoSchema>;
+
 const ResultConsentMessageSchema = PayloadOriginSchema.extend({
   status: z.literal(StatusSchema.enum.result),
-  consentInfo: z.custom<icrc21_consent_info>(),
+  consentInfo: ResultConsentInfoSchema,
   approve: ConsentMessageApprovalSchema,
   reject: RejectionSchema
 });

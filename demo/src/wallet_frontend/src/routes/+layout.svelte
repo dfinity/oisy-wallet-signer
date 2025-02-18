@@ -1,14 +1,14 @@
 <script lang="ts">
-	import { DEFAULT_SIGNER_WINDOW_SIZE } from '@dfinity/oisy-wallet-signer';
-	import type { Snippet } from 'svelte';
 	import Layout from '$core/components/Layout.svelte';
-	import '$core/styles/app.scss';
+	import '$core/styles/app.css';
+	import type { Snippet } from 'svelte';
+	import { DEFAULT_SIGNER_WINDOW_SIZE } from '@dfinity/oisy-wallet-signer';
 
 	const size = DEFAULT_SIGNER_WINDOW_SIZE;
 
-	interface Props {
+	type Props = {
 		children: Snippet;
-	}
+	};
 
 	let { children }: Props = $props();
 </script>

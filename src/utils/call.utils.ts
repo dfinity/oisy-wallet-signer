@@ -7,20 +7,19 @@ import {
 } from '@dfinity/agent';
 import {RecordClass, VariantClass} from '@dfinity/candid/lib/cjs/idl';
 import {Principal} from '@dfinity/principal';
-import {assertNonNullish} from '@dfinity/utils';
+import {assertNonNullish, base64ToUint8Array} from '@dfinity/utils';
 import {LOCAL_REPLICA_URL, MAINNET_REPLICA_URL} from '../constants/core.constants';
 import {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import type {IcrcCallCanisterResult} from '../types/icrc-responses';
 import {RelyingPartyHost} from '../types/relying-party-options';
 import {decodeCallRequest} from './agentjs-cbor-copy.utils';
-import {base64ToUint8Array} from './base64.utils';
 import {
   assertCallArg,
   assertCallCanisterId,
   assertCallMethod,
   assertCallSender
 } from './call.assert.utils';
-import {decodeResult} from './idl.utils';
+import {decodeIdl} from './idl.utils';
 
 export const assertCallResponse = ({
   params: {method, arg, canisterId, sender},
@@ -79,6 +78,11 @@ export const decodeResponse = async <T>({
     ...(localhost && {shouldFetchRootKey: true})
   });
 
+  assertNonNullish(
+    agent.rootKey,
+    'Missing agent root key, which is required to certify the response.'
+  );
+
   const certificate = await Certificate.create({
     certificate: base64ToUint8Array(cert),
     rootKey: agent.rootKey,
@@ -97,8 +101,8 @@ export const decodeResponse = async <T>({
     'A reply cannot be resolved within the provided certificate. This is unexpected; it should have been known at this point.'
   );
 
-  return decodeResult<T>({
+  return decodeIdl<T>({
     recordClass: resultRecordClass,
-    reply
+    bytes: reply
   });
 };

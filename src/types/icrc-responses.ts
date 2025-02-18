@@ -1,4 +1,5 @@
-import {z} from 'zod';
+import {UrlSchema} from '@dfinity/zod-schemas';
+import * as z from 'zod';
 import {IcrcBlobSchema} from './blob';
 import {IcrcAccountsSchema} from './icrc-accounts';
 import {
@@ -7,7 +8,6 @@ import {
   IcrcStandardSchema
 } from './icrc-standards';
 import {inferRpcResponseSchema} from './rpc';
-import {UrlSchema} from './url';
 
 const IcrcScopeMethodSchema = z.object({
   method: IcrcScopedMethodSchema
