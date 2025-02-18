@@ -56,12 +56,9 @@ describe('Relying Party handlers', () => {
       });
 
       it('should call icrc29_status postMessage and returns ready', () =>
-        // eslint-disable-next-line @typescript-eslint/return-await
         new Promise<void>((resolve) => {
-          // eslint-disable-next-line @typescript-eslint/no-floating-promises
           retryRequestStatus({popup, isReady, timeoutInMilliseconds: 120000, id: testId}).then(
             (result) => {
-              // eslint-disable-next-line @typescript-eslint/unbound-method
               expect(postMessageMock).toHaveBeenCalledWith(
                 {
                   id: testId,
@@ -87,11 +84,10 @@ describe('Relying Party handlers', () => {
       });
 
       it('should timeout after 30 seconds', () =>
-        // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
+        // eslint-disable-next-line no-async-promise-executor
         new Promise<void>(async (resolve) => {
           const retries = (30 * 1000) / DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS;
 
-          // eslint-disable-next-line @typescript-eslint/no-floating-promises
           retryRequestStatus({popup, isReady, timeoutInMilliseconds: 30000, id: testId}).then(
             (result) => {
               expect(result).toEqual('timeout');
@@ -104,11 +100,10 @@ describe('Relying Party handlers', () => {
         }));
 
       it('should poll ready function', () =>
-        // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
+        // eslint-disable-next-line no-async-promise-executor
         new Promise<void>(async (resolve) => {
           const retries = (30 * 1000) / DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS;
 
-          // eslint-disable-next-line @typescript-eslint/no-floating-promises
           retryRequestStatus({popup, isReady, timeoutInMilliseconds: 30000, id: testId}).then(
             () => {
               expect(isReady).toHaveBeenCalledTimes(retries);
@@ -122,11 +117,10 @@ describe('Relying Party handlers', () => {
     });
 
     it('should not bring the popup in front with focus', () =>
-      // eslint-disable-next-line @typescript-eslint/return-await, no-async-promise-executor, @typescript-eslint/no-misused-promises
+      // eslint-disable-next-line no-async-promise-executor
       new Promise<void>(async (resolve) => {
         const retries = (30 * 1000) / DEFAULT_POLLING_INTERVAL_IN_MILLISECONDS;
 
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         retryRequestStatus({popup, isReady, timeoutInMilliseconds: 30000, id: testId}).then(() => {
           expect(focusMock).not.toHaveBeenCalled();
 

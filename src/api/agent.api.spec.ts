@@ -4,7 +4,6 @@ import type {SignerOptions} from '../types/signer-options';
 import {AgentApi} from './agent.api';
 
 vi.mock('../agent/custom-http-agent', async (importOriginal) => {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
   const originalModule = await importOriginal<typeof import('../agent/custom-http-agent')>();
   return {
     ...originalModule,
@@ -45,7 +44,6 @@ describe('AgentApi', () => {
     it('should call createAgent and cache the result for the first call', async () => {
       const agent = await agentApi.getAgentTest(signerOptions);
 
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(CustomHttpAgent.create).toHaveBeenCalledWith({
         identity,
         shouldFetchRootKey: true,
@@ -56,7 +54,6 @@ describe('AgentApi', () => {
 
       await agentApi.getAgentTest(signerOptions);
 
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(CustomHttpAgent.create).toHaveBeenCalledOnce();
     });
 
@@ -70,7 +67,6 @@ describe('AgentApi', () => {
 
       const newAgent = await agentApi.getAgentTest(differentSignerOptions);
 
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(CustomHttpAgent.create).toHaveBeenCalledTimes(2);
 
       expect(newAgent).toEqual({test: 'mockCustomAgent'});
@@ -81,7 +77,6 @@ describe('AgentApi', () => {
 
       await agentApi.getAgentTest(signerOptions);
 
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(CustomHttpAgent.create).toHaveBeenCalledOnce();
     });
   });
@@ -90,7 +85,6 @@ describe('AgentApi', () => {
     it('should call createAgent with fetchRootKey for local development (localhost)', async () => {
       await agentApi.getAgentTest(signerOptions);
 
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(CustomHttpAgent.create).toHaveBeenCalledWith({
         identity,
         shouldFetchRootKey: true,
@@ -106,7 +100,6 @@ describe('AgentApi', () => {
 
       await agentApi.getAgentTest(nonLocalSignerOptions);
 
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(CustomHttpAgent.create).toHaveBeenCalledWith({
         identity,
         host: 'https://icp-api.io',
@@ -121,7 +114,6 @@ describe('AgentApi', () => {
 
       await agentApi.getAgentTest(optionsWithoutHost);
 
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(CustomHttpAgent.create).toHaveBeenCalledWith({
         identity,
         host: 'https://icp-api.io',
@@ -137,7 +129,6 @@ describe('AgentApi', () => {
 
       await agentApi.getAgentTest(localSignerOptions);
 
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(CustomHttpAgent.create).toHaveBeenCalledWith({
         identity,
         shouldFetchRootKey: true,
