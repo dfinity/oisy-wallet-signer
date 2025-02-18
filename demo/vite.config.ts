@@ -4,8 +4,7 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import tailwindcss from '@tailwindcss/vite';
 import { type UserConfig } from 'vite';
 
-export const defineConfig = ({ port }: { port?: number } = {}): UserConfig => {
-	return {
+export const defineConfig = ({ port }: { port?: number } = {}): UserConfig => ({
 		build: {
 			emptyOutDir: true,
 			rollupOptions: {
@@ -30,5 +29,4 @@ export const defineConfig = ({ port }: { port?: number } = {}): UserConfig => {
 		worker: {
 			format: 'es'
 		}
-	};
-};
+	});

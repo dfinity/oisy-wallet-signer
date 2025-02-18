@@ -1,17 +1,17 @@
 <script lang="ts">
+	import type { TransferParams, ApproveParams } from '@dfinity/ledger-icrc';
 	import type { IcrcWallet } from '@dfinity/oisy-wallet-signer/icrc-wallet';
 	import { isNullish, nonNullish } from '@dfinity/utils';
 	import { fade } from 'svelte/transition';
 	import Button from '$core/components/Button.svelte';
 	import Value from '$core/components/Value.svelte';
-	import { accountsStore } from '$lib/stores/accounts.store';
-	import { authStore } from '$core/stores/auth.store';
-	import type { TransferParams, ApproveParams } from '@dfinity/ledger-icrc';
 	import { E8S_PER_ICP } from '$core/constants/app.constants';
+	import { authStore } from '$core/stores/auth.store';
+	import { accountsStore } from '$lib/stores/accounts.store';
 
-	type Props = {
+	interface Props {
 		wallet: IcrcWallet | undefined;
-	};
+	}
 
 	let { wallet }: Props = $props();
 

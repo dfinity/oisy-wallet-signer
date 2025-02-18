@@ -6,9 +6,9 @@
 
 	const size = DEFAULT_SIGNER_WINDOW_SIZE;
 
-	type Props = {
+	interface Props {
 		children: Snippet;
-	};
+	}
 
 	let { children }: Props = $props();
 </script>

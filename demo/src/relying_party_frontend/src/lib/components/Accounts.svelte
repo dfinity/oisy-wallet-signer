@@ -6,9 +6,9 @@
 	import Value from '$core/components/Value.svelte';
 	import { accountsStore } from '$lib/stores/accounts.store';
 
-	type Props = {
+	interface Props {
 		wallet: IcrcWallet | undefined;
-	};
+	}
 
 	let { wallet }: Props = $props();
 
