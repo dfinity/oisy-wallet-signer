@@ -54,7 +54,7 @@
 		}, 2000);
 	};
 
-	const onreset = async () => {
+	const onreset = () => {
 		result = undefined;
 	};
 </script>

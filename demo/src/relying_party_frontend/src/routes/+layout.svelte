@@ -1,7 +1,7 @@
 <script lang="ts">
-	import Layout from '$core/components/Layout.svelte';
 	import '$core/styles/app.css';
 	import type { Snippet } from 'svelte';
+	import Layout from '$core/components/Layout.svelte';
 
 	interface Props {
 		children: Snippet;

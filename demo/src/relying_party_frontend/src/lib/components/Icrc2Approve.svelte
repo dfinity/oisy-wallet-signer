@@ -42,7 +42,7 @@
 		});
 	};
 
-	const onreset = async () => {
+	const onreset = () => {
 		result = undefined;
 	};
 </script>

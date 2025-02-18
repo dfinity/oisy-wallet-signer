@@ -17,7 +17,7 @@
 		accountsStore.set(accounts);
 	};
 
-	const onreset = async () => {
+	const onreset = () => {
 		accountsStore.set(null);
 	};
 </script>
