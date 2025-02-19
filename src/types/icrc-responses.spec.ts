@@ -1,3 +1,4 @@
+import {uint8ArrayToBase64} from '@dfinity/utils';
 import {
   ICRC25_PERMISSIONS,
   ICRC25_PERMISSION_GRANTED,
@@ -5,7 +6,6 @@ import {
   ICRC27_ACCOUNTS
 } from '../constants/icrc.constants';
 import {mockAccounts, mockPrincipalText} from '../mocks/icrc-accounts.mocks';
-import {uint8ArrayToBase64} from '../utils/base64.utils';
 import {
   IcrcAccountsResponseSchema,
   IcrcCallCanisterResponseSchema,

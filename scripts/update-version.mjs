@@ -37,12 +37,22 @@ const updateVersion = async () => {
     currentVersion: packageJson.version
   });
 
+  // Peer dependencies need to point to wip references but only the @dfinity ones - e.g. @dfinity/utils@0.0.1-next
+  const peerDependencies = Object.entries(packageJson.peerDependencies ?? {}).reduce(
+    (acc, [key, value]) => {
+      acc[key] = key.startsWith('@dfinity') ? '*' : value;
+      return acc;
+    },
+    {}
+  );
+
   writeFileSync(
     packagePath,
     JSON.stringify(
       {
         ...packageJson,
-        version
+        version,
+        ...(Object.keys(peerDependencies).length > 0 && {peerDependencies})
       },
       null,
       2

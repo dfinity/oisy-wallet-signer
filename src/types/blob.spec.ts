@@ -1,4 +1,4 @@
-import {uint8ArrayToBase64} from '../utils/base64.utils';
+import {uint8ArrayToBase64} from '@dfinity/utils';
 import {IcrcBlobSchema} from './blob';
 
 describe('IcrcBlob', () => {

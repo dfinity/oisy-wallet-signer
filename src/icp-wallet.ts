@@ -11,13 +11,13 @@ import {
   Icrc1TransferResult,
   ApproveResult as Icrc2ApproveResult
 } from '@dfinity/ledger-icp/dist/candid/ledger';
+import type {PrincipalText} from '@dfinity/zod-schemas';
 import {TransferArgs, TransferResult} from './constants/icrc-1.idl.constants';
 import {ApproveArgs, ApproveResult} from './constants/icrc-2.idl.constants';
 import {RelyingParty} from './relying-party';
 import type {IcrcAccount} from './types/icrc-accounts';
 import type {IcrcCallCanisterRequestParams} from './types/icrc-requests';
 import type {Origin} from './types/post-message';
-import type {PrincipalText} from './types/principal';
 import {RelyingPartyOptions} from './types/relying-party-options';
 import type {RelyingPartyRequestOptions} from './types/relying-party-requests';
 import {decodeResponse} from './utils/call.utils';

@@ -7,13 +7,12 @@ import {
 } from '@dfinity/agent';
 import {RecordClass, VariantClass} from '@dfinity/candid/lib/cjs/idl';
 import {Principal} from '@dfinity/principal';
-import {assertNonNullish} from '@dfinity/utils';
+import {assertNonNullish, base64ToUint8Array} from '@dfinity/utils';
 import {LOCAL_REPLICA_URL, MAINNET_REPLICA_URL} from '../constants/core.constants';
 import {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import type {IcrcCallCanisterResult} from '../types/icrc-responses';
 import {RelyingPartyHost} from '../types/relying-party-options';
 import {decodeCallRequest} from './agentjs-cbor-copy.utils';
-import {base64ToUint8Array} from './base64.utils';
 import {
   assertCallArg,
   assertCallCanisterId,
@@ -78,6 +77,11 @@ export const decodeResponse = async <T>({
     host: localhost ? (host ?? LOCAL_REPLICA_URL) : MAINNET_REPLICA_URL,
     ...(localhost && {shouldFetchRootKey: true})
   });
+
+  assertNonNullish(
+    agent.rootKey,
+    'Missing agent root key, which is required to certify the response.'
+  );
 
   const certificate = await Certificate.create({
     certificate: base64ToUint8Array(cert),

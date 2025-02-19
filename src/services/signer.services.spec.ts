@@ -1,6 +1,6 @@
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {IcrcTokenMetadata, mapTokenMetadata} from '@dfinity/ledger-icrc';
-import {assertNonNullish} from '@dfinity/utils';
+import {assertNonNullish, base64ToUint8Array} from '@dfinity/utils';
 import type {Mock, MockInstance} from 'vitest';
 import {Icrc21Canister} from '../api/icrc21-canister.api';
 import {SignerApi} from '../api/signer.api';
@@ -21,7 +21,6 @@ import {JSON_RPC_VERSION_2, type RpcId, type RpcResponseWithError} from '../type
 import type {Notify} from '../types/signer-handlers';
 import type {SignerOptions} from '../types/signer-options';
 import type {ConsentMessagePromptPayload} from '../types/signer-prompts';
-import {base64ToUint8Array} from '../utils/base64.utils';
 import {mapIcrc21ErrorToString} from '../utils/icrc-21.utils';
 import {SignerService} from './signer.service';
 
