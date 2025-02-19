@@ -1,17 +1,17 @@
 <script lang="ts">
-	import type { Signer } from '@dfinity/oisy-wallet-signer/signer';
 	import {
 		type CallCanisterPromptPayload,
 		ICRC49_CALL_CANISTER,
 		type CallCanisterStatus
 	} from '@dfinity/oisy-wallet-signer';
+	import type { Signer } from '@dfinity/oisy-wallet-signer/signer';
 	import { isNullish, nonNullish } from '@dfinity/utils';
 	import { fade } from 'svelte/transition';
 	import { emit } from '$core/utils/events.utils';
 
-	type Props = {
+	interface Props {
 		signer: Signer | undefined;
-	};
+	}
 
 	let { signer }: Props = $props();
 

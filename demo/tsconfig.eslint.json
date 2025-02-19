@@ -1,0 +1,23 @@
+{
+	"extends": "./src/wallet_frontend/tsconfig.json",
+	"include": [
+		"ambient.d.ts",
+		"non-ambient.d.ts",
+		"./src/**/types/**/$types.d.ts",
+		"./vite.config.ts",
+		"./src/**/vite.config.ts",
+		"./src/**/*.js",
+		"./src/**/*.ts",
+		"./src/**/*.svelte",
+		"./tailwind.config.ts",
+		"./src/**/tailwind.config.ts",
+		"./src/**/svelte.config.js",
+		"./src/**/postcss.config.js",
+		"./playwright.config.ts",
+		"./src/**/playwright.config.ts",
+		"./juno.dev.config.js",
+		"./eslint.config.mjs",
+		"./eslint-local-rules.cjs"
+	],
+	"exclude": ["./node_modules/**", "./src/**/node_modules/**", "./build/**", "./src/**/build/**"]
+}

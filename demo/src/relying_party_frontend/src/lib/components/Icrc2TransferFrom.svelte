@@ -1,17 +1,17 @@
 <script lang="ts">
+	import type { IcrcBlockIndex, TransferFromParams } from '@dfinity/ledger-icrc';
 	import type { IcrcWallet } from '@dfinity/oisy-wallet-signer/icrc-wallet';
+	import { Principal } from '@dfinity/principal';
 	import { isNullish, nonNullish } from '@dfinity/utils';
 	import Button from '$core/components/Button.svelte';
-	import { accountsStore } from '$lib/stores/accounts.store';
-	import { authStore } from '$core/stores/auth.store';
-	import type { IcrcBlockIndex, TransferFromParams } from '@dfinity/ledger-icrc';
 	import { E8S_PER_ICP, ICP_LEDGER_CANISTER_ID } from '$core/constants/app.constants';
-	import { Principal } from '@dfinity/principal';
+	import { authStore } from '$core/stores/auth.store';
 	import { emit } from '$core/utils/events.utils';
+	import { accountsStore } from '$lib/stores/accounts.store';
 
-	type Props = {
+	interface Props {
 		wallet: IcrcWallet | undefined;
-	};
+	}
 
 	let { wallet }: Props = $props();
 
@@ -54,7 +54,7 @@
 		}, 2000);
 	};
 
-	const onreset = async () => {
+	const onreset = () => {
 		result = undefined;
 	};
 </script>
