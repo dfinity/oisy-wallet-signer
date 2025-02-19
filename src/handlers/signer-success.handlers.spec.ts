@@ -22,28 +22,27 @@ describe('Signer-success.handlers', () => {
   let id: RpcId;
   const origin = 'https://hello.com';
 
-  let originalOpener: typeof window.opener;
+  let sourceMock: Window;
 
   let postMessageMock: Mock;
 
   beforeEach(() => {
     id = crypto.randomUUID();
-    originalOpener = window.opener;
 
     postMessageMock = vi.fn();
 
-    vi.stubGlobal('opener', {postMessage: postMessageMock});
+    sourceMock = {
+      postMessage: postMessageMock
+    } as unknown as Window;
   });
 
   afterEach(() => {
-    window.opener = originalOpener;
-
     vi.restoreAllMocks();
   });
 
   describe('notifyReady', () => {
     it('should post a message with the msg', () => {
-      notifyReady({id, origin});
+      notifyReady({id, origin, source: sourceMock});
 
       const expectedMessage: IcrcReadyResponse = {
         jsonrpc: JSON_RPC_VERSION_2,
@@ -51,13 +50,13 @@ describe('Signer-success.handlers', () => {
         result: 'ready'
       };
 
-      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
+      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage);
     });
   });
 
   describe('notifySupportedStandards', () => {
     it('should post a message with the msg', () => {
-      notifySupportedStandards({id, origin});
+      notifySupportedStandards({id, origin, source: sourceMock});
 
       const expectedMessage: IcrcSupportedStandardsResponse = {
         jsonrpc: JSON_RPC_VERSION_2,
@@ -67,7 +66,7 @@ describe('Signer-success.handlers', () => {
         }
       };
 
-      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
+      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage);
     });
   });
 
@@ -82,7 +81,7 @@ describe('Signer-success.handlers', () => {
         }
       ];
 
-      notifyPermissionScopes({id, origin, scopes});
+      notifyPermissionScopes({id, origin, scopes, source: sourceMock});
 
       const expectedMessage: IcrcScopesResponse = {
         jsonrpc: JSON_RPC_VERSION_2,
@@ -92,13 +91,13 @@ describe('Signer-success.handlers', () => {
         }
       };
 
-      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
+      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage);
     });
   });
 
   describe('notifyAccounts', () => {
     it('should post a message with the accounts', () => {
-      notifyAccounts({id, origin, accounts: mockAccounts});
+      notifyAccounts({id, origin, accounts: mockAccounts, source: sourceMock});
 
       const expectedMessage = {
         jsonrpc: JSON_RPC_VERSION_2,
@@ -106,13 +105,13 @@ describe('Signer-success.handlers', () => {
         result: {accounts: mockAccounts}
       };
 
-      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
+      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage);
     });
   });
 
   describe('notifyCallCanister', () => {
     it('should post a message with the call canister result', () => {
-      notifyCallCanister({id, origin, result: mockCallCanisterSuccess});
+      notifyCallCanister({id, origin, result: mockCallCanisterSuccess, source: sourceMock});
 
       const expectedMessage = {
         jsonrpc: JSON_RPC_VERSION_2,
@@ -120,7 +119,7 @@ describe('Signer-success.handlers', () => {
         result: mockCallCanisterSuccess
       };
 
-      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, origin);
+      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage);
     });
   });
 });
