@@ -27,7 +27,6 @@ import {
 } from './custom-http-agent';
 
 vi.mock('@dfinity/agent', async (importOriginal) => {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
   const originalModule = await importOriginal<typeof import('@dfinity/agent')>();
 
   class MockHttpAgent {
@@ -99,9 +98,8 @@ describe('CustomHttpAgent', () => {
 
     await CustomHttpAgent.create(agentOptions);
 
-    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(httpAgent.HttpAgent.create).toHaveBeenCalledOnce();
-    // eslint-disable-next-line @typescript-eslint/unbound-method
+
     expect(httpAgent.HttpAgent.create).toHaveBeenCalledWith(agentOptions);
   });
 

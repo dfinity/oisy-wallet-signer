@@ -162,7 +162,7 @@ export class RelyingParty {
       try {
         const {origin: relyingPartyOrigin} = new URL(url);
         expectedOrigin = relyingPartyOrigin;
-      } catch (err: unknown) {
+      } catch (_err: unknown) {
         // Unlikely to happen if window.open succeeded
         response = new MessageError(
           `The origin ${origin} of the signer URL ${url} cannot be parsed.`

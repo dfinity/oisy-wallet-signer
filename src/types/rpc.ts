@@ -29,7 +29,6 @@ export const RpcRequestSchema = RpcSchema.extend({
 
 type _RpcRequest = z.infer<typeof RpcRequestSchema>;
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const inferRpcRequestWithoutParamsSchema = <M extends string>({method}: {method: M}) =>
   RpcRequestSchema.omit({method: true, params: true})
     .strict()
@@ -44,7 +43,6 @@ type RpcRequestWithoutParamsReturnType<M extends string> = ReturnType<
 
 type _RpcRequestWithoutParams<M extends string> = z.infer<RpcRequestWithoutParamsReturnType<M>>;
 
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
 export const inferRpcRequestWithParamsSchema = <T extends z.ZodTypeAny, M extends string>({
   params,
   method
@@ -62,7 +60,6 @@ export const inferRpcRequestWithParamsSchema = <T extends z.ZodTypeAny, M extend
         params
       })
     );
-/* eslint-enable */
 
 export const RpcNotificationSchema = RpcRequestSchema.omit({id: true}).strict();
 
@@ -118,7 +115,6 @@ export const RpcResponseWithErrorSchema = RpcResponseSchema.extend({
 
 export type RpcResponseWithError = z.infer<typeof RpcResponseWithErrorSchema>;
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const inferRpcResponseSchema = <T extends z.ZodTypeAny>(result: T) =>
   RpcResponseWithErrorSchema.omit({error: true})
     .merge(

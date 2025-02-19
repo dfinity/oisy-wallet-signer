@@ -27,7 +27,6 @@ export const assertCallArg = ({
   const callRequestArg = arrayBufferToUint8Array(responseArg);
 
   const uint8ArrayEqual = ({first, second}: {first: Uint8Array; second: Uint8Array}): boolean =>
-    // eslint-disable-next-line local-rules/prefer-object-params
     first.length === second.length && first.every((value, index) => value === second[index]);
 
   if (!uint8ArrayEqual({first: requestArg, second: callRequestArg})) {

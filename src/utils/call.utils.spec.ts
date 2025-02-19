@@ -15,7 +15,6 @@ import * as callUtils from './call.assert.utils';
 import {assertCallResponse, decodeResponse} from './call.utils';
 
 vi.mock('@dfinity/agent', async (importOriginal) => {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
   const originalModule = await importOriginal<typeof import('@dfinity/agent')>();
 
   class MockHttpAgent {
