@@ -210,7 +210,6 @@ describe('Signer services', () => {
     describe('Call consent message throws an error', () => {
       it('should return error when consentMessage throws an error', async () => {
         spyIcrc21CanisterConsentMessage.mockImplementation(() => {
-          // eslint-disable-next-line @typescript-eslint/no-throw-literal
           throw 'Test';
         });
 
@@ -228,7 +227,6 @@ describe('Signer services', () => {
 
       it('should call notifyNetworkError with an unknown error message when consentMessage throws some error', async () => {
         spyIcrc21CanisterConsentMessage.mockImplementation(() => {
-          // eslint-disable-next-line @typescript-eslint/no-throw-literal
           throw 'Test';
         });
 

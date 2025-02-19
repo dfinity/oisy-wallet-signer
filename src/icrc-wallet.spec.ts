@@ -30,7 +30,6 @@ import * as callUtils from './utils/call.utils';
 const mocks = vi.hoisted(() => ({getRootKey: vi.fn()}));
 
 vi.mock('@dfinity/agent', async (importOriginal) => {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
   const originalModule = await importOriginal<typeof import('@dfinity/agent')>();
 
   class MockHttpAgent {
