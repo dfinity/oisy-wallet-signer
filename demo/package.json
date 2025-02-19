@@ -19,7 +19,10 @@
 		"check:party": "npm run check -w src/relying_party_frontend",
 		"check:wallet": "npm run check -w src/wallet_frontend",
 		"check": "npm run check:party && npm run check:wallet",
-		"lint": "prettier --check . && eslint .",
+		"sync:party": "npm run sync -w src/relying_party_frontend",
+		"sync:wallet": "npm run sync -w src/wallet_frontend",
+		"sync": "npm run sync:party && npm run sync:wallet",
+		"lint": "prettier --check . && npm run sync && eslint .",
 		"format": "prettier --write ."
 	},
 	"devDependencies": {
