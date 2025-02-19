@@ -1,6 +1,7 @@
-import type {RequestId, SubmitResponse} from '@dfinity/agent';
 import * as httpAgent from '@dfinity/agent';
-import type {MockInstance} from 'vitest';
+import {RequestId, SubmitResponse} from '@dfinity/agent';
+import {base64ToUint8Array} from '@dfinity/utils';
+import {MockInstance} from 'vitest';
 import {
   mockLocalIcRootKey,
   mockRejectedLocalCallTime,
@@ -16,17 +17,16 @@ import {
   mockRequestPayload
 } from '../mocks/custom-http-agent.mocks';
 import {mockCanisterId} from '../mocks/icrc-accounts.mocks';
-import {base64ToUint8Array} from '../utils/base64.utils';
 import {
   CustomHttpAgent,
   InvalidCertificateReplyError,
   InvalidCertificateStatusError,
   RequestError,
-  UndefinedRequestDetailsError
+  UndefinedRequestDetailsError,
+  UndefinedRootKeyError
 } from './custom-http-agent';
 
 vi.mock('@dfinity/agent', async (importOriginal) => {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
   const originalModule = await importOriginal<typeof import('@dfinity/agent')>();
 
   class MockHttpAgent {
@@ -98,9 +98,8 @@ describe('CustomHttpAgent', () => {
 
     await CustomHttpAgent.create(agentOptions);
 
-    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(httpAgent.HttpAgent.create).toHaveBeenCalledOnce();
-    // eslint-disable-next-line @typescript-eslint/unbound-method
+
     expect(httpAgent.HttpAgent.create).toHaveBeenCalledWith(agentOptions);
   });
 
@@ -278,6 +277,11 @@ describe('CustomHttpAgent', () => {
             InvalidCertificateReplyError
           );
         });
+      });
+
+      it('should throw an exception if the agent root key is not defined', async () => {
+        vi.spyOn(agent.agent, 'rootKey', 'get').mockReturnValue(null);
+        await expect(agent.request(mockRequestPayload)).rejects.toThrow(UndefinedRootKeyError);
       });
     });
 

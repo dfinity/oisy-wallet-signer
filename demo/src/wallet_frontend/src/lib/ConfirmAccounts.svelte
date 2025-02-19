@@ -1,17 +1,17 @@
 <script lang="ts">
-	import { fade } from 'svelte/transition';
-	import type { Signer } from '@dfinity/oisy-wallet-signer/signer';
-	import { isNullish, nonNullish } from '@dfinity/utils';
 	import {
 		ICRC27_ACCOUNTS,
 		type AccountsApproval,
 		type AccountsPromptPayload
 	} from '@dfinity/oisy-wallet-signer';
+	import type { Signer } from '@dfinity/oisy-wallet-signer/signer';
+	import { isNullish, nonNullish } from '@dfinity/utils';
+	import { fade } from 'svelte/transition';
 	import { authStore } from '$core/stores/auth.store';
 
-	type Props = {
+	interface Props {
 		signer: Signer | undefined;
-	};
+	}
 
 	let { signer }: Props = $props();
 

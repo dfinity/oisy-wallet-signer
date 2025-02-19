@@ -22,7 +22,6 @@ vi.mock('../agent/custom-http-agent', async (importOriginal) => {
   };
 
   return {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
     ...(await importOriginal<typeof import('../agent/custom-http-agent')>()),
     CustomHttpAgent: {
       create: vi.fn().mockResolvedValue(mockCustomAgent)

@@ -1,4 +1,5 @@
-import {isNullish} from '@dfinity/utils';
+import {base64ToUint8Array, isNullish} from '@dfinity/utils';
+import {PrincipalTextSchema} from '@dfinity/zod-schemas';
 import * as z from 'zod';
 import {
   ICRC25_PERMISSIONS,
@@ -8,14 +9,13 @@ import {
   ICRC29_STATUS,
   ICRC49_CALL_CANISTER
 } from '../constants/icrc.constants';
-import {base64ToUint8Array} from '../utils/base64.utils';
 import {IcrcBlobSchema} from './blob';
 import {IcrcScopedMethodSchema} from './icrc-standards';
-import {PrincipalTextSchema} from './principal';
 import {inferRpcRequestWithParamsSchema, inferRpcRequestWithoutParamsSchema} from './rpc';
 
 // icrc25_request_permissions
 // https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_request_permissions
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const IcrcRequestedScopesSchema = z.object({
   scopes: z
     .array(

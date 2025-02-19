@@ -1,6 +1,6 @@
 import {Principal} from '@dfinity/principal';
+import {uint8ArrayToBase64} from '@dfinity/utils';
 import {mockPrincipalText} from '../mocks/icrc-accounts.mocks';
-import {uint8ArrayToBase64} from '../utils/base64.utils';
 import {IcrcAccountSchema, IcrcAccountsSchema} from './icrc-accounts';
 
 describe('ICRC accounts', () => {

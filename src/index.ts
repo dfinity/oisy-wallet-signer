@@ -18,7 +18,6 @@ export type * from './types/icrc-requests';
 export type * from './types/icrc-responses';
 export type * from './types/icrc-standards';
 export type * from './types/post-message';
-export type * from './types/principal';
 export type * from './types/relying-party-options';
 export type * from './types/relying-party-requests';
 export type * from './types/rpc';

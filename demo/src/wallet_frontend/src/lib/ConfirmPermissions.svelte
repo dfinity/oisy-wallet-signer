@@ -1,24 +1,26 @@
 <script lang="ts">
-	import { fade } from 'svelte/transition';
+	import {
+		ICRC25_REQUEST_PERMISSIONS,
+		type IcrcScope,
+		type PermissionsConfirmation,
+		type PermissionsPromptPayload
+	} from '@dfinity/oisy-wallet-signer';
 	import type { Signer } from '@dfinity/oisy-wallet-signer/signer';
 	import { isNullish, nonNullish } from '@dfinity/utils';
-	import { ICRC25_REQUEST_PERMISSIONS, type IcrcScope } from '@dfinity/oisy-wallet-signer';
-	import Button from '$core/components/Button.svelte';
+	import { fade } from 'svelte/transition';
 	import Article from '$core/components/Article.svelte';
-	import type {
-		PermissionsConfirmation,
-		PermissionsPromptPayload
-	} from '@dfinity/oisy-wallet-signer';
+	import Button from '$core/components/Button.svelte';
 
-	type Props = {
+	interface Props {
 		signer: Signer | undefined;
-	};
+	}
 
 	let { signer }: Props = $props();
 
 	let scopes = $state<IcrcScope[] | undefined>(undefined);
 	let confirm = $state<PermissionsConfirmation | undefined>(undefined);
 
+	// eslint-disable-next-line local-rules/prefer-object-params
 	const sortScope = (
 		{ scope: { method: methodA } }: IcrcScope,
 		{ scope: { method: methodB } }: IcrcScope
@@ -44,7 +46,7 @@
 		});
 	});
 
-	const onsubmit = async ($event: SubmitEvent) => {
+	const onsubmit = ($event: SubmitEvent) => {
 		$event.preventDefault();
 
 		// TODO: alert errors

@@ -14,7 +14,6 @@ import type {SignerOptions} from '../types/signer-options';
 import {Icrc21Canister} from './icrc21-canister.api';
 
 vi.mock('@dfinity/agent', async (importOriginal) => {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
   const originalModule = await importOriginal<typeof import('@dfinity/agent')>();
 
   const mockActor = {test: 123};
@@ -39,7 +38,6 @@ vi.mock('../agent/custom-http-agent', async (importOriginal) => {
   };
 
   return {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
     ...(await importOriginal<typeof import('../agent/custom-http-agent')>()),
     CustomHttpAgent: {
       create: vi.fn().mockResolvedValue(mockCustomAgent)
@@ -143,14 +141,13 @@ describe('icrc-21.canister.api', () => {
 
   describe('Actors cache', () => {
     it('should create a new actor when none exists ', async () => {
-      // eslint-disable-next-line @typescript-eslint/dot-notation
       const result = await canister['getIcrc21Actor']({
         canisterId: mockCanisterId,
         ...signerOptions
       });
 
       // Assert that the CustomHttpAgent is created and passed to createActor
-      // eslint-disable-next-line @typescript-eslint/unbound-method
+
       expect(CustomHttpAgent.create).toHaveBeenCalledWith({
         identity: signerOptions.owner,
         host: signerOptions.host,
@@ -158,7 +155,7 @@ describe('icrc-21.canister.api', () => {
       });
 
       // TODO: spyOn nor function does work with vitest and Actor.createActor. Not against a better idea than disabling eslint for next line.
-      // eslint-disable-next-line @typescript-eslint/unbound-method
+
       expect(Actor.createActor).toHaveBeenCalledWith(idlFactory, {
         agent: expect.any(Object),
         canisterId: mockCanisterId
@@ -168,13 +165,11 @@ describe('icrc-21.canister.api', () => {
     });
 
     it('should return the same actor if called multiple times with the same canisterId', async () => {
-      // eslint-disable-next-line @typescript-eslint/dot-notation
       const result = await canister['getIcrc21Actor']({
         canisterId: mockCanisterId,
         ...signerOptions
       });
 
-      // eslint-disable-next-line @typescript-eslint/dot-notation
       const resultAgain = await canister['getIcrc21Actor']({
         canisterId: mockCanisterId,
         ...signerOptions
@@ -183,31 +178,29 @@ describe('icrc-21.canister.api', () => {
       expect(resultAgain).toBe(result);
 
       // Ensure that the `CustomHttpAgent.create` is only called once
-      // eslint-disable-next-line @typescript-eslint/unbound-method
+
       expect(CustomHttpAgent.create).toHaveBeenCalledOnce();
 
       // TODO: spyOn nor function does work with vitest and Actor.createActor. Not against a better idea than disabling eslint for next line.
-      // eslint-disable-next-line @typescript-eslint/unbound-method
+
       expect(Actor.createActor).toHaveBeenCalledOnce();
     });
 
     it('should create a new actor when canisterId changes', async () => {
       const differentCanisterId = Principal.fromText('v7iq7-yiaaa-aaaan-qmrtq-cai');
 
-      // eslint-disable-next-line @typescript-eslint/dot-notation
       await canister['getIcrc21Actor']({
         canisterId: mockCanisterId,
         ...signerOptions
       });
 
-      // eslint-disable-next-line @typescript-eslint/dot-notation
       await canister['getIcrc21Actor']({
         canisterId: differentCanisterId,
         ...signerOptions
       });
 
       // TODO: spyOn nor function does work with vitest and Actor.createActor. Not against a better idea than disabling eslint for next line.
-      // eslint-disable-next-line @typescript-eslint/unbound-method
+
       expect(Actor.createActor).toHaveBeenCalledTimes(2);
     });
   });

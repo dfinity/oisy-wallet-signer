@@ -1,9 +1,9 @@
 <script lang="ts">
 	import type { IcrcScopesArray } from '@dfinity/oisy-wallet-signer';
 
-	type Props = {
+	interface Props {
 		scopes: IcrcScopesArray;
-	};
+	}
 
 	let { scopes }: Props = $props();
 </script>

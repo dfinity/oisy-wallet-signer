@@ -3,14 +3,14 @@
 	import { nonNullish } from '@dfinity/utils';
 	import { fade } from 'svelte/transition';
 	import Value from '$core/components/Value.svelte';
-	import { accountsStore } from '$lib/stores/accounts.store';
 	import Icrc1Transfer from '$lib/components/Icrc1Transfer.svelte';
 	import Icrc2Approve from '$lib/components/Icrc2Approve.svelte';
 	import Icrc2TransferFrom from '$lib/components/Icrc2TransferFrom.svelte';
+	import { accountsStore } from '$lib/stores/accounts.store';
 
-	type Props = {
+	interface Props {
 		wallet: IcrcWallet | undefined;
-	};
+	}
 
 	let { wallet }: Props = $props();
 </script>

@@ -15,7 +15,6 @@ import * as callUtils from './call.assert.utils';
 import {assertCallResponse, decodeResponse} from './call.utils';
 
 vi.mock('@dfinity/agent', async (importOriginal) => {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
   const originalModule = await importOriginal<typeof import('@dfinity/agent')>();
 
   class MockHttpAgent {
@@ -124,10 +123,6 @@ describe('call.utils', () => {
 
     beforeEach(() => {
       vi.setSystemTime(mockLocalCallTime);
-
-      createSpy = vi.spyOn(agent.HttpAgent, 'create').mockResolvedValue({
-        rootKey: mockLocalIcRootKey.buffer
-      } as unknown as agent.HttpAgent);
     });
 
     afterEach(() => {
@@ -135,36 +130,64 @@ describe('call.utils', () => {
       vi.useRealTimers();
     });
 
-    it('should decode success response', async () => {
-      const response = await decodeResponse({
-        params: mockLocalCallParams,
-        result: mockLocalCallResult,
-        resultRecordClass: TransferResult
+    describe('With agent root key', () => {
+      beforeEach(() => {
+        createSpy = vi.spyOn(agent.HttpAgent, 'create').mockResolvedValue({
+          rootKey: mockLocalIcRootKey.buffer
+        } as unknown as agent.HttpAgent);
       });
 
-      expect(response).toEqual({
-        Ok: mockLocalBlockHeight
+      it('should decode success response', async () => {
+        const response = await decodeResponse({
+          params: mockLocalCallParams,
+          result: mockLocalCallResult,
+          resultRecordClass: TransferResult
+        });
+
+        expect(response).toEqual({
+          Ok: mockLocalBlockHeight
+        });
+      });
+
+      it('should create agent with a custom host', async () => {
+        const host = 'http://localhost:8080';
+
+        const response = await decodeResponse({
+          params: mockLocalCallParams,
+          result: mockLocalCallResult,
+          resultRecordClass: TransferResult,
+          host
+        });
+
+        expect(response).toEqual({
+          Ok: mockLocalBlockHeight
+        });
+
+        expect(createSpy).toHaveBeenCalledWith({
+          host,
+          identity: new AnonymousIdentity(),
+          shouldFetchRootKey: true
+        });
       });
     });
 
-    it('should create agent with a custom host', async () => {
-      const host = 'http://localhost:8080';
-
-      const response = await decodeResponse({
-        params: mockLocalCallParams,
-        result: mockLocalCallResult,
-        resultRecordClass: TransferResult,
-        host
+    describe('Without agent root key', () => {
+      beforeEach(() => {
+        createSpy = vi.spyOn(agent.HttpAgent, 'create').mockResolvedValue({
+          rootKey: null
+        } as unknown as agent.HttpAgent);
       });
 
-      expect(response).toEqual({
-        Ok: mockLocalBlockHeight
-      });
-
-      expect(createSpy).toHaveBeenCalledWith({
-        host,
-        identity: new AnonymousIdentity(),
-        shouldFetchRootKey: true
+      it('should throw an exception is agent root key is undefined', async () => {
+        await expect(
+          decodeResponse({
+            params: mockLocalCallParams,
+            result: mockLocalCallResult,
+            resultRecordClass: TransferResult
+          })
+        ).rejects.toThrowError(
+          'Missing agent root key, which is required to certify the response.'
+        );
       });
     });
 

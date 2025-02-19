@@ -1,9 +1,8 @@
 import {Principal} from '@dfinity/principal';
-import {arrayBufferToUint8Array} from '@dfinity/utils';
+import {arrayBufferToUint8Array, base64ToUint8Array} from '@dfinity/utils';
+import {PrincipalText} from '@dfinity/zod-schemas';
 import {IcrcBlob} from '../types/blob';
 import {Method} from '../types/icrc-requests';
-import {PrincipalText} from '../types/principal';
-import {base64ToUint8Array} from './base64.utils';
 
 export const assertCallMethod = ({
   requestMethod,
@@ -28,7 +27,6 @@ export const assertCallArg = ({
   const callRequestArg = arrayBufferToUint8Array(responseArg);
 
   const uint8ArrayEqual = ({first, second}: {first: Uint8Array; second: Uint8Array}): boolean =>
-    // eslint-disable-next-line local-rules/prefer-object-params
     first.length === second.length && first.every((value, index) => value === second[index]);
 
   if (!uint8ArrayEqual({first: requestArg, second: callRequestArg})) {
