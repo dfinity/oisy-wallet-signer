@@ -398,6 +398,12 @@ describe('Signer', () => {
           notifyPermissionsSpy = vi.spyOn(signerSuccessHandlers, 'notifyPermissionScopes');
           notifyErrorSpy = vi.spyOn(signerHandlers, 'notifyError');
         });
+        // TODO: remove this test once the busy error notification issue has been fixed
+        it('should not notify an error when status is requested', () => {
+          const messageEvent = new MessageEvent('message', requestStatus);
+          window.dispatchEvent(messageEvent);
+          expect(notifyErrorSpy).not.toHaveBeenCalled();
+        });
 
         it('should notify READY for icrc29_status', () => {
           const messageEvent = new MessageEvent('message', requestStatus);
