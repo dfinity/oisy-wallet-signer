@@ -245,7 +245,7 @@ export class Signer {
    * @returns {boolean} returns true` if the signer is busy, otherwise `false`.
    */
   private assertNotBusy({data: msgData, origin}: SignerMessageEvent): {busy: boolean} {
-    if (this.#busy) {
+    if (this.#busy && msgData?.method !== 'icrc29_status') {
       notifyErrorBusy({
         id: msgData?.id ?? null,
         origin
