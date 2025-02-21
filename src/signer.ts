@@ -132,7 +132,7 @@ export class Signer {
 
     // The heartbeat might be triggered while the signer is busy processing requests.
     // Since these informative requests do not impact the signer's behavior, it is acceptable to provide a response.
-    const {handled: handledHeartbeat} = await this.handleHeartbeatMessage(message);
+    const {handled: handledHeartbeat} = this.handleHeartbeatMessage(message);
     if (handledHeartbeat) {
       return;
     }
@@ -155,7 +155,7 @@ export class Signer {
     });
   };
 
-  private async handleHeartbeatMessage(message: SignerMessageEvent): Promise<{handled: boolean}> {
+  private handleHeartbeatMessage(message: SignerMessageEvent): {handled: boolean} {
     const {handled: statusRequestHandled} = this.handleStatusRequest(message);
     if (statusRequestHandled) {
       return {handled: true};
