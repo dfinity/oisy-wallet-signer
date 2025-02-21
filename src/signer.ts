@@ -6,6 +6,7 @@ import {
   ICRC25_PERMISSION_GRANTED,
   ICRC25_REQUEST_PERMISSIONS,
   ICRC27_ACCOUNTS,
+  ICRC29_STATUS,
   ICRC49_CALL_CANISTER
 } from './constants/icrc.constants';
 import {SIGNER_DEFAULT_SCOPES, SignerErrorCode} from './constants/signer.constants';
@@ -245,7 +246,12 @@ export class Signer {
    * @returns {boolean} returns true` if the signer is busy, otherwise `false`.
    */
   private assertNotBusy({data: msgData, origin}: SignerMessageEvent): {busy: boolean} {
-    if (this.#busy) {
+    // TODO: This is a temporary workaround to suppress the busy error, which is likely triggered due
+    //  to an error raised by *.safeParse(data)
+    //  A follow-up pull-request with a clean fix will be provided asap
+    //  Original code:
+    // if (this.#busy) {
+    if (this.#busy && msgData?.method !== ICRC29_STATUS) {
       notifyErrorBusy({
         id: msgData?.id ?? null,
         origin
