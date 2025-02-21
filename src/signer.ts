@@ -6,7 +6,6 @@ import {
   ICRC25_PERMISSION_GRANTED,
   ICRC25_REQUEST_PERMISSIONS,
   ICRC27_ACCOUNTS,
-  ICRC29_STATUS,
   ICRC49_CALL_CANISTER
 } from './constants/icrc.constants';
 import {SIGNER_DEFAULT_SCOPES, SignerErrorCode} from './constants/signer.constants';
@@ -131,6 +130,20 @@ export class Signer {
       return;
     }
 
+    // At this point the connection with the relying party should have been initialized and the origin should be set.
+    // The correctness of the origin must be verified for all valid RpcRequest's, including heartbeat requests (icrc29_status).
+    const {valid} = this.assertNotUndefinedAndSameOrigin(message);
+    if (!valid) {
+      // we can immediately abort further execution if the origin does not match
+      return;
+    }
+
+    const {handled: handleHeartbeat} = await this.handleHeartbeatMessage(message);
+    if (handleHeartbeat) {
+      // we can immediately abort further execution thereby ensuring that the heartbeat messages will always return a valid response, even if the signer is busy
+      return;
+    }
+
     const {busy} = this.assertNotBusy(message);
     if (busy) {
       return;
@@ -138,8 +151,8 @@ export class Signer {
 
     // TODO: wrap a try catch around all handler and notify "Unexpected exception" in case if issues
 
-    const {handled} = await this.handleMessage(message);
-    if (handled) {
+    const {handled: handledMesage} = await this.handleMessage(message);
+    if (handledMesage) {
       return;
     }
 
@@ -149,17 +162,15 @@ export class Signer {
     });
   };
 
-  private async handleMessage(message: SignerMessageEvent): Promise<{handled: boolean}> {
+  private async handleHeartbeatMessage(message: SignerMessageEvent): Promise<{handled: boolean}> {
     const {handled: statusRequestHandled} = this.handleStatusRequest(message);
     if (statusRequestHandled) {
       return {handled: true};
     }
+    return {handled:false}
+  }
 
-    // At this point the connection with the relying party should have been initialized and the origin should be set.
-    const {valid} = this.assertNotUndefinedAndSameOrigin(message);
-    if (!valid) {
-      return {handled: true};
-    }
+  private async handleMessage(message: SignerMessageEvent): Promise<{handled: boolean}> {
 
     const {handled: supportedStandardsRequestHandled} = this.handleSupportedStandards(message);
     if (supportedStandardsRequestHandled) {
@@ -246,12 +257,7 @@ export class Signer {
    * @returns {boolean} returns true` if the signer is busy, otherwise `false`.
    */
   private assertNotBusy({data: msgData, origin}: SignerMessageEvent): {busy: boolean} {
-    // TODO: This is a temporary workaround to suppress the busy error, which is likely triggered due
-    //  to an error raised by *.safeParse(data)
-    //  A follow-up pull-request with a clean fix will be provided asap
-    //  Original code:
-    // if (this.#busy) {
-    if (this.#busy && msgData?.method !== ICRC29_STATUS) {
+    if (this.#busy) {
       notifyErrorBusy({
         id: msgData?.id ?? null,
         origin
@@ -369,7 +375,7 @@ export class Signer {
   // TODO: maybe provide a prompt for the developer to get to know when status "ready" was exchanged?
 
   /**
-   * Handles incoming status requests.
+   * Handles incoming status requests treat them as a heartbeat.
    *
    * Parses the message data to determine if it conforms to a status request, sends a notification indicating that the signer is ready and set the origin for asserting subsequent calls.
    *
