@@ -130,8 +130,6 @@ export class Signer {
       return;
     }
 
-    // The heartbeat might be triggered while the signer is busy processing requests.
-    // Since these informative requests do not impact the signer's behavior, it is acceptable to provide a response.
     const {handled: handledHeartbeat} = this.handleHeartbeatMessage(message);
     if (handledHeartbeat) {
       return;
@@ -155,6 +153,16 @@ export class Signer {
     });
   };
 
+  /**
+   * Handles a potential heartbeat message request.
+   *
+   * The heartbeat might be triggered while the signer is busy processing requests.
+   * Since these informative requests do not impact the signer's behavior, it is acceptable to provide a response.
+   *
+   * @private
+   * @param {SignerMessageEvent} message - The message event to process.
+   * @returns {{ handled: boolean }} - An object indicating whether the message was handled.
+   */
   private handleHeartbeatMessage(message: SignerMessageEvent): {handled: boolean} {
     const {handled: statusRequestHandled} = this.handleStatusRequest(message);
     if (statusRequestHandled) {
