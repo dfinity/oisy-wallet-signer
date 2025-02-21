@@ -130,6 +130,13 @@ export class Signer {
       return;
     }
 
+    // The heartbeat might be triggered while the signer is busy processing requests.
+    // Since these informative requests do not impact the signer's behavior, it is acceptable to provide a response.
+    const {handled: handledHeartbeat} = await this.handleHeartbeatMessage(message);
+    if (handledHeartbeat) {
+      return;
+    }
+
     const {busy} = this.assertNotBusy(message);
     if (busy) {
       return;
@@ -148,12 +155,16 @@ export class Signer {
     });
   };
 
-  private async handleMessage(message: SignerMessageEvent): Promise<{handled: boolean}> {
+  private async handleHeartbeatMessage(message: SignerMessageEvent): Promise<{handled: boolean}> {
     const {handled: statusRequestHandled} = this.handleStatusRequest(message);
     if (statusRequestHandled) {
       return {handled: true};
     }
 
+    return {handled: false};
+  }
+
+  private async handleMessage(message: SignerMessageEvent): Promise<{handled: boolean}> {
     // At this point the connection with the relying party should have been initialized and the origin should be set.
     const {valid} = this.assertNotUndefinedAndSameOrigin(message);
     if (!valid) {
@@ -191,6 +202,7 @@ export class Signer {
 
   private setWalletOrigin({origin}: Pick<SignerMessageEvent, 'origin'>) {
     // We do not reassign the origin with the same value if it is already set. It is not a significant performance win.
+    // In addition, requesting the status is now triggered periodically.
     if (nonNullish(this.#walletOrigin)) {
       return;
     }
