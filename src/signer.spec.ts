@@ -398,29 +398,12 @@ describe('Signer', () => {
           notifyPermissionsSpy = vi.spyOn(signerSuccessHandlers, 'notifyPermissionScopes');
           notifyErrorSpy = vi.spyOn(signerHandlers, 'notifyError');
         });
-
-        it('should notify READY for icrc29_status', () => {
-          const messageEvent = new MessageEvent('message', requestStatus);
-          window.dispatchEvent(messageEvent);
-
-          expect(postMessageMock).toHaveBeenCalledWith(
-            {
-              jsonrpc: JSON_RPC_VERSION_2,
-              id: testId,
-              result: 'ready'
-            },
-            testOrigin
-          );
-        });
-
-        it('should notify READY everytime subsequent call of icrc29_status', () => {
-          const messageEvent = new MessageEvent('message', requestStatus);
-
-          for (let i = 0; i < 3; i++) {
+        describe('Not Busy', () => {
+          it('should notify ready', () => {
+            const messageEvent = new MessageEvent('message', requestStatus);
             window.dispatchEvent(messageEvent);
 
-            expect(postMessageMock).toHaveBeenNthCalledWith(
-              i + 1,
+            expect(postMessageMock).toHaveBeenCalledWith(
               {
                 jsonrpc: JSON_RPC_VERSION_2,
                 id: testId,
@@ -428,18 +411,116 @@ describe('Signer', () => {
               },
               testOrigin
             );
-          }
+          });
+
+          it('should notify ready everytime subsequent call of icrc29_status', () => {
+            const messageEvent = new MessageEvent('message', requestStatus);
+
+            for (let i = 0; i < 3; i++) {
+              window.dispatchEvent(messageEvent);
+
+              expect(postMessageMock).toHaveBeenNthCalledWith(
+                i + 1,
+                {
+                  jsonrpc: JSON_RPC_VERSION_2,
+                  id: testId,
+                  result: 'ready'
+                },
+                testOrigin
+              );
+            }
+          });
+
+          it('should not notify any other messages than ready', () => {
+            const messageEvent = new MessageEvent('message', requestStatus);
+            window.dispatchEvent(messageEvent);
+
+            expect(notifyAccountsSpy).not.toHaveBeenCalled();
+            expect(notifyCallCanisterSpy).not.toHaveBeenCalled();
+            expect(notifySupportedStandardsSpy).not.toHaveBeenCalled();
+            expect(notifyPermissionsSpy).not.toHaveBeenCalled();
+            expect(notifyErrorSpy).not.toHaveBeenCalled();
+          });
+
+          it('should not handle with busy', () => {
+            let handleWithBusySpy = vi.spyOn(
+              signer as unknown as {handleWithBusy: () => void},
+              'handleWithBusy'
+            );
+            const messageEvent = new MessageEvent('message', requestStatus);
+            window.dispatchEvent(messageEvent);
+            expect(handleWithBusySpy).not.toHaveBeenCalled();
+          });
         });
+        describe('Busy', () => {
+          const prepareConfirm = async (): Promise<{
+            confirm: PermissionsConfirmation | undefined;
+            messageEvent: MessageEvent;
+          }> => {
+            let confirm: PermissionsConfirmation | undefined;
 
-        it('should not notify any other messages than ready', () => {
-          const messageEvent = new MessageEvent('message', requestStatus);
-          window.dispatchEvent(messageEvent);
+            signer.register({
+              method: ICRC25_REQUEST_PERMISSIONS,
+              prompt: ({confirm: confirmScopes, requestedScopes: _}: PermissionsPromptPayload) => {
+                confirm = confirmScopes;
+              }
+            });
 
-          expect(notifyAccountsSpy).not.toHaveBeenCalled();
-          expect(notifyCallCanisterSpy).not.toHaveBeenCalled();
-          expect(notifySupportedStandardsSpy).not.toHaveBeenCalled();
-          expect(notifyPermissionsSpy).not.toHaveBeenCalled();
-          expect(notifyErrorSpy).not.toHaveBeenCalled();
+            const messageEvent = new MessageEvent('message', requestPermissionsMsg);
+            window.dispatchEvent(messageEvent);
+
+            await vi.waitFor(() => {
+              expect(confirm).not.toBeUndefined();
+            });
+
+            return {
+              confirm,
+              messageEvent
+            };
+          };
+
+          beforeEach(async () => {
+            console.info('Prepare Confirm');
+
+            await initWalletReady();
+
+            const {messageEvent} = await prepareConfirm();
+
+            // Sending a second request should lead to busy given that the confirm is not handled
+            window.dispatchEvent(messageEvent);
+          });
+
+          it('should notify ready even if signer is busy', () => {
+            const messageEvent = new MessageEvent('message', requestStatus);
+            window.dispatchEvent(messageEvent);
+
+            expect(postMessageMock).toHaveBeenCalledWith(
+              {
+                jsonrpc: JSON_RPC_VERSION_2,
+                id: testId,
+                result: 'ready'
+              },
+              testOrigin
+            );
+          });
+
+          it('should not notify error BUSY if signer is busy', () => {
+            const messageEvent = new MessageEvent('message', requestStatus);
+            window.dispatchEvent(messageEvent);
+
+            expect(postMessageMock).not.toHaveBeenLastCalledWith(
+              {
+                jsonrpc: JSON_RPC_VERSION_2,
+                id: testId,
+                error: {
+                  code: SignerErrorCode.BUSY,
+                  message:
+                    'The signer is currently processing a request and cannot handle new requests at this time.'
+                }
+              },
+              testOrigin
+            );
+          });
         });
       });
 
