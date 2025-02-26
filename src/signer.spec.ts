@@ -1682,7 +1682,7 @@ describe('Signer', () => {
               });
             });
 
-            describe('Busy', async () => {
+            describe('Busy', () => {
               let messageEvent: MessageEvent;
 
               beforeEach(async () => {
