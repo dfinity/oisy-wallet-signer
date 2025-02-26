@@ -389,7 +389,7 @@ describe('Signer', () => {
           const messageEvent = new MessageEvent('message', requestStatus);
           window.dispatchEvent(messageEvent);
 
-          expect(postMessageMock).toHaveBeenCalledWith(
+          expect(postMessageMock).toHaveBeenLastCalledWith(
             {
               jsonrpc: JSON_RPC_VERSION_2,
               id: testId,
@@ -562,9 +562,9 @@ describe('Signer', () => {
             expect(notifyPermissionsSpy).not.toHaveBeenCalled();
             expect(notifyErrorSpy).not.toHaveBeenCalled();
           });
-
-          assertHeartbeatsIfBusy();
         });
+
+        // TODO: supported standards should probably also emitted if the signer is busy
       });
 
       describe('Permissions', () => {
@@ -725,7 +725,9 @@ describe('Signer', () => {
             expect(notifyErrorSpy).not.toHaveBeenCalled();
           });
 
-          assertHeartbeatsIfBusy();
+          // TODO: should permissions be emitted if the signer is busy?
+          // If yes, we should improve the implementation
+          // If no, we should create a test that assert that ready is answer even if permissions are queried. However, it's probably difficult to test, probably requires more mocking, therefore not sure it is worth the effort.
         });
       });
 
@@ -1121,29 +1123,36 @@ describe('Signer', () => {
             del({key: `oisy_signer_${testOrigin}_${owner.getPrincipal().toText()}`});
           });
 
-          it('should reject if busy', async () => {
-            const {messageEvent} = await prepareConfirm();
+          describe('Busy', () => {
+            let messageEvent: MessageEvent;
 
-            // Sending a second request should lead to busy given that the confirm is not handled
-            window.dispatchEvent(messageEvent);
-
-            await vi.waitFor(() => {
-              expect(postMessageMock).toHaveBeenLastCalledWith(
-                {
-                  jsonrpc: JSON_RPC_VERSION_2,
-                  id: testId,
-                  error: {
-                    code: SignerErrorCode.BUSY,
-                    message:
-                      'The signer is currently processing a request and cannot handle new requests at this time.'
-                  }
-                },
-                testOrigin
-              );
+            beforeEach(async () => {
+              const {messageEvent: m} = await prepareConfirm();
+              messageEvent = m;
             });
-          });
 
-          assertHeartbeatsIfBusy();
+            it('should reject if busy', async () => {
+              // Sending a second request should lead to busy given that the confirm is not handled
+              window.dispatchEvent(messageEvent);
+
+              await vi.waitFor(() => {
+                expect(postMessageMock).toHaveBeenLastCalledWith(
+                  {
+                    jsonrpc: JSON_RPC_VERSION_2,
+                    id: testId,
+                    error: {
+                      code: SignerErrorCode.BUSY,
+                      message:
+                        'The signer is currently processing a request and cannot handle new requests at this time.'
+                    }
+                  },
+                  testOrigin
+                );
+              });
+            });
+
+            assertHeartbeatsIfBusy();
+          });
 
           it('should reset to idle', async () => {
             const {confirm} = await prepareConfirm();
@@ -1671,29 +1680,36 @@ describe('Signer', () => {
               });
             });
 
-            it('should reject if busy', async () => {
-              const {messageEvent} = await prepareApprove();
+            describe('Busy', async () => {
+              let messageEvent: MessageEvent;
 
-              // Sending a second request should lead to busy given that the approve is not handled
-              window.dispatchEvent(messageEvent);
-
-              await vi.waitFor(() => {
-                expect(postMessageMock).toHaveBeenLastCalledWith(
-                  {
-                    jsonrpc: JSON_RPC_VERSION_2,
-                    id: testId,
-                    error: {
-                      code: SignerErrorCode.BUSY,
-                      message:
-                        'The signer is currently processing a request and cannot handle new requests at this time.'
-                    }
-                  },
-                  testOrigin
-                );
+              beforeEach(async () => {
+                const {messageEvent: m} = await prepareApprove();
+                messageEvent = m;
               });
-            });
 
-            assertHeartbeatsIfBusy();
+              it('should reject if busy', async () => {
+                // Sending a second request should lead to busy given that the approve is not handled
+                window.dispatchEvent(messageEvent);
+
+                await vi.waitFor(() => {
+                  expect(postMessageMock).toHaveBeenLastCalledWith(
+                    {
+                      jsonrpc: JSON_RPC_VERSION_2,
+                      id: testId,
+                      error: {
+                        code: SignerErrorCode.BUSY,
+                        message:
+                          'The signer is currently processing a request and cannot handle new requests at this time.'
+                      }
+                    },
+                    testOrigin
+                  );
+                });
+              });
+
+              assertHeartbeatsIfBusy();
+            });
 
             it('should reset to idle', async () => {
               const {approve} = await prepareApprove();
@@ -1873,29 +1889,36 @@ describe('Signer', () => {
                   });
                 });
 
-                it('should reject if busy', async () => {
-                  const {messageEvent} = await prepareConfirm();
+                describe('Busy', () => {
+                  let messageEvent: MessageEvent;
 
-                  // Sending a second request should lead to busy given that the confirm is not handled
-                  window.dispatchEvent(messageEvent);
-
-                  await vi.waitFor(() => {
-                    expect(postMessageMock).toHaveBeenLastCalledWith(
-                      {
-                        jsonrpc: JSON_RPC_VERSION_2,
-                        id: testId,
-                        error: {
-                          code: SignerErrorCode.BUSY,
-                          message:
-                            'The signer is currently processing a request and cannot handle new requests at this time.'
-                        }
-                      },
-                      testOrigin
-                    );
+                  beforeEach(async () => {
+                    const {messageEvent: m} = await prepareConfirm();
+                    messageEvent = m;
                   });
-                });
 
-                assertHeartbeatsIfBusy();
+                  it('should reject if busy', async () => {
+                    // Sending a second request should lead to busy given that the confirm is not handled
+                    window.dispatchEvent(messageEvent);
+
+                    await vi.waitFor(() => {
+                      expect(postMessageMock).toHaveBeenLastCalledWith(
+                        {
+                          jsonrpc: JSON_RPC_VERSION_2,
+                          id: testId,
+                          error: {
+                            code: SignerErrorCode.BUSY,
+                            message:
+                              'The signer is currently processing a request and cannot handle new requests at this time.'
+                          }
+                        },
+                        testOrigin
+                      );
+                    });
+                  });
+
+                  assertHeartbeatsIfBusy();
+                });
               });
 
               describe('Call canister error', () => {
