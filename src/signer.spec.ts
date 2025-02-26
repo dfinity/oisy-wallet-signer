@@ -433,18 +433,22 @@ describe('Signer', () => {
           notifyErrorSpy = vi.spyOn(signerHandlers, 'notifyError');
         });
 
+        const assertNotifyReady = () => {
+          expect(postMessageMock).toHaveBeenCalledWith(
+              {
+                jsonrpc: JSON_RPC_VERSION_2,
+                id: testId,
+                result: 'ready'
+              },
+              testOrigin
+          );
+        }
+
         it('should notify READY for icrc29_status', () => {
           const messageEvent = new MessageEvent('message', requestStatus);
           window.dispatchEvent(messageEvent);
 
-          expect(postMessageMock).toHaveBeenCalledWith(
-            {
-              jsonrpc: JSON_RPC_VERSION_2,
-              id: testId,
-              result: 'ready'
-            },
-            testOrigin
-          );
+          assertNotifyReady();
         });
 
         it('should notify READY everytime subsequent call of icrc29_status', () => {
@@ -486,6 +490,20 @@ describe('Signer', () => {
           await vi.waitFor(() => {
             expect(handleWithBusySpy).not.toHaveBeenCalled();
           });
+        });
+
+        it('should not handle with busy', async () => {
+          const handleWithBusySpy = vi.spyOn(
+            signer as unknown as {handleWithBusy: () => void},
+            'handleWithBusy'
+          );
+          const messageEvent = new MessageEvent('message', requestStatus);
+          window.dispatchEvent(messageEvent);
+
+          // Ensures the answer to the status message has been notified.
+          await vi.waitFor(assertNotifyReady);
+
+          expect(handleWithBusySpy).not.toHaveBeenCalled();
         });
       });
 
