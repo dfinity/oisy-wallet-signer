@@ -435,14 +435,14 @@ describe('Signer', () => {
 
         const assertNotifyReady = () => {
           expect(postMessageMock).toHaveBeenCalledWith(
-              {
-                jsonrpc: JSON_RPC_VERSION_2,
-                id: testId,
-                result: 'ready'
-              },
-              testOrigin
+            {
+              jsonrpc: JSON_RPC_VERSION_2,
+              id: testId,
+              result: 'ready'
+            },
+            testOrigin
           );
-        }
+        };
 
         it('should notify READY for icrc29_status', () => {
           const messageEvent = new MessageEvent('message', requestStatus);
