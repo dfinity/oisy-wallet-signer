@@ -476,14 +476,16 @@ describe('Signer', () => {
           expect(notifyErrorSpy).not.toHaveBeenCalled();
         });
 
-        it('should not handle with busy', () => {
+        it('should not handle with busy', async () => {
           const handleWithBusySpy = vi.spyOn(
             signer as unknown as {handleWithBusy: () => void},
             'handleWithBusy'
           );
           const messageEvent = new MessageEvent('message', requestStatus);
           window.dispatchEvent(messageEvent);
-          expect(handleWithBusySpy).not.toHaveBeenCalled();
+          await vi.waitFor(() => {
+            expect(handleWithBusySpy).not.toHaveBeenCalled();
+          });
         });
       });
 
@@ -1680,7 +1682,7 @@ describe('Signer', () => {
               });
             });
 
-            describe('Busy', () => {
+            describe('Busy', async () => {
               let messageEvent: MessageEvent;
 
               beforeEach(async () => {
