@@ -477,7 +477,7 @@ describe('Signer', () => {
         });
 
         it('should not handle with busy', () => {
-          let handleWithBusySpy = vi.spyOn(
+          const handleWithBusySpy = vi.spyOn(
             signer as unknown as {handleWithBusy: () => void},
             'handleWithBusy'
           );
