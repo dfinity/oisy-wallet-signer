@@ -535,7 +535,7 @@ describe('Signer', () => {
               );
             });
           });
-          it('should not notify error for icrc25_supported_standards even if signer is busy', async () => {
+          it('should not notify error for icrc25_supported_standards when signer is busy', async () => {
             const messageEvent = new MessageEvent('message', msg);
             window.dispatchEvent(messageEvent);
 
