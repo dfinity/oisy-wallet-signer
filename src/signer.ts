@@ -130,8 +130,9 @@ export class Signer {
       return;
     }
 
-    const {handled: handledHeartbeat} = this.handleHeartbeatMessage(message);
-    if (handledHeartbeat) {
+    // all ready-only message requests must be handled before any
+    const {handled: handledReadOnly} = this.handleReadOnlyMessage(message);
+    if (handledReadOnly) {
       return;
     }
 
@@ -154,20 +155,22 @@ export class Signer {
   };
 
   /**
-   * Handles a potential heartbeat message request.
+   * Handles a potential readonly-only message request.
    *
-   * The heartbeat might be triggered while the signer is busy processing requests.
-   * Since these informative requests do not impact the signer's behavior, it is acceptable to provide a response.
+   * The readonly-only message request might be triggered while the signer is busy processing requests.
+   * Since these informative requests do not impact the signer's behavior, it is acceptable to provide a response read-only requests.
    *
    * @private
    * @param {SignerMessageEvent} message - The message event to process.
    * @returns {{ handled: boolean }} - An object indicating whether the message was handled.
    */
-  private handleHeartbeatMessage(message: SignerMessageEvent): {handled: boolean} {
+  private handleReadOnlyMessage(message: SignerMessageEvent): {handled: boolean} {
     const {handled: statusRequestHandled} = this.handleStatusRequest(message);
     if (statusRequestHandled) {
       return {handled: true};
     }
+
+    // TODO: handle any read-only message requests here (e.g. handleSupportedStandards(..))
 
     return {handled: false};
   }
