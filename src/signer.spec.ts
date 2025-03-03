@@ -584,6 +584,8 @@ describe('Signer', () => {
             expect(notifyErrorSpy).not.toHaveBeenCalled();
           });
         });
+
+        // TODO: supported standards should probably also emitted if the signer is busy
       });
 
       describe('Permissions', () => {
