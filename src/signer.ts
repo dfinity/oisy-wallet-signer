@@ -154,25 +154,21 @@ export class Signer {
   };
 
   /**
-   * Handles a potential readonly-only message request.
+   * Handles a potential heartbeat message request.
    *
-   * The readonly-only message request might be triggered while the signer is busy processing requests.
-   * Since these informative requests do not impact the signer's behavior, it is acceptable to provide a response read-only requests.
+   * The heartbeat might be triggered while the signer is busy processing requests.
+   * Since these informative requests do not impact the signer's behavior, it is acceptable to provide a response.
    *
    * @private
    * @param {SignerMessageEvent} message - The message event to process.
    * @returns {{ handled: boolean }} - An object indicating whether the message was handled.
    */
-  private handleReadOnlyMessage(message: SignerMessageEvent): {handled: boolean} {
+  private handleHeartbeatMessage(message: SignerMessageEvent): {handled: boolean} {
     const {handled: statusRequestHandled} = this.handleStatusRequest(message);
     if (statusRequestHandled) {
       return {handled: true};
     }
-    const {handled: supportedStandardsRequestHandled} = this.handleSupportedStandards(message);
-    if (supportedStandardsRequestHandled) {
-      return {handled: true};
-    }
-    // TODO: handle read-only message requests in the future here (e.g. handleSupportedStandards(..))
+
     return {handled: false};
   }
 
@@ -180,6 +176,11 @@ export class Signer {
     // At this point the connection with the relying party should have been initialized and the origin should be set.
     const {valid} = this.assertNotUndefinedAndSameOrigin(message);
     if (!valid) {
+      return {handled: true};
+    }
+
+    const {handled: supportedStandardsRequestHandled} = this.handleSupportedStandards(message);
+    if (supportedStandardsRequestHandled) {
       return {handled: true};
     }
 
