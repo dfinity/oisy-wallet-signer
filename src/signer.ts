@@ -130,7 +130,6 @@ export class Signer {
       return;
     }
 
-    // all ready-only message requests must be handled before any
     const {handled: handledReadOnly} = this.handleReadOnlyMessage(message);
     if (handledReadOnly) {
       return;
@@ -169,9 +168,7 @@ export class Signer {
     if (statusRequestHandled) {
       return {handled: true};
     }
-
-    // TODO: handle any read-only message requests here (e.g. handleSupportedStandards(..))
-
+    // TODO: handle read-only message requests in the future here (e.g. handleSupportedStandards(..))
     return {handled: false};
   }
 
