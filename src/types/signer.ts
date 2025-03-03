@@ -7,6 +7,7 @@ import {
   IcrcSupportedStandardsRequestSchema
 } from './icrc-requests';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const SignerMessageEventDataSchema = z
   .union([
     IcrcStatusRequestSchema,

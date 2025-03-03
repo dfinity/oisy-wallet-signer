@@ -1,6 +1,0 @@
-dist
-
-# Never-ending story: It's easier to just exclude did files from the lint checks.
-src/declarations
-
-src/tsconfig.json

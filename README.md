@@ -491,13 +491,7 @@ Make sure you have Docker installed on your machine ([Windows](https://docs.dock
 > [!NOTE]
 > For MacBooks with M processors, it is important to use Docker Desktop version 4.25.0 or later, ideally the latest available version.
 
-2. Install Juno CLI:
-
-```bash
-npm i -g @junobuild/cli
-```
-
-3. Start the Demo:
+2. Start the Demo:
 
 Navigate to the [demo](./demo) directory and start the environment:
 
@@ -507,12 +501,12 @@ Navigate to the [demo](./demo) directory and start the environment:
 ```bash
 cd demo
 npm ci
-juno dev start
+npx juno dev start
 npm run dev:party
 npm run dev:wallet
 ```
 
-4. Run the Tests:
+3. Run the Tests:
 
 Return to the root directory and execute the tests:
 

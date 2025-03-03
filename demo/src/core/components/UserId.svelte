@@ -1,13 +1,13 @@
 <script lang="ts">
+	import type { Principal } from '@dfinity/principal';
 	import Value from '$core/components/Value.svelte';
 	import { shortenWithMiddleEllipsis } from '$core/utils/format.utils';
-	import type { Principal } from '@dfinity/principal';
 
-	type Props = {
+	interface Props {
 		shorten?: boolean;
 		user?: Principal;
 		title?: string;
-	};
+	}
 
 	let { shorten, user, title = 'Your User ID' }: Props = $props();
 

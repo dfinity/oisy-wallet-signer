@@ -1,6 +1,7 @@
 import * as z from 'zod';
 import {IcrcScopesSchema, IcrcSupportedStandardsSchema} from './icrc-responses';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const RelyingPartyMessageEventDataSchema = z
   .union([IcrcSupportedStandardsSchema, IcrcScopesSchema])
   .optional();

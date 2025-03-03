@@ -77,7 +77,7 @@ export class IcpWallet extends RelyingParty {
 
     const canisterId = ledgerCanisterId ?? ICP_LEDGER_CANISTER_ID;
 
-    const method = 'icrc1_transfer' as const;
+    const method = 'icrc1_transfer';
 
     const callParams: IcrcCallCanisterRequestParams = {
       sender: owner,
@@ -126,7 +126,7 @@ export class IcpWallet extends RelyingParty {
 
     const canisterId = ledgerCanisterId ?? ICP_LEDGER_CANISTER_ID;
 
-    const method = 'icrc2_approve' as const;
+    const method = 'icrc2_approve';
 
     const callParams: IcrcCallCanisterRequestParams = {
       sender: owner,

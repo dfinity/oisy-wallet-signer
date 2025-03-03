@@ -113,6 +113,7 @@ export type ConsentMessageApproval = z.infer<typeof ConsentMessageApprovalSchema
 
 const LoadingConsentMessageStatusSchema = z.enum(['loading']);
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ConsentMessageStatusSchema = LoadingConsentMessageStatusSchema.or(StatusSchema);
 
 export type ConsentMessageStatus = z.infer<typeof ConsentMessageStatusSchema>;
@@ -181,6 +182,7 @@ export type ConsentMessagePrompt = z.infer<typeof ConsentMessagePromptSchema>;
 
 const ExecutingCallCanisterStatusSchema = z.enum(['executing']);
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const CallCanisterStatusSchema = ExecutingCallCanisterStatusSchema.or(StatusSchema);
 
 export type CallCanisterStatus = z.infer<typeof CallCanisterStatusSchema>;

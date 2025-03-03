@@ -4,11 +4,12 @@
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
-		"build": "svelte-kit sync && tsc --noEmit && vite build",
+		"sync": "svelte-kit sync",
+		"build": "npm run sync && tsc --noEmit && vite build",
 		"preview": "vite preview",
 		"test:unit": "vitest",
-		"check": "svelte-kit sync && svelte-check --no-tsconfig",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
+		"check": "npm run sync && svelte-check --no-tsconfig",
+		"check:watch": "npm run sync && svelte-check --tsconfig ./tsconfig.json --watch"
 	},
 	"type": "module"
 }

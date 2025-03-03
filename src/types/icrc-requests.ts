@@ -15,6 +15,7 @@ import {inferRpcRequestWithParamsSchema, inferRpcRequestWithoutParamsSchema} fro
 
 // icrc25_request_permissions
 // https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#icrc25_request_permissions
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const IcrcRequestedScopesSchema = z.object({
   scopes: z
     .array(
