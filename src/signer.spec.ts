@@ -518,42 +518,23 @@ describe('Signer', () => {
         };
 
         describe('Not ready', () => {
-          it('should notify supported standards for icrc25_supported_standards even if signer is busy', async () => {
+          it('should notify connection is not yet established', () => {
             const messageEvent = new MessageEvent('message', msg);
             window.dispatchEvent(messageEvent);
 
-            await vi.waitFor(() => {
-              expect(postMessageMock).toHaveBeenCalledWith(
-                {
-                  jsonrpc: JSON_RPC_VERSION_2,
-                  id: testId,
-                  result: {
-                    supportedStandards: SIGNER_SUPPORTED_STANDARDS
-                  }
-                },
-                testOrigin
-              );
-            });
+            expect(postMessageMock).toHaveBeenCalledWith(
+              {
+                jsonrpc: JSON_RPC_VERSION_2,
+                id: testId,
+                error: {
+                  code: SignerErrorCode.ORIGIN_ERROR,
+                  message: 'The relying party has not established a connection to the signer.'
+                }
+              },
+              testOrigin
+            );
           });
-          it('should not notify error for icrc25_supported_standards when signer is busy', async () => {
-            const messageEvent = new MessageEvent('message', msg);
-            window.dispatchEvent(messageEvent);
-
-            await vi.waitFor(() => {
-              expect(postMessageMock).not.toHaveBeenLastCalledWith(
-                {
-                  jsonrpc: JSON_RPC_VERSION_2,
-                  id: testId,
-                  error: {
-                    code: SignerErrorCode.BUSY,
-                    message:
-                      'The signer is currently processing a request and cannot handle new requests at this time.'
-                  }
-                },
-                testOrigin
-              );
-            });
-          });
+          assertHeartbeatsIfBusy();
         });
 
         describe('Ready', () => {
@@ -603,8 +584,6 @@ describe('Signer', () => {
             expect(notifyErrorSpy).not.toHaveBeenCalled();
           });
         });
-
-        // TODO: supported standards should probably also emitted if the signer is busy
       });
 
       describe('Permissions', () => {
