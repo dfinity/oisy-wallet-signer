@@ -48,7 +48,7 @@ describe('AgentApi', () => {
         identity,
         shouldFetchRootKey: true,
         host: 'http://localhost:8080',
-        useQueryNonces: true,
+        useQueryNonces: true
       });
 
       expect(agent).toEqual({test: 'mockCustomAgent'});
@@ -90,7 +90,7 @@ describe('AgentApi', () => {
         identity,
         shouldFetchRootKey: true,
         host: 'http://localhost:8080',
-        useQueryNonces: true,
+        useQueryNonces: true
       });
     });
 
@@ -106,7 +106,7 @@ describe('AgentApi', () => {
         identity,
         host: 'https://icp-api.io',
         shouldFetchRootKey: false,
-        useQueryNonces: true,
+        useQueryNonces: true
       });
     });
 
@@ -121,7 +121,7 @@ describe('AgentApi', () => {
         identity,
         host: 'https://icp-api.io',
         shouldFetchRootKey: false,
-        useQueryNonces: true,
+        useQueryNonces: true
       });
     });
 
@@ -137,7 +137,7 @@ describe('AgentApi', () => {
         identity,
         shouldFetchRootKey: true,
         host: 'http://127.0.0.1:8000',
-        useQueryNonces: true,
+        useQueryNonces: true
       });
     });
   });

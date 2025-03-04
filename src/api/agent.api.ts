@@ -32,7 +32,7 @@ export abstract class AgentApi {
       identity,
       host: host ?? MAINNET_REPLICA_URL,
       shouldFetchRootKey,
-      useQueryNonces: true,
+      useQueryNonces: true
     });
   }
 }

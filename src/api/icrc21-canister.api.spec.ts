@@ -152,7 +152,7 @@ describe('icrc-21.canister.api', () => {
         identity: signerOptions.owner,
         host: signerOptions.host,
         shouldFetchRootKey: true,
-        useQueryNonces: true,
+        useQueryNonces: true
       });
 
       // TODO: spyOn nor function does work with vitest and Actor.createActor. Not against a better idea than disabling eslint for next line.
