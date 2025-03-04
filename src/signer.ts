@@ -168,6 +168,10 @@ export class Signer {
     if (statusRequestHandled) {
       return {handled: true};
     }
+    const {handled: supportedStandardsRequestHandled} = this.handleSupportedStandards(message);
+    if (supportedStandardsRequestHandled) {
+      return {handled: true};
+    }
     // TODO: handle read-only message requests in the future here (e.g. handleSupportedStandards(..))
     return {handled: false};
   }
@@ -176,11 +180,6 @@ export class Signer {
     // At this point the connection with the relying party should have been initialized and the origin should be set.
     const {valid} = this.assertNotUndefinedAndSameOrigin(message);
     if (!valid) {
-      return {handled: true};
-    }
-
-    const {handled: supportedStandardsRequestHandled} = this.handleSupportedStandards(message);
-    if (supportedStandardsRequestHandled) {
       return {handled: true};
     }
 
