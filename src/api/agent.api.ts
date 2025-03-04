@@ -31,7 +31,8 @@ export abstract class AgentApi {
     return await CustomHttpAgent.create({
       identity,
       host: host ?? MAINNET_REPLICA_URL,
-      shouldFetchRootKey
+      shouldFetchRootKey,
+      useQueryNonces: true,
     });
   }
 }

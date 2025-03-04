@@ -47,7 +47,8 @@ describe('AgentApi', () => {
       expect(CustomHttpAgent.create).toHaveBeenCalledWith({
         identity,
         shouldFetchRootKey: true,
-        host: 'http://localhost:8080'
+        host: 'http://localhost:8080',
+        useQueryNonces: true,
       });
 
       expect(agent).toEqual({test: 'mockCustomAgent'});
@@ -88,7 +89,8 @@ describe('AgentApi', () => {
       expect(CustomHttpAgent.create).toHaveBeenCalledWith({
         identity,
         shouldFetchRootKey: true,
-        host: 'http://localhost:8080'
+        host: 'http://localhost:8080',
+        useQueryNonces: true,
       });
     });
 
@@ -103,7 +105,8 @@ describe('AgentApi', () => {
       expect(CustomHttpAgent.create).toHaveBeenCalledWith({
         identity,
         host: 'https://icp-api.io',
-        shouldFetchRootKey: false
+        shouldFetchRootKey: false,
+        useQueryNonces: true,
       });
     });
 
@@ -117,7 +120,8 @@ describe('AgentApi', () => {
       expect(CustomHttpAgent.create).toHaveBeenCalledWith({
         identity,
         host: 'https://icp-api.io',
-        shouldFetchRootKey: false
+        shouldFetchRootKey: false,
+        useQueryNonces: true,
       });
     });
 
@@ -132,7 +136,8 @@ describe('AgentApi', () => {
       expect(CustomHttpAgent.create).toHaveBeenCalledWith({
         identity,
         shouldFetchRootKey: true,
-        host: 'http://127.0.0.1:8000'
+        host: 'http://127.0.0.1:8000',
+        useQueryNonces: true,
       });
     });
   });

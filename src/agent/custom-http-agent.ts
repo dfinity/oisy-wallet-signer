@@ -36,6 +36,7 @@ export class CustomHttpAgent {
   static async create(
     options?: HttpAgentOptions & {
       shouldFetchRootKey?: boolean;
+      useQueryNonces?: boolean;
     }
   ): Promise<CustomHttpAgent> {
     const agent = await HttpAgent.create(options);
