@@ -331,6 +331,15 @@ describe('Signer', () => {
       }
     };
 
+    const requestSupportedStandards = {
+      data: {
+        id: testId,
+        jsonrpc: JSON_RPC_VERSION_2,
+        method: ICRC25_SUPPORTED_STANDARDS
+      },
+      origin: testOrigin
+    };
+
     const requestPermissionsDataSortedScopes = requestPermissionsData.params.scopes.sort(
       ({method: methodA}, {method: methodB}): number => methodA.localeCompare(methodB)
     );
@@ -384,7 +393,7 @@ describe('Signer', () => {
         signer.disconnect();
       });
 
-      const assertHeartbeatsIfBusy = () => {
+      const assertReadOnlyIfBusy = () => {
         it('should notify ready even if signer is busy', () => {
           const messageEvent = new MessageEvent('message', requestStatus);
           window.dispatchEvent(messageEvent);
@@ -411,6 +420,22 @@ describe('Signer', () => {
                 code: SignerErrorCode.BUSY,
                 message:
                   'The signer is currently processing a request and cannot handle new requests at this time.'
+              }
+            },
+            testOrigin
+          );
+        });
+
+        it('should notify supported standards even if signer is busy', () => {
+          const messageEvent = new MessageEvent('message', requestSupportedStandards);
+          window.dispatchEvent(messageEvent);
+
+          expect(postMessageMock).toHaveBeenCalledWith(
+            {
+              jsonrpc: JSON_RPC_VERSION_2,
+              id: testId,
+              result: {
+                supportedStandards: SIGNER_SUPPORTED_STANDARDS
               }
             },
             testOrigin
@@ -508,53 +533,26 @@ describe('Signer', () => {
       });
 
       describe('Supported standards', () => {
-        const msg = {
-          data: {
-            id: testId,
-            jsonrpc: JSON_RPC_VERSION_2,
-            method: ICRC25_SUPPORTED_STANDARDS
-          },
-          origin: testOrigin
+        const notifySupportedStandards = () => {
+          it('should notify supported standards for icrc25_supported_standards', () => {
+            const messageEvent = new MessageEvent('message', requestSupportedStandards);
+            window.dispatchEvent(messageEvent);
+
+            expect(postMessageMock).toHaveBeenCalledWith(
+              {
+                jsonrpc: JSON_RPC_VERSION_2,
+                id: testId,
+                result: {
+                  supportedStandards: SIGNER_SUPPORTED_STANDARDS
+                }
+              },
+              testOrigin
+            );
+          });
         };
 
         describe('Not ready', () => {
-          it('should notify supported standards for icrc25_supported_standards even if signer is busy', async () => {
-            const messageEvent = new MessageEvent('message', msg);
-            window.dispatchEvent(messageEvent);
-
-            await vi.waitFor(() => {
-              expect(postMessageMock).toHaveBeenCalledWith(
-                {
-                  jsonrpc: JSON_RPC_VERSION_2,
-                  id: testId,
-                  result: {
-                    supportedStandards: SIGNER_SUPPORTED_STANDARDS
-                  }
-                },
-                testOrigin
-              );
-            });
-          });
-          it('should not notify error for icrc25_supported_standards when signer is busy', async () => {
-            const messageEvent = new MessageEvent('message', msg);
-            window.dispatchEvent(messageEvent);
-
-            await vi.waitFor(() => {
-              expect(postMessageMock).not.toHaveBeenLastCalledWith(
-                {
-                  jsonrpc: JSON_RPC_VERSION_2,
-                  id: testId,
-                  error: {
-                    code: SignerErrorCode.BUSY,
-                    message:
-                      'The signer is currently processing a request and cannot handle new requests at this time.'
-                  }
-                },
-                testOrigin
-              );
-            });
-          });
-          assertHeartbeatsIfBusy();
+          notifySupportedStandards();
         });
 
         describe('Ready', () => {
@@ -577,24 +575,10 @@ describe('Signer', () => {
             await initWalletReady();
           });
 
-          it('should notify supported standards for icrc25_supported_standards', () => {
-            const messageEvent = new MessageEvent('message', msg);
-            window.dispatchEvent(messageEvent);
-
-            expect(postMessageMock).toHaveBeenCalledWith(
-              {
-                jsonrpc: JSON_RPC_VERSION_2,
-                id: testId,
-                result: {
-                  supportedStandards: SIGNER_SUPPORTED_STANDARDS
-                }
-              },
-              testOrigin
-            );
-          });
+          notifySupportedStandards();
 
           it('should not notify any other messages than ready icrc25_supported_standards', () => {
-            const messageEvent = new MessageEvent('message', msg);
+            const messageEvent = new MessageEvent('message', requestSupportedStandards);
             window.dispatchEvent(messageEvent);
 
             expect(notifySupportedStandardsSpy).toHaveBeenCalled();
@@ -1192,7 +1176,7 @@ describe('Signer', () => {
               });
             });
 
-            assertHeartbeatsIfBusy();
+            assertReadOnlyIfBusy();
           });
 
           it('should reset to idle', async () => {
@@ -1749,7 +1733,7 @@ describe('Signer', () => {
                 });
               });
 
-              assertHeartbeatsIfBusy();
+              assertReadOnlyIfBusy();
             });
 
             it('should reset to idle', async () => {
@@ -1958,7 +1942,7 @@ describe('Signer', () => {
                     });
                   });
 
-                  assertHeartbeatsIfBusy();
+                  assertReadOnlyIfBusy();
                 });
               });
 
@@ -2291,7 +2275,7 @@ describe('Signer', () => {
                     });
                   });
 
-                  assertHeartbeatsIfBusy();
+                  assertReadOnlyIfBusy();
                 });
               });
             });
