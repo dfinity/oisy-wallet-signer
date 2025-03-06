@@ -7,3 +7,10 @@ export const mockIcrcLocalCallParams = {
   canisterId: mockLedgerCanisterId,
   arg: 'RElETAZte24AbAKzsNrDA2ithsqDBQFufW54bAb7ygECxvy2AgO6ieXCBAGi3pTrBgGC8/ORDATYo4yoDX0BBQEdP0Duk4WbdYJC1svDpO9SpE+aElxKU7FNBuH2LAIAAAAAAMCWsQI='
 };
+
+export const mockIcrcLocalCallParamsWithNonce = {
+  ...mockLocalCallParams,
+  canisterId: mockLedgerCanisterId,
+  arg: 'RElETAZte24AbAKzsNrDA2ithsqDBQFufW54bAb7ygECxvy2AgO6ieXCBAGi3pTrBgGC8/ORDATYo4yoDX0BBQEdP0Duk4WbdYJC1svDpO9SpE+aElxKU7FNBuH2LAIAAAAAAMCWsQI=',
+  nonce: 'RElBuH2BOAAAAwJaxAg=='
+};

@@ -61,12 +61,14 @@ export class IcpWallet extends RelyingParty {
     request,
     owner,
     ledgerCanisterId,
-    options
+    options,
+    nonce
   }: {
     options?: RelyingPartyRequestOptions;
     request: Icrc1TransferRequest;
     ledgerCanisterId?: PrincipalText;
-  } & Pick<IcrcAccount, 'owner'>): Promise<BlockHeight> => {
+  } & Pick<IcrcAccount, 'owner'> &
+    Pick<IcrcCallCanisterRequestParams, 'nonce'>): Promise<BlockHeight> => {
     // TODO: should we convert ic-js to zod? or should we map Icrc1TransferRequest to zod?
     const rawArgs = toIcrc1TransferRawRequest(request);
 
@@ -83,7 +85,8 @@ export class IcpWallet extends RelyingParty {
       sender: owner,
       method,
       canisterId,
-      arg
+      arg,
+      nonce
     };
 
     // TODO: uncomment nonce and add TODO - not yet supported by agent-js
@@ -111,12 +114,14 @@ export class IcpWallet extends RelyingParty {
     request,
     owner,
     ledgerCanisterId,
-    options
+    options,
+    nonce
   }: {
     options?: RelyingPartyRequestOptions;
     request: Icrc2ApproveRequest;
     ledgerCanisterId?: PrincipalText;
-  } & Pick<IcrcAccount, 'owner'>): Promise<BlockHeight> => {
+  } & Pick<IcrcAccount, 'owner'> &
+    Pick<IcrcCallCanisterRequestParams, 'nonce'>): Promise<BlockHeight> => {
     const rawArgs = toIcrc2ApproveRawRequest(request);
 
     const arg = encodeIdl({
@@ -132,7 +137,8 @@ export class IcpWallet extends RelyingParty {
       sender: owner,
       method,
       canisterId,
-      arg
+      arg,
+      nonce
     };
 
     // TODO: uncomment nonce and add TODO - not yet supported by agent-js

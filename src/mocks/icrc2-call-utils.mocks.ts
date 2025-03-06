@@ -28,6 +28,14 @@ export const mockIcrc2ApproveLocalCallParams = {
   arg: 'RElETAZufW17bgFueGwCs7DawwNorYbKgwUCbAjG/LYCALqJ5cIEAqLelOsGAoLz85EMA9ijjKgNfZGcnL8NAN6n99oNA8uW3LQOBAEFAZBOAAAAgOHrFwAAAR1wrhf9pp3iZ9Bw1WInTn+Deg5NH72sw5brmCMkAgA='
 };
 
+export const mockIcrc2ApproveLocalCallParamsWithNonce = {
+  sender: mockIcrc2LocalWalletPrincipal.toText(),
+  method: 'icrc2_approve',
+  canisterId: mockLedgerCanisterId,
+  arg: 'RElETAZufW17bgFueGwCs7DawwNorYbKgwUCbAjG/LYCALqJ5cIEAqLelOsGAoLz85EMA9ijjKgNfZGcnL8NAN6n99oNA8uW3LQOBAEFAZBOAAAAgOHrFwAAAR1wrhf9pp3iZ9Bw1WInTn+Deg5NH72sw5brmCMkAgA=',
+  nonce: 'RElET7DawwNorYbKgwUCAgA='
+};
+
 export const mockIcrc2ApproveLocalCallResult: IcrcCallCanisterResult = {
   certificate:
     '2dn3omlzaWduYXR1cmVYMIC3logCob8DYcIFy9gebO0DvZVd2iccOAz5AHL3aAxsYCZThCisjNBEyONoQv0DPWR0cmVlgwGDAYIEWCAS9O1o7R14YUVtryMC6wOuqmjDSDbx9KmJQHyCDPd+VYMBggRYIL82mnbOr7Ko9rvdYzaGWcIiOsRbiHRqrB66XO9NBFHngwJOcmVxdWVzdF9zdGF0dXODAYIEWCAHPsrkYM5hgpPtyoKK/NOHGHctkzcEZfRc2gdsdJqe9IMBggRYIFM7zdSXahl4OcOAf1cZZln87BKyv4WzJhBF27kKpiR+gwJYIPcCRu6ehaKC8oNJ55f+vDizz1uJejM/bnYIck6iFlAsgwGDAkVyZXBseYIDWIFESURMCGsCvIoBfcX+0gEBawnRxJh8AsKR7LkCf+uCqJcEA6HD6/0HBJyE6PwIBfCH5tsJBpPlvsgMf4WP7pUPBuuc29UPB2wCx+vE0AlxxJixtQ19bAGLvfKbAX1sAb+bt/ANfWwBkq7O5Q99bAGju5GMCnhsAZy6tpwCfQEAAAiDAkZzdGF0dXOCA0dyZXBsaWVkgwGCBFggsSMhqVzG1RvK/79hnq0Fwcpekky581QV2c0zi57paLCDAkR0aW1lggNJ69ajhMbo/IoY',
@@ -45,6 +53,13 @@ export const mockIcrc2TransferFromLocalCallParams = {
   ...mockIcrc2ApproveLocalCallParams,
   method: 'icrc2_transfer_from',
   arg: 'RElETAZte24AbAKzsNrDA2ithsqDBQFufW54bAf7ygECxvy2AgPhhcGUAgHqyoqeBAK6ieXCBAGC8/ORDATYo4yoDX0BBQEdcK4X/aad4mfQcNViJ05/g3oOTR+9rMOW65gjJAIAAAABHf20rMt4azj3bZ3NzvryHiiKwr6v1kT6ns4Zi0cCAAAAwPD1Cw=='
+};
+
+export const mockIcrc2TransferFromLocalCallParamsWithNonce = {
+  ...mockIcrc2ApproveLocalCallParams,
+  method: 'icrc2_transfer_from',
+  arg: 'RElETAZte24AbAKzsNrDA2ithsqDBQFufW54bAf7ygECxvy2AgPhhcGUAgHqyoqeBAK6ieXCBAGC8/ORDATYo4yoDX0BBQEdcK4X/aad4mfQcNViJ05/g3oOTR+9rMOW65gjJAIAAAABHf20rMt4azj3bZ3NzvryHiiKwr6v1kT6ns4Zi0cCAAAAwPD1Cw==',
+  nonce: 'RElET7DawwNorYbKgwUCAgA='
 };
 
 export const mockIcrc2TransferFromLocalCallResult: IcrcCallCanisterResult = {

@@ -9,10 +9,15 @@ import {
   mockLocalRelyingPartyPrincipal
 } from './mocks/call-utils.mocks';
 import {mockLocalIcRootKey} from './mocks/custom-http-agent-responses.mocks';
-import {mockIcrcLocalCallParams, mockLedgerCanisterId} from './mocks/icrc-call-utils.mocks';
+import {
+  mockIcrcLocalCallParams,
+  mockIcrcLocalCallParamsWithNonce,
+  mockLedgerCanisterId
+} from './mocks/icrc-call-utils.mocks';
 import {
   mockIcrc2ApproveLocalBlockHeight,
   mockIcrc2ApproveLocalCallParams,
+  mockIcrc2ApproveLocalCallParamsWithNonce,
   mockIcrc2ApproveLocalCallResult,
   mockIcrc2ApproveLocalCallTime,
   mockIcrc2LocalIcRootKey,
@@ -20,6 +25,7 @@ import {
   mockIcrc2LocalWalletPrincipal,
   mockIcrc2TransferFromLocalBlockHeight,
   mockIcrc2TransferFromLocalCallParams,
+  mockIcrc2TransferFromLocalCallParamsWithNonce,
   mockIcrc2TransferFromLocalCallResult,
   mockIcrc2TransferFromLocalCallTime
 } from './mocks/icrc2-call-utils.mocks';
@@ -109,6 +115,7 @@ describe('icrc-wallet', () => {
     };
 
     const {sender} = mockIcrcLocalCallParams;
+    const {nonce} = mockIcrcLocalCallParamsWithNonce;
 
     beforeEach(() => {
       vi.setSystemTime(mockLocalCallTime);
@@ -215,6 +222,29 @@ describe('icrc-wallet', () => {
 
       spy.mockRestore();
     });
+
+    it('should include nonce in call parameters when provided', async () => {
+      const mockCall = vi.fn().mockResolvedValue(mockLocalCallResult);
+      // @ts-expect-error we mock call for testing purposes
+      icrcWallet.call = mockCall;
+
+      const spy = vi
+        .spyOn(callUtils, 'decodeResponse')
+        .mockResolvedValue({Ok: mockLocalBlockHeight});
+
+      await icrcWallet.transfer({
+        params,
+        owner: sender,
+        ledgerCanisterId: mockLedgerCanisterId,
+        nonce
+      });
+
+      expect(mockCall).toHaveBeenCalledWith({
+        params: mockIcrcLocalCallParamsWithNonce
+      });
+
+      spy.mockRestore();
+    });
   });
 
   describe('approve', () => {
@@ -228,6 +258,7 @@ describe('icrc-wallet', () => {
     };
 
     const {sender} = mockIcrc2ApproveLocalCallParams;
+    const {nonce} = mockIcrc2ApproveLocalCallParamsWithNonce;
 
     beforeEach(() => {
       vi.setSystemTime(mockIcrc2ApproveLocalCallTime);
@@ -334,6 +365,31 @@ describe('icrc-wallet', () => {
 
       spy.mockRestore();
     });
+
+    // In the "approve" describe block:
+    // In the "approve" describe block:
+    it('should include nonce in call parameters when provided', async () => {
+      const mockCall = vi.fn().mockResolvedValue(mockIcrc2ApproveLocalCallParamsWithNonce);
+      // @ts-expect-error we mock call for testing purposes
+      icrcWallet.call = mockCall;
+
+      const spy = vi
+        .spyOn(callUtils, 'decodeResponse')
+        .mockResolvedValue({Ok: mockIcrc2ApproveLocalBlockHeight});
+
+      await icrcWallet.approve({
+        params,
+        owner: sender,
+        ledgerCanisterId: mockLedgerCanisterId,
+        nonce
+      });
+
+      expect(mockCall).toHaveBeenCalledWith({
+        params: mockIcrc2ApproveLocalCallParamsWithNonce
+      });
+
+      spy.mockRestore();
+    });
   });
 
   describe('transferFrom', () => {
@@ -350,6 +406,7 @@ describe('icrc-wallet', () => {
     };
 
     const {sender} = mockIcrc2TransferFromLocalCallParams;
+    const {nonce} = mockIcrc2TransferFromLocalCallParamsWithNonce;
 
     beforeEach(() => {
       vi.setSystemTime(mockIcrc2TransferFromLocalCallTime);
@@ -453,6 +510,30 @@ describe('icrc-wallet', () => {
           host: mockParameters.host
         })
       );
+
+      spy.mockRestore();
+    });
+
+    // In the "transferFrom" describe block:
+    it('should include nonce in call parameters when provided', async () => {
+      const mockCall = vi.fn().mockResolvedValue(mockIcrc2TransferFromLocalCallParamsWithNonce);
+      // @ts-expect-error we mock call for testing purposes
+      icrcWallet.call = mockCall;
+
+      const spy = vi
+        .spyOn(callUtils, 'decodeResponse')
+        .mockResolvedValue({Ok: mockIcrc2TransferFromLocalBlockHeight});
+
+      await icrcWallet.transferFrom({
+        params,
+        owner: sender,
+        ledgerCanisterId: mockLedgerCanisterId,
+        nonce
+      });
+
+      expect(mockCall).toHaveBeenCalledWith({
+        params: mockIcrc2TransferFromLocalCallParamsWithNonce
+      });
 
       spy.mockRestore();
     });

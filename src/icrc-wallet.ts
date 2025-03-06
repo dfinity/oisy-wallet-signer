@@ -66,12 +66,14 @@ export class IcrcWallet extends RelyingParty {
     params,
     owner,
     ledgerCanisterId: canisterId,
-    options
+    options,
+    nonce
   }: {
     params: TransferParams;
     ledgerCanisterId: PrincipalText;
     options?: RelyingPartyRequestOptions;
-  } & Pick<IcrcAccount, 'owner'>): Promise<IcrcBlockIndex> => {
+  } & Pick<IcrcAccount, 'owner'> &
+    Pick<IcrcCallCanisterRequestParams, 'nonce'>): Promise<IcrcBlockIndex> => {
     const rawArgs = toTransferArg(params);
 
     const arg = encodeIdl({
@@ -83,7 +85,8 @@ export class IcrcWallet extends RelyingParty {
       sender: owner,
       method: 'icrc1_transfer',
       canisterId,
-      arg
+      arg,
+      nonce
     };
 
     const callResult = await this.call({
@@ -127,12 +130,14 @@ export class IcrcWallet extends RelyingParty {
     params,
     owner,
     ledgerCanisterId: canisterId,
-    options
+    options,
+    nonce
   }: {
     params: ApproveParams;
     ledgerCanisterId: PrincipalText;
     options?: RelyingPartyRequestOptions;
-  } & Pick<IcrcAccount, 'owner'>): Promise<IcrcBlockIndex> => {
+  } & Pick<IcrcAccount, 'owner'> &
+    Pick<IcrcCallCanisterRequestParams, 'nonce'>): Promise<IcrcBlockIndex> => {
     const rawArgs = toApproveArgs(params);
 
     const arg = encodeIdl({
@@ -144,7 +149,8 @@ export class IcrcWallet extends RelyingParty {
       sender: owner,
       method: 'icrc2_approve',
       canisterId,
-      arg
+      arg,
+      nonce
     };
 
     const callResult = await this.call({
@@ -188,12 +194,14 @@ export class IcrcWallet extends RelyingParty {
     params,
     owner,
     ledgerCanisterId: canisterId,
-    options
+    options,
+    nonce
   }: {
     params: TransferFromParams;
     ledgerCanisterId: PrincipalText;
     options?: RelyingPartyRequestOptions;
-  } & Pick<IcrcAccount, 'owner'>): Promise<IcrcBlockIndex> => {
+  } & Pick<IcrcAccount, 'owner'> &
+    Pick<IcrcCallCanisterRequestParams, 'nonce'>): Promise<IcrcBlockIndex> => {
     const rawArgs = toTransferFromArgs(params);
 
     const arg = encodeIdl({
@@ -205,7 +213,8 @@ export class IcrcWallet extends RelyingParty {
       sender: owner,
       method: 'icrc2_transfer_from',
       canisterId,
-      arg
+      arg,
+      nonce
     };
 
     const callResult = await this.call({

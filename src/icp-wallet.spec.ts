@@ -5,6 +5,7 @@ import {IcpWallet} from './icp-wallet';
 import {
   mockLocalBlockHeight,
   mockLocalCallParams,
+  mockLocalCallParamswithNonce,
   mockLocalCallResult,
   mockLocalCallTime,
   mockLocalRelyingPartyPrincipal
@@ -14,6 +15,7 @@ import {mockCanisterId} from './mocks/icrc-accounts.mocks';
 import {
   mockIcrc2ApproveLocalBlockHeight,
   mockIcrc2ApproveLocalCallParams,
+  mockIcrc2ApproveLocalCallParamsWithNonce,
   mockIcrc2ApproveLocalCallResult,
   mockIcrc2ApproveLocalCallTime,
   mockIcrc2LocalIcRootKey,
@@ -105,6 +107,7 @@ describe('icp-wallet', () => {
     };
 
     const {sender} = mockLocalCallParams;
+    const {nonce} = mockLocalCallParamswithNonce;
 
     beforeEach(() => {
       vi.setSystemTime(mockLocalCallTime);
@@ -218,6 +221,25 @@ describe('icp-wallet', () => {
 
       spy.mockRestore();
     });
+
+    it('should include nonce in call parameters when provided', async () => {
+      const mockCall = vi.fn().mockResolvedValue(mockLocalCallParamswithNonce);
+
+      // @ts-expect-error we mock call for testing purposes
+      icpWallet.call = mockCall;
+
+      const spy = vi
+        .spyOn(callUtils, 'decodeResponse')
+        .mockResolvedValue({Ok: mockLocalBlockHeight});
+
+      await icpWallet.icrc1Transfer({request, owner: sender, nonce});
+
+      expect(mockCall).toHaveBeenCalledWith({
+        params: mockLocalCallParamswithNonce
+      });
+
+      spy.mockRestore();
+    });
   });
 
   describe('icrc2Approve', () => {
@@ -231,6 +253,7 @@ describe('icp-wallet', () => {
     };
 
     const {sender} = mockIcrc2ApproveLocalCallParams;
+    const {nonce} = mockIcrc2ApproveLocalCallParamsWithNonce;
 
     beforeEach(() => {
       vi.setSystemTime(mockIcrc2ApproveLocalCallTime);
@@ -341,6 +364,25 @@ describe('icp-wallet', () => {
           host: mockParameters.host
         })
       );
+
+      spy.mockRestore();
+    });
+
+    it('should include nonce in call parameters when provided', async () => {
+      const mockCall = vi.fn().mockResolvedValue(mockIcrc2ApproveLocalCallParamsWithNonce);
+
+      // @ts-expect-error we mock call for testing purposes
+      icpWallet.call = mockCall;
+
+      const spy = vi
+        .spyOn(callUtils, 'decodeResponse')
+        .mockResolvedValue({Ok: mockIcrc2ApproveLocalBlockHeight});
+
+      await icpWallet.icrc2Approve({request, owner: sender, nonce});
+
+      expect(mockCall).toHaveBeenCalledWith({
+        params: mockIcrc2ApproveLocalCallParamsWithNonce
+      });
 
       spy.mockRestore();
     });

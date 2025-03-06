@@ -16,6 +16,16 @@ export const mockRequestPayload: Pick<
   method: mockRequestMethod
 };
 
+export const mockRequestPayloadWithNonce: Pick<
+  IcrcCallCanisterRequestParams,
+  'canisterId' | 'method' | 'arg' | 'nonce'
+> = {
+  arg: uint8ArrayToBase64(new Uint8Array([1, 2, 3, 4])),
+  nonce: uint8ArrayToBase64(new Uint8Array([1, 4, 5, 2])),
+  canisterId: mockCanisterId,
+  method: mockRequestMethod
+};
+
 export const mockRequestDetails: CallRequest = {
   arg: new Uint8Array([68, 73, 68, 76, 6, 109, 123, 110, 0, 108]),
   canister_id: Principal.fromText(mockCanisterId),
