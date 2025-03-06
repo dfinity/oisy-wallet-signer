@@ -1,6 +1,8 @@
 import {
   Certificate,
   HttpAgent,
+  HttpAgentRequest,
+  Nonce,
   defaultStrategy,
   lookupResultToBuffer,
   pollForResponse as pollForResponseAgent,
@@ -52,12 +54,19 @@ export class CustomHttpAgent {
   request = async ({
     arg,
     canisterId,
-    method: methodName
+    method: methodName,
+    nonce
   }: Pick<
     // This could have been made agnostic by inlining the types here, but for simplicity and because they are strongly typed, I decided to reuse the interface.
     IcrcCallCanisterRequestParams,
-    'canisterId' | 'method' | 'arg'
+    'canisterId' | 'method' | 'arg' | 'nonce'
   >): Promise<CustomHttpAgentResponse> => {
+    // Use the private method to add the transform with the nonce.
+    if (nonNullish(nonce)) {
+      const formattedNonce = base64ToUint8Array(nonce) as Nonce;
+      this.addNonceTransform(formattedNonce);
+    }
+
     const {requestDetails, ...restResponse} = await this.#agent.call(canisterId, {
       methodName,
       arg: base64ToUint8Array(arg),
@@ -196,5 +205,21 @@ export class CustomHttpAgent {
     );
 
     return {certificate, requestDetails};
+  }
+
+  private addNonceTransform(nonce: Nonce): void {
+    this.#agent.addTransform('update', (args): Promise<HttpAgentRequest> => {
+      if (args.endpoint !== 'call') {
+        return Promise.resolve(args);
+      }
+
+      return Promise.resolve({
+        ...args,
+        body: {
+          ...args.body,
+          nonce
+        }
+      });
+    });
   }
 }
