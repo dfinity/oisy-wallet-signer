@@ -1,8 +1,10 @@
 import {
   Certificate,
   HttpAgent,
+  Nonce,
   defaultStrategy,
   lookupResultToBuffer,
+  makeNonceTransform,
   pollForResponse as pollForResponseAgent,
   type CallRequest,
   type HttpAgentOptions,
@@ -52,12 +54,11 @@ export class CustomHttpAgent {
   request = async ({
     arg,
     canisterId,
-    method: methodName
-  }: Pick<
-    // This could have been made agnostic by inlining the types here, but for simplicity and because they are strongly typed, I decided to reuse the interface.
-    IcrcCallCanisterRequestParams,
-    'canisterId' | 'method' | 'arg'
-  >): Promise<CustomHttpAgentResponse> => {
+    method: methodName,
+    nonce
+  }: Omit<IcrcCallCanisterRequestParams, 'sender'>): Promise<CustomHttpAgentResponse> => {
+    this.attachRequestNonce({nonce});
+
     const {requestDetails, ...restResponse} = await this.#agent.call(canisterId, {
       methodName,
       arg: base64ToUint8Array(arg),
@@ -196,5 +197,17 @@ export class CustomHttpAgent {
     );
 
     return {certificate, requestDetails};
+  }
+
+  private attachRequestNonce({nonce}: Pick<IcrcCallCanisterRequestParams, 'nonce'>): void {
+    if (isNullish(nonce)) {
+      // Consumer has not provided a nonce. Therefore, we let agent-js generate one for the request.
+      return;
+    }
+
+    this.#agent.addTransform(
+      'update',
+      makeNonceTransform((): Nonce => base64ToUint8Array(nonce) as Nonce)
+    );
   }
 }
