@@ -51,20 +51,39 @@ export class CustomHttpAgent {
     return this.#agent;
   }
 
+  #cache: Record<Hash, Epiry>
+
   request = async ({
     arg,
     canisterId,
     method: methodName,
     nonce
   }: Omit<IcrcCallCanisterRequestParams, 'sender'>): Promise<CustomHttpAgentResponse> => {
-    this.attachRequestNonce({nonce});
 
-    const {requestDetails, ...restResponse} = await this.#agent.call(canisterId, {
-      methodName,
-      arg: base64ToUint8Array(arg),
-      // effectiveCanisterId is optional but, actually mandatory according SDK team.
-      effectiveCanisterId: canisterId
-    });
+    const hash = somethingHash({
+      canisterId, sender, method, arg, nonce
+    })
+
+    const myExpiry = this.#cache.get(hash) !== undefined ? this.#cache.get(hash) : new Expiry(5min);
+
+    try {
+      this.attachRequestNonce({nonce});
+
+      this.attachAddTransformExpiry(myExpiry);
+
+      const {requestDetails, ...restResponse} = await this.#agent.call(canisterId, {
+        methodName,
+        arg: base64ToUint8Array(arg),
+        // effectiveCanisterId is optional but, actually mandatory according SDK team.
+        effectiveCanisterId: canisterId
+      });
+    } finally {
+      for (const entry in this.#cache) {
+        if entry.expiry === expired {
+          this.#cache.delete(entry)
+        }
+      }
+    }
 
     this.assertRequestDetails(requestDetails);
 

@@ -20,5 +20,7 @@
 {/snippet}
 
 <Layout {title} {description}>
-	{@render children()}
+	<AuthGuard>
+		{@render children()}
+	</AuthGuard>
 </Layout>

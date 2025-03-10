@@ -12,40 +12,22 @@
 	import ConsentMessage from '$lib/ConsentMessage.svelte';
 	import GetICP from '$lib/GetICP.svelte';
 
-	let signer = $state<Signer | undefined>(undefined);
 
-	$effect(() => {
-		if ($notSignedIn) {
-			signer?.disconnect();
-			return;
-		}
-
-		if (isNullish($authStore.identity)) {
-			signer?.disconnect();
-			return;
-		}
-
-		signer = Signer.init({
-			owner: $authStore.identity,
-			host: LOCAL_REPLICA_URL
-		});
-
-		return () => {
-			signer?.disconnect();
-		};
-	});
 </script>
 
-<UserId user={$authStore?.identity?.getPrincipal()} />
+<AuthGuard>
+    <UserId user={$authStore?.identity?.getPrincipal()} />
 
-<Balance owner={$authStore.identity?.getPrincipal()} />
+    <Balance owner={$authStore.identity?.getPrincipal()} />
 
-<GetICP />
+    <GetICP />
 
-<ConfirmPermissions {signer} />
+    <ConfirmPermissions {signer} />
 
-<ConfirmAccounts {signer} />
+    <ConfirmAccounts {signer} />
 
-<ConsentMessage {signer} />
+    <ConsentMessage {signer} />
 
-<CallCanister {signer} />
+    <CallCanister {signer} />
+
+</AuthGuard>

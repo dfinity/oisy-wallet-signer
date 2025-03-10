@@ -47,14 +47,6 @@ const SessionOptionsSchema = z.object({
 
 export const SignerOptionsSchema = z.object({
   /**
-   * The owner who interacts with the signer.
-   *
-   * When the signer is initialized, the owner should be signed in to the consumer dApp.
-   * Upon signing out, it is up to the consumer to disconnect the signer.
-   */
-  owner: IdentityNotAnonymousSchema,
-
-  /**
    * The replica's host to which the signer should connect to.
    * If localhost or 127.0.0.1 are provided, the signer will automatically connect to a local replica and fetch the root key for the agent.
    */
