@@ -3,6 +3,7 @@ import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {IcrcLedgerCanister} from '@dfinity/ledger-icrc';
 import {Principal} from '@dfinity/principal';
 import {uint8ArrayToBase64} from '@dfinity/utils';
+import {CustomHttpAgent} from '../agent/custom-http-agent';
 import {mockCallCanisterSuccess} from '../mocks/call-canister.mocks';
 import {mockRepliedLocalCertificate} from '../mocks/custom-http-agent-responses.mocks';
 import {mockRequestDetails, mockRequestPayload} from '../mocks/custom-http-agent.mocks';
@@ -49,7 +50,7 @@ describe('Signer-api', () => {
   });
 
   describe('call', () => {
-    it('should call request and return the properly encoded result if nonce not provided', async () => {
+    it('should call request and return the properly encoded result', async () => {
       const result = await signerApi.call({
         params: {
           ...mockRequestPayload,
@@ -61,9 +62,12 @@ describe('Signer-api', () => {
       expect(result).toEqual(mockCallCanisterSuccess);
     });
 
-    it('should call request and return the properly encoded result if nonce not provided', async () => {
+    it('should call request wiht nonce if nonce is provided', async () => {
+      const agent = await CustomHttpAgent.create();
+      const spy = vi.spyOn(agent, 'request');
       const nonce = uint8ArrayToBase64(httpAgent.makeNonce());
-      const result = await signerApi.call({
+
+      await signerApi.call({
         params: {
           ...mockRequestPayload,
           sender: identity.getPrincipal().toText(),
@@ -72,7 +76,7 @@ describe('Signer-api', () => {
         ...signerOptions
       });
 
-      expect(result).toEqual(mockCallCanisterSuccess);
+      expect(spy).toHaveBeenCalledWith(expect.objectContaining({nonce}));
     });
   });
 
