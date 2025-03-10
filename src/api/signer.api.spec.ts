@@ -62,7 +62,7 @@ describe('Signer-api', () => {
       expect(result).toEqual(mockCallCanisterSuccess);
     });
 
-    it('should call request wiht nonce if nonce is provided', async () => {
+    it('should call request with nonce if nonce is provided', async () => {
       const agent = await CustomHttpAgent.create();
       const spy = vi.spyOn(agent, 'request');
       const nonce = uint8ArrayToBase64(httpAgent.makeNonce());
