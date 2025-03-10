@@ -4,6 +4,7 @@ import {
   Nonce,
   defaultStrategy,
   lookupResultToBuffer,
+  makeNonce,
   makeNonceTransform,
   pollForResponse as pollForResponseAgent,
   type CallRequest,
@@ -201,7 +202,8 @@ export class CustomHttpAgent {
 
   private attachRequestNonce({nonce}: Pick<IcrcCallCanisterRequestParams, 'nonce'>): void {
     if (isNullish(nonce)) {
-      // Consumer has not provided a nonce. Therefore, we let agent-js generate one for the request.
+      // Consumer has not provided a nonce. Therefore, we generate a new one for the request to reassign current value.
+      this.#agent.addTransform('update', makeNonceTransform(makeNonce));
       return;
     }
 
