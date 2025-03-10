@@ -51,7 +51,7 @@ import {RpcRequestSchema, type RpcId} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
 import {MissingPromptError} from './types/signer-errors';
 import type {Notify} from './types/signer-handlers';
-import type {SignerOptions} from './types/signer-options';
+import type {IdentityNotAnonymous, SignerOptions} from './types/signer-options';
 import {
   AccountsPromptSchema,
   CallCanisterPromptSchema,
@@ -84,12 +84,20 @@ export class Signer {
   // TODO: improve implementation to avoid an unexpected misusage in the future where an issue in the code would lead the busy flag to be reset to idle while effectively still being busy
   #busy = false;
 
+  #owner: IdentityNotAnonymous;
+
   readonly #signerService = new SignerService();
 
   private constructor(options: SignerOptions) {
     this.#signerOptions = options;
 
     window.addEventListener('message', this.onMessageListener);
+  }
+
+  setOwner = (owner: IdentityNotAnonymous) => {
+    IdentityNotAnonymousSchema.parse(owner);
+
+    this.#owner = owner;
   }
 
   /**
@@ -110,6 +118,7 @@ export class Signer {
   disconnect = (): void => {
     window.removeEventListener('message', this.onMessageListener);
     this.#walletOrigin = null;
+    this.#owner = null;
   };
 
   // TODO: onbeforeunload, the signer should notify an error 4001 if and only if there is a pending request at the same time.
@@ -132,6 +141,11 @@ export class Signer {
 
     const {handled: handledReadOnly} = this.handleReadOnlyMessage(message);
     if (handledReadOnly) {
+      return;
+    }
+
+    const {initialized} = this.handleOwnerInitialized();
+    if (!initialized) {
       return;
     }
 
@@ -273,6 +287,20 @@ export class Signer {
     }
 
     return {busy: false};
+  }
+
+  private handleOwnerInitialized(): {initialized: boolean} {
+    if (isNullish(this.#owner)) {
+      // 504
+      notifyErrorBusy({
+        id: msgData?.id ?? null,
+        origin
+      });
+
+      return {initialized: false};
+    }
+
+    return {initialized: true};
   }
 
   private async handleWithBusy(
@@ -555,10 +583,12 @@ export class Signer {
   private emitPermissions({id}: Pick<NotifyPermissions, 'id'>): void {
     assertNonNullish(this.#walletOrigin, "The relying party's origin is unknown.");
 
-    const {owner, sessionOptions} = this.#signerOptions;
+    assertNonNullish(this.#owner, "This cannot be null")
+
+    const {sessionOptions} = this.#signerOptions;
 
     const scopes = readSessionValidScopes({
-      owner: owner.getPrincipal(),
+      owner: this.#owner.getPrincipal(),
       origin: this.#walletOrigin,
       sessionOptions
     });

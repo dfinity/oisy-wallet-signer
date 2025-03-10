@@ -2,7 +2,7 @@ export const DEV = import.meta.env.DEV;
 export const PROD = import.meta.env.PROD;
 export const WALLET_URL = PROD ? 'https://oisy.com/sign' : 'http://localhost:5174/sign';
 
-export const LOCAL_REPLICA_HOST = 'localhost:4943';
+export const LOCAL_REPLICA_HOST = 'localhost:5987';
 export const LOCAL_REPLICA_URL = `http://${LOCAL_REPLICA_HOST}`;
 
 // How long the delegation identity should remain valid?
