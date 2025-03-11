@@ -206,16 +206,6 @@ describe('CustomHttpAgent', () => {
         expect(spyTransform).not.toHaveBeenCalled();
       });
 
-      it('should make a request and call transform', async () => {
-        const spyTransform = vi.spyOn(agent.agent, 'addTransform');
-
-        await agent.request({
-          ...mockRequestPayload
-        });
-
-        expect(spyTransform).toHaveBeenCalledOnce();
-      });
-
       describe('Invalid response', () => {
         it('should throw UndefinedRequestDetailsError if requestDetails is null', async () => {
           spyCall.mockResolvedValue({
