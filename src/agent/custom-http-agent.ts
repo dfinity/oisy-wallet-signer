@@ -1,9 +1,11 @@
 import {
   Certificate,
+  Expiry,
   HttpAgent,
   Nonce,
   defaultStrategy,
   lookupResultToBuffer,
+  makeExpiryTransform,
   makeNonceTransform,
   pollForResponse as pollForResponseAgent,
   type CallRequest,
@@ -13,7 +15,10 @@ import {
 import {bufFromBufLike} from '@dfinity/candid';
 import {Principal} from '@dfinity/principal';
 import {base64ToUint8Array, isNullish, nonNullish} from '@dfinity/utils';
+import {DEFAULT_EXPIRY_DURATION} from '../constants/http-agent.constants';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
+import {generateHash} from '../utils/crypto.utils';
+import {expiryToMs, isTimestampExpired} from '../utils/custom-http-agent.utils';
 
 export type CustomHttpAgentResponse = Pick<Required<SubmitResponse>, 'requestDetails'> & {
   certificate: Certificate;
@@ -30,9 +35,11 @@ export class UndefinedRootKeyError extends Error {}
 // Therefore, it is cleaner in my opinion to encapsulate the agent rather than extend it.
 export class CustomHttpAgent {
   readonly #agent: HttpAgent;
+  #cache: Map<string, Expiry>;
 
   private constructor(agent: HttpAgent) {
     this.#agent = agent;
+    this.#cache = new Map();
   }
 
   static async create(
@@ -55,9 +62,14 @@ export class CustomHttpAgent {
     arg,
     canisterId,
     method: methodName,
-    nonce
-  }: Omit<IcrcCallCanisterRequestParams, 'sender'>): Promise<CustomHttpAgentResponse> => {
+    nonce,
+    sender
+  }: IcrcCallCanisterRequestParams): Promise<CustomHttpAgentResponse> => {
+    const hash = await generateHash({canisterId, sender, method: methodName, arg, nonce});    
+    const ingressExpiry = this.getIngressExpiry(hash);
+        
     this.attachRequestNonce({nonce});
+    this.attachAddTransformExpiry(ingressExpiry);
 
     const {requestDetails, ...restResponse} = await this.#agent.call(canisterId, {
       methodName,
@@ -210,4 +222,21 @@ export class CustomHttpAgent {
       makeNonceTransform((): Nonce => base64ToUint8Array(nonce) as Nonce)
     );
   }
+  private attachAddTransformExpiry(expiry: number): void {
+    this.#agent.addTransform('update', makeExpiryTransform(expiry));
+  }
+
+  private getIngressExpiry(hash: string): number {
+    const existingExpiry = this.#cache.get(hash);
+
+    if (existingExpiry && !isTimestampExpired(expiryToMs(existingExpiry))) {
+        const delta = expiryToMs(existingExpiry) - Date.now();
+        return delta;
+    }
+
+    const newExpiry = new Expiry(DEFAULT_EXPIRY_DURATION);
+    this.#cache.set(hash, newExpiry);
+
+    return DEFAULT_EXPIRY_DURATION;
+}
 }
