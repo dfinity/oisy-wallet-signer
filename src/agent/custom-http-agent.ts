@@ -1,9 +1,11 @@
 import {
   Certificate,
+  Expiry,
   HttpAgent,
   Nonce,
   defaultStrategy,
   lookupResultToBuffer,
+  makeExpiryTransform,
   makeNonceTransform,
   pollForResponse as pollForResponseAgent,
   type CallRequest,
@@ -13,7 +15,10 @@ import {
 import {bufFromBufLike} from '@dfinity/candid';
 import {Principal} from '@dfinity/principal';
 import {base64ToUint8Array, isNullish, nonNullish} from '@dfinity/utils';
+import {DEFAULT_EXPIRY_DURATION} from '../constants/http-agent.constants';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
+import {generateHash} from '../utils/crypto.utils';
+import {expiryToMs} from '../utils/custom-http-agent.utils';
 
 export type CustomHttpAgentResponse = Pick<Required<SubmitResponse>, 'requestDetails'> & {
   certificate: Certificate;
@@ -30,9 +35,11 @@ export class UndefinedRootKeyError extends Error {}
 // Therefore, it is cleaner in my opinion to encapsulate the agent rather than extend it.
 export class CustomHttpAgent {
   readonly #agent: HttpAgent;
+  #cache: Map<string, Expiry>;
 
   private constructor(agent: HttpAgent) {
     this.#agent = agent;
+    this.#cache = new Map();
   }
 
   static async create(
@@ -55,9 +62,14 @@ export class CustomHttpAgent {
     arg,
     canisterId,
     method: methodName,
-    nonce
-  }: Omit<IcrcCallCanisterRequestParams, 'sender'>): Promise<CustomHttpAgentResponse> => {
+    nonce,
+    sender
+  }: IcrcCallCanisterRequestParams): Promise<CustomHttpAgentResponse> => {
+    const hash = nonce ? await generateHash({ canisterId, sender, method: methodName, arg, nonce }) : null;
+    const ingressExpiry = hash ? this.getIngressExpiry(hash) : DEFAULT_EXPIRY_DURATION;
+
     this.attachRequestNonce({nonce});
+    this.attachAddTransformExpiry(ingressExpiry);
 
     const {requestDetails, ...restResponse} = await this.#agent.call(canisterId, {
       methodName,
@@ -76,6 +88,8 @@ export class CustomHttpAgent {
       callResponse: {requestDetails, ...restResponse},
       canisterId
     });
+
+    this.cleanCacheAfterCall();
 
     // I assume that if we get a result at this point, it means we can respond to the caller.
     // However, this is not how it's handled in Agent-js. For some reason, regardless of whether they get a result at this point or not, if the response has a status of 202, they overwrite the result with pollForResponse, which seems incorrect.
@@ -209,5 +223,33 @@ export class CustomHttpAgent {
       'update',
       makeNonceTransform((): Nonce => base64ToUint8Array(nonce) as Nonce)
     );
+  }
+  private attachAddTransformExpiry(expiry: number): void {
+    this.#agent.addTransform('update', makeExpiryTransform(expiry));
+  }
+
+  private getIngressExpiry(hash: string): number {
+    const existingExpiry = this.#cache.get(hash);
+
+    // TODO: Should we try with a new expiry or reject the request if the timestamp is expired?
+    return (!existingExpiry || expiryToMs(existingExpiry) <= Date.now())
+      ? this.createAndStoreNewExpiry(hash)
+      : expiryToMs(existingExpiry) - Date.now();
+  }
+
+  private createAndStoreNewExpiry(hash: string): number {
+    const newExpiry = new Expiry(DEFAULT_EXPIRY_DURATION);
+    this.#cache.set(hash, newExpiry);
+    return DEFAULT_EXPIRY_DURATION;
+  }
+
+  private cleanCacheAfterCall(): void {
+    const now = Date.now();
+
+    for (const [key, expiry] of this.#cache.entries()) {
+      if (expiryToMs(expiry) <= now) {
+        this.#cache.delete(key);
+      }
+    }
   }
 }

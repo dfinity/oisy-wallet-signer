@@ -13,13 +13,14 @@ export class SignerApi extends Icrc21Canister {
   async call({
     owner,
     host,
-    params: {canisterId, method, arg, nonce}
+    params: {canisterId, method, arg, nonce, sender}
   }: {
     params: IcrcCallCanisterRequestParams;
   } & SignerOptions): Promise<IcrcCallCanisterResult> {
     const agent = await this.getAgent({host, owner});
 
     const result = await agent.request({
+      sender,
       canisterId,
       method,
       arg,
