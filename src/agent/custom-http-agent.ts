@@ -65,8 +65,8 @@ export class CustomHttpAgent {
     nonce,
     sender
   }: IcrcCallCanisterRequestParams): Promise<CustomHttpAgentResponse> => {
-    const hash = await generateHash({canisterId, sender, method: methodName, arg, nonce});
-    const ingressExpiry = this.getIngressExpiry({hash, nonce});
+    const hash = nonce ? await generateHash({ canisterId, sender, method: methodName, arg, nonce }) : null;
+    const ingressExpiry = hash ? this.getIngressExpiry(hash) : DEFAULT_EXPIRY_DURATION;
 
     this.attachRequestNonce({nonce});
     this.attachAddTransformExpiry(ingressExpiry);
@@ -228,19 +228,13 @@ export class CustomHttpAgent {
     this.#agent.addTransform('update', makeExpiryTransform(expiry));
   }
 
-  private getIngressExpiry({hash, nonce}: {hash: string; nonce?: string}): number {
-    if (isNullish(nonce)){ 
-      return DEFAULT_EXPIRY_DURATION
-    };
-
+  private getIngressExpiry(hash: string): number {
     const existingExpiry = this.#cache.get(hash);
 
-        // TODO: Should we try with a new expiry or reject the request if the timestamp is expired?
-    if (!existingExpiry || expiryToMs(existingExpiry) <= Date.now()) {
-      return this.createAndStoreNewExpiry(hash);
-    }
-
-    return expiryToMs(existingExpiry) - Date.now();
+    // TODO: Should we try with a new expiry or reject the request if the timestamp is expired?
+    return (!existingExpiry || expiryToMs(existingExpiry) <= Date.now())
+      ? this.createAndStoreNewExpiry(hash)
+      : expiryToMs(existingExpiry) - Date.now();
   }
 
   private createAndStoreNewExpiry(hash: string): number {
