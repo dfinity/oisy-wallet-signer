@@ -18,7 +18,7 @@ import {base64ToUint8Array, isNullish, nonNullish} from '@dfinity/utils';
 import {DEFAULT_EXPIRY_DURATION} from '../constants/http-agent.constants';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import {generateHash} from '../utils/crypto.utils';
-import {expiryToMs, isTimestampExpired} from '../utils/custom-http-agent.utils';
+import {expiryToMs} from '../utils/custom-http-agent.utils';
 
 export type CustomHttpAgentResponse = Pick<Required<SubmitResponse>, 'requestDetails'> & {
   certificate: Certificate;
@@ -65,9 +65,9 @@ export class CustomHttpAgent {
     nonce,
     sender
   }: IcrcCallCanisterRequestParams): Promise<CustomHttpAgentResponse> => {
-    const hash = await generateHash({canisterId, sender, method: methodName, arg, nonce});    
-    const ingressExpiry = this.getIngressExpiry(hash);
-        
+    const hash = await generateHash({canisterId, sender, method: methodName, arg, nonce});
+    const ingressExpiry = this.getIngressExpiry({hash, nonce});
+
     this.attachRequestNonce({nonce});
     this.attachAddTransformExpiry(ingressExpiry);
 
@@ -88,6 +88,8 @@ export class CustomHttpAgent {
       callResponse: {requestDetails, ...restResponse},
       canisterId
     });
+
+    this.cleanCacheAfterCall();
 
     // I assume that if we get a result at this point, it means we can respond to the caller.
     // However, this is not how it's handled in Agent-js. For some reason, regardless of whether they get a result at this point or not, if the response has a status of 202, they overwrite the result with pollForResponse, which seems incorrect.
@@ -226,17 +228,34 @@ export class CustomHttpAgent {
     this.#agent.addTransform('update', makeExpiryTransform(expiry));
   }
 
-  private getIngressExpiry(hash: string): number {
+  private getIngressExpiry({hash, nonce}: {hash: string; nonce?: string}): number {
+    if (isNullish(nonce)){ 
+      return DEFAULT_EXPIRY_DURATION
+    };
+
     const existingExpiry = this.#cache.get(hash);
 
-    if (existingExpiry && !isTimestampExpired(expiryToMs(existingExpiry))) {
-        const delta = expiryToMs(existingExpiry) - Date.now();
-        return delta;
+        // TODO: Should we try with a new expiry or reject the request if the timestamp is expired?
+    if (!existingExpiry || expiryToMs(existingExpiry) <= Date.now()) {
+      return this.createAndStoreNewExpiry(hash);
     }
 
+    return expiryToMs(existingExpiry) - Date.now();
+  }
+
+  private createAndStoreNewExpiry(hash: string): number {
     const newExpiry = new Expiry(DEFAULT_EXPIRY_DURATION);
     this.#cache.set(hash, newExpiry);
-
     return DEFAULT_EXPIRY_DURATION;
-}
+  }
+
+  private cleanCacheAfterCall(): void {
+    const now = Date.now();
+
+    for (const [key, expiry] of this.#cache.entries()) {
+      if (expiryToMs(expiry) <= now) {
+        this.#cache.delete(key);
+      }
+    }
+  }
 }
