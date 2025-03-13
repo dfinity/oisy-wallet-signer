@@ -20,7 +20,7 @@ const IdentitySchema = z.custom<Identity>((value: unknown): boolean => {
   }
 }, 'The value provided is not a valid Identity.');
 
-const IdentityNotAnonymousSchema = IdentitySchema.refine(
+export const IdentityNotAnonymousSchema = IdentitySchema.refine(
   (identity) => !identity.getPrincipal().isAnonymous(),
   {
     message: 'The Principal is anonymous and cannot be used.'
@@ -45,15 +45,7 @@ const SessionOptionsSchema = z.object({
   sessionPermissionExpirationInMilliseconds: z.number().positive().optional()
 });
 
-export const SignerOptionsSchema = z.object({
-  /**
-   * The owner who interacts with the signer.
-   *
-   * When the signer is initialized, the owner should be signed in to the consumer dApp.
-   * Upon signing out, it is up to the consumer to disconnect the signer.
-   */
-  owner: IdentityNotAnonymousSchema,
-
+export const SignerInitOptionsSchema = z.object({
   /**
    * The replica's host to which the signer should connect to.
    * If localhost or 127.0.0.1 are provided, the signer will automatically connect to a local replica and fetch the root key for the agent.
@@ -66,4 +58,24 @@ export const SignerOptionsSchema = z.object({
   sessionOptions: SessionOptionsSchema.optional()
 });
 
+export const SignerOptionsSchema = z.object({
+  /**
+   * The replica's host to which the signer should connect to.
+   * If localhost or 127.0.0.1 are provided, the signer will automatically connect to a local replica and fetch the root key for the agent.
+   */
+  host: SignerHostSchema,
+  /**
+   * Options for managing session behavior, including session expiration times.
+   */
+  sessionOptions: SessionOptionsSchema.optional(),
+  /**
+   * The owner who interacts with the signer.
+   *
+   * When the signer is initialized, the owner should be signed in to the consumer dApp.
+   * Upon signing out, it is up to the consumer to disconnect the signer.
+   */
+  owner: IdentityNotAnonymousSchema,
+});
+
 export type SignerOptions = z.infer<typeof SignerOptionsSchema>;
+export type SignerInitOptions = z.infer<typeof SignerInitOptionsSchema>;

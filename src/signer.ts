@@ -13,6 +13,7 @@ import {
   notifyErrorActionAborted,
   notifyErrorBusy,
   notifyErrorMissingPrompt,
+  notifyErrorNotInitializes,
   notifyErrorPermissionNotGranted,
   notifyErrorRequestNotSupported
 } from './handlers/signer-errors.handlers';
@@ -51,7 +52,12 @@ import {RpcRequestSchema, type RpcId} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
 import {MissingPromptError} from './types/signer-errors';
 import type {Notify} from './types/signer-handlers';
-import type {SignerOptions} from './types/signer-options';
+import {
+  IdentityNotAnonymousSchema,
+  SignerInitOptions,
+  type IdentityNotAnonymous,
+  type SignerOptions
+} from './types/signer-options';
 import {
   AccountsPromptSchema,
   CallCanisterPromptSchema,
@@ -71,7 +77,7 @@ import {
 } from './types/signer-prompts';
 
 export class Signer {
-  readonly #signerOptions: SignerOptions;
+  readonly #signerOptions: SignerInitOptions;
 
   // eslint-disable-next-line local-rules/use-option-type-wrapper
   #walletOrigin: string | undefined | null;
@@ -80,17 +86,25 @@ export class Signer {
   #accountsPrompt: AccountsPrompt | undefined;
   #consentMessagePrompt: ConsentMessagePrompt | undefined;
   #callCanisterPrompt: CallCanisterPrompt | undefined;
+  #owner: IdentityNotAnonymous | null;
 
   // TODO: improve implementation to avoid an unexpected misusage in the future where an issue in the code would lead the busy flag to be reset to idle while effectively still being busy
   #busy = false;
 
   readonly #signerService = new SignerService();
 
-  private constructor(options: SignerOptions) {
+  private constructor(options: SignerInitOptions) {
     this.#signerOptions = options;
+    this.#owner = null;
 
     window.addEventListener('message', this.onMessageListener);
   }
+
+  setOwner = (owner: IdentityNotAnonymous) => {
+    IdentityNotAnonymousSchema.parse(owner);
+
+    this.#owner = owner;
+  };
 
   /**
    * Creates a signer that listens and communicates with a relying party.
@@ -99,7 +113,7 @@ export class Signer {
    * @param {SignerOptions} options - The options for the signer.
    * @returns {Signer} The connected signer.
    */
-  static init(options: SignerOptions): Signer {
+  static init(options: SignerInitOptions): Signer {
     return new Signer(options);
   }
 
@@ -110,6 +124,7 @@ export class Signer {
   disconnect = (): void => {
     window.removeEventListener('message', this.onMessageListener);
     this.#walletOrigin = null;
+    this.#owner = null;
   };
 
   // TODO: onbeforeunload, the signer should notify an error 4001 if and only if there is a pending request at the same time.
@@ -127,6 +142,11 @@ export class Signer {
 
     if (!success) {
       // We are only interested in JSON-RPC messages, so we are ignoring any other messages emitted at the window level, as the consumer might be using other events.
+      return;
+    }
+
+    const {initialized} = this.handleOwnerInitialized(message);
+    if (!initialized) {
       return;
     }
 
@@ -273,6 +293,20 @@ export class Signer {
     }
 
     return {busy: false};
+  }
+
+  private handleOwnerInitialized({data: msgData, origin}: SignerMessageEvent): {
+    initialized: boolean;
+  } {
+    if (isNullish(this.#owner)) {
+      notifyErrorNotInitializes({
+        id: msgData?.id ?? null,
+        origin
+      });
+      return {initialized: false};
+    }
+
+    return {initialized: true};
   }
 
   private async handleWithBusy(
@@ -554,11 +588,12 @@ export class Signer {
 
   private emitPermissions({id}: Pick<NotifyPermissions, 'id'>): void {
     assertNonNullish(this.#walletOrigin, "The relying party's origin is unknown.");
+    assertNonNullish(this.#owner, 'Owner is not set on the signer');
 
-    const {owner, sessionOptions} = this.#signerOptions;
+    const {sessionOptions} = this.#signerOptions;
 
     const scopes = readSessionValidScopes({
-      owner: owner.getPrincipal(),
+      owner: this.#owner.getPrincipal(),
       origin: this.#walletOrigin,
       sessionOptions
     });
@@ -590,10 +625,9 @@ export class Signer {
 
   private savePermissions({scopes}: {scopes: IcrcScopesArray}): void {
     assertNonNullish(this.#walletOrigin, "The relying party's origin is unknown.");
+    assertNonNullish(this.#owner, 'Owner is not set on the signer');
 
-    const {owner} = this.#signerOptions;
-
-    saveSessionScopes({owner: owner.getPrincipal(), origin: this.#walletOrigin, scopes});
+    saveSessionScopes({owner: this.#owner.getPrincipal(), origin: this.#walletOrigin, scopes});
   }
 
   /**
@@ -725,6 +759,10 @@ export class Signer {
         return {handled: false};
       }
 
+      if (isNullish(this.#owner)) {
+        return {handled: false};
+      }
+
       const {id: requestId, params} = callData;
 
       const permission = await this.assertAndPromptPermissions({
@@ -750,7 +788,7 @@ export class Signer {
         notify,
         params,
         prompt: this.#consentMessagePrompt,
-        options: this.#signerOptions
+        options: {...this.#signerOptions, owner: this.#owner as IdentityNotAnonymous}
       });
 
       if (userConsent !== 'approved') {
@@ -760,7 +798,7 @@ export class Signer {
       await this.#signerService.callCanister({
         notify,
         params,
-        options: this.#signerOptions,
+        options: {...this.#signerOptions, owner: this.#owner as IdentityNotAnonymous},
         prompt: this.#callCanisterPrompt
       });
 
@@ -796,10 +834,10 @@ export class Signer {
     origin: Origin;
     requestId: RpcId;
   }): Promise<Omit<IcrcPermissionState, 'ask_on_use'>> {
-    const {owner} = this.#signerOptions;
+    assertNonNullish(this.#owner, 'The signer is not initialized an owner');
 
     const currentPermission = sessionScopeState({
-      owner: owner.getPrincipal(),
+      owner: this.#owner?.getPrincipal(),
       origin,
       method
     });
