@@ -55,7 +55,7 @@ import type {Notify} from './types/signer-handlers';
 import {
   IdentityNotAnonymousSchema,
   SignerInitOptions,
-  type IdentityNotAnonymous,
+  type IdentityNotAnonymous
 } from './types/signer-options';
 import {
   AccountsPromptSchema,
@@ -787,7 +787,7 @@ export class Signer {
         notify,
         params,
         prompt: this.#consentMessagePrompt,
-        options: {...this.#signerOptions, owner: this.#owner as IdentityNotAnonymous}
+        options: {...this.#signerOptions, owner: this.#owner}
       });
 
       if (userConsent !== 'approved') {
@@ -797,7 +797,7 @@ export class Signer {
       await this.#signerService.callCanister({
         notify,
         params,
-        options: {...this.#signerOptions, owner: this.#owner as IdentityNotAnonymous},
+        options: {...this.#signerOptions, owner: this.#owner},
         prompt: this.#callCanisterPrompt
       });
 
