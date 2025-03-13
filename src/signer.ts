@@ -56,7 +56,6 @@ import {
   IdentityNotAnonymousSchema,
   SignerInitOptions,
   type IdentityNotAnonymous,
-  type SignerOptions
 } from './types/signer-options';
 import {
   AccountsPromptSchema,
