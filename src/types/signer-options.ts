@@ -74,7 +74,7 @@ export const SignerOptionsSchema = z.object({
    * When the signer is initialized, the owner should be signed in to the consumer dApp.
    * Upon signing out, it is up to the consumer to disconnect the signer.
    */
-  owner: IdentityNotAnonymousSchema,
+  owner: IdentityNotAnonymousSchema
 });
 
 export type SignerOptions = z.infer<typeof SignerOptionsSchema>;

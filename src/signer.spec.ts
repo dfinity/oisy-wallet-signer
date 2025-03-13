@@ -40,7 +40,7 @@ import {IcrcPermissionStateSchema, type IcrcScopedMethod} from './types/icrc-sta
 import type {Origin} from './types/post-message';
 import {JSON_RPC_VERSION_2} from './types/rpc';
 import type {SignerMessageEventData} from './types/signer';
-import type {IdentityNotAnonymous, SignerInitOptions, SignerOptions} from './types/signer-options';
+import type {IdentityNotAnonymous, SignerInitOptions} from './types/signer-options';
 import {
   AccountsPromptSchema,
   CallCanisterPromptSchema,
@@ -310,21 +310,21 @@ describe('Signer', () => {
     let requestId: string;
     let postMessageMock: MockInstance;
     const testOrigin = 'https://test.com';
-  
+
     beforeEach(() => {
       requestId = crypto.randomUUID();
       // Initialize the signer without setting an owner
       signer = Signer.init(signerOptions);
       postMessageMock = vi.fn();
-      vi.stubGlobal('opener', { postMessage: postMessageMock });
+      vi.stubGlobal('opener', {postMessage: postMessageMock});
     });
-  
+
     afterEach(() => {
       signer.disconnect();
       vi.clearAllMocks();
       vi.restoreAllMocks();
     });
-  
+
     it('should emit NOT_INITIALIZED error when a status message is received and no owner is set', async () => {
       const statusMessage = new MessageEvent('message', {
         data: {
@@ -334,10 +334,10 @@ describe('Signer', () => {
         },
         origin: testOrigin
       });
-  
+
       const notifyErrorSpy = vi.spyOn(signerHandlers, 'notifyError');
       window.dispatchEvent(statusMessage);
-  
+
       await vi.waitFor(() => {
         expect(notifyErrorSpy).toHaveBeenCalledWith({
           id: requestId,
@@ -438,7 +438,7 @@ describe('Signer', () => {
 
       beforeEach(() => {
         signer = Signer.init(signerOptions);
-        signer.setOwner(initOwner)
+        signer.setOwner(initOwner);
       });
 
       afterEach(() => {
