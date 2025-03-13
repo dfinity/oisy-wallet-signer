@@ -4,6 +4,7 @@ import {
   Nonce,
   defaultStrategy,
   lookupResultToBuffer,
+  makeNonce,
   makeNonceTransform,
   pollForResponse as pollForResponseAgent,
   type CallRequest,
@@ -201,7 +202,8 @@ export class CustomHttpAgent {
 
   private attachRequestNonce({nonce}: Pick<IcrcCallCanisterRequestParams, 'nonce'>): void {
     if (isNullish(nonce)) {
-      // Consumer has not provided a nonce. Therefore, we let agent-js generate one for the request.
+      // We always assign the transformer to generate a random nonce because we maintain a static reference to an agent. This ensures that even if the agent was previously configured with a transformer using a relying party's nonce, it will always generate a fresh one.
+      this.#agent.addTransform('update', makeNonceTransform(makeNonce));
       return;
     }
 
