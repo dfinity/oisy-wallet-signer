@@ -20,7 +20,7 @@ const IdentitySchema = z.custom<Identity>((value: unknown): boolean => {
   }
 }, 'The value provided is not a valid Identity.');
 
-const IdentityNotAnonymousSchema = IdentitySchema.refine(
+export const IdentityNotAnonymousSchema = IdentitySchema.refine(
   (identity) => !identity.getPrincipal().isAnonymous(),
   {
     message: 'The Principal is anonymous and cannot be used.'
@@ -67,3 +67,4 @@ export const SignerOptionsSchema = z.object({
 });
 
 export type SignerOptions = z.infer<typeof SignerOptionsSchema>;
+export type SignerInitOptions = Omit<SignerOptions, 'owner'>;
