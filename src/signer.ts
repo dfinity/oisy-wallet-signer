@@ -13,6 +13,7 @@ import {
   notifyErrorActionAborted,
   notifyErrorBusy,
   notifyErrorMissingPrompt,
+  notifyErrorNotInitialized,
   notifyErrorPermissionNotGranted,
   notifyErrorRequestNotSupported
 } from './handlers/signer-errors.handlers';
@@ -51,7 +52,11 @@ import {RpcRequestSchema, type RpcId} from './types/rpc';
 import type {SignerMessageEvent} from './types/signer';
 import {MissingPromptError} from './types/signer-errors';
 import type {Notify} from './types/signer-handlers';
-import type {SignerOptions} from './types/signer-options';
+import {
+  IdentityNotAnonymous,
+  IdentityNotAnonymousSchema,
+  SignerInitOptions
+} from './types/signer-options';
 import {
   AccountsPromptSchema,
   CallCanisterPromptSchema,
@@ -71,7 +76,7 @@ import {
 } from './types/signer-prompts';
 
 export class Signer {
-  readonly #signerOptions: SignerOptions;
+  readonly #signerOptions: SignerInitOptions;
 
   // eslint-disable-next-line local-rules/use-option-type-wrapper
   #walletOrigin: string | undefined | null;
@@ -83,11 +88,13 @@ export class Signer {
 
   // TODO: improve implementation to avoid an unexpected misusage in the future where an issue in the code would lead the busy flag to be reset to idle while effectively still being busy
   #busy = false;
+  #owner: IdentityNotAnonymous | null;
 
   readonly #signerService = new SignerService();
 
-  private constructor(options: SignerOptions) {
+  private constructor(options: SignerInitOptions) {
     this.#signerOptions = options;
+    this.#owner = null;
 
     window.addEventListener('message', this.onMessageListener);
   }
@@ -99,7 +106,7 @@ export class Signer {
    * @param {SignerOptions} options - The options for the signer.
    * @returns {Signer} The connected signer.
    */
-  static init(options: SignerOptions): Signer {
+  static init(options: SignerInitOptions): Signer {    
     return new Signer(options);
   }
 
@@ -109,7 +116,22 @@ export class Signer {
    */
   disconnect = (): void => {
     window.removeEventListener('message', this.onMessageListener);
+    this.#owner = null;
     this.#walletOrigin = null;
+  };
+
+  /**
+   * Sets owner to signer, thats allows to communicate with a relying party.
+   * @param {IdentityNotAnonymous} options - The options for the signer owner param.
+   * @returns {void}
+   */
+  setOwner = ({owner}: {owner: IdentityNotAnonymous}): void => {
+    if (nonNullish(this.#owner)) {
+      return;
+    }
+
+    IdentityNotAnonymousSchema.parse(owner);
+    this.#owner = owner;
   };
 
   // TODO: onbeforeunload, the signer should notify an error 4001 if and only if there is a pending request at the same time.
@@ -127,6 +149,11 @@ export class Signer {
 
     if (!success) {
       // We are only interested in JSON-RPC messages, so we are ignoring any other messages emitted at the window level, as the consumer might be using other events.
+      return;
+    }
+
+    const {initialized} = this.handleOwnerInitialized(message);
+    if (!initialized) {
       return;
     }
 
@@ -286,6 +313,22 @@ export class Signer {
       // For simplicity reasons we always reset to state idle even if it was not set to busy as we do not want to hang on a busy state if an exception is thrown.
       this.setIdle();
     }
+  }
+
+  private handleOwnerInitialized({data: msgData, origin}: SignerMessageEvent): {
+    initialized: boolean;
+  } {
+    try {
+      // Use Zod to assert that the owner is not nullish and not anonymous.
+      IdentityNotAnonymousSchema.parse(this.#owner);
+    } catch {
+      notifyErrorNotInitialized({
+        id: msgData?.id ?? null,
+        origin
+      });
+      return {initialized: false};
+    }
+    return {initialized: true};
   }
 
   // This function, strictly speaking, is useful for testing purposes to easily assert the busy flag is reset back to an idle state.
@@ -554,11 +597,12 @@ export class Signer {
 
   private emitPermissions({id}: Pick<NotifyPermissions, 'id'>): void {
     assertNonNullish(this.#walletOrigin, "The relying party's origin is unknown.");
+    assertNonNullish(this.#owner, 'Owner is not set on the signer');
 
-    const {owner, sessionOptions} = this.#signerOptions;
+    const {sessionOptions} = this.#signerOptions;
 
     const scopes = readSessionValidScopes({
-      owner: owner.getPrincipal(),
+      owner: this.#owner.getPrincipal(),
       origin: this.#walletOrigin,
       sessionOptions
     });
@@ -590,10 +634,9 @@ export class Signer {
 
   private savePermissions({scopes}: {scopes: IcrcScopesArray}): void {
     assertNonNullish(this.#walletOrigin, "The relying party's origin is unknown.");
+    assertNonNullish(this.#owner, 'Owner is not set on the signer');
 
-    const {owner} = this.#signerOptions;
-
-    saveSessionScopes({owner: owner.getPrincipal(), origin: this.#walletOrigin, scopes});
+    saveSessionScopes({owner: this.#owner.getPrincipal(), origin: this.#walletOrigin, scopes});
   }
 
   /**
@@ -721,6 +764,10 @@ export class Signer {
       const {success: isCallCanisterRequest, data: callData} =
         IcrcCallCanisterRequestSchema.safeParse(data);
 
+      if (isNullish(this.#owner)) {
+        return {handled: false};
+      }
+
       if (!isCallCanisterRequest) {
         return {handled: false};
       }
@@ -750,7 +797,7 @@ export class Signer {
         notify,
         params,
         prompt: this.#consentMessagePrompt,
-        options: this.#signerOptions
+        options: {...this.#signerOptions, owner: this.#owner}
       });
 
       if (userConsent !== 'approved') {
@@ -760,7 +807,7 @@ export class Signer {
       await this.#signerService.callCanister({
         notify,
         params,
-        options: this.#signerOptions,
+        options: {...this.#signerOptions, owner: this.#owner},
         prompt: this.#callCanisterPrompt
       });
 
@@ -796,10 +843,10 @@ export class Signer {
     origin: Origin;
     requestId: RpcId;
   }): Promise<Omit<IcrcPermissionState, 'ask_on_use'>> {
-    const {owner} = this.#signerOptions;
+    assertNonNullish(this.#owner, 'The signer is not initialized an owner');
 
     const currentPermission = sessionScopeState({
-      owner: owner.getPrincipal(),
+      owner: this.#owner.getPrincipal(),
       origin,
       method
     });
