@@ -106,7 +106,7 @@ export class Signer {
    * @param {SignerOptions} options - The options for the signer.
    * @returns {Signer} The connected signer.
    */
-  static init(options: SignerInitOptions): Signer {    
+  static init(options: SignerInitOptions): Signer {
     return new Signer(options);
   }
 
