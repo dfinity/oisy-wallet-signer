@@ -12,7 +12,13 @@ import {
 } from '@dfinity/agent';
 import {bufFromBufLike} from '@dfinity/candid';
 import {Principal} from '@dfinity/principal';
-import {base64ToUint8Array, isNullish, nonNullish, nowInBigIntNanoSeconds} from '@dfinity/utils';
+import {
+  base64ToUint8Array,
+  isNullish,
+  nonNullish,
+  nowInBigIntNanoSeconds,
+  uint8ArrayToBase64
+} from '@dfinity/utils';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import {generateHash} from '../utils/crypto.utils';
 
@@ -62,16 +68,18 @@ export class CustomHttpAgent {
     nonce,
     sender
   }: IcrcCallCanisterRequestParams): Promise<CustomHttpAgentResponse> => {
-    const hash = nonce ? await generateHash({ canisterId, sender, method: methodName, arg, nonce }) : null;    
-    const modifiedMethodName = `${methodName}_hash_${hash ?? ''}_nonce_${nonce ?? ''}`;
+    const hash = nonce
+      ? await generateHash({canisterId, sender, method: methodName, arg, nonce})
+      : null;      
+
+    const modifiedMethodName = `${methodName}_nonce_${nonce ?? ''}`;
 
     const {requestDetails, ...restResponse} = await this.#agent.call(canisterId, {
       methodName: modifiedMethodName,
       arg: base64ToUint8Array(arg),
       // effectiveCanisterId is optional but, actually mandatory according SDK team.
       effectiveCanisterId: canisterId
-    });    
-
+    });
     this.assertRequestDetails(requestDetails);
 
     if (isNullish(requestDetails)) {
@@ -86,8 +94,6 @@ export class CustomHttpAgent {
     if (hash && !this.#cache.has(hash)) {
       this.#cache.set(hash, requestDetails.ingress_expiry);
     }
-
-    this.cleanCacheAfterCall();
 
     // I assume that if we get a result at this point, it means we can respond to the caller.
     // However, this is not how it's handled in Agent-js. For some reason, regardless of whether they get a result at this point or not, if the response has a status of 202, they overwrite the result with pollForResponse, which seems incorrect.
@@ -211,48 +217,40 @@ export class CustomHttpAgent {
     return {certificate, requestDetails};
   }
 
-  private customTransform(): HttpAgentRequestTransformFn {  
-    // eslint-disable-next-line require-await
-    return async (request) => {            
-      const modifiedMethodName = request.body.method_name;
-      const {originalMethodName, hash, nonce} = this.splitModifiedMethodName(modifiedMethodName);
+  private customTransform(): HttpAgentRequestTransformFn {
+    return async (request) => {
+      const {canister_id, sender, method_name, arg} = request.body;
+      const [originalMethodName, nonce] = method_name.split('_nonce_');
 
-      request.body.method_name = originalMethodName;    
+      request.body.method_name = originalMethodName;
 
-      if (!hash || !nonce) {
+      if (!nonce) {
         return request;
       }
+
+      const hash = await generateHash({
+        canisterId: canister_id.toString(),
+        sender: sender.toString(),
+        method: method_name,
+        arg: uint8ArrayToBase64(arg),
+        nonce
+      });
 
       request.body.nonce = base64ToUint8Array(nonce);
 
-      const existingExpiry = this.#cache.get(hash);
-      
-      if (!existingExpiry){
+      const cachedExpiry = this.#cache.get(hash);
+
+      if (!cachedExpiry) {
         return request;
       }
-        
-      if (existingExpiry['_value'] < nowInBigIntNanoSeconds()){
-        throw Error('Ingress Expiry has been expired')
+
+      if (cachedExpiry['_value'] < nowInBigIntNanoSeconds()) {
+        throw Error('Ingress Expiry has been expired.');
       }
 
-      request.body.ingress_expiry = existingExpiry;
+      request.body.ingress_expiry = cachedExpiry;
 
       return request;
     };
-  }  
-
-  private cleanCacheAfterCall(): void {
-    for (const [key, expiry] of this.#cache.entries()) {
-      if (expiry['_value'] <= nowInBigIntNanoSeconds()) {
-        this.#cache.delete(key);
-      }
-    }
-  }
-
-  private splitModifiedMethodName(modifiedMethodName: string) {
-    const [rest, nonce] = modifiedMethodName.split('_nonce_');
-    const [originalMethodName, hash] = rest.split('_hash_');
-    
-    return { originalMethodName, hash, nonce };
   }
 }
