@@ -2,10 +2,10 @@ import {
   Certificate,
   Expiry,
   HttpAgent,
+  HttpAgentRequestTransformFn,
   Nonce,
   defaultStrategy,
   lookupResultToBuffer,
-  makeExpiryTransform,
   makeNonceTransform,
   pollForResponse as pollForResponseAgent,
   type CallRequest,
@@ -14,11 +14,9 @@ import {
 } from '@dfinity/agent';
 import {bufFromBufLike} from '@dfinity/candid';
 import {Principal} from '@dfinity/principal';
-import {base64ToUint8Array, isNullish, nonNullish} from '@dfinity/utils';
-import {DEFAULT_EXPIRY_DURATION} from '../constants/http-agent.constants';
+import {base64ToUint8Array, isNullish, nonNullish, nowInBigIntNanoSeconds} from '@dfinity/utils';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import {generateHash} from '../utils/crypto.utils';
-import {expiryToMs} from '../utils/custom-http-agent.utils';
 
 export type CustomHttpAgentResponse = Pick<Required<SubmitResponse>, 'requestDetails'> & {
   certificate: Certificate;
@@ -40,6 +38,7 @@ export class CustomHttpAgent {
   private constructor(agent: HttpAgent) {
     this.#agent = agent;
     this.#cache = new Map();
+    this.#agent.addTransform('update', this.customTransform());
   }
 
   static async create(
@@ -65,14 +64,13 @@ export class CustomHttpAgent {
     nonce,
     sender
   }: IcrcCallCanisterRequestParams): Promise<CustomHttpAgentResponse> => {
-    const hash = nonce ? await generateHash({ canisterId, sender, method: methodName, arg, nonce }) : null;
-    const ingressExpiry = hash ? this.getIngressExpiry(hash) : DEFAULT_EXPIRY_DURATION;
-
     this.attachRequestNonce({nonce});
-    this.attachAddTransformExpiry(ingressExpiry);
+
+    const hash = nonce ? await generateHash({ canisterId, sender, method: methodName, arg, nonce }) : null;    
+    const modifiedMethodName = `${methodName}_hash_${hash ?? ''}`;
 
     const {requestDetails, ...restResponse} = await this.#agent.call(canisterId, {
-      methodName,
+      methodName: modifiedMethodName,
       arg: base64ToUint8Array(arg),
       // effectiveCanisterId is optional but, actually mandatory according SDK team.
       effectiveCanisterId: canisterId
@@ -88,6 +86,10 @@ export class CustomHttpAgent {
       callResponse: {requestDetails, ...restResponse},
       canisterId
     });
+
+    if (hash && !this.#cache.has(hash)) {
+      this.#cache.set(hash, requestDetails.ingress_expiry);
+    }
 
     this.cleanCacheAfterCall();
 
@@ -213,6 +215,42 @@ export class CustomHttpAgent {
     return {certificate, requestDetails};
   }
 
+  private customTransform(): HttpAgentRequestTransformFn {  
+    // eslint-disable-next-line require-await
+    return async (request) => {            
+      const modifiedMethodName = request.body.method_name;
+      const [originalMethodName, hash] = modifiedMethodName.split('_hash_');
+
+      request.body.method_name = originalMethodName;          
+
+      if (!hash) {
+        return request;
+      }                  
+      
+      const existingExpiry = this.#cache.get(hash);
+      
+      if (!existingExpiry){
+        return request;
+      }
+        
+      if (existingExpiry['_value'] < nowInBigIntNanoSeconds()){
+        throw Error('Ingress Expiry has been expired')
+      }
+
+      request.body.ingress_expiry = existingExpiry;
+      
+      return request;
+    };
+  }  
+
+  private cleanCacheAfterCall(): void {
+    for (const [key, expiry] of this.#cache.entries()) {
+      if (expiry['_value'] <= nowInBigIntNanoSeconds()) {
+        this.#cache.delete(key);
+      }
+    }
+  }
+
   private attachRequestNonce({nonce}: Pick<IcrcCallCanisterRequestParams, 'nonce'>): void {
     if (isNullish(nonce)) {
       // Consumer has not provided a nonce. Therefore, we let agent-js generate one for the request.
@@ -223,33 +261,5 @@ export class CustomHttpAgent {
       'update',
       makeNonceTransform((): Nonce => base64ToUint8Array(nonce) as Nonce)
     );
-  }
-  private attachAddTransformExpiry(expiry: number): void {
-    this.#agent.addTransform('update', makeExpiryTransform(expiry));
-  }
-
-  private getIngressExpiry(hash: string): number {
-    const existingExpiry = this.#cache.get(hash);
-
-    // TODO: Should we try with a new expiry or reject the request if the timestamp is expired?
-    return (!existingExpiry || expiryToMs(existingExpiry) <= Date.now())
-      ? this.createAndStoreNewExpiry(hash)
-      : expiryToMs(existingExpiry) - Date.now();
-  }
-
-  private createAndStoreNewExpiry(hash: string): number {
-    const newExpiry = new Expiry(DEFAULT_EXPIRY_DURATION);
-    this.#cache.set(hash, newExpiry);
-    return DEFAULT_EXPIRY_DURATION;
-  }
-
-  private cleanCacheAfterCall(): void {
-    const now = Date.now();
-
-    for (const [key, expiry] of this.#cache.entries()) {
-      if (expiryToMs(expiry) <= now) {
-        this.#cache.delete(key);
-      }
-    }
   }
 }
