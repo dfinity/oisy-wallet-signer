@@ -42,7 +42,6 @@ export class CustomHttpAgent {
   private constructor(agent: HttpAgent) {
     this.#agent = agent;
     this.#cache = new Map();
-    this.#agent.addTransform('update', this.customTransform());
   }
 
   static async create(
@@ -65,14 +64,10 @@ export class CustomHttpAgent {
     arg,
     canisterId,
     method: methodName,
-    nonce,
-    sender
+    nonce
   }: IcrcCallCanisterRequestParams): Promise<CustomHttpAgentResponse> => {
-    const hash = nonce
-      ? await generateHash({canisterId, sender, method: methodName, arg, nonce})
-      : null;      
-
-    const modifiedMethodName = `${methodName}_nonce_${nonce ?? ''}`;
+    const modifiedMethodName = `${methodName}::nonce::${nonce ?? ''}`;
+    this.#agent.addTransform('update', this.customTransform());
 
     const {requestDetails, ...restResponse} = await this.#agent.call(canisterId, {
       methodName: modifiedMethodName,
@@ -80,6 +75,7 @@ export class CustomHttpAgent {
       // effectiveCanisterId is optional but, actually mandatory according SDK team.
       effectiveCanisterId: canisterId
     });
+
     this.assertRequestDetails(requestDetails);
 
     if (isNullish(requestDetails)) {
@@ -90,10 +86,6 @@ export class CustomHttpAgent {
       callResponse: {requestDetails, ...restResponse},
       canisterId
     });
-
-    if (hash && !this.#cache.has(hash)) {
-      this.#cache.set(hash, requestDetails.ingress_expiry);
-    }
 
     // I assume that if we get a result at this point, it means we can respond to the caller.
     // However, this is not how it's handled in Agent-js. For some reason, regardless of whether they get a result at this point or not, if the response has a status of 202, they overwrite the result with pollForResponse, which seems incorrect.
@@ -219,8 +211,8 @@ export class CustomHttpAgent {
 
   private customTransform(): HttpAgentRequestTransformFn {
     return async (request) => {
-      const {canister_id, sender, method_name, arg} = request.body;
-      const [originalMethodName, nonce] = method_name.split('_nonce_');
+      const {canister_id, sender, method_name, arg, ingress_expiry} = request.body;
+      const [originalMethodName, nonce] = method_name.split('::nonce::');
 
       request.body.method_name = originalMethodName;
 
@@ -241,6 +233,7 @@ export class CustomHttpAgent {
       const cachedExpiry = this.#cache.get(hash);
 
       if (!cachedExpiry) {
+        this.#cache.set(hash, ingress_expiry);
         return request;
       }
 
