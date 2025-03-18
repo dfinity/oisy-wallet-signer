@@ -3,10 +3,8 @@ import {
   Expiry,
   HttpAgent,
   HttpAgentRequestTransformFn,
-  Nonce,
   defaultStrategy,
   lookupResultToBuffer,
-  makeNonceTransform,
   pollForResponse as pollForResponseAgent,
   type CallRequest,
   type HttpAgentOptions,
@@ -64,17 +62,15 @@ export class CustomHttpAgent {
     nonce,
     sender
   }: IcrcCallCanisterRequestParams): Promise<CustomHttpAgentResponse> => {
-    this.attachRequestNonce({nonce});
-
     const hash = nonce ? await generateHash({ canisterId, sender, method: methodName, arg, nonce }) : null;    
-    const modifiedMethodName = `${methodName}_hash_${hash ?? ''}`;
+    const modifiedMethodName = `${methodName}_hash_${hash ?? ''}_nonce_${nonce ?? ''}`;
 
     const {requestDetails, ...restResponse} = await this.#agent.call(canisterId, {
       methodName: modifiedMethodName,
       arg: base64ToUint8Array(arg),
       // effectiveCanisterId is optional but, actually mandatory according SDK team.
       effectiveCanisterId: canisterId
-    });
+    });    
 
     this.assertRequestDetails(requestDetails);
 
@@ -219,14 +215,16 @@ export class CustomHttpAgent {
     // eslint-disable-next-line require-await
     return async (request) => {            
       const modifiedMethodName = request.body.method_name;
-      const [originalMethodName, hash] = modifiedMethodName.split('_hash_');
+      const {originalMethodName, hash, nonce} = this.splitModifiedMethodName(modifiedMethodName);
 
-      request.body.method_name = originalMethodName;          
+      request.body.method_name = originalMethodName;    
 
-      if (!hash) {
+      if (!hash || !nonce) {
         return request;
-      }                  
-      
+      }
+
+      request.body.nonce = base64ToUint8Array(nonce);
+
       const existingExpiry = this.#cache.get(hash);
       
       if (!existingExpiry){
@@ -238,7 +236,7 @@ export class CustomHttpAgent {
       }
 
       request.body.ingress_expiry = existingExpiry;
-      
+
       return request;
     };
   }  
@@ -251,15 +249,10 @@ export class CustomHttpAgent {
     }
   }
 
-  private attachRequestNonce({nonce}: Pick<IcrcCallCanisterRequestParams, 'nonce'>): void {
-    if (isNullish(nonce)) {
-      // Consumer has not provided a nonce. Therefore, we let agent-js generate one for the request.
-      return;
-    }
-
-    this.#agent.addTransform(
-      'update',
-      makeNonceTransform((): Nonce => base64ToUint8Array(nonce) as Nonce)
-    );
+  private splitModifiedMethodName(modifiedMethodName: string) {
+    const [rest, nonce] = modifiedMethodName.split('_nonce_');
+    const [originalMethodName, hash] = rest.split('_hash_');
+    
+    return { originalMethodName, hash, nonce };
   }
 }
