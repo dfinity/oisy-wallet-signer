@@ -84,6 +84,10 @@ export class CustomHttpAgent {
       }
     );
 
+    // Option 3.
+    // Roman's solution of doing add or remove nonce here.
+    // This would require to remove `get agent(): HttpAgent {` from this class and follow with using either HttpAgent and this class solely on call.
+
     this.assertRequestDetails(requestDetails);
 
     if (isNullish(requestDetails)) {
