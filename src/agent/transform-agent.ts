@@ -72,6 +72,7 @@ export class HttpTransformedAgent extends HttpAgent {
     return new this({...options});
   }
 
+  // @override
   public static async create(
     options: HttpAgentOptions = {
       shouldFetchRootKey: false
