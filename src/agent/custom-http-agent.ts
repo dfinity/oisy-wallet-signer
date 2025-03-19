@@ -1,8 +1,6 @@
 import {
   Certificate,
-  Expiry,
   HttpAgent,
-  HttpAgentRequestTransformFn,
   defaultStrategy,
   lookupResultToBuffer,
   pollForResponse as pollForResponseAgent,
@@ -12,15 +10,9 @@ import {
 } from '@dfinity/agent';
 import {bufFromBufLike} from '@dfinity/candid';
 import {Principal} from '@dfinity/principal';
-import {
-  base64ToUint8Array,
-  isNullish,
-  nonNullish,
-  nowInBigIntNanoSeconds,
-  uint8ArrayToBase64
-} from '@dfinity/utils';
+import {base64ToUint8Array, isNullish, nonNullish} from '@dfinity/utils';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
-import {generateHash} from '../utils/crypto.utils';
+import {HttpTransformedAgent} from './transform-agent';
 
 export type CustomHttpAgentResponse = Pick<Required<SubmitResponse>, 'requestDetails'> & {
   certificate: Certificate;
@@ -36,12 +28,10 @@ export class UndefinedRootKeyError extends Error {}
 // While this is possible, it would require using Object.assign to clone the HttpAgent into a CustomHttpAgent, because the super function does not accept generics.
 // Therefore, it is cleaner in my opinion to encapsulate the agent rather than extend it.
 export class CustomHttpAgent {
-  readonly #agent: HttpAgent;
-  #cache: Map<string, Expiry>;
+  readonly #agent: HttpTransformedAgent;
 
-  private constructor(agent: HttpAgent) {
+  private constructor(agent: HttpTransformedAgent) {
     this.#agent = agent;
-    this.#cache = new Map();
   }
 
   static async create(
@@ -49,7 +39,13 @@ export class CustomHttpAgent {
       shouldFetchRootKey?: boolean;
     }
   ): Promise<CustomHttpAgent> {
-    const agent = await HttpAgent.create(options);
+    // Option 1.
+    // const agent = await HttpAgent.create(options);
+    // agent.addTransform('update', customTransform());
+
+    // Option 2.
+    const agent = await HttpTransformedAgent.create(options);
+
     return new CustomHttpAgent(agent);
   }
 
@@ -67,14 +63,26 @@ export class CustomHttpAgent {
     nonce
   }: IcrcCallCanisterRequestParams): Promise<CustomHttpAgentResponse> => {
     const modifiedMethodName = `${methodName}::nonce::${nonce ?? ''}`;
-    this.#agent.addTransform('update', this.customTransform());
 
-    const {requestDetails, ...restResponse} = await this.#agent.call(canisterId, {
-      methodName: modifiedMethodName,
-      arg: base64ToUint8Array(arg),
-      // effectiveCanisterId is optional but, actually mandatory according SDK team.
-      effectiveCanisterId: canisterId
-    });
+    // Option 1.
+    // const {requestDetails, ...restResponse} = await this.#agent.call(canisterId, {
+    //   methodName: modifiedMethodName,
+    //   arg: base64ToUint8Array(arg),
+    //   // effectiveCanisterId is optional but, actually mandatory according SDK team.
+    //   effectiveCanisterId: canisterId
+    // });
+
+    // Option 2.
+    const {requestDetails, ...restResponse} = await this.#agent.callWithPotentialNonce(
+      nonce,
+      canisterId,
+      {
+        methodName: modifiedMethodName,
+        arg: base64ToUint8Array(arg),
+        // effectiveCanisterId is optional but, actually mandatory according SDK team.
+        effectiveCanisterId: canisterId
+      }
+    );
 
     this.assertRequestDetails(requestDetails);
 
@@ -207,43 +215,5 @@ export class CustomHttpAgent {
     );
 
     return {certificate, requestDetails};
-  }
-
-  private customTransform(): HttpAgentRequestTransformFn {
-    return async (request) => {
-      const {canister_id, sender, method_name, arg, ingress_expiry} = request.body;
-      const [originalMethodName, nonce] = method_name.split('::nonce::');
-
-      request.body.method_name = originalMethodName;
-
-      if (!nonce) {
-        return request;
-      }
-
-      const hash = await generateHash({
-        canisterId: canister_id.toString(),
-        sender: sender.toString(),
-        method: method_name,
-        arg: uint8ArrayToBase64(arg),
-        nonce
-      });
-
-      request.body.nonce = base64ToUint8Array(nonce);
-
-      const cachedExpiry = this.#cache.get(hash);
-
-      if (!cachedExpiry) {
-        this.#cache.set(hash, ingress_expiry);
-        return request;
-      }
-
-      if (cachedExpiry['_value'] < nowInBigIntNanoSeconds()) {
-        throw Error('Ingress Expiry has been expired.');
-      }
-
-      request.body.ingress_expiry = cachedExpiry;
-
-      return request;
-    };
   }
 }
