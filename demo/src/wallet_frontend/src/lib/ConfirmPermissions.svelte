@@ -75,7 +75,7 @@
 			<p class="font-bold dark:text-white">Requested Permissions</p>
 
 			<ul class="mt-2 mb-4 dark:text-white" data-tid="requested-permissions-list">
-				{#each scopes as scope}
+				{#each scopes as scope (scope.scope.method)}
 					<li>
 						<input type="checkbox" onchange={() => onToggle(scope)} class="mr-1" />
 						{scope.scope.method}
