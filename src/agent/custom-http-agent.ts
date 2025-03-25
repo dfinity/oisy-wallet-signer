@@ -1,8 +1,11 @@
 import {
   Certificate,
   HttpAgent,
+  Nonce,
   defaultStrategy,
   lookupResultToBuffer,
+  makeNonce,
+  makeNonceTransform,
   pollForResponse as pollForResponseAgent,
   type CallRequest,
   type HttpAgentOptions,
@@ -52,12 +55,11 @@ export class CustomHttpAgent {
   request = async ({
     arg,
     canisterId,
-    method: methodName
-  }: Pick<
-    // This could have been made agnostic by inlining the types here, but for simplicity and because they are strongly typed, I decided to reuse the interface.
-    IcrcCallCanisterRequestParams,
-    'canisterId' | 'method' | 'arg'
-  >): Promise<CustomHttpAgentResponse> => {
+    method: methodName,
+    nonce
+  }: Omit<IcrcCallCanisterRequestParams, 'sender'>): Promise<CustomHttpAgentResponse> => {
+    this.attachRequestNonce({nonce});
+
     const {requestDetails, ...restResponse} = await this.#agent.call(canisterId, {
       methodName,
       arg: base64ToUint8Array(arg),
@@ -196,5 +198,18 @@ export class CustomHttpAgent {
     );
 
     return {certificate, requestDetails};
+  }
+
+  private attachRequestNonce({nonce}: Pick<IcrcCallCanisterRequestParams, 'nonce'>): void {
+    if (isNullish(nonce)) {
+      // We always assign the transformer to generate a random nonce because we maintain a static reference to an agent. This ensures that even if the agent was previously configured with a transformer using a relying party's nonce, it will always generate a fresh one.
+      this.#agent.addTransform('update', makeNonceTransform(makeNonce));
+      return;
+    }
+
+    this.#agent.addTransform(
+      'update',
+      makeNonceTransform((): Nonce => base64ToUint8Array(nonce) as Nonce)
+    );
   }
 }

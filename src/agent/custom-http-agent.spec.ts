@@ -1,6 +1,6 @@
 import * as httpAgent from '@dfinity/agent';
 import {RequestId, SubmitResponse} from '@dfinity/agent';
-import {base64ToUint8Array} from '@dfinity/utils';
+import {base64ToUint8Array, uint8ArrayToBase64} from '@dfinity/utils';
 import {MockInstance} from 'vitest';
 import {
   mockLocalIcRootKey,
@@ -32,6 +32,7 @@ vi.mock('@dfinity/agent', async (importOriginal) => {
   class MockHttpAgent {
     call = vi.fn();
     create = vi.fn();
+    addTransform = vi.fn();
 
     get rootKey(): ArrayBuffer {
       return mockLocalIcRootKey.buffer;
@@ -156,6 +157,80 @@ describe('CustomHttpAgent', () => {
           expect(response.certificate).toEqual(certificate);
           expect(response.requestDetails).toEqual(mockRequestDetails);
         });
+      });
+
+      it('should call transform if a nonce is provided', async () => {
+        const spyTransform = vi.spyOn(agent.agent, 'addTransform');
+
+        const nonce = uint8ArrayToBase64(httpAgent.makeNonce());
+
+        await agent.request({
+          ...mockRequestPayload,
+          nonce
+        });
+
+        expect(spyTransform).toHaveBeenCalledOnce();
+        expect(spyTransform).toHaveBeenCalledWith('update', expect.any(Function));
+
+        const [[firstArg, secondArg]] = spyTransform.mock.calls;
+
+        expect(firstArg).toBe('update');
+        expect(secondArg).toBeInstanceOf(Function);
+
+        enum Endpoint {
+          Query = 'read',
+          ReadState = 'read_state',
+          Call = 'call'
+        }
+
+        const mockRequest = {
+          endpoint: Endpoint.Call,
+          request: {
+            headers: new Map()
+          },
+          body: {nonce: []}
+        };
+
+        await secondArg(mockRequest as unknown as httpAgent.HttpAgentSubmitRequest);
+
+        expect(mockRequest.body.nonce).toEqual(base64ToUint8Array(nonce));
+      });
+
+      it('should call transform when no nonce is provided and reassign a new nonce', async () => {
+        const spyTransform = vi.spyOn(agent.agent, 'addTransform');
+        const spyMakeNonce = vi.spyOn(httpAgent, 'makeNonce');
+
+        await agent.request({
+          ...mockRequestPayload
+        });
+
+        expect(spyTransform).toHaveBeenCalledOnce();
+        expect(spyTransform).toHaveBeenCalledWith('update', expect.any(Function));
+
+        const [[firstArg, secondArg]] = spyTransform.mock.calls;
+
+        expect(firstArg).toBe('update');
+        expect(secondArg).toBeInstanceOf(Function);
+
+        enum Endpoint {
+          Query = 'read',
+          ReadState = 'read_state',
+          Call = 'call'
+        }
+
+        const mockRequest = {
+          endpoint: Endpoint.Call,
+          request: {
+            headers: new Map()
+          },
+          body: {nonce: []}
+        };
+
+        await secondArg(mockRequest as unknown as httpAgent.HttpAgentSubmitRequest);
+
+        const nonceValue = spyMakeNonce.mock.results[0].value;
+
+        expect(mockRequest.body.nonce).toEqual(nonceValue);
       });
 
       describe('Invalid response', () => {
@@ -332,6 +407,80 @@ describe('CustomHttpAgent', () => {
 
             expect(spyPollForResponse).toHaveBeenCalledOnce();
           });
+        });
+
+        it('should call transform if a nonce is provided', async () => {
+          const spyTransform = vi.spyOn(agent.agent, 'addTransform');
+
+          const nonce = uint8ArrayToBase64(httpAgent.makeNonce());
+
+          await agent.request({
+            ...mockRequestPayload,
+            nonce
+          });
+
+          expect(spyTransform).toHaveBeenCalledOnce();
+          expect(spyTransform).toHaveBeenCalledWith('update', expect.any(Function));
+
+          const [[firstArg, secondArg]] = spyTransform.mock.calls;
+
+          expect(firstArg).toBe('update');
+          expect(secondArg).toBeInstanceOf(Function);
+
+          enum Endpoint {
+            Query = 'read',
+            ReadState = 'read_state',
+            Call = 'call'
+          }
+
+          const mockRequest = {
+            endpoint: Endpoint.Call,
+            request: {
+              headers: new Map()
+            },
+            body: {nonce: []}
+          };
+
+          await secondArg(mockRequest as unknown as httpAgent.HttpAgentSubmitRequest);
+
+          expect(mockRequest.body.nonce).toEqual(base64ToUint8Array(nonce));
+        });
+
+        it('should call transform when no nonce is provided and reassign a new nonce', async () => {
+          const spyTransform = vi.spyOn(agent.agent, 'addTransform');
+          const spyMakeNonce = vi.spyOn(httpAgent, 'makeNonce');
+
+          await agent.request({
+            ...mockRequestPayload
+          });
+
+          expect(spyTransform).toHaveBeenCalledOnce();
+          expect(spyTransform).toHaveBeenCalledWith('update', expect.any(Function));
+
+          const [[firstArg, secondArg]] = spyTransform.mock.calls;
+
+          expect(firstArg).toBe('update');
+          expect(secondArg).toBeInstanceOf(Function);
+
+          enum Endpoint {
+            Query = 'read',
+            ReadState = 'read_state',
+            Call = 'call'
+          }
+
+          const mockRequest = {
+            endpoint: Endpoint.Call,
+            request: {
+              headers: new Map()
+            },
+            body: {nonce: []}
+          };
+
+          await secondArg(mockRequest as unknown as httpAgent.HttpAgentSubmitRequest);
+
+          const nonceValue = spyMakeNonce.mock.results[0].value;
+
+          expect(mockRequest.body.nonce).toEqual(nonceValue);
         });
 
         describe('Invalid response', () => {

@@ -2,6 +2,8 @@ import * as httpAgent from '@dfinity/agent';
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {IcrcLedgerCanister} from '@dfinity/ledger-icrc';
 import {Principal} from '@dfinity/principal';
+import {uint8ArrayToBase64} from '@dfinity/utils';
+import {CustomHttpAgent} from '../agent/custom-http-agent';
 import {mockCallCanisterSuccess} from '../mocks/call-canister.mocks';
 import {mockRepliedLocalCertificate} from '../mocks/custom-http-agent-responses.mocks';
 import {mockRequestDetails, mockRequestPayload} from '../mocks/custom-http-agent.mocks';
@@ -58,6 +60,23 @@ describe('Signer-api', () => {
       });
 
       expect(result).toEqual(mockCallCanisterSuccess);
+    });
+
+    it('should call request with nonce if nonce is provided', async () => {
+      const agent = await CustomHttpAgent.create();
+      const spy = vi.spyOn(agent, 'request');
+      const nonce = uint8ArrayToBase64(httpAgent.makeNonce());
+
+      await signerApi.call({
+        params: {
+          ...mockRequestPayload,
+          sender: identity.getPrincipal().toText(),
+          nonce
+        },
+        ...signerOptions
+      });
+
+      expect(spy).toHaveBeenCalledWith(expect.objectContaining({nonce}));
     });
   });
 

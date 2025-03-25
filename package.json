@@ -1,6 +1,6 @@
 {
   "name": "@dfinity/oisy-wallet-signer",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "A library designed to facilitate communication between a dApp and the OISY Wallet on the Internet Computer. ",
   "license": "Apache-2.0",
   "type": "module",
@@ -75,28 +75,28 @@
     "i18n": "node scripts/i18n.mjs && prettier --write ./src/types/i18n.ts"
   },
   "devDependencies": {
-    "@dfinity/eslint-config-oisy-wallet": "^0.1.0",
-    "@dfinity/identity": "^2.3.0",
-    "@dfinity/internet-identity-playwright": "^0.0.4",
-    "@playwright/test": "^1.49.1",
+    "@dfinity/eslint-config-oisy-wallet": "^0.1.2",
+    "@dfinity/identity": "^2.4.0",
+    "@dfinity/internet-identity-playwright": "^0.0.5",
+    "@playwright/test": "^1.51.1",
     "@types/jest": "^29.5.14",
-    "@types/node": "^22.10.2",
-    "esbuild": "^0.25.0",
+    "@types/node": "^22.13.13",
+    "esbuild": "^0.25.1",
     "jsdom": "^26.0.0",
-    "prettier": "^3.4.2",
+    "prettier": "^3.5.3",
     "prettier-plugin-organize-imports": "^4.1.0",
     "typescript": "^5.4.5",
-    "vitest": "^3.0.2"
+    "vitest": "^3.0.9"
   },
   "engines": {
     "node": ">=22"
   },
   "peerDependencies": {
-    "@dfinity/agent": "^2.3.0",
-    "@dfinity/candid": "^2.3.0",
+    "@dfinity/agent": "^2.4.0",
+    "@dfinity/candid": "^2.4.0",
     "@dfinity/ledger-icp": "^2",
     "@dfinity/ledger-icrc": "^2",
-    "@dfinity/principal": "^2.3.0",
+    "@dfinity/principal": "^2.4.0",
     "@dfinity/utils": "^2",
     "@dfinity/zod-schemas": "*",
     "borc": "^2.1.1",

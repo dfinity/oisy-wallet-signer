@@ -130,6 +130,11 @@ export class Signer {
       return;
     }
 
+    const {handled: handledReadOnly} = this.handleReadOnlyMessage(message);
+    if (handledReadOnly) {
+      return;
+    }
+
     const {busy} = this.assertNotBusy(message);
     if (busy) {
       return;
@@ -148,20 +153,33 @@ export class Signer {
     });
   };
 
-  private async handleMessage(message: SignerMessageEvent): Promise<{handled: boolean}> {
+  /**
+   * Handles a potential readonly-only message request.
+   *
+   * The readonly-only message request might be triggered while the signer is busy processing requests.
+   * Since these informative requests do not impact the signer's behavior, it is acceptable to provide a response read-only requests.
+   *
+   * @private
+   * @param {SignerMessageEvent} message - The message event to process.
+   * @returns {{ handled: boolean }} - An object indicating whether the message was handled.
+   */
+  private handleReadOnlyMessage(message: SignerMessageEvent): {handled: boolean} {
     const {handled: statusRequestHandled} = this.handleStatusRequest(message);
     if (statusRequestHandled) {
       return {handled: true};
     }
+    const {handled: supportedStandardsRequestHandled} = this.handleSupportedStandards(message);
+    if (supportedStandardsRequestHandled) {
+      return {handled: true};
+    }
+    // TODO: handle read-only message requests in the future here (e.g. handleSupportedStandards(..))
+    return {handled: false};
+  }
 
+  private async handleMessage(message: SignerMessageEvent): Promise<{handled: boolean}> {
     // At this point the connection with the relying party should have been initialized and the origin should be set.
     const {valid} = this.assertNotUndefinedAndSameOrigin(message);
     if (!valid) {
-      return {handled: true};
-    }
-
-    const {handled: supportedStandardsRequestHandled} = this.handleSupportedStandards(message);
-    if (supportedStandardsRequestHandled) {
       return {handled: true};
     }
 
@@ -191,6 +209,7 @@ export class Signer {
 
   private setWalletOrigin({origin}: Pick<SignerMessageEvent, 'origin'>) {
     // We do not reassign the origin with the same value if it is already set. It is not a significant performance win.
+    // In addition, requesting the status is now triggered periodically.
     if (nonNullish(this.#walletOrigin)) {
       return;
     }
