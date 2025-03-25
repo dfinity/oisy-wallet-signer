@@ -8,6 +8,6 @@
 	let { scopes }: Props = $props();
 </script>
 
-{#each scopes as scope}
+{#each scopes as scope (scope.scope.method)}
 	<p>{scope.scope.method}: <strong>{scope.state}</strong></p>
 {/each}
