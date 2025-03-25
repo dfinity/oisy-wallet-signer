@@ -1,4 +1,8 @@
-@import 'tailwindcss';
+@import 'tailwindcss' source(none);
+
+@source "../../../src/core";
+@source "../../../src/relying_party_frontend";
+@source "../../../src/wallet_frontend";
 
 @theme {
 	--color-*: initial;
