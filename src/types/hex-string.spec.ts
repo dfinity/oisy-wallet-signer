@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {HexStringSchema} from './hexString';
+import {HexStringSchema} from './hex-string';
 
 describe('HexStringSchema', () => {
   it('should validate correct lowercase hex strings', () => {
