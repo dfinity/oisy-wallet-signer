@@ -27,7 +27,7 @@
 		<Value id="accounts" testId="accounts" title="Accounts">
 			{#if nonNullish($accountsStore)}
 				<ul in:fade data-tid="accounts-list">
-					{#each $accountsStore as account}
+					{#each $accountsStore as account (account.owner)}
 						<li>{account.owner}</li>
 					{/each}
 				</ul>

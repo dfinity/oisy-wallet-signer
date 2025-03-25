@@ -27,7 +27,7 @@
 {#if nonNullish(supportedStandards)}
 	<Value id="supported-standards" testId="supported-standards" title="Supported standards">
 		<ul in:fade>
-			{#each supportedStandards as standard}
+			{#each supportedStandards as standard (standard.name)}
 				<li>{standard.name}</li>
 			{/each}
 		</ul>
