@@ -1,5 +1,5 @@
 import {jsonReplacer, uint8ArrayToHexString} from '@dfinity/utils';
-import {HexString} from 'src/types/hexString';
+import {HexString} from 'src/types/hex-string';
 
 export const generateHash = async <T extends object>(params: T): Promise<HexString> => {
   const jsonString = JSON.stringify(params, jsonReplacer);
