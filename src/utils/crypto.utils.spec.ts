@@ -53,6 +53,7 @@ describe('generateHash', () => {
       const hashB = await generateHash({user: principalB});
 
       expect(hashA).not.toBe(hashB);
+      expect(hashA).toMatch(hexRegex);
     });
 
     it('handles Uint8Array values correctly', async () => {
