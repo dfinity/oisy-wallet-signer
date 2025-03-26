@@ -34,6 +34,23 @@ describe('generateHash', () => {
     expect(hash1).toBe(hash2);
   });
 
+  it('returns the expected hash for simple value', async () => {
+    const hash = await generateHash({a: 123});
+    expect(hash).toEqual('917cbcf20ffdb44b525db310004af7597b512c57cf37ad585d9b37b5e6617cca');
+  });
+
+  it('generates the expected hash for a complex payload', async () => {
+    const payload = {
+      amount: 987654321n,
+      user: Principal.fromText('aaaaa-aa'),
+      key: new Uint8Array([1, 2, 3, 4])
+    };
+
+    const hash = await generateHash(payload);
+
+    expect(hash).toEqual('7809e083f1e990698332f9328280d37d0d6b4637d2a2d8e2fdce0ccf13d9a40e');
+  });
+
   describe('handles complex value types', () => {
     it('handles BigInt values and distinguishes them correctly', async () => {
       const hash1 = await generateHash({amount: 123n});
