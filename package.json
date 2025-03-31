@@ -83,7 +83,7 @@
     "@types/node": "^22.13.13",
     "esbuild": "^0.25.1",
     "jsdom": "^26.0.0",
-    "prettier": "^3.4.2",
+    "prettier": "^3.5.3",
     "prettier-plugin-organize-imports": "^4.1.0",
     "typescript": "^5.4.5",
     "vitest": "^3.0.9"
