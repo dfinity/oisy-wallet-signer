@@ -24,11 +24,6 @@ export enum SignerErrorCode {
   BUSY = 503,
 
   /**
-   * Owner is not set on the signer.
-   */
-  NOT_INITIALIZED = 504,
-
-  /**
    * A generic error.
    * @see https://github.com/dfinity/wg-identity-authentication/blob/main/topics/icrc_25_signer_interaction_standard.md#errors
    */

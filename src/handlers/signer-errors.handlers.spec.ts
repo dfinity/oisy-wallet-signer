@@ -6,7 +6,6 @@ import {
   notifyErrorActionAborted,
   notifyErrorBusy,
   notifyErrorMissingPrompt,
-  notifyErrorNotInitialized,
   notifyErrorPermissionNotGranted,
   notifyErrorRequestNotSupported,
   notifyErrorSenderNotAllowed,
@@ -177,25 +176,6 @@ describe('Signer-errors.handlers', () => {
       };
 
       notifyErrorBusy({id: requestId, origin: testOrigin});
-
-      const expectedMessage: RpcResponseWithError = {
-        jsonrpc: JSON_RPC_VERSION_2,
-        id: requestId,
-        error
-      };
-
-      expect(postMessageMock).toHaveBeenCalledWith(expectedMessage, testOrigin);
-    });
-  });
-
-  describe('notifyErrorNotInitialized', () => {
-    it('should post an error message indicating the signer is not initialized (owner missing)', () => {
-      const error = {
-        code: SignerErrorCode.NOT_INITIALIZED,
-        message: 'The signer does not have an owner set.'
-      };
-
-      notifyErrorNotInitialized({id: requestId, origin: testOrigin});
 
       const expectedMessage: RpcResponseWithError = {
         jsonrpc: JSON_RPC_VERSION_2,

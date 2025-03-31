@@ -76,13 +76,3 @@ export const notifyErrorBusy = (notify: Notify): void => {
     }
   });
 };
-
-export const notifyErrorNotInitialized = (notify: Notify): void => {
-  notifyError({
-    ...notify,
-    error: {
-      code: SignerErrorCode.NOT_INITIALIZED,
-      message: 'The signer does not have an owner set.'
-    }
-  });
-};

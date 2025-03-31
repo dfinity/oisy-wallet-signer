@@ -1,11 +1,10 @@
 import {
   Certificate,
+  Expiry,
   HttpAgent,
-  Nonce,
+  HttpAgentRequestTransformFn,
   defaultStrategy,
   lookupResultToBuffer,
-  makeNonce,
-  makeNonceTransform,
   pollForResponse as pollForResponseAgent,
   type CallRequest,
   type HttpAgentOptions,
@@ -13,8 +12,15 @@ import {
 } from '@dfinity/agent';
 import {bufFromBufLike} from '@dfinity/candid';
 import {Principal} from '@dfinity/principal';
-import {base64ToUint8Array, isNullish, nonNullish} from '@dfinity/utils';
+import {
+  base64ToUint8Array,
+  isNullish,
+  nonNullish,
+  nowInBigIntNanoSeconds,
+  uint8ArrayToBase64
+} from '@dfinity/utils';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
+import {generateHash} from '../utils/crypto.utils';
 
 export type CustomHttpAgentResponse = Pick<Required<SubmitResponse>, 'requestDetails'> & {
   certificate: Certificate;
@@ -31,9 +37,11 @@ export class UndefinedRootKeyError extends Error {}
 // Therefore, it is cleaner in my opinion to encapsulate the agent rather than extend it.
 export class CustomHttpAgent {
   readonly #agent: HttpAgent;
+  #cache: Map<string, Expiry>;
 
   private constructor(agent: HttpAgent) {
     this.#agent = agent;
+    this.#cache = new Map();
   }
 
   static async create(
@@ -57,11 +65,12 @@ export class CustomHttpAgent {
     canisterId,
     method: methodName,
     nonce
-  }: Omit<IcrcCallCanisterRequestParams, 'sender'>): Promise<CustomHttpAgentResponse> => {
-    this.attachRequestNonce({nonce});
+  }: IcrcCallCanisterRequestParams): Promise<CustomHttpAgentResponse> => {
+    const modifiedMethodName = `${methodName}::nonce::${nonce ?? ''}`;
+    this.#agent.addTransform('update', this.customTransform());
 
     const {requestDetails, ...restResponse} = await this.#agent.call(canisterId, {
-      methodName,
+      methodName: modifiedMethodName,
       arg: base64ToUint8Array(arg),
       // effectiveCanisterId is optional but, actually mandatory according SDK team.
       effectiveCanisterId: canisterId
@@ -200,16 +209,41 @@ export class CustomHttpAgent {
     return {certificate, requestDetails};
   }
 
-  private attachRequestNonce({nonce}: Pick<IcrcCallCanisterRequestParams, 'nonce'>): void {
-    if (isNullish(nonce)) {
-      // We always assign the transformer to generate a random nonce because we maintain a static reference to an agent. This ensures that even if the agent was previously configured with a transformer using a relying party's nonce, it will always generate a fresh one.
-      this.#agent.addTransform('update', makeNonceTransform(makeNonce));
-      return;
-    }
+  private customTransform(): HttpAgentRequestTransformFn {
+    return async (request) => {
+      const {canister_id, sender, method_name, arg, ingress_expiry} = request.body;
+      const [originalMethodName, nonce] = method_name.split('::nonce::');
 
-    this.#agent.addTransform(
-      'update',
-      makeNonceTransform((): Nonce => base64ToUint8Array(nonce) as Nonce)
-    );
+      request.body.method_name = originalMethodName;
+
+      if (!nonce) {
+        return request;
+      }
+
+      const hash = await generateHash({
+        canisterId: canister_id.toString(),
+        sender: sender.toString(),
+        method: method_name,
+        arg: uint8ArrayToBase64(arg),
+        nonce
+      });
+
+      request.body.nonce = base64ToUint8Array(nonce);
+
+      const cachedExpiry = this.#cache.get(hash);
+
+      if (!cachedExpiry) {
+        this.#cache.set(hash, ingress_expiry);
+        return request;
+      }
+
+      if (cachedExpiry['_value'] < nowInBigIntNanoSeconds()) {
+        throw Error('Ingress Expiry has been expired.');
+      }
+
+      request.body.ingress_expiry = cachedExpiry;
+
+      return request;
+    };
   }
 }

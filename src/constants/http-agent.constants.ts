@@ -1,0 +1,1 @@
+export const DEFAULT_EXPIRY_DURATION = 5 * 60 * 1000;
