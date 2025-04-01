@@ -44,7 +44,9 @@ describe('Http-Agent-Provider', () => {
 
   it('should create a HttpAgentProvider with the shouldFetchRootKey in options', async () => {
     const agentOptions = {shouldFetchRootKey: true};
+    const spyCreate = vi.spyOn(httpAgent.HttpAgent, 'create');
     const agent = await HttpAgentProvider.create(agentOptions);
+    expect(spyCreate).toHaveBeenCalledWith(agentOptions);
     expect(agent).toBeInstanceOf(HttpAgentProvider);
   });
 
@@ -53,7 +55,9 @@ describe('Http-Agent-Provider', () => {
       owner: Ed25519KeyIdentity.generate(),
       host: 'http://localhost:8080'
     };
+    const spyCreate = vi.spyOn(httpAgent.HttpAgent, 'create');
     const agent = await HttpAgentProvider.create(agentOptions);
+    expect(spyCreate).toHaveBeenCalledWith(agentOptions);
     expect(agent).toBeInstanceOf(HttpAgentProvider);
   });
 
