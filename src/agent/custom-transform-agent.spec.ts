@@ -1,4 +1,4 @@
-import {Expiry, HttpAgentSubmitRequest} from '@dfinity/agent';
+import * as httpAgent from '@dfinity/agent';
 import {nonNullish} from '@dfinity/utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import {createMockRequest, mockRequestPayload} from '../mocks/custom-http-agent.mocks';
@@ -42,8 +42,7 @@ afterEach(() => {
 
 describe('customAddTransform integration with HttpAgent', () => {
   it('should register transform before making a call', async () => {
-    const {HttpAgent} = await import('@dfinity/agent');
-    const agent = await HttpAgent.create();
+    const agent = await httpAgent.HttpAgent.create();
     const spyCall = vi.spyOn(agent, 'call');
     const spyTransform = vi.spyOn(agent, 'addTransform');
     const transform = customAddTransform();
@@ -67,24 +66,26 @@ describe('customAddTransform integration with HttpAgent', () => {
 
 describe('customAddTransform core logic', () => {
   it('throws if cached expiry is older than now', async () => {
-    const ingress_expiry = new Expiry(1);
+    const ingress_expiry = new httpAgent.Expiry(1);
     const mockRequest = createMockRequest({ingress_expiry, nonce: new Uint8Array([9, 9, 9])});
     const transform = customAddTransform();
 
-    const firstResult = await transform(mockRequest as unknown as HttpAgentSubmitRequest);
+    const firstResult = await transform(mockRequest as unknown as httpAgent.HttpAgentSubmitRequest);
 
     if (nonNullish(firstResult?.body?.ingress_expiry)) {
       expect(firstResult.body.ingress_expiry).toEqual(ingress_expiry);
     }
 
-    await expect(transform(mockRequest as unknown as HttpAgentSubmitRequest)).rejects.toThrow(
-      'Ingress Expiry has been expired.'
+    await expect(
+      transform(mockRequest as unknown as httpAgent.HttpAgentSubmitRequest)
+    ).rejects.toThrow(
+      'The request has expired and is no longer valid. Please try again with a new request.'
     );
   });
 
   it('should cache and re-use ingress_expiry if same hash', async () => {
-    const expiry1 = new Expiry(5 * 60 * 1000);
-    const expiry2 = new Expiry(5 * 60 * 1000);
+    const expiry1 = new httpAgent.Expiry(5 * 60 * 1000);
+    const expiry2 = new httpAgent.Expiry(5 * 60 * 1000);
     const mockRequest1 = createMockRequest({
       ingress_expiry: expiry1,
       nonce: new Uint8Array([1, 1, 1])
@@ -96,13 +97,17 @@ describe('customAddTransform core logic', () => {
 
     const transform = customAddTransform();
 
-    const firstResult = await transform(mockRequest1 as unknown as HttpAgentSubmitRequest);
+    const firstResult = await transform(
+      mockRequest1 as unknown as httpAgent.HttpAgentSubmitRequest
+    );
 
     if (nonNullish(firstResult?.body?.ingress_expiry)) {
       expect(firstResult.body.ingress_expiry).toEqual(expiry1);
     }
 
-    const secondResult = await transform(mockRequest2 as unknown as HttpAgentSubmitRequest);
+    const secondResult = await transform(
+      mockRequest2 as unknown as httpAgent.HttpAgentSubmitRequest
+    );
 
     if (nonNullish(secondResult?.body?.ingress_expiry)) {
       expect(secondResult.body.ingress_expiry).toEqual(expiry1);
@@ -110,17 +115,19 @@ describe('customAddTransform core logic', () => {
   });
 
   it('should add ingress_expiry to cache if it does not exist and use cache for subsequent calls', async () => {
-    const ingress_expiry = new Expiry(5 * 60 * 1000);
+    const ingress_expiry = new httpAgent.Expiry(5 * 60 * 1000);
     const mockRequest = createMockRequest({ingress_expiry, nonce: new Uint8Array([9, 9, 9])});
     const transform = customAddTransform();
 
-    const firstResult = await transform(mockRequest as unknown as HttpAgentSubmitRequest);
+    const firstResult = await transform(mockRequest as unknown as httpAgent.HttpAgentSubmitRequest);
 
     if (nonNullish(firstResult?.body?.ingress_expiry)) {
       expect(firstResult.body.ingress_expiry).toEqual(ingress_expiry);
     }
 
-    const secondResult = await transform(mockRequest as unknown as HttpAgentSubmitRequest);
+    const secondResult = await transform(
+      mockRequest as unknown as httpAgent.HttpAgentSubmitRequest
+    );
 
     if (nonNullish(secondResult?.body?.ingress_expiry)) {
       expect(secondResult.body.ingress_expiry).toEqual(ingress_expiry);

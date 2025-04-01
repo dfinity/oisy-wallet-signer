@@ -1,10 +1,8 @@
 import {Expiry, HttpAgentRequest, HttpAgentRequestTransformFn} from '@dfinity/agent';
 import {isNullish, nowInBigIntNanoSeconds, uint8ArrayToBase64} from '@dfinity/utils';
-import {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import {HexString} from '../types/hex-string';
+import {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import {generateHash} from '../utils/crypto.utils';
-
-const MAX_CACHE_SIZE = 50;
 
 /**
  * A custom transform function that processes the HTTP agent request.
@@ -18,21 +16,6 @@ const MAX_CACHE_SIZE = 50;
  */
 export const customAddTransform = (): HttpAgentRequestTransformFn => {
   const cache: Map<HexString, Expiry> = new Map();
-
-  /**
-   * Cleans up expired entries from the cache.
-   * This function iterates over the cache and removes entries where the expiry time has passed.
-   * The cleanup is triggered before each transformation to ensure the cache does not grow uncontrollably.
-   */
-  const cleanupExpiredCache = () => {
-    const currentNanoTime = nowInBigIntNanoSeconds();
-
-    for (const [key, expiry] of cache) {
-      if (expiry['_value'] < currentNanoTime) {
-        cache.delete(key);
-      }
-    }
-  };
 
   return async (request: HttpAgentRequest) => {
     const {canister_id, sender, method_name, arg, ingress_expiry, nonce} = request.body;
@@ -50,11 +33,6 @@ export const customAddTransform = (): HttpAgentRequestTransformFn => {
     };
 
     const hash = await generateHash(hashRequestData);
-
-    if (cache.size > MAX_CACHE_SIZE) {
-      cleanupExpiredCache();
-    }
-
     const cachedExpiry = cache.get(hash);
 
     if (isNullish(cachedExpiry)) {
@@ -62,8 +40,10 @@ export const customAddTransform = (): HttpAgentRequestTransformFn => {
       return request;
     }
 
-    if (cachedExpiry['_value'] < nowInBigIntNanoSeconds()) {
-      throw Error('Ingress Expiry has been expired.');
+    if (cachedExpiry['_value'] <= nowInBigIntNanoSeconds()) {
+      throw Error(
+        'The request has expired and is no longer valid. Please try again with a new request.'
+      );
     }
 
     request.body.ingress_expiry = cachedExpiry;
