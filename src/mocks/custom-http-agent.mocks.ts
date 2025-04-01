@@ -25,3 +25,27 @@ export const mockRequestDetails: CallRequest = {
   request_type: SubmitRequestType.Call,
   sender: Principal.fromText(mockPrincipalText)
 };
+
+enum Endpoint {
+  Query = 'read',
+  ReadState = 'read_state',
+  Call = 'call'
+}
+
+export const createMockRequest = ({
+  ingress_expiry,
+  nonce
+}: {
+  ingress_expiry?: Expiry;
+  nonce?: Uint8Array;
+}) => ({
+  endpoint: Endpoint.Call,
+  request: {
+    headers: new Map()
+  },
+  body: {
+    ...mockRequestDetails,
+    ingress_expiry,
+    nonce
+  }
+});
