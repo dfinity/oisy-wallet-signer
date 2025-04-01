@@ -19,7 +19,6 @@ import {
   mockRequestPayloadWithNonce
 } from '../mocks/custom-http-agent.mocks';
 import {mockCanisterId} from '../mocks/icrc-accounts.mocks';
-import {HttpAgentProvider} from './http-agent-provider';
 import {
   CustomHttpAgent,
   InvalidCertificateReplyError,
@@ -28,6 +27,7 @@ import {
   UndefinedRequestDetailsError,
   UndefinedRootKeyError
 } from './custom-http-agent';
+import {HttpAgentProvider} from './http-agent-provider';
 
 vi.mock('@dfinity/agent', async (importOriginal) => {
   const originalModule = await importOriginal<typeof import('@dfinity/agent')>();
