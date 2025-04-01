@@ -1,9 +1,11 @@
 import * as httpAgent from '@dfinity/agent';
+import {Ed25519KeyIdentity} from '@dfinity/identity';
+import {SignerOptions} from 'src/types/signer-options';
 import {
   mockLocalIcRootKey,
   mockRepliedLocalCallTime
 } from '../mocks/custom-http-agent-responses.mocks';
-import {CustomHttpAgent} from './custom-http-agent';
+import {HttpAgentProvider} from './http-agent-provider';
 
 vi.mock('@dfinity/agent', async (importOriginal) => {
   const originalModule = await importOriginal<typeof import('@dfinity/agent')>();
@@ -40,14 +42,23 @@ describe('Http-Agent-Provider', () => {
     vi.useRealTimers();
   });
 
-  it('should create a CustomHttpAgent with the correct options', async () => {
+  it('should create a HttpAgentProvider with the shouldFetchRootKey in options', async () => {
     const agentOptions = {shouldFetchRootKey: true};
-    const agent = await CustomHttpAgent.create(agentOptions);
-    expect(agent).toBeInstanceOf(CustomHttpAgent);
+    const agent = await HttpAgentProvider.create(agentOptions);
+    expect(agent).toBeInstanceOf(HttpAgentProvider);
+  });
+
+  it('should create a HttpAgentProvider with the HttpAgentOptions', async () => {
+    const agentOptions: SignerOptions = {
+      owner: Ed25519KeyIdentity.generate(),
+      host: 'http://localhost:8080'
+    };
+    const agent = await HttpAgentProvider.create(agentOptions);
+    expect(agent).toBeInstanceOf(HttpAgentProvider);
   });
 
   it('should expose the wrapped agent', async () => {
-    const agent = await CustomHttpAgent.create({});
+    const agent = await HttpAgentProvider.create({});
     expect(agent.agent).toBeDefined();
     expect(agent.agent).toBeInstanceOf(httpAgent.HttpAgent);
   });
@@ -55,7 +66,7 @@ describe('Http-Agent-Provider', () => {
   it('should call HttpAgent.create once with the provided options', async () => {
     const agentOptions = {shouldFetchRootKey: true};
 
-    await CustomHttpAgent.create(agentOptions);
+    await HttpAgentProvider.create(agentOptions);
 
     expect(httpAgent.HttpAgent.create).toHaveBeenCalledOnce();
 
