@@ -27,7 +27,7 @@ import {
   RequestError,
   UndefinedRequestDetailsError,
   UndefinedRootKeyError
-} from './new-custom-http-agent';
+} from './custom-http-agent';
 
 vi.mock('@dfinity/agent', async (importOriginal) => {
   const originalModule = await importOriginal<typeof import('@dfinity/agent')>();
