@@ -15,7 +15,7 @@ updates:
       - dependency-name: 'eslint'
       - dependency-name: 'eslint-*'
     commit-message:
-      prefix: "build"
+      prefix: 'build'
 
   - package-ecosystem: npm
     directory: '/demo'
@@ -27,4 +27,4 @@ updates:
       - dependency-name: 'eslint'
       - dependency-name: 'eslint-*'
     commit-message:
-      prefix: "build"
+      prefix: 'build'
