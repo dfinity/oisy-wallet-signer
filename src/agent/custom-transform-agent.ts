@@ -35,6 +35,10 @@ export const customAddTransform = (): HttpAgentRequestTransformFn => {
     const hash = await generateHash(hashRequestData);
     const cachedExpiry = cache.get(hash);
 
+    /* If no nonce is provided, we don't need to cache or check expiry, so we return the request as is.
+     This behavior is by design, as nonces are necessary for identifying unique requests and ensuring
+     cache correctness.
+    */
     if (isNullish(cachedExpiry)) {
       cache.set(hash, ingress_expiry);
       return request;
