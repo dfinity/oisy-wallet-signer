@@ -27,6 +27,7 @@ export abstract class AgentApi {
 
       return agent;
     }
+    
     return this.#agents[key];
   }
 
