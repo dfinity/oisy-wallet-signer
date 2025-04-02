@@ -27,7 +27,7 @@ import {
   UndefinedRequestDetailsError,
   UndefinedRootKeyError
 } from './custom-http-agent';
-import {customAddTransform} from './custom-transform-agent';
+import * as transformAgent from './custom-transform-agent';
 
 vi.mock('@dfinity/agent', async (importOriginal) => {
   const originalModule = await importOriginal<typeof import('@dfinity/agent')>();
@@ -90,7 +90,7 @@ describe('CustomHttpAgent', () => {
   });
 
   it('should call customAddTransform in the constructor', async () => {
-    const spyCustomAddTransform = vi.mocked(customAddTransform);
+    const spyCustomAddTransform = vi.spyOn(transformAgent, 'customAddTransform');
 
     const agent = await CustomHttpAgent.create();
 
