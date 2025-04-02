@@ -1,60 +1,72 @@
 import {isNullish} from '@dfinity/utils';
-import {CustomHttpAgent} from '../agent/custom-http-agent';
+import {CustomHttpAgent} from '../agent/custom-http-agent'; // Corrected import path
 import {HttpAgentProvider} from '../agent/http-agent-provider';
 import {MAINNET_REPLICA_URL} from '../constants/core.constants';
 import type {SignerOptions} from '../types/signer-options';
 
 export abstract class AgentApi {
-  #agents: Record<string, HttpAgentProvider | CustomHttpAgent> = {};
+  #agents: Record<string, HttpAgentProvider> = {};
 
-  protected async getAgent<T extends HttpAgentProvider | CustomHttpAgent>({
-    options,
-    type
-  }: {
-    options: SignerOptions;
-    type: 'default' | 'custom';
-  }): Promise<T> {
-    const {owner} = options;
-    const key = `${owner.getPrincipal().toText()}_${type}`;
-
-    if (isNullish(this.#agents[key])) {
-      const agent = await this.createAgent({options, type});
-      this.#agents[key] = agent;
-      return agent as T;
-    }
-    return this.#agents[key] as T;
-  }
-
-  private async createAgent({
+  private async getAgent({
     options,
     type
   }: {
     options: SignerOptions;
     type: 'default' | 'custom';
   }): Promise<HttpAgentProvider | CustomHttpAgent> {
-    const {owner, host} = options;
+    const {owner} = options;
+    const key = `${owner.getPrincipal().toText()}_${type}`;
+
+    if (isNullish(this.#agents[key])) {
+      const agent = await this.createAgent({options, type});
+      this.#agents[key] = agent;
+      return agent;
+    }
+    return this.#agents[key];
+  }
+
+  private async createAgent({
+    options: {owner: identity, host},
+    type
+  }: {
+    options: SignerOptions;
+    type: 'default' | 'custom';
+  }): Promise<HttpAgentProvider> {
     const {hostname} = new URL(host ?? MAINNET_REPLICA_URL);
     const shouldFetchRootKey = ['localhost', '127.0.0.1'].includes(hostname);
-
-    if (type === 'default') {
-      return await HttpAgentProvider.create({
-        identity: owner,
-        host: host ?? MAINNET_REPLICA_URL,
-        shouldFetchRootKey
-      });
-    }
-    return await CustomHttpAgent.create({
-      identity: owner,
+    const createOptions = {
+      identity,
       host: host ?? MAINNET_REPLICA_URL,
       shouldFetchRootKey
-    });
+    };
+
+    if (type === 'default') {
+      return await HttpAgentProvider.create(createOptions);
+    }
+    return await CustomHttpAgent.create(createOptions);
   }
 
+  /**
+   * Returns a default `HttpAgentProvider` instance for the given signer options.
+   * This agent does NOT include custom transforms and is suitable for certified calls
+   * like ledger metadata, where transforms should be avoided.
+   *
+   * @param {SignerOptions} options - The signer configuration including identity and host.
+   * @returns {Promise<HttpAgentProvider>} - A promise that resolves to a default agent instance.
+   */
   protected async getDefaultAgent(options: SignerOptions): Promise<HttpAgentProvider> {
-    return await this.getAgent<HttpAgentProvider>({options, type: 'default'});
+    return (await this.getAgent({options, type: 'default'})) as HttpAgentProvider;
   }
 
+  /**
+   * Returns a `CustomHttpAgent` instance for the given signer options.
+   * This agent includes custom transforms and is intended for update or query calls
+   * where the custom behavior is needed.
+   *
+   * @param {SignerOptions} options - The signer configuration including identity and host.
+   * @returns {Promise<CustomHttpAgent>} - A promise that resolves to a custom agent instance.
+   */
   protected async getCustomAgent(options: SignerOptions): Promise<CustomHttpAgent> {
-    return await this.getAgent<CustomHttpAgent>({options, type: 'custom'});
+    return (await this.getAgent({options, type: 'custom'})) as CustomHttpAgent;
   }
 }

@@ -24,7 +24,9 @@ class TestAgent extends AgentApi {
     options: SignerOptions;
     type: 'default' | 'custom';
   }): Promise<CustomHttpAgent | HttpAgentProvider> {
-    return await this.getAgent({options, type});
+    return type === 'default'
+      ? await this.getDefaultAgent(options)
+      : await this.getCustomAgent(options);
   }
 }
 
