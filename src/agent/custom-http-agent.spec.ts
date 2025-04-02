@@ -1,7 +1,7 @@
 import * as httpAgent from '@dfinity/agent';
 import {RequestId, SubmitResponse} from '@dfinity/agent';
 import {Ed25519KeyIdentity} from '@dfinity/identity';
-import {base64ToUint8Array, nonNullish} from '@dfinity/utils';
+import {base64ToUint8Array} from '@dfinity/utils';
 import {MockInstance} from 'vitest';
 import {
   mockLocalIcRootKey,
@@ -27,7 +27,6 @@ import {
   UndefinedRequestDetailsError,
   UndefinedRootKeyError
 } from './custom-http-agent';
-import {HttpAgentProvider} from './http-agent-provider';
 
 vi.mock('@dfinity/agent', async (importOriginal) => {
   const originalModule = await importOriginal<typeof import('@dfinity/agent')>();
@@ -92,13 +91,10 @@ describe('CustomHttpAgent', () => {
       shouldFetchRootKey: true
     };
 
-    const httpAgentCreateSpy = vi.spyOn(HttpAgentProvider, 'create');
     const spyCreate = vi.spyOn(httpAgent.HttpAgent, 'create');
     const customAgent = await CustomHttpAgent.create(agentOptions);
 
     expect(spyCreate).toHaveBeenCalledWith(agentOptions);
-
-    expect(httpAgentCreateSpy).toHaveBeenCalledWith(agentOptions);
 
     expect(customAgent).toBeInstanceOf(CustomHttpAgent);
   });
@@ -155,20 +151,6 @@ describe('CustomHttpAgent', () => {
       describe('Replied (success) response', () => {
         beforeEach(() => {
           spyCall = vi.spyOn(agent.agent, 'call').mockResolvedValue(mockRepliedSubmitResponse);
-        });
-
-        it('should call agent on request with nonce', async () => {
-          await agent.request(mockRequestPayloadWithNonce);
-
-          expect(spyCall).toHaveBeenCalledOnce();
-          expect(spyCall).toHaveBeenCalledWith(mockCanisterId, {
-            arg: base64ToUint8Array(mockRequestPayload.arg),
-            effectiveCanisterId: mockCanisterId,
-            methodName: mockRequestMethod,
-            nonce:
-              nonNullish(mockRequestPayloadWithNonce.nonce) &&
-              base64ToUint8Array(mockRequestPayloadWithNonce.nonce)
-          });
         });
 
         it('should call agent on request without nonce', async () => {
@@ -356,20 +338,6 @@ describe('CustomHttpAgent', () => {
               arg: base64ToUint8Array(mockRequestPayload.arg),
               effectiveCanisterId: mockCanisterId,
               methodName: mockRequestMethod
-            });
-          });
-
-          it('should call agent on request with nonce', async () => {
-            await agent.request(mockRequestPayloadWithNonce);
-
-            expect(spyCall).toHaveBeenCalledOnce();
-            expect(spyCall).toHaveBeenCalledWith(mockCanisterId, {
-              arg: base64ToUint8Array(mockRequestPayload.arg),
-              effectiveCanisterId: mockCanisterId,
-              methodName: mockRequestMethod,
-              nonce:
-                nonNullish(mockRequestPayloadWithNonce.nonce) &&
-                base64ToUint8Array(mockRequestPayloadWithNonce.nonce)
             });
           });
 

@@ -12,7 +12,6 @@ import {bufFromBufLike} from '@dfinity/candid';
 import {Principal} from '@dfinity/principal';
 import {base64ToUint8Array, isNullish, nonNullish} from '@dfinity/utils';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
-import {customAddTransform} from './custom-transform-agent';
 import {HttpAgentProvider} from './http-agent-provider';
 
 export type CustomHttpAgentResponse = Pick<Required<SubmitResponse>, 'requestDetails'> & {
@@ -26,33 +25,27 @@ export class InvalidCertificateStatusError extends Error {}
 export class UndefinedRootKeyError extends Error {}
 
 export class CustomHttpAgent extends HttpAgentProvider {
-  #agent: HttpAgent;
-
   private constructor(agent: HttpAgent) {
     super(agent);
-    this.#agent = agent;
-    agent.addTransform('update', customAddTransform());
   }
 
   static async create(
     options?: HttpAgentOptions & {shouldFetchRootKey?: boolean}
   ): Promise<CustomHttpAgent> {
-    const httpAgentProvider = await HttpAgentProvider.create(options);
-    return new CustomHttpAgent(httpAgentProvider.agent);
+    const agent = await HttpAgent.create(options);
+    return new CustomHttpAgent(agent);
   }
 
   request = async ({
     arg,
     canisterId,
-    method: methodName,
-    nonce
+    method: methodName
   }: Omit<IcrcCallCanisterRequestParams, 'sender'>): Promise<CustomHttpAgentResponse> => {
-    const {requestDetails, ...restResponse} = await this.#agent.call(canisterId, {
+    const {requestDetails, ...restResponse} = await this.agent.call(canisterId, {
       methodName,
       arg: base64ToUint8Array(arg),
       // effectiveCanisterId is optional but, actually mandatory according SDK team.
-      effectiveCanisterId: canisterId,
-      nonce: nonNullish(nonce) ? base64ToUint8Array(nonce) : undefined
+      effectiveCanisterId: canisterId
     });
 
     this.assertRequestDetails(requestDetails);
@@ -116,13 +109,13 @@ export class CustomHttpAgent extends HttpAgentProvider {
 
     const {certificate: cert} = body;
 
-    if (isNullish(this.#agent.rootKey)) {
+    if (isNullish(this.agent.rootKey)) {
       throw new UndefinedRootKeyError();
     }
 
     const certificate = await Certificate.create({
       certificate: bufFromBufLike(cert),
-      rootKey: this.#agent.rootKey,
+      rootKey: this.agent.rootKey,
       canisterId: Principal.fromText(canisterId)
     });
 
@@ -179,7 +172,7 @@ export class CustomHttpAgent extends HttpAgentProvider {
     'canisterId'
   >): Promise<CustomHttpAgentResponse> {
     const {certificate} = await pollForResponseAgent(
-      this.#agent,
+      this.agent,
       Principal.fromText(canisterId),
       requestId,
       defaultStrategy()
