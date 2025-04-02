@@ -5,7 +5,7 @@ import {MAINNET_REPLICA_URL} from '../constants/core.constants';
 import type {SignerOptions} from '../types/signer-options';
 
 export abstract class AgentApi {
-  #agents: Record<string, HttpAgentProvider> = {};
+  #agents: Record<string, HttpAgentProvider> | undefined = undefined;
 
   private async getAgent({
     options,
@@ -17,9 +17,14 @@ export abstract class AgentApi {
     const {owner} = options;
     const key = `${owner.getPrincipal().toText()}_${type}`;
 
-    if (isNullish(this.#agents[key])) {
+    if (isNullish(this.#agents) || isNullish(this.#agents[key])) {
       const agent = await this.createAgent({options, type});
-      this.#agents[key] = agent;
+
+      this.#agents = {
+        ...(this.#agents ?? {}),
+        [key]: agent
+      };
+
       return agent;
     }
     return this.#agents[key];
