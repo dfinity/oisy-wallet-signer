@@ -2,11 +2,8 @@ import {
   CallRequest,
   Certificate,
   HttpAgent,
-  Nonce,
   defaultStrategy,
   lookupResultToBuffer,
-  makeNonce,
-  makeNonceTransform,
   pollForResponse as pollForResponseAgent,
   type HttpAgentOptions,
   type SubmitResponse
@@ -15,6 +12,7 @@ import {bufFromBufLike} from '@dfinity/candid';
 import {Principal} from '@dfinity/principal';
 import {base64ToUint8Array, isNullish, nonNullish} from '@dfinity/utils';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
+import {customAddTransform} from './custom-transform-agent';
 import {HttpAgentProvider} from './http-agent-provider';
 
 export type CustomHttpAgentResponse = Pick<Required<SubmitResponse>, 'requestDetails'> & {
@@ -30,6 +28,7 @@ export class UndefinedRootKeyError extends Error {}
 export class CustomHttpAgent extends HttpAgentProvider {
   private constructor(agent: HttpAgent) {
     super(agent);
+    this._agent.addTransform('update', customAddTransform());
   }
 
   static async create(
@@ -45,13 +44,12 @@ export class CustomHttpAgent extends HttpAgentProvider {
     method: methodName,
     nonce
   }: Omit<IcrcCallCanisterRequestParams, 'sender'>): Promise<CustomHttpAgentResponse> => {
-    this.attachRequestNonce({nonce});
-
     const {requestDetails, ...restResponse} = await this._agent.call(canisterId, {
       methodName,
       arg: base64ToUint8Array(arg),
       // effectiveCanisterId is optional but, actually mandatory according SDK team.
-      effectiveCanisterId: canisterId
+      effectiveCanisterId: canisterId,
+      nonce: nonNullish(nonce) ? base64ToUint8Array(nonce) : undefined
     });
 
     this.assertRequestDetails(requestDetails);
@@ -185,18 +183,5 @@ export class CustomHttpAgent extends HttpAgentProvider {
     );
 
     return {certificate, requestDetails};
-  }
-
-  private attachRequestNonce({nonce}: Pick<IcrcCallCanisterRequestParams, 'nonce'>): void {
-    if (isNullish(nonce)) {
-      // We always assign the transformer to generate a random nonce because we maintain a static reference to an agent. This ensures that even if the agent was previously configured with a transformer using a relying party's nonce, it will always generate a fresh one.
-      this._agent.addTransform('update', makeNonceTransform(makeNonce));
-      return;
-    }
-
-    this._agent.addTransform(
-      'update',
-      makeNonceTransform((): Nonce => base64ToUint8Array(nonce) as Nonce)
-    );
   }
 }
