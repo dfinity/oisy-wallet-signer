@@ -26,7 +26,6 @@ export class RequestError extends Error {}
 export class InvalidCertificateReplyError extends Error {}
 export class InvalidCertificateStatusError extends Error {}
 export class UndefinedRootKeyError extends Error {}
-
 export class CustomHttpAgent extends HttpAgentProvider {
   private constructor(agent: HttpAgent) {
     super(agent);
