@@ -54,10 +54,6 @@ vi.mock('@dfinity/agent', async (importOriginal) => {
   };
 });
 
-vi.mock('./custom-transform-agent', () => ({
-  customAddTransform: vi.fn(() => vi.fn())
-}));
-
 describe('CustomHttpAgent', () => {
   const mockResponse: SubmitResponse['response'] = {
     body: null,
