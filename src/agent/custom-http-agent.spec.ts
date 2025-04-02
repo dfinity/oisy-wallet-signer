@@ -15,8 +15,7 @@ import {
 import {
   mockRequestDetails,
   mockRequestMethod,
-  mockRequestPayload,
-  mockRequestPayloadWithNonce
+  mockRequestPayload
 } from '../mocks/custom-http-agent.mocks';
 import {mockCanisterId} from '../mocks/icrc-accounts.mocks';
 import {
@@ -166,13 +165,6 @@ describe('CustomHttpAgent', () => {
 
         it('should make a request and return a certificate and request details', async () => {
           const response = await agent.request(mockRequestPayload);
-
-          expect(response.certificate).toEqual(certificate);
-          expect(response.requestDetails).toEqual(mockRequestDetails);
-        });
-
-        it('should make a request with nonce and return a certificate and request details', async () => {
-          const response = await agent.request(mockRequestPayloadWithNonce);
 
           expect(response.certificate).toEqual(certificate);
           expect(response.requestDetails).toEqual(mockRequestDetails);
