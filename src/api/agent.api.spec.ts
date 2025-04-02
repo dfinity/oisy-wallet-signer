@@ -1,21 +1,30 @@
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {CustomHttpAgent} from '../agent/custom-http-agent';
+import {HttpAgentProvider} from '../agent/http-agent-provider';
 import type {SignerOptions} from '../types/signer-options';
 import {AgentApi} from './agent.api';
 
-vi.mock('../agent/custom-http-agent', async (importOriginal) => {
-  const originalModule = await importOriginal<typeof import('../agent/custom-http-agent')>();
-  return {
-    ...originalModule,
-    CustomHttpAgent: {
-      create: vi.fn().mockResolvedValue({test: 'mockCustomAgent'})
-    }
-  };
-});
+vi.mock('../agent/custom-http-agent', () => ({
+  CustomHttpAgent: {
+    create: vi.fn().mockResolvedValue({test: 'mockCustomAgent'})
+  }
+}));
+
+vi.mock('../agent/http-agent-provider', () => ({
+  HttpAgentProvider: {
+    create: vi.fn().mockResolvedValue({test: 'mockDefaultAgent'})
+  }
+}));
 
 class TestAgent extends AgentApi {
-  async getAgentTest(params: SignerOptions): Promise<CustomHttpAgent> {
-    return await this.getAgent(params);
+  async getAgentTest({
+    options,
+    type
+  }: {
+    options: SignerOptions;
+    type: 'default' | 'custom';
+  }): Promise<CustomHttpAgent | HttpAgentProvider> {
+    return await this.getAgent({options, type});
   }
 }
 
@@ -38,11 +47,11 @@ describe('AgentApi', () => {
     vi.clearAllMocks();
   });
 
-  describe('Cache', () => {
+  describe('Cache for Custom AgentApi', () => {
     const identity2 = Ed25519KeyIdentity.generate();
 
     it('should call createAgent and cache the result for the first call', async () => {
-      const agent = await agentApi.getAgentTest(signerOptions);
+      const agent = await agentApi.getAgentTest({options: signerOptions, type: 'custom'});
 
       expect(CustomHttpAgent.create).toHaveBeenCalledWith({
         identity,
@@ -52,38 +61,118 @@ describe('AgentApi', () => {
 
       expect(agent).toEqual({test: 'mockCustomAgent'});
 
-      await agentApi.getAgentTest(signerOptions);
+      await agentApi.getAgentTest({options: signerOptions, type: 'custom'});
 
       expect(CustomHttpAgent.create).toHaveBeenCalledOnce();
     });
 
     it('should create and cache a new agent for a different identity', async () => {
-      await agentApi.getAgentTest(signerOptions);
+      await agentApi.getAgentTest({options: signerOptions, type: 'custom'});
 
       const differentSignerOptions: SignerOptions = {
         owner: identity2,
         host: 'http://localhost:8080'
       };
 
-      const newAgent = await agentApi.getAgentTest(differentSignerOptions);
+      const newAgent = await agentApi.getAgentTest({
+        options: differentSignerOptions,
+        type: 'custom'
+      });
 
       expect(CustomHttpAgent.create).toHaveBeenCalledTimes(2);
-
       expect(newAgent).toEqual({test: 'mockCustomAgent'});
     });
 
-    it('should not call createAgent if the agent is already cached for the same identity', async () => {
-      await agentApi.getAgentTest(signerOptions);
+    it('should create and cache a new agent for a different identity', async () => {
+      await agentApi.getAgentTest({options: signerOptions, type: 'custom'});
 
-      await agentApi.getAgentTest(signerOptions);
+      const differentSignerOptions: SignerOptions = {
+        owner: identity2,
+        host: 'http://localhost:8080'
+      };
+
+      const newAgent = await agentApi.getAgentTest({
+        options: differentSignerOptions,
+        type: 'custom'
+      });
+
+      expect(CustomHttpAgent.create).toHaveBeenCalledTimes(2);
+      expect(newAgent).toEqual({test: 'mockCustomAgent'});
+    });
+
+    it('should not call createAgent if the agent is already cached for the same identity and type', async () => {
+      await agentApi.getAgentTest({options: signerOptions, type: 'custom'});
+
+      await agentApi.getAgentTest({options: signerOptions, type: 'custom'});
 
       expect(CustomHttpAgent.create).toHaveBeenCalledOnce();
     });
   });
 
-  describe('Host and root key', () => {
+  describe('Cache for default AgentApi', () => {
+    const identity2 = Ed25519KeyIdentity.generate();
+
+    it('should call createAgent and cache the result for the first call(custom)', async () => {
+      const agent = await agentApi.getAgentTest({options: signerOptions, type: 'default'});
+
+      expect(HttpAgentProvider.create).toHaveBeenCalledWith({
+        identity,
+        shouldFetchRootKey: true,
+        host: 'http://localhost:8080'
+      });
+
+      expect(agent).toEqual({test: 'mockDefaultAgent'});
+
+      await agentApi.getAgentTest({options: signerOptions, type: 'default'});
+
+      expect(HttpAgentProvider.create).toHaveBeenCalledOnce();
+    });
+
+    it('should call createAgent and cache the result for the first call(default)', async () => {
+      const agent = await agentApi.getAgentTest({options: signerOptions, type: 'default'});
+
+      expect(HttpAgentProvider.create).toHaveBeenCalledWith({
+        identity,
+        shouldFetchRootKey: true,
+        host: 'http://localhost:8080'
+      });
+
+      expect(agent).toEqual({test: 'mockDefaultAgent'});
+
+      await agentApi.getAgentTest({options: signerOptions, type: 'default'});
+
+      expect(HttpAgentProvider.create).toHaveBeenCalledOnce();
+    });
+
+    it('should create and cache a new agent for a different identity', async () => {
+      await agentApi.getAgentTest({options: signerOptions, type: 'default'});
+
+      const differentSignerOptions: SignerOptions = {
+        owner: identity2,
+        host: 'http://localhost:8080'
+      };
+
+      const newAgent = await agentApi.getAgentTest({
+        options: differentSignerOptions,
+        type: 'default'
+      });
+
+      expect(HttpAgentProvider.create).toHaveBeenCalledTimes(2);
+      expect(newAgent).toEqual({test: 'mockDefaultAgent'});
+    });
+
+    it('should not call createAgent if the agent is already cached for the same identity and type', async () => {
+      await agentApi.getAgentTest({options: signerOptions, type: 'default'});
+
+      await agentApi.getAgentTest({options: signerOptions, type: 'default'});
+
+      expect(HttpAgentProvider.create).toHaveBeenCalledOnce();
+    });
+  });
+
+  describe('Host and root key Custom AgentApi', () => {
     it('should call createAgent with fetchRootKey for local development (localhost)', async () => {
-      await agentApi.getAgentTest(signerOptions);
+      await agentApi.getAgentTest({options: signerOptions, type: 'custom'});
 
       expect(CustomHttpAgent.create).toHaveBeenCalledWith({
         identity,
@@ -98,7 +187,7 @@ describe('AgentApi', () => {
         host: 'https://icp-api.io'
       };
 
-      await agentApi.getAgentTest(nonLocalSignerOptions);
+      await agentApi.getAgentTest({options: nonLocalSignerOptions, type: 'custom'});
 
       expect(CustomHttpAgent.create).toHaveBeenCalledWith({
         identity,
@@ -112,7 +201,7 @@ describe('AgentApi', () => {
         owner: identity
       };
 
-      await agentApi.getAgentTest(optionsWithoutHost);
+      await agentApi.getAgentTest({options: optionsWithoutHost, type: 'custom'});
 
       expect(CustomHttpAgent.create).toHaveBeenCalledWith({
         identity,
@@ -127,9 +216,65 @@ describe('AgentApi', () => {
         host: 'http://127.0.0.1:8000'
       };
 
-      await agentApi.getAgentTest(localSignerOptions);
+      await agentApi.getAgentTest({options: localSignerOptions, type: 'custom'});
 
       expect(CustomHttpAgent.create).toHaveBeenCalledWith({
+        identity,
+        shouldFetchRootKey: true,
+        host: 'http://127.0.0.1:8000'
+      });
+    });
+  });
+
+  describe('Host and root key default AgentApi', () => {
+    it('should call createAgent with fetchRootKey for local development (localhost)', async () => {
+      await agentApi.getAgentTest({options: signerOptions, type: 'default'});
+
+      expect(HttpAgentProvider.create).toHaveBeenCalledWith({
+        identity,
+        shouldFetchRootKey: true,
+        host: 'http://localhost:8080'
+      });
+    });
+
+    it('should call createAgent without fetchRootKey for non-local host', async () => {
+      const nonLocalSignerOptions: SignerOptions = {
+        owner: identity,
+        host: 'https://icp-api.io'
+      };
+
+      await agentApi.getAgentTest({options: nonLocalSignerOptions, type: 'default'});
+
+      expect(HttpAgentProvider.create).toHaveBeenCalledWith({
+        identity,
+        host: 'https://icp-api.io',
+        shouldFetchRootKey: false
+      });
+    });
+
+    it('should default to the mainnet host if host is undefined', async () => {
+      const optionsWithoutHost: SignerOptions = {
+        owner: identity
+      };
+
+      await agentApi.getAgentTest({options: optionsWithoutHost, type: 'default'});
+
+      expect(HttpAgentProvider.create).toHaveBeenCalledWith({
+        identity,
+        host: 'https://icp-api.io',
+        shouldFetchRootKey: false
+      });
+    });
+
+    it('should call createAgent with fetchRootKey for 127.0.0.1', async () => {
+      const localSignerOptions: SignerOptions = {
+        owner: identity,
+        host: 'http://127.0.0.1:8000'
+      };
+
+      await agentApi.getAgentTest({options: localSignerOptions, type: 'default'});
+
+      expect(HttpAgentProvider.create).toHaveBeenCalledWith({
         identity,
         shouldFetchRootKey: true,
         host: 'http://127.0.0.1:8000'

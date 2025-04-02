@@ -65,7 +65,7 @@ export class Icrc21Canister extends AgentApi {
     canisterId: string | Principal;
     idlFactory: IDL.InterfaceFactory;
   } & SignerOptions): Promise<ActorSubclass<T>> {
-    const {agent} = await this.getAgent({host, owner});
+    const {agent} = await this.getDefaultAgent({host, owner});
 
     return await Actor.createActor(idlFactory, {
       agent,
