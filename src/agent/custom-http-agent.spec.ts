@@ -100,9 +100,7 @@ describe('CustomHttpAgent', () => {
 
   it('should expose the wrapped agent', async () => {
     const customAgent = await CustomHttpAgent.create({});
-
     expect(customAgent.agent).toBeDefined();
-
     expect(customAgent.agent).toBeInstanceOf(httpAgent.HttpAgent);
   });
 
@@ -152,7 +150,7 @@ describe('CustomHttpAgent', () => {
           spyCall = vi.spyOn(agent.agent, 'call').mockResolvedValue(mockRepliedSubmitResponse);
         });
 
-        it('should call agent on request without nonce', async () => {
+        it('should call agent on request', async () => {
           await agent.request(mockRequestPayload);
 
           expect(spyCall).toHaveBeenCalledOnce();
@@ -322,7 +320,7 @@ describe('CustomHttpAgent', () => {
         });
 
         describe('Valid response', () => {
-          it('should call agent on request without nonce', async () => {
+          it('should call agent on request', async () => {
             await agent.request(mockRequestPayload);
 
             expect(spyCall).toHaveBeenCalledOnce();
@@ -335,13 +333,6 @@ describe('CustomHttpAgent', () => {
 
           it('should make a request and return a certificate and request details', async () => {
             const response = await agent.request(mockRequestPayload);
-
-            expect(response.certificate).toEqual(certificate);
-            expect(response.requestDetails).toEqual(mockRequestDetails);
-          });
-
-          it('should make a request with nonce and return a certificate and request details', async () => {
-            const response = await agent.request(mockRequestPayloadWithNonce);
 
             expect(response.certificate).toEqual(certificate);
             expect(response.requestDetails).toEqual(mockRequestDetails);
@@ -432,9 +423,9 @@ describe('CustomHttpAgent', () => {
   });
 
   it('should throw an error if the arguments are not well formatted', async () => {
-    const customAgent = await CustomHttpAgent.create();
+    const agent = await CustomHttpAgent.create();
     await expect(
-      customAgent.request({
+      agent.request({
         arg: 'base64-encoded-argument',
         canisterId: mockCanisterId,
         method: mockRequestMethod
