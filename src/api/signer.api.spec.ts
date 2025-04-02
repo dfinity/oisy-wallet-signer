@@ -81,6 +81,9 @@ describe('SignerApi', () => {
 
   describe('ledgerMetadata', () => {
     describe('success', () => {
+      const ledgerCanisterMock = {
+        metadata: () => Promise.resolve(mockIcrcLedgerMetadata)
+      } as unknown as IcrcLedgerCanister;
       beforeEach(() => {
         vi.mock('../agent/http-agent-provider', () => {
           const mockBasicAgent = {
@@ -100,15 +103,11 @@ describe('SignerApi', () => {
           };
         });
 
-        const ledgerCanisterMock = {
-          metadata: () => Promise.resolve(mockIcrcLedgerMetadata)
-        } as unknown as IcrcLedgerCanister;
-
         vi.spyOn(IcrcLedgerCanister, 'create').mockImplementation(() => ledgerCanisterMock);
       });
 
       it('should call ledger metadata with a certified call', async () => {
-        const spy = vi.spyOn((await IcrcLedgerCanister.create({} as any)) as any, 'metadata');
+        const spy = vi.spyOn(ledgerCanisterMock, 'metadata');
 
         await signerApi.ledgerMetadata({
           params: {
