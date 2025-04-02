@@ -181,14 +181,16 @@ describe('CustomHttpAgent', () => {
         it('should call agent on request with nonce', async () => {
           await agent.request(mockRequestPayloadWithNonce);
 
+          const mockedNonce =
+            nonNullish(mockRequestPayloadWithNonce.nonce) &&
+            base64ToUint8Array(mockRequestPayloadWithNonce.nonce);
+
           expect(spyCall).toHaveBeenCalledOnce();
           expect(spyCall).toHaveBeenCalledWith(mockCanisterId, {
             arg: base64ToUint8Array(mockRequestPayload.arg),
             effectiveCanisterId: mockCanisterId,
             methodName: mockRequestMethod,
-            nonce:
-              nonNullish(mockRequestPayloadWithNonce.nonce) &&
-              base64ToUint8Array(mockRequestPayloadWithNonce.nonce)
+            nonce: mockedNonce
           });
         });
 
@@ -372,14 +374,16 @@ describe('CustomHttpAgent', () => {
           it('should call agent on request with nonce', async () => {
             await agent.request(mockRequestPayloadWithNonce);
 
+            const mockedNonce =
+              nonNullish(mockRequestPayloadWithNonce.nonce) &&
+              base64ToUint8Array(mockRequestPayloadWithNonce.nonce);
+
             expect(spyCall).toHaveBeenCalledOnce();
             expect(spyCall).toHaveBeenCalledWith(mockCanisterId, {
               arg: base64ToUint8Array(mockRequestPayload.arg),
               effectiveCanisterId: mockCanisterId,
               methodName: mockRequestMethod,
-              nonce:
-                nonNullish(mockRequestPayloadWithNonce.nonce) &&
-                base64ToUint8Array(mockRequestPayloadWithNonce.nonce)
+              nonce: mockedNonce
             });
           });
 
