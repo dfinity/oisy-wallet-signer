@@ -5,10 +5,10 @@ import {HttpAgent, type HttpAgentOptions} from '@dfinity/agent';
  * allows initialization and retrieval of the agent.
  */
 export class HttpAgentProvider {
-  readonly #agent: HttpAgent;
+  protected _agent: HttpAgent;
 
   protected constructor(agent: HttpAgent) {
-    this.#agent = agent;
+    this._agent = agent;
   }
 
   /**
@@ -30,6 +30,6 @@ export class HttpAgentProvider {
    * We need to expose the agent to create the actor for requesting the consent message.
    */
   get agent(): HttpAgent {
-    return this.#agent;
+    return this._agent;
   }
 }
