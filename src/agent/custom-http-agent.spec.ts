@@ -1,5 +1,6 @@
 import * as httpAgent from '@dfinity/agent';
 import {RequestId, SubmitResponse} from '@dfinity/agent';
+import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {base64ToUint8Array, uint8ArrayToBase64} from '@dfinity/utils';
 import {MockInstance} from 'vitest';
 import {
@@ -83,15 +84,24 @@ describe('CustomHttpAgent', () => {
   });
 
   it('should create a CustomHttpAgent with the correct options', async () => {
-    const agentOptions = {shouldFetchRootKey: true};
-    const agent = await CustomHttpAgent.create(agentOptions);
-    expect(agent).toBeInstanceOf(CustomHttpAgent);
+    const agentOptions = {
+      owner: Ed25519KeyIdentity.generate(),
+      host: 'http://localhost:8080',
+      shouldFetchRootKey: true
+    };
+
+    const spyCreate = vi.spyOn(httpAgent.HttpAgent, 'create');
+    const customAgent = await CustomHttpAgent.create(agentOptions);
+
+    expect(spyCreate).toHaveBeenCalledWith(agentOptions);
+
+    expect(customAgent).toBeInstanceOf(CustomHttpAgent);
   });
 
   it('should expose the wrapped agent', async () => {
-    const agent = await CustomHttpAgent.create({});
-    expect(agent.agent).toBeDefined();
-    expect(agent.agent).toBeInstanceOf(httpAgent.HttpAgent);
+    const customAgent = await CustomHttpAgent.create({});
+    expect(customAgent.agent).toBeDefined();
+    expect(customAgent.agent).toBeInstanceOf(httpAgent.HttpAgent);
   });
 
   it('should call HttpAgent.create once with the provided options', async () => {
