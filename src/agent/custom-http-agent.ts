@@ -47,7 +47,7 @@ export class CustomHttpAgent extends HttpAgentProvider {
   }: Omit<IcrcCallCanisterRequestParams, 'sender'>): Promise<CustomHttpAgentResponse> => {
     this.attachRequestNonce({nonce});
 
-    const {requestDetails, ...restResponse} = await this.agent.call(canisterId, {
+    const {requestDetails, ...restResponse} = await this._agent.call(canisterId, {
       methodName,
       arg: base64ToUint8Array(arg),
       // effectiveCanisterId is optional but, actually mandatory according SDK team.
@@ -115,13 +115,13 @@ export class CustomHttpAgent extends HttpAgentProvider {
 
     const {certificate: cert} = body;
 
-    if (isNullish(this.agent.rootKey)) {
+    if (isNullish(this._agent.rootKey)) {
       throw new UndefinedRootKeyError();
     }
 
     const certificate = await Certificate.create({
       certificate: bufFromBufLike(cert),
-      rootKey: this.agent.rootKey,
+      rootKey: this._agent.rootKey,
       canisterId: Principal.fromText(canisterId)
     });
 
@@ -178,7 +178,7 @@ export class CustomHttpAgent extends HttpAgentProvider {
     'canisterId'
   >): Promise<CustomHttpAgentResponse> {
     const {certificate} = await pollForResponseAgent(
-      this.agent,
+      this._agent,
       Principal.fromText(canisterId),
       requestId,
       defaultStrategy()
@@ -190,11 +190,11 @@ export class CustomHttpAgent extends HttpAgentProvider {
   private attachRequestNonce({nonce}: Pick<IcrcCallCanisterRequestParams, 'nonce'>): void {
     if (isNullish(nonce)) {
       // We always assign the transformer to generate a random nonce because we maintain a static reference to an agent. This ensures that even if the agent was previously configured with a transformer using a relying party's nonce, it will always generate a fresh one.
-      this.agent.addTransform('update', makeNonceTransform(makeNonce));
+      this._agent.addTransform('update', makeNonceTransform(makeNonce));
       return;
     }
 
-    this.agent.addTransform(
+    this._agent.addTransform(
       'update',
       makeNonceTransform((): Nonce => base64ToUint8Array(nonce) as Nonce)
     );
