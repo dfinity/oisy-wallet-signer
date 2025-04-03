@@ -1,12 +1,13 @@
 import {Actor} from '@dfinity/agent';
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {Principal} from '@dfinity/principal';
-import * as agent from '../agent/http-agent-provider';
 import type {
   _SERVICE as Icrc21Actor,
   icrc21_consent_message_request,
   icrc21_consent_message_response
 } from '../declarations/icrc-21';
+// eslint-disable-next-line import/no-relative-parent-imports
+import * as httpAgentProvider from '../agent/http-agent-provider';
 // eslint-disable-next-line import/no-relative-parent-imports
 import {idlFactory} from '../declarations/icrc-21.idl';
 import {mockCanisterId} from '../mocks/icrc-accounts.mocks';
@@ -145,7 +146,7 @@ describe('icrc-21.canister.api', () => {
 
       // Assert that the CustomHttpAgent is created and passed to createActor
 
-      expect(agent.HttpAgentProvider.create).toHaveBeenCalledWith({
+      expect(httpAgentProvider.HttpAgentProvider.create).toHaveBeenCalledWith({
         identity: signerOptions.owner,
         host: signerOptions.host,
         shouldFetchRootKey: true
@@ -176,7 +177,7 @@ describe('icrc-21.canister.api', () => {
 
       // Ensure that the `CustomHttpAgent.create` is only called once
 
-      expect(agent.HttpAgentProvider.create).toHaveBeenCalledOnce();
+      expect(httpAgentProvider.HttpAgentProvider.create).toHaveBeenCalledOnce();
 
       // TODO: spyOn nor function does work with vitest and Actor.createActor. Not against a better idea than disabling eslint for next line.
 
@@ -203,11 +204,11 @@ describe('icrc-21.canister.api', () => {
 
     it('should return an instance of HttpAgentProvider from getDefaultAgent', async () => {
       // @ts-expect-error: accessing protected method for test
-      const httpAgentProvider = await canister.getDefaultAgent({
+      const agent = await canister.getDefaultAgent({
         ...signerOptions
       });
 
-      expect(httpAgentProvider).toBeInstanceOf(agent);
+      expect(agent).toBeInstanceOf(httpAgentProvider.HttpAgentProvider);
     });
   });
 });
