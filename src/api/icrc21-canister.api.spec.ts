@@ -1,7 +1,7 @@
 import {Actor} from '@dfinity/agent';
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {Principal} from '@dfinity/principal';
-import {CustomHttpAgent} from '../agent/custom-http-agent';
+import {HttpAgentProvider} from '../agent/http-agent-provider';
 import type {
   _SERVICE as Icrc21Actor,
   icrc21_consent_message_request,
@@ -13,35 +13,26 @@ import {mockCanisterId} from '../mocks/icrc-accounts.mocks';
 import type {SignerOptions} from '../types/signer-options';
 import {Icrc21Canister} from './icrc21-canister.api';
 
-vi.mock('@dfinity/agent', async (importOriginal) => {
-  const originalModule = await importOriginal<typeof import('@dfinity/agent')>();
-
+vi.mock('@dfinity/agent', () => {
   const mockActor = {test: 123};
 
   return {
-    ...originalModule,
     Actor: {
-      ...originalModule.Actor,
       createActor: vi.fn().mockResolvedValue(mockActor)
     },
     createSync: vi.fn()
   };
 });
 
-vi.mock('../agent/custom-http-agent', async (importOriginal) => {
-  const mockAgent = {test: 456};
-
-  const mockCustomAgent = {
-    get agent() {
-      return mockAgent;
-    }
-  };
+vi.mock('../agent/http-agent-provider', () => {
+  class MockHttpAgentProvider {
+    static create = vi.fn().mockResolvedValue({
+      agent: {test: 456}
+    });
+  }
 
   return {
-    ...(await importOriginal<typeof import('../agent/custom-http-agent')>()),
-    CustomHttpAgent: {
-      create: vi.fn().mockResolvedValue(mockCustomAgent)
-    }
+    HttpAgentProvider: MockHttpAgentProvider
   };
 });
 
@@ -148,7 +139,7 @@ describe('icrc-21.canister.api', () => {
 
       // Assert that the CustomHttpAgent is created and passed to createActor
 
-      expect(CustomHttpAgent.create).toHaveBeenCalledWith({
+      expect(HttpAgentProvider.create).toHaveBeenCalledWith({
         identity: signerOptions.owner,
         host: signerOptions.host,
         shouldFetchRootKey: true
@@ -179,7 +170,7 @@ describe('icrc-21.canister.api', () => {
 
       // Ensure that the `CustomHttpAgent.create` is only called once
 
-      expect(CustomHttpAgent.create).toHaveBeenCalledOnce();
+      expect(HttpAgentProvider.create).toHaveBeenCalledOnce();
 
       // TODO: spyOn nor function does work with vitest and Actor.createActor. Not against a better idea than disabling eslint for next line.
 
