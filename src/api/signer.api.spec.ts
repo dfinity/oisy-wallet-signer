@@ -3,6 +3,7 @@ import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {IcrcLedgerCanister} from '@dfinity/ledger-icrc';
 import {Principal} from '@dfinity/principal';
 import {uint8ArrayToBase64} from '@dfinity/utils';
+import {CustomHttpAgent} from '../agent/custom-http-agent';
 import {mockCallCanisterSuccess} from '../mocks/call-canister.mocks';
 import {mockRepliedLocalCertificate} from '../mocks/custom-http-agent-responses.mocks';
 import {mockRequestDetails, mockRequestPayload} from '../mocks/custom-http-agent.mocks';
@@ -10,7 +11,27 @@ import {mockIcrcLedgerMetadata} from '../mocks/icrc-ledger.mocks';
 import type {SignerOptions} from '../types/signer-options';
 import {SignerApi} from './signer.api';
 
-describe('SignerApi', () => {
+vi.mock('../agent/custom-http-agent', async (importOriginal) => {
+  const mockCustomAgent = {
+    get agent() {
+      return {};
+    },
+
+    request: vi.fn(() => ({
+      certificate: httpAgent.fromHex(mockRepliedLocalCertificate),
+      requestDetails: mockRequestDetails
+    }))
+  };
+
+  return {
+    ...(await importOriginal<typeof import('../agent/custom-http-agent')>()),
+    CustomHttpAgent: {
+      create: vi.fn().mockResolvedValue(mockCustomAgent)
+    }
+  };
+});
+
+describe('Signer-api', () => {
   const identity = Ed25519KeyIdentity.generate();
 
   const signerOptions: SignerOptions = {
@@ -29,26 +50,6 @@ describe('SignerApi', () => {
   });
 
   describe('call', () => {
-    beforeEach(() => {
-      vi.mock('../agent/custom-http-agent', () => {
-        const mockCustomAgent = {
-          get agent() {
-            return {};
-          },
-          request: vi.fn(() => ({
-            certificate: httpAgent.fromHex(mockRepliedLocalCertificate),
-            requestDetails: mockRequestDetails
-          }))
-        };
-
-        return {
-          CustomHttpAgent: {
-            create: vi.fn().mockResolvedValue(mockCustomAgent)
-          }
-        };
-      });
-    });
-
     it('should call request and return the properly encoded result', async () => {
       const result = await signerApi.call({
         params: {
@@ -62,7 +63,7 @@ describe('SignerApi', () => {
     });
 
     it('should call request with nonce if nonce is provided', async () => {
-      const agent = await (await import('../agent/custom-http-agent')).CustomHttpAgent.create();
+      const agent = await CustomHttpAgent.create();
       const spy = vi.spyOn(agent, 'request');
       const nonce = uint8ArrayToBase64(httpAgent.makeNonce());
 
@@ -84,25 +85,8 @@ describe('SignerApi', () => {
       const ledgerCanisterMock = {
         metadata: () => Promise.resolve(mockIcrcLedgerMetadata)
       } as unknown as IcrcLedgerCanister;
+
       beforeEach(() => {
-        vi.mock('../agent/http-agent-provider', () => {
-          const mockBasicAgent = {
-            get agent() {
-              return {};
-            },
-            request: vi.fn(() => ({
-              certificate: httpAgent.fromHex(mockRepliedLocalCertificate),
-              requestDetails: mockRequestDetails
-            }))
-          };
-
-          return {
-            HttpAgentProvider: {
-              create: vi.fn().mockResolvedValue(mockBasicAgent)
-            }
-          };
-        });
-
         vi.spyOn(IcrcLedgerCanister, 'create').mockImplementation(() => ledgerCanisterMock);
       });
 
@@ -153,11 +137,11 @@ describe('SignerApi', () => {
     describe('error', () => {
       const mockError = new Error('Test');
 
-      beforeEach(() => {
-        const ledgerCanisterMock = {
-          metadata: () => Promise.reject(mockError)
-        } as unknown as IcrcLedgerCanister;
+      const ledgerCanisterMock = {
+        metadata: () => Promise.reject(mockError)
+      } as unknown as IcrcLedgerCanister;
 
+      beforeEach(() => {
         vi.spyOn(IcrcLedgerCanister, 'create').mockImplementation(() => ledgerCanisterMock);
       });
 
