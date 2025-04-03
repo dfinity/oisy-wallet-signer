@@ -1,12 +1,12 @@
 import {Actor} from '@dfinity/agent';
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {Principal} from '@dfinity/principal';
+import * as httpAgentProvider from '../agent/http-agent-provider';
 import type {
   _SERVICE as Icrc21Actor,
   icrc21_consent_message_request,
   icrc21_consent_message_response
 } from '../declarations/icrc-21';
-import * as httpAgentProvider from '../agent/http-agent-provider';
 // eslint-disable-next-line import/no-relative-parent-imports
 import {idlFactory} from '../declarations/icrc-21.idl';
 import {mockCanisterId} from '../mocks/icrc-accounts.mocks';
