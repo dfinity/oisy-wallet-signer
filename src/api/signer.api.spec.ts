@@ -3,6 +3,7 @@ import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {IcrcLedgerCanister} from '@dfinity/ledger-icrc';
 import {Principal} from '@dfinity/principal';
 import {uint8ArrayToBase64} from '@dfinity/utils';
+import * as customAgent from '../agent/custom-http-agent';
 import {mockCallCanisterSuccess} from '../mocks/call-canister.mocks';
 import {mockRepliedLocalCertificate} from '../mocks/custom-http-agent-responses.mocks';
 import {mockRequestDetails, mockRequestPayload} from '../mocks/custom-http-agent.mocks';
@@ -62,7 +63,7 @@ describe('SignerApi', () => {
     });
 
     it('should call request with nonce if nonce is provided', async () => {
-      const agent = await (await import('../agent/custom-http-agent')).CustomHttpAgent.create();
+      const agent = await customAgent.CustomHttpAgent.create();
       const spy = vi.spyOn(agent, 'request');
       const nonce = uint8ArrayToBase64(httpAgent.makeNonce());
 
