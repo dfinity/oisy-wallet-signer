@@ -27,7 +27,7 @@ export abstract class AgentApi {
 
       return agent;
     }
-    
+
     return this.#agents[key];
   }
 
@@ -37,7 +37,7 @@ export abstract class AgentApi {
   }: {
     options: SignerOptions;
     type: 'default' | 'custom';
-  }): Promise<HttpAgentProvider> {
+  }): Promise<HttpAgentProvider | CustomHttpAgent> {
     const {hostname} = new URL(host ?? MAINNET_REPLICA_URL);
     const shouldFetchRootKey = ['localhost', '127.0.0.1'].includes(hostname);
     const createOptions = {
@@ -53,9 +53,8 @@ export abstract class AgentApi {
   }
 
   /**
-   * Returns a default `HttpAgentProvider` instance for the given signer options.
-   * This agent does NOT include custom transforms and is suitable for certified calls
-   * like ledger metadata, where transforms should be avoided.
+   *Returns a default `HttpAgentProvider` instance for the given signer options.
+   *This agent does not overwrite any default features provided by agent-js.
    *
    * @param {SignerOptions} options - The signer configuration including identity and host.
    * @returns {Promise<HttpAgentProvider>} - A promise that resolves to a default agent instance.
@@ -66,8 +65,7 @@ export abstract class AgentApi {
 
   /**
    * Returns a `CustomHttpAgent` instance for the given signer options.
-   * This agent includes custom transforms and is intended for update or query calls
-   * where the custom behavior is needed.
+   * This agent uses custom transforms that are notably used to handle nonce in calls.
    *
    * @param {SignerOptions} options - The signer configuration including identity and host.
    * @returns {Promise<CustomHttpAgent>} - A promise that resolves to a custom agent instance.
