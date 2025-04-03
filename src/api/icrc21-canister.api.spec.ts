@@ -1,7 +1,7 @@
 import {Actor} from '@dfinity/agent';
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {Principal} from '@dfinity/principal';
-import {HttpAgentProvider} from '../agent/http-agent-provider';
+import * as agent from '../agent/http-agent-provider';
 import type {
   _SERVICE as Icrc21Actor,
   icrc21_consent_message_request,
@@ -13,11 +13,15 @@ import {mockCanisterId} from '../mocks/icrc-accounts.mocks';
 import type {SignerOptions} from '../types/signer-options';
 import {Icrc21Canister} from './icrc21-canister.api';
 
-vi.mock('@dfinity/agent', () => {
+vi.mock('@dfinity/agent', async (importOriginal) => {
+  const originalModule = await importOriginal<typeof import('@dfinity/agent')>();
+
   const mockActor = {test: 123};
 
   return {
+    ...originalModule,
     Actor: {
+      ...originalModule.Actor,
       createActor: vi.fn().mockResolvedValue(mockActor)
     },
     createSync: vi.fn()
@@ -25,14 +29,16 @@ vi.mock('@dfinity/agent', () => {
 });
 
 vi.mock('../agent/http-agent-provider', () => {
-  class MockHttpAgentProvider {
-    static create = vi.fn().mockResolvedValue({
-      agent: {test: 456}
-    });
+  class HttpAgentProvider {
+    get agent() {
+      return {test: 456};
+    }
+
+    static create = vi.fn().mockImplementation(() => new HttpAgentProvider());
   }
 
   return {
-    HttpAgentProvider: MockHttpAgentProvider
+    HttpAgentProvider
   };
 });
 
@@ -139,7 +145,7 @@ describe('icrc-21.canister.api', () => {
 
       // Assert that the CustomHttpAgent is created and passed to createActor
 
-      expect(HttpAgentProvider.create).toHaveBeenCalledWith({
+      expect(agent.HttpAgentProvider.create).toHaveBeenCalledWith({
         identity: signerOptions.owner,
         host: signerOptions.host,
         shouldFetchRootKey: true
@@ -170,7 +176,7 @@ describe('icrc-21.canister.api', () => {
 
       // Ensure that the `CustomHttpAgent.create` is only called once
 
-      expect(HttpAgentProvider.create).toHaveBeenCalledOnce();
+      expect(agent.HttpAgentProvider.create).toHaveBeenCalledOnce();
 
       // TODO: spyOn nor function does work with vitest and Actor.createActor. Not against a better idea than disabling eslint for next line.
 
@@ -193,6 +199,15 @@ describe('icrc-21.canister.api', () => {
       // TODO: spyOn nor function does work with vitest and Actor.createActor. Not against a better idea than disabling eslint for next line.
 
       expect(Actor.createActor).toHaveBeenCalledTimes(2);
+    });
+
+    it('should return an instance of HttpAgentProvider from getDefaultAgent', async () => {
+      // @ts-expect-error: accessing protected method for test
+      const httpAgentProvider = await canister.getDefaultAgent({
+        ...signerOptions
+      });
+
+      expect(httpAgentProvider).toBeInstanceOf(agent);
     });
   });
 });
