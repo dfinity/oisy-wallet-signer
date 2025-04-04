@@ -4,6 +4,7 @@ import {IcrcLedgerCanister} from '@dfinity/ledger-icrc';
 import {Principal} from '@dfinity/principal';
 import {uint8ArrayToBase64} from '@dfinity/utils';
 import * as customAgent from '../agent/custom-http-agent';
+import * as defaultAgent from '../agent/http-agent-provider';
 import {mockCallCanisterSuccess} from '../mocks/call-canister.mocks';
 import {mockRepliedLocalCertificate} from '../mocks/custom-http-agent-responses.mocks';
 import {mockRequestDetails, mockRequestPayload} from '../mocks/custom-http-agent.mocks';
@@ -161,11 +162,11 @@ describe('SignerApi', () => {
       });
       it('should return an instance of HttpAgentProvider from getDefaultAgent', async () => {
         // @ts-expect-error: accessing protected method for test
-        const agent = await signerApi.getCustomAgent({
+        const agent = await signerApi.getDefaultAgent({
           ...signerOptions
         });
 
-        expect(agent).toBeInstanceOf(customAgent.CustomHttpAgent);
+        expect(agent).toBeInstanceOf(defaultAgent.HttpAgentProvider);
       });
     });
 
