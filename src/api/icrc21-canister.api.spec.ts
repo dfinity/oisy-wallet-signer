@@ -1,7 +1,7 @@
 import {Actor} from '@dfinity/agent';
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {Principal} from '@dfinity/principal';
-import {CustomHttpAgent} from '../agent/custom-http-agent';
+import * as httpAgentProvider from '../agent/http-agent-provider';
 import type {
   _SERVICE as Icrc21Actor,
   icrc21_consent_message_request,
@@ -28,20 +28,17 @@ vi.mock('@dfinity/agent', async (importOriginal) => {
   };
 });
 
-vi.mock('../agent/custom-http-agent', async (importOriginal) => {
-  const mockAgent = {test: 456};
-
-  const mockCustomAgent = {
+vi.mock('../agent/http-agent-provider', () => {
+  class HttpAgentProvider {
     get agent() {
-      return mockAgent;
+      return {test: 456};
     }
-  };
+
+    static create = vi.fn().mockImplementation(() => new HttpAgentProvider());
+  }
 
   return {
-    ...(await importOriginal<typeof import('../agent/custom-http-agent')>()),
-    CustomHttpAgent: {
-      create: vi.fn().mockResolvedValue(mockCustomAgent)
-    }
+    HttpAgentProvider
   };
 });
 
@@ -148,7 +145,7 @@ describe('icrc-21.canister.api', () => {
 
       // Assert that the CustomHttpAgent is created and passed to createActor
 
-      expect(CustomHttpAgent.create).toHaveBeenCalledWith({
+      expect(httpAgentProvider.HttpAgentProvider.create).toHaveBeenCalledWith({
         identity: signerOptions.owner,
         host: signerOptions.host,
         shouldFetchRootKey: true
@@ -179,7 +176,7 @@ describe('icrc-21.canister.api', () => {
 
       // Ensure that the `CustomHttpAgent.create` is only called once
 
-      expect(CustomHttpAgent.create).toHaveBeenCalledOnce();
+      expect(httpAgentProvider.HttpAgentProvider.create).toHaveBeenCalledOnce();
 
       // TODO: spyOn nor function does work with vitest and Actor.createActor. Not against a better idea than disabling eslint for next line.
 
@@ -202,6 +199,15 @@ describe('icrc-21.canister.api', () => {
       // TODO: spyOn nor function does work with vitest and Actor.createActor. Not against a better idea than disabling eslint for next line.
 
       expect(Actor.createActor).toHaveBeenCalledTimes(2);
+    });
+
+    it('should return an instance of HttpAgentProvider from getDefaultAgent', async () => {
+      // @ts-expect-error: accessing protected method for test
+      const agent = await canister.getDefaultAgent({
+        ...signerOptions
+      });
+
+      expect(agent).toBeInstanceOf(httpAgentProvider.HttpAgentProvider);
     });
   });
 });
