@@ -32,20 +32,21 @@ describe('SignerApi', () => {
   describe('call', () => {
     beforeEach(() => {
       vi.mock('../agent/custom-http-agent', () => {
-        const mockCustomAgent = {
+        class CustomHttpAgent {
           get agent() {
             return {};
-          },
-          request: vi.fn(() => ({
+          }
+
+          request = vi.fn(() => ({
             certificate: httpAgent.fromHex(mockRepliedLocalCertificate),
             requestDetails: mockRequestDetails
-          }))
-        };
+          }));
+
+          static create = vi.fn().mockResolvedValue(new CustomHttpAgent());
+        }
 
         return {
-          CustomHttpAgent: {
-            create: vi.fn().mockResolvedValue(mockCustomAgent)
-          }
+          CustomHttpAgent
         };
       });
     });
@@ -78,6 +79,14 @@ describe('SignerApi', () => {
 
       expect(spy).toHaveBeenCalledWith(expect.objectContaining({nonce}));
     });
+    it('should return an instance of CustomHttpAgent from getCustomAgent', async () => {
+      // @ts-expect-error: accessing protected method for test
+      const agent = await signerApi.getCustomAgent({
+        ...signerOptions
+      });
+
+      expect(agent).toBeInstanceOf(customAgent.CustomHttpAgent);
+    });
   });
 
   describe('ledgerMetadata', () => {
@@ -87,20 +96,21 @@ describe('SignerApi', () => {
       } as unknown as IcrcLedgerCanister;
       beforeEach(() => {
         vi.mock('../agent/http-agent-provider', () => {
-          const mockBasicAgent = {
+          class HttpAgentProvider {
             get agent() {
               return {};
-            },
-            request: vi.fn(() => ({
+            }
+
+            request = vi.fn(() => ({
               certificate: httpAgent.fromHex(mockRepliedLocalCertificate),
               requestDetails: mockRequestDetails
-            }))
-          };
+            }));
+
+            static create = vi.fn().mockResolvedValue(new HttpAgentProvider());
+          }
 
           return {
-            HttpAgentProvider: {
-              create: vi.fn().mockResolvedValue(mockBasicAgent)
-            }
+            HttpAgentProvider
           };
         });
 
@@ -148,6 +158,14 @@ describe('SignerApi', () => {
         });
 
         expect(result).toEqual(mockIcrcLedgerMetadata);
+      });
+      it('should return an instance of HttpAgentProvider from getDefaultAgent', async () => {
+        // @ts-expect-error: accessing protected method for test
+        const agent = await signerApi.getCustomAgent({
+          ...signerOptions
+        });
+
+        expect(agent).toBeInstanceOf(customAgent.CustomHttpAgent);
       });
     });
 
