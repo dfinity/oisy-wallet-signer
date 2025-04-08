@@ -31,7 +31,7 @@
 		"@junobuild/vite-plugin": "^2.0.0",
 		"@rollup/plugin-inject": "^5.0.5",
 		"@sveltejs/adapter-static": "^3.0.8",
-		"@sveltejs/kit": "^2.20.2",
+		"@sveltejs/kit": "^2.20.4",
 		"@sveltejs/vite-plugin-svelte": "^5.0.3",
 		"@tailwindcss/vite": "^4.0.17",
 		"@types/node": "^22.13.13",
