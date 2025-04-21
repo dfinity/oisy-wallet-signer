@@ -130,14 +130,14 @@ export class RelyingParty {
       throw new Error(`Options cannot be parsed: ${error?.message ?? ''}`);
     }
 
-    const {url, windowOptions, connectionOptions} = options;
+    const {url, windowOptions, connectionOptions, target} = options;
 
     const popupFeatures =
       typeof windowOptions === 'string'
         ? windowOptions
         : windowFeatures(windowOptions ?? DEFAULT_SIGNER_WINDOW_TOP_RIGHT);
 
-    const popup = window.open(url, 'relyingPartyWindow', popupFeatures);
+    const popup = window.open(url, target ?? 'relyingPartyWindow', popupFeatures);
 
     assertNonNullish(popup, 'Unable to open the signer window.');
 

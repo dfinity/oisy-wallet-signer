@@ -60,6 +60,8 @@ export const RelyingPartyOptionsSchema = z.object({
    */
   url: UrlSchema,
 
+  target: z.string().optional(),
+
   /**
    * Optional window options to display the signer, which can be an object of type WindowOptions or a string.
    * If a string is passed, those are applied as-is to the window that is opened (see https://developer.mozilla.org/en-US/docs/Web/API/Window/open#windowfeatures for more information).
