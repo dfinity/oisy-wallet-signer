@@ -58,7 +58,13 @@ export const RelyingPartyOptionsSchema = z.object({
   /**
    * The URL of the signer.
    */
-  url: UrlSchema,
+  // TODO: add x-safari- hack toUrlSchema
+  // {
+  //   "code": "custom",
+  //   "message": "Invalid URL.",
+  //   "path": ["url"]
+  // }
+  url: z.string(),
 
   target: z.string().optional(),
 
