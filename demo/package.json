@@ -57,7 +57,7 @@
 		"@dfinity/ledger-icp": "^2.6.11",
 		"@dfinity/ledger-icrc": "^2.7.6",
 		"@dfinity/principal": "^2.4.0",
-		"@dfinity/utils": "^2.11.0",
+		"@dfinity/utils": "^2.13.0",
 		"buffer": "^6.0.3",
 		"zod": "^3.24.2"
 	},
