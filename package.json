@@ -97,7 +97,7 @@
     "@dfinity/ledger-icp": "^2",
     "@dfinity/ledger-icrc": "^2",
     "@dfinity/principal": "^2.4.0",
-    "@dfinity/utils": "^2",
+    "@dfinity/utils": "^2.13.0",
     "@dfinity/zod-schemas": "*",
     "borc": "^2.1.1",
     "simple-cbor": "^0.4.1",
