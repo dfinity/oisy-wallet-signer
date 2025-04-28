@@ -1,8 +1,7 @@
 import {Expiry, HttpAgentRequest, HttpAgentRequestTransformFn} from '@dfinity/agent';
-import {isNullish, nowInBigIntNanoSeconds, uint8ArrayToBase64} from '@dfinity/utils';
+import {hashObject, isNullish, nowInBigIntNanoSeconds, uint8ArrayToBase64} from '@dfinity/utils';
 import {HexString} from '../types/hex-string';
 import {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
-import {generateHash} from '../utils/crypto.utils';
 
 /**
  * A custom transform function that processes the HTTP agent request.
@@ -36,7 +35,7 @@ export const customAddTransform = (): HttpAgentRequestTransformFn => {
       nonce: uint8ArrayToBase64(nonce)
     };
 
-    const hash = await generateHash(hashRequestData);
+    const hash = await hashObject(hashRequestData);
     const cachedExpiry = cache.get(hash);
 
     if (isNullish(cachedExpiry)) {
