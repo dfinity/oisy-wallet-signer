@@ -41,8 +41,8 @@ import {
   RelyingPartyResponseError
 } from './types/relying-party-errors';
 import {
-  type RelyingPartyHost,
   RelyingPartyOptionsSchema,
+  type RelyingPartyHost,
   type RelyingPartyOptions
 } from './types/relying-party-options';
 import {

@@ -1,10 +1,10 @@
 import {
-  type CallRequest,
   Certificate,
   HttpAgent,
   defaultStrategy,
   lookupResultToBuffer,
   pollForResponse as pollForResponseAgent,
+  type CallRequest,
   type HttpAgentOptions,
   type SubmitResponse
 } from '@dfinity/agent';

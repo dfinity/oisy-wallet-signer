@@ -1,5 +1,5 @@
-import * as httpAgent from '@dfinity/agent';
 import type {RequestId, SubmitResponse} from '@dfinity/agent';
+import * as httpAgent from '@dfinity/agent';
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {base64ToUint8Array, nonNullish} from '@dfinity/utils';
 import type {MockInstance} from 'vitest';

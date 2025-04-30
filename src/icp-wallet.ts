@@ -1,11 +1,11 @@
 import {
-  type BlockHeight,
-  type Icrc2ApproveRequest,
   mapIcrc1TransferError,
   mapIcrc2ApproveError,
   toIcrc1TransferRawRequest,
   toIcrc2ApproveRawRequest,
-  type Icrc1TransferRequest
+  type BlockHeight,
+  type Icrc1TransferRequest,
+  type Icrc2ApproveRequest
 } from '@dfinity/ledger-icp';
 import type {
   Icrc1TransferResult,

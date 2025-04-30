@@ -1,12 +1,12 @@
 import {
-  type ApproveParams,
-  type IcrcBlockIndex,
-  type TransferFromParams,
-  type TransferParams,
   IcrcTransferError,
   toApproveArgs,
   toTransferArg,
-  toTransferFromArgs
+  toTransferFromArgs,
+  type ApproveParams,
+  type IcrcBlockIndex,
+  type TransferFromParams,
+  type TransferParams
 } from '@dfinity/ledger-icrc';
 import type {
   ApproveError,

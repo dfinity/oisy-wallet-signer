@@ -10,7 +10,11 @@ import type {
 } from '../declarations/icrc-2';
 import type {icrc21_consent_info} from '../declarations/icrc-21';
 import type {I18n} from '../types/i18n';
-import type {SignerBuilderFn, SignerBuilderParams, SignerBuildersResult} from '../types/signer-builders';
+import type {
+  SignerBuilderFn,
+  SignerBuilderParams,
+  SignerBuildersResult
+} from '../types/signer-builders';
 import {decodeMemo} from '../utils/builders.utils';
 import {formatAmount, formatDate} from '../utils/format.utils';
 import {decodeIdl} from '../utils/idl.utils';
