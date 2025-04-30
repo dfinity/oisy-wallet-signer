@@ -40,7 +40,7 @@ import {IcrcPermissionStateSchema, type IcrcScopedMethod} from './types/icrc-sta
 import type {Origin} from './types/post-message';
 import {JSON_RPC_VERSION_2} from './types/rpc';
 import type {SignerMessageEventData} from './types/signer';
-import type {SignerOptions} from './types/signer-options';
+import type {IdentityNotAnonymous, SignerInitOptions} from './types/signer-options';
 import {
   AccountsPromptSchema,
   CallCanisterPromptSchema,
@@ -59,15 +59,15 @@ import {mapIcrc21ErrorToString} from './utils/icrc-21.utils';
 import {del, get} from './utils/storage.utils';
 
 describe('Signer', () => {
-  const owner = Ed25519KeyIdentity.generate();
+  const owner: IdentityNotAnonymous = Ed25519KeyIdentity.generate();
 
-  const signerOptions: SignerOptions = {
-    owner,
+  const signerOptions: SignerInitOptions = {
     host: 'http://localhost:4943'
   };
 
   it('should init a signer', () => {
     const signer = Signer.init(signerOptions);
+    signer.setOwner({owner});
     expect(signer).toBeInstanceOf(Signer);
     signer.disconnect();
   });
@@ -76,6 +76,7 @@ describe('Signer', () => {
     const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
 
     const signer = Signer.init(signerOptions);
+    signer.setOwner({owner});
     expect(addEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
     signer.disconnect();
   });
@@ -84,6 +85,7 @@ describe('Signer', () => {
     const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
 
     const signer = Signer.init(signerOptions);
+    signer.setOwner({owner});
     signer.disconnect();
 
     expect(removeEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
@@ -93,6 +95,7 @@ describe('Signer', () => {
     const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
 
     const signer = Signer.init(signerOptions);
+    signer.setOwner({owner});
     signer.disconnect();
 
     expect(removeEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
@@ -110,6 +113,7 @@ describe('Signer', () => {
 
     beforeEach(() => {
       signer = Signer.init(signerOptions);
+      signer.setOwner({owner});
       onMessageListenerSpy = vi.spyOn(signer as unknown as {onMessage: () => void}, 'onMessage');
     });
 
@@ -163,6 +167,7 @@ describe('Signer', () => {
 
     beforeEach(() => {
       signer = Signer.init(signerOptions);
+      signer.setOwner({owner});
       notifyReadySpy = vi.spyOn(signerSuccessHandlers, 'notifyReady');
       postMessageMock = vi.fn();
       vi.stubGlobal('opener', {postMessage: postMessageMock});
@@ -387,6 +392,7 @@ describe('Signer', () => {
 
       beforeEach(() => {
         signer = Signer.init(signerOptions);
+        signer.setOwner({owner});
       });
 
       afterEach(() => {
@@ -655,7 +661,7 @@ describe('Signer', () => {
           });
 
           it('should notify permissions already confirmed and saved in local storage for icrc25_permissions plus default permissions with ask_on_use', () => {
-            const owner = signerOptions.owner.getPrincipal();
+            const ownerIdentity = owner.getPrincipal();
 
             const scopes: IcrcScopesArray = [
               {
@@ -667,7 +673,7 @@ describe('Signer', () => {
             ];
 
             saveSessionScopes({
-              owner,
+              owner: ownerIdentity,
               origin: testOrigin,
               scopes
             });
@@ -691,11 +697,11 @@ describe('Signer', () => {
               testOrigin
             );
 
-            del({key: `oisy_signer_${testOrigin}_${owner.toText()}`});
+            del({key: `oisy_signer_${testOrigin}_${ownerIdentity.toText()}`});
           });
 
           it('should notify permissions as ask_on_use if expired plus default permissions with ask_on_use as well', () => {
-            const owner = signerOptions.owner.getPrincipal();
+            const owner = Ed25519KeyIdentity.generate().getPrincipal();
 
             const scopes: IcrcScopesArray = [
               {
@@ -1030,7 +1036,7 @@ describe('Signer', () => {
             ];
 
             saveSessionScopes({
-              owner: signerOptions.owner.getPrincipal(),
+              owner: owner.getPrincipal(),
               origin: testOrigin,
               scopes
             });
@@ -1096,7 +1102,7 @@ describe('Signer', () => {
             ];
 
             saveSessionScopes({
-              owner: signerOptions.owner.getPrincipal(),
+              owner: owner.getPrincipal(),
               origin: testOrigin,
               scopes
             });
@@ -1224,7 +1230,7 @@ describe('Signer', () => {
         ];
 
         afterEach(() => {
-          del({key: `oisy_signer_${testOrigin}_${signerOptions.owner.getPrincipal().toText()}`});
+          del({key: `oisy_signer_${testOrigin}_${owner.getPrincipal().toText()}`});
         });
 
         describe.each(testParams)('$method', ({method, requestData}) => {
@@ -1289,7 +1295,7 @@ describe('Signer', () => {
               });
 
               saveSessionScopes({
-                owner: signerOptions.owner.getPrincipal(),
+                owner: owner.getPrincipal(),
                 origin: testOrigin,
                 scopes: [
                   {
@@ -1376,7 +1382,7 @@ describe('Signer', () => {
 
               await vi.waitFor(() => {
                 const storedScopes: SessionPermissions | undefined = get({
-                  key: `oisy_signer_${testOrigin}_${signerOptions.owner.getPrincipal().toText()}`
+                  key: `oisy_signer_${testOrigin}_${owner.getPrincipal().toText()}`
                 });
 
                 expect(storedScopes).not.toBeUndefined();
@@ -1518,7 +1524,7 @@ describe('Signer', () => {
               });
 
               saveSessionScopes({
-                owner: signerOptions.owner.getPrincipal(),
+                owner: owner.getPrincipal(),
                 origin: testOrigin,
                 scopes: [
                   {
@@ -1624,7 +1630,7 @@ describe('Signer', () => {
               });
 
               saveSessionScopes({
-                owner: signerOptions.owner.getPrincipal(),
+                owner: owner.getPrincipal(),
                 origin: testOrigin,
                 scopes: [
                   {
@@ -1836,7 +1842,7 @@ describe('Signer', () => {
                   });
 
                   saveSessionScopes({
-                    owner: signerOptions.owner.getPrincipal(),
+                    owner: owner.getPrincipal(),
                     origin: testOrigin,
                     scopes: [
                       {
@@ -1886,7 +1892,7 @@ describe('Signer', () => {
                   });
 
                   saveSessionScopes({
-                    owner: signerOptions.owner.getPrincipal(),
+                    owner: owner.getPrincipal(),
                     origin: testOrigin,
                     scopes: [
                       {
@@ -1964,7 +1970,7 @@ describe('Signer', () => {
                   });
 
                   saveSessionScopes({
-                    owner: signerOptions.owner.getPrincipal(),
+                    owner: owner.getPrincipal(),
                     origin: testOrigin,
                     scopes: [
                       {
@@ -2025,7 +2031,7 @@ describe('Signer', () => {
                   });
 
                   saveSessionScopes({
-                    owner: signerOptions.owner.getPrincipal(),
+                    owner: owner.getPrincipal(),
                     origin: testOrigin,
                     scopes: [
                       {
@@ -2102,7 +2108,7 @@ describe('Signer', () => {
                   });
 
                   saveSessionScopes({
-                    owner: signerOptions.owner.getPrincipal(),
+                    owner: owner.getPrincipal(),
                     origin: testOrigin,
                     scopes: [
                       {
@@ -2141,7 +2147,7 @@ describe('Signer', () => {
                   });
 
                   saveSessionScopes({
-                    owner: signerOptions.owner.getPrincipal(),
+                    owner: owner.getPrincipal(),
                     origin: testOrigin,
                     scopes: [
                       {
@@ -2191,6 +2197,7 @@ describe('Signer', () => {
 
                     expect(spyCanisterCall).toHaveBeenCalledWith({
                       ...signerOptions,
+                      owner,
                       params: {
                         ...mockCallCanisterParams,
                         sender: owner.getPrincipal().toText()
@@ -2229,6 +2236,7 @@ describe('Signer', () => {
 
                     expect(spyCanisterCall).toHaveBeenCalledWith({
                       ...signerOptions,
+                      owner,
                       params: {
                         ...mockCallCanisterParams,
                         sender: owner.getPrincipal().toText()
@@ -2401,7 +2409,7 @@ describe('Signer', () => {
         it('should save permissions in storage', async () => {
           payload.confirm(scopes);
 
-          const expectedKey = `oisy_signer_${testOrigin}_${signerOptions.owner.getPrincipal().toText()}`;
+          const expectedKey = `oisy_signer_${testOrigin}_${owner.getPrincipal().toText()}`;
           const expectedData = {
             scopes: scopes.map((scope) => ({
               ...scope,
@@ -2433,6 +2441,7 @@ describe('Signer', () => {
             sessionPermissionExpirationInMilliseconds
           }
         });
+        signerWithOptions.setOwner({owner});
       });
 
       afterEach(() => {
@@ -2451,7 +2460,7 @@ describe('Signer', () => {
         });
 
         describe('Permissions', () => {
-          const owner = signerOptions.owner.getPrincipal();
+          const ownerIdentity = owner.getPrincipal();
 
           const scopes: IcrcScopesArray = [
             {
@@ -2464,7 +2473,7 @@ describe('Signer', () => {
 
           it('should notify permissions granted if still not expired', () => {
             saveSessionScopes({
-              owner,
+              owner: ownerIdentity,
               origin: testOrigin,
               scopes
             });
@@ -2490,12 +2499,12 @@ describe('Signer', () => {
               testOrigin
             );
 
-            del({key: `oisy_signer_${testOrigin}_${owner.toText()}`});
+            del({key: `oisy_signer_${testOrigin}_${ownerIdentity.toText()}`});
           });
 
           it('should notify expired permissions with ask_on_use', () => {
             saveSessionScopes({
-              owner,
+              owner: ownerIdentity,
               origin: testOrigin,
               scopes
             });
@@ -2524,7 +2533,7 @@ describe('Signer', () => {
               testOrigin
             );
 
-            del({key: `oisy_signer_${testOrigin}_${owner.toText()}`});
+            del({key: `oisy_signer_${testOrigin}_${ownerIdentity.toText()}`});
           });
         });
       });
@@ -2536,6 +2545,7 @@ describe('Signer', () => {
 
     beforeEach(() => {
       signer = Signer.init(signerOptions);
+      signer.setOwner({owner});
     });
 
     afterEach(() => {
@@ -2617,6 +2627,76 @@ describe('Signer', () => {
       }).toThrowError(
         'The specified method is not supported. Please ensure you are using a supported standard.'
       );
+    });
+  });
+
+  describe('should return a NOT_INITIALIZED error when calling owner-dependent methods without an owner', () => {
+    const signerOptions = {host: 'http://localhost:4943'};
+    const testOrigin = 'https://hello.com';
+    const testId = crypto.randomUUID();
+
+    const requestAccountsData: IcrcAccountsRequest = {
+      id: testId,
+      jsonrpc: JSON_RPC_VERSION_2,
+      method: ICRC27_ACCOUNTS
+    };
+
+    const requestCallCanisterData: IcrcCallCanisterRequest = {
+      id: testId,
+      jsonrpc: JSON_RPC_VERSION_2,
+      method: ICRC49_CALL_CANISTER,
+      params: {
+        ...mockCallCanisterParams
+      }
+    };
+
+    const testParams: Array<{
+      method: IcrcScopedMethod;
+      requestData: IcrcAccountsRequest | IcrcCallCanisterRequest | IcrcRequestAnyPermissionsRequest;
+    }> = [
+      {method: 'icrc27_accounts', requestData: requestAccountsData},
+      {method: 'icrc49_call_canister', requestData: requestCallCanisterData}
+    ];
+
+    let signer: Signer;
+    let postMessageMock: MockInstance;
+
+    beforeEach(() => {
+      // Initialize the signer without setting an owner.
+      signer = Signer.init(signerOptions);
+      postMessageMock = vi.fn();
+      vi.stubGlobal('opener', {postMessage: postMessageMock});
+    });
+
+    afterEach(() => {
+      signer.disconnect();
+      vi.clearAllMocks();
+      vi.restoreAllMocks();
+    });
+
+    testParams.forEach(({method, requestData}) => {
+      it(`should trigger notifyError for ${method} when owner is not set`, async () => {
+        const messageEvent = new MessageEvent('message', {
+          data: requestData,
+          origin: testOrigin
+        });
+
+        window.dispatchEvent(messageEvent);
+
+        await vi.waitFor(() => {
+          expect(postMessageMock).toHaveBeenCalledWith(
+            {
+              jsonrpc: JSON_RPC_VERSION_2,
+              id: testId,
+              error: {
+                code: SignerErrorCode.NOT_INITIALIZED,
+                message: 'The signer does not have an owner set.'
+              }
+            },
+            testOrigin
+          );
+        });
+      });
     });
   });
 });
