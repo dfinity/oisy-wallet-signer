@@ -1,3 +1,4 @@
+import type * as agent from '@dfinity/agent';
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {Icrc1TransferRequest, Icrc2ApproveRequest} from '@dfinity/ledger-icp';
 import {toNullable} from '@dfinity/utils';
@@ -26,7 +27,7 @@ import * as callUtils from './utils/call.utils';
 const mocks = vi.hoisted(() => ({getRootKey: vi.fn()}));
 
 vi.mock('@dfinity/agent', async (importOriginal) => {
-  const originalModule = await importOriginal<typeof import('@dfinity/agent')>();
+  const originalModule = await importOriginal<typeof agent>();
 
   class MockHttpAgent {
     call = vi.fn();

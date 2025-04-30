@@ -15,7 +15,7 @@ import * as callUtils from './call.assert.utils';
 import {assertCallResponse, decodeResponse} from './call.utils';
 
 vi.mock('@dfinity/agent', async (importOriginal) => {
-  const originalModule = await importOriginal<typeof import('@dfinity/agent')>();
+  const originalModule = await importOriginal<typeof agent>();
 
   class MockHttpAgent {
     call = vi.fn();

@@ -1,3 +1,4 @@
+import type * as agent from '@dfinity/agent';
 import {Actor} from '@dfinity/agent';
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {Principal} from '@dfinity/principal';
@@ -14,7 +15,7 @@ import type {SignerOptions} from '../types/signer-options';
 import {Icrc21Canister} from './icrc21-canister.api';
 
 vi.mock('@dfinity/agent', async (importOriginal) => {
-  const originalModule = await importOriginal<typeof import('@dfinity/agent')>();
+  const originalModule = await importOriginal<typeof agent>();
 
   const mockActor = {test: 123};
 
