@@ -1,7 +1,7 @@
-import {Expiry, HttpAgentRequest, HttpAgentRequestTransformFn} from '@dfinity/agent';
+import type {Expiry, HttpAgentRequest, HttpAgentRequestTransformFn} from '@dfinity/agent';
 import {hashObject, isNullish, nowInBigIntNanoSeconds, uint8ArrayToBase64} from '@dfinity/utils';
-import {HexString} from '../types/hex-string';
-import {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
+import type {HexString} from '../types/hex-string';
+import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 
 /**
  * A custom transform function that processes the HTTP agent request.

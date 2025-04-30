@@ -3,7 +3,7 @@ import {
   buildContentMessageIcrc2Approve,
   buildContentMessageIcrc2TransferFrom
 } from '../builders/signer.builders';
-import {SignerBuilderFn, SignerBuilderMethods} from '../types/signer-builders';
+import type {SignerBuilderFn, SignerBuilderMethods} from '../types/signer-builders';
 
 // @see {@link https://github.com/dfinity/ic/blob/master/packages/icrc-ledger-types/src/icrc21/lib.rs#L20}
 export const MAX_CONSENT_MESSAGE_ARG_SIZE_BYTES = 500;

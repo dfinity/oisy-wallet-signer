@@ -6,7 +6,7 @@ import {asciiStringToByteArray, base64ToUint8Array, fromNullable} from '@dfinity
 import {TransferArgs} from '../constants/icrc-1.idl.constants';
 import {ApproveArgs, TransferFromArgs} from '../constants/icrc-2.idl.constants';
 import {MAX_CONSENT_MESSAGE_ARG_SIZE_BYTES} from '../constants/signer.builders.constants';
-import {TransferArgs as TransferArgsType} from '../declarations/icrc-1';
+import type {TransferArgs as TransferArgsType} from '../declarations/icrc-1';
 import {mockCallCanisterParams} from '../mocks/call-canister.mocks';
 import {mockPrincipalText} from '../mocks/icrc-accounts.mocks';
 import {mockIcrcApproveArg, mockIcrcApproveRawArgs} from '../mocks/icrc-approve.mocks';
@@ -15,7 +15,7 @@ import {
   mockIcrcTransferFromArg,
   mockIcrcTransferFromRawArgs
 } from '../mocks/icrc-transfer-from.mocks';
-import {
+import type {
   SignerBuilderFn,
   SignerBuildersResult,
   SignerBuildersResultError,
@@ -189,7 +189,7 @@ s3oqv-3j7id-xjhbm-3owbe-fvwly-oso6u-vej6n-bexck-koyu2-bxb6y-wae
 3,200.00000001 TKN
 
 **From:**
-${encodeIcrcAccount({owner: owner.getPrincipal(), subaccount: subaccount})}
+${encodeIcrcAccount({owner: owner.getPrincipal(), subaccount})}
 
 **To:**
 ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.to.subaccount)})}
@@ -443,7 +443,7 @@ ${encodeIcrcAccount({owner: owner.getPrincipal()})}`
 ${encodeIcrcAccount({owner: mockIcrcApproveRawArgs.spender.owner, subaccount: fromNullable(mockIcrcApproveRawArgs.spender.subaccount)})}
 
 **Your account:**
-${encodeIcrcAccount({owner: owner.getPrincipal(), subaccount: subaccount})}
+${encodeIcrcAccount({owner: owner.getPrincipal(), subaccount})}
 
 **Requested withdrawal allowance:**
 3,200.00000001 TKN
@@ -457,7 +457,7 @@ No expiration.
 0.0010033 TKN
 
 **Transaction fees to be paid by:**
-${encodeIcrcAccount({owner: owner.getPrincipal(), subaccount: subaccount})}`
+${encodeIcrcAccount({owner: owner.getPrincipal(), subaccount})}`
       });
     });
 

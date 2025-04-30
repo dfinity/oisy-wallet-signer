@@ -1,5 +1,5 @@
 import {Ed25519KeyIdentity} from '@dfinity/identity';
-import {Icrc1TransferRequest, Icrc2ApproveRequest} from '@dfinity/ledger-icp';
+import type {Icrc1TransferRequest, Icrc2ApproveRequest} from '@dfinity/ledger-icp';
 import {toNullable} from '@dfinity/utils';
 import {IcpWallet} from './icp-wallet';
 import {
@@ -19,7 +19,7 @@ import {
   mockIcrc2LocalIcRootKey,
   mockIcrc2LocalRelyingPartyPrincipal
 } from './mocks/icrc2-call-utils.mocks';
-import {RelyingPartyOptions} from './types/relying-party-options';
+import type {RelyingPartyOptions} from './types/relying-party-options';
 import {JSON_RPC_VERSION_2} from './types/rpc';
 import * as callUtils from './utils/call.utils';
 

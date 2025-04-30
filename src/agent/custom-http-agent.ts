@@ -1,5 +1,5 @@
 import {
-  CallRequest,
+  type CallRequest,
   Certificate,
   HttpAgent,
   defaultStrategy,

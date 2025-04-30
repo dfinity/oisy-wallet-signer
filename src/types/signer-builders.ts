@@ -1,6 +1,6 @@
-import {IcrcTokenMetadata} from '@dfinity/ledger-icrc';
-import {Principal} from '@dfinity/principal';
-import {icrc21_consent_info} from '../declarations/icrc-21';
+import type {IcrcTokenMetadata} from '@dfinity/ledger-icrc';
+import type {Principal} from '@dfinity/principal';
+import type {icrc21_consent_info} from '../declarations/icrc-21';
 
 export interface SignerBuildersResultOk {
   Ok: icrc21_consent_info;

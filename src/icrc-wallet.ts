@@ -1,9 +1,9 @@
 import {
-  ApproveParams,
-  IcrcBlockIndex,
+  type ApproveParams,
+  type IcrcBlockIndex,
+  type TransferFromParams,
+  type TransferParams,
   IcrcTransferError,
-  TransferFromParams,
-  TransferParams,
   toApproveArgs,
   toTransferArg,
   toTransferFromArgs
@@ -22,11 +22,11 @@ import {
   TransferFromResult
 } from './constants/icrc-2.idl.constants';
 import {RelyingParty} from './relying-party';
-import {IcrcAccount} from './types/icrc-accounts';
-import {IcrcCallCanisterRequestParams} from './types/icrc-requests';
-import {Origin} from './types/post-message';
-import {RelyingPartyOptions} from './types/relying-party-options';
-import {RelyingPartyRequestOptions} from './types/relying-party-requests';
+import type {IcrcAccount} from './types/icrc-accounts';
+import type {IcrcCallCanisterRequestParams} from './types/icrc-requests';
+import type {Origin} from './types/post-message';
+import type {RelyingPartyOptions} from './types/relying-party-options';
+import type {RelyingPartyRequestOptions} from './types/relying-party-requests';
 import {decodeResponse} from './utils/call.utils';
 import {encodeIdl} from './utils/idl.utils';
 

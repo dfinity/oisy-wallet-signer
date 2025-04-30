@@ -1,5 +1,5 @@
 import {Principal} from '@dfinity/principal';
-import {IcrcCallCanisterResult} from '../types/icrc-responses';
+import type {IcrcCallCanisterResult} from '../types/icrc-responses';
 import {mockLedgerCanisterId} from './icrc-call-utils.mocks';
 
 export const mockIcrc2LocalIcRootKey = new Uint8Array([

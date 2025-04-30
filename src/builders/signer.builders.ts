@@ -3,14 +3,14 @@ import {fromNullable, isNullish, nonNullish} from '@dfinity/utils';
 import {TransferArgs} from '../constants/icrc-1.idl.constants';
 import {ApproveArgs, TransferFromArgs} from '../constants/icrc-2.idl.constants';
 import {MAX_CONSENT_MESSAGE_ARG_SIZE_BYTES} from '../constants/signer.builders.constants';
-import {TransferArgs as IcrcTransferArg} from '../declarations/icrc-1';
-import {
+import type {TransferArgs as IcrcTransferArg} from '../declarations/icrc-1';
+import type {
   ApproveArgs as IcrcApproveArgs,
   TransferFromArgs as IcrcTransferFromArgs
 } from '../declarations/icrc-2';
 import type {icrc21_consent_info} from '../declarations/icrc-21';
-import {I18n} from '../types/i18n';
-import {SignerBuilderFn, SignerBuilderParams, SignerBuildersResult} from '../types/signer-builders';
+import type {I18n} from '../types/i18n';
+import type {SignerBuilderFn, SignerBuilderParams, SignerBuildersResult} from '../types/signer-builders';
 import {decodeMemo} from '../utils/builders.utils';
 import {formatAmount, formatDate} from '../utils/format.utils';
 import {decodeIdl} from '../utils/idl.utils';

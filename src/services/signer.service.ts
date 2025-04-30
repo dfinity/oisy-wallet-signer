@@ -3,7 +3,7 @@ import {Principal} from '@dfinity/principal';
 import {base64ToUint8Array, isNullish, notEmptyString} from '@dfinity/utils';
 import {SignerApi} from '../api/signer.api';
 import {SIGNER_BUILDERS} from '../constants/signer.builders.constants';
-import {icrc21_consent_message_response} from '../declarations/icrc-21';
+import type {icrc21_consent_message_response} from '../declarations/icrc-21';
 import {
   notifyErrorActionAborted,
   notifyErrorMissingPrompt,
@@ -15,7 +15,7 @@ import {notifyCallCanister} from '../handlers/signer-success.handlers';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import type {Notify} from '../types/signer-handlers';
 import type {SignerOptions} from '../types/signer-options';
-import {
+import type {
   CallCanisterPrompt,
   ConsentInfoWarn,
   ConsentMessageApproval,

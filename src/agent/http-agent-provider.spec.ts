@@ -1,6 +1,6 @@
 import * as httpAgent from '@dfinity/agent';
 import {Ed25519KeyIdentity} from '@dfinity/identity';
-import {SignerOptions} from 'src/types/signer-options';
+import type {SignerOptions} from 'src/types/signer-options';
 import {
   mockLocalIcRootKey,
   mockRepliedLocalCallTime

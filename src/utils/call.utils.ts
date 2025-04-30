@@ -5,13 +5,13 @@ import {
   lookupResultToBuffer,
   requestIdOf
 } from '@dfinity/agent';
-import {RecordClass, VariantClass} from '@dfinity/candid/lib/cjs/idl';
+import type {RecordClass, VariantClass} from '@dfinity/candid/lib/cjs/idl';
 import {Principal} from '@dfinity/principal';
 import {assertNonNullish, base64ToUint8Array} from '@dfinity/utils';
 import {LOCAL_REPLICA_URL, MAINNET_REPLICA_URL} from '../constants/core.constants';
-import {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
+import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import type {IcrcCallCanisterResult} from '../types/icrc-responses';
-import {RelyingPartyHost} from '../types/relying-party-options';
+import type {RelyingPartyHost} from '../types/relying-party-options';
 import {decodeCallRequest} from './agentjs-cbor-copy.utils';
 import {
   assertCallArg,

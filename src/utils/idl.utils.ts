@@ -1,7 +1,7 @@
 import {IDL} from '@dfinity/candid';
-import {RecordClass, VariantClass} from '@dfinity/candid/lib/cjs/idl';
+import type {RecordClass, VariantClass} from '@dfinity/candid/lib/cjs/idl';
 import {uint8ArrayToBase64} from '@dfinity/utils';
-import {IcrcBlob} from '../types/blob';
+import type {IcrcBlob} from '../types/blob';
 
 export const encodeIdl = <T>({
   recordClass,
