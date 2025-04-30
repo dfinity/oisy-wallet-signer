@@ -8,7 +8,7 @@ import {
 import {HttpAgentProvider} from './http-agent-provider';
 
 vi.mock('@dfinity/agent', async (importOriginal) => {
-  const originalModule = await importOriginal<typeof import('@dfinity/agent')>();
+  const originalModule = await importOriginal<typeof httpAgent>();
 
   class MockHttpAgent {
     call = vi.fn();

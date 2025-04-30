@@ -30,7 +30,7 @@ import {
 import * as transformAgent from './custom-transform-agent';
 
 vi.mock('@dfinity/agent', async (importOriginal) => {
-  const originalModule = await importOriginal<typeof import('@dfinity/agent')>();
+  const originalModule = await importOriginal<typeof httpAgent>();
 
   class MockHttpAgent {
     call = vi.fn();

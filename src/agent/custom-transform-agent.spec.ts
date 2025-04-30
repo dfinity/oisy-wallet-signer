@@ -5,7 +5,7 @@ import {createMockRequest, mockRequestPayload} from '../mocks/custom-http-agent.
 import {customAddTransform} from './custom-transform-agent';
 
 vi.mock('@dfinity/agent', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@dfinity/agent')>();
+  const actual = await importOriginal<typeof httpAgent>();
 
   class MockHttpAgent {
     addTransform = vi.fn();
