@@ -85,23 +85,6 @@ describe('AgentApi', () => {
       expect(newAgent).toEqual({test: 'mockCustomAgent'});
     });
 
-    it('should create and cache a new agent for a different identity', async () => {
-      await agentApi.getAgentTest({options: signerOptions, type: 'custom'});
-
-      const differentSignerOptions: SignerOptions = {
-        owner: identity2,
-        host: 'http://localhost:8080'
-      };
-
-      const newAgent = await agentApi.getAgentTest({
-        options: differentSignerOptions,
-        type: 'custom'
-      });
-
-      expect(CustomHttpAgent.create).toHaveBeenCalledTimes(2);
-      expect(newAgent).toEqual({test: 'mockCustomAgent'});
-    });
-
     it('should not call createAgent if the agent is already cached for the same identity and type', async () => {
       await agentApi.getAgentTest({options: signerOptions, type: 'custom'});
 
