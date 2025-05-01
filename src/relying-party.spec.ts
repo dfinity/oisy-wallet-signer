@@ -457,7 +457,7 @@ describe('Relying Party', () => {
             message: errorMsg
           };
 
-          await expect(promise).rejects.toThrowError(new RelyingPartyResponseError(error));
+          await expect(promise).rejects.toThrow(new RelyingPartyResponseError(error));
         });
 
         it('should throw error if the signer popup is closed', async () => {
@@ -695,7 +695,7 @@ describe('Relying Party', () => {
               message: errorMsg
             };
 
-            await expect(promise).rejects.toThrowError(new RelyingPartyResponseError(error));
+            await expect(promise).rejects.toThrow(new RelyingPartyResponseError(error));
           });
 
           it('should throw error if the signer popup is closed', async () => {
@@ -914,7 +914,7 @@ describe('Relying Party', () => {
               message: errorMsg
             };
 
-            await expect(promise).rejects.toThrowError(new RelyingPartyResponseError(error));
+            await expect(promise).rejects.toThrow(new RelyingPartyResponseError(error));
           });
 
           it('should throw error if the signer popup is closed', async () => {
@@ -1176,7 +1176,7 @@ describe('Relying Party', () => {
             message: errorMsg
           };
 
-          await expect(promise).rejects.toThrowError(new RelyingPartyResponseError(error));
+          await expect(promise).rejects.toThrow(new RelyingPartyResponseError(error));
         });
 
         it('should throw error if the signer popup is closed', async () => {
@@ -1435,7 +1435,7 @@ describe('Relying Party', () => {
             message: errorMsg
           };
 
-          await expect(promise).rejects.toThrowError(new RelyingPartyResponseError(error));
+          await expect(promise).rejects.toThrow(new RelyingPartyResponseError(error));
         });
 
         it('should throw error if the signer popup is closed', async () => {
@@ -1595,12 +1595,14 @@ describe('Relying Party', () => {
           ]);
 
           const result = await relyingParty.requestPermissionsNotGranted();
+
           expect(result).toEqual({allPermissionsGranted: true});
           expect(relyingParty.requestPermissions).not.toHaveBeenCalled();
         });
 
         it('should request only missing permissions if some are not granted', async () => {
           const result = await relyingParty.requestPermissionsNotGranted();
+
           expect(result).toEqual({allPermissionsGranted: true});
           expect(relyingParty.requestPermissions).toHaveBeenCalledWith({
             params: {scopes: [{method: ICRC49_CALL_CANISTER}]}
@@ -1614,6 +1616,7 @@ describe('Relying Party', () => {
           ]);
 
           const result = await relyingParty.requestPermissionsNotGranted();
+
           expect(result).toEqual({allPermissionsGranted: false});
         });
 

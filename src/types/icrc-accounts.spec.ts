@@ -10,7 +10,8 @@ describe('ICRC accounts', () => {
         owner: mockPrincipalText
       };
       const result = IcrcAccountSchema.safeParse(validAccount);
-      expect(result.success).toBe(true);
+
+      expect(result.success).toBeTruthy();
     });
 
     it('should pass validation with a valid owner and optional subaccount', () => {
@@ -19,7 +20,8 @@ describe('ICRC accounts', () => {
         subaccount: uint8ArrayToBase64(new Uint8Array(32))
       };
       const result = IcrcAccountSchema.safeParse(validAccount);
-      expect(result.success).toBe(true);
+
+      expect(result.success).toBeTruthy();
     });
 
     it('should pass validation with an anonymous principal', () => {
@@ -27,7 +29,8 @@ describe('ICRC accounts', () => {
         owner: Principal.anonymous().toText()
       };
       const result = IcrcAccountSchema.safeParse(validAccount);
-      expect(result.success).toBe(true);
+
+      expect(result.success).toBeTruthy();
     });
 
     it('should fail validation with an invalid Principal string', () => {
@@ -35,7 +38,9 @@ describe('ICRC accounts', () => {
         owner: 'invalid-principal'
       };
       const result = IcrcAccountSchema.safeParse(invalidAccount);
-      expect(result.success).toBe(false);
+
+      expect(result.success).toBeFalsy();
+
       if (!result.success) {
         expect(result.error.errors[0].message).toBe(
           'Invalid textual representation of a Principal.'
@@ -49,7 +54,9 @@ describe('ICRC accounts', () => {
         subaccount: uint8ArrayToBase64(new Uint8Array(31))
       };
       const result = IcrcAccountSchema.safeParse(invalidAccount);
-      expect(result.success).toBe(false);
+
+      expect(result.success).toBeFalsy();
+
       if (!result.success) {
         expect(result.error.errors[0].message).toBe('Subaccount must be exactly 32 bytes long.');
       }
@@ -61,7 +68,8 @@ describe('ICRC accounts', () => {
         subaccount: 'invalid-subaccount'
       };
       const result = IcrcAccountSchema.safeParse(invalidAccount);
-      expect(result.success).toBe(false);
+
+      expect(result.success).toBeFalsy();
     });
   });
 
@@ -69,7 +77,8 @@ describe('ICRC accounts', () => {
     it('should pass validation with a single valid account', () => {
       const validAccounts = [{owner: mockPrincipalText}];
       const result = IcrcAccountsSchema.safeParse(validAccounts);
-      expect(result.success).toBe(true);
+
+      expect(result.success).toBeTruthy();
     });
 
     it('should pass validation with multiple valid accounts', () => {
@@ -78,12 +87,15 @@ describe('ICRC accounts', () => {
         {owner: Principal.anonymous().toText(), subaccount: uint8ArrayToBase64(new Uint8Array(32))}
       ];
       const result = IcrcAccountsSchema.safeParse(validAccounts);
-      expect(result.success).toBe(true);
+
+      expect(result.success).toBeTruthy();
     });
 
     it('should fail validation with an empty array', () => {
       const result = IcrcAccountsSchema.safeParse([]);
-      expect(result.success).toBe(false);
+
+      expect(result.success).toBeFalsy();
+
       if (!result.success) {
         expect(result.error.errors[0].message).toContain('at least 1 element(s)');
       }
@@ -95,7 +107,9 @@ describe('ICRC accounts', () => {
         {owner: 'invalid-principal'}
       ];
       const result = IcrcAccountsSchema.safeParse(invalidAccounts);
-      expect(result.success).toBe(false);
+
+      expect(result.success).toBeFalsy();
+
       if (!result.success) {
         expect(result.error.errors[0].message).toBe(
           'Invalid textual representation of a Principal.'
@@ -108,7 +122,9 @@ describe('ICRC accounts', () => {
         {owner: mockPrincipalText, subaccount: uint8ArrayToBase64(new Uint8Array(31))}
       ];
       const result = IcrcAccountsSchema.safeParse(invalidAccounts);
-      expect(result.success).toBe(false);
+
+      expect(result.success).toBeFalsy();
+
       if (!result.success) {
         expect(result.error.errors[0].message).toBe('Subaccount must be exactly 32 bytes long.');
       }
@@ -117,13 +133,15 @@ describe('ICRC accounts', () => {
     it('should pass validation with an account that has no subaccount (optional field)', () => {
       const validAccounts = [{owner: mockPrincipalText}];
       const result = IcrcAccountsSchema.safeParse(validAccounts);
-      expect(result.success).toBe(true);
+
+      expect(result.success).toBeTruthy();
     });
 
     it('should fail validation when subaccount is not a blob', () => {
       const invalidAccounts = [{owner: mockPrincipalText, subaccount: 'invalid-subaccount'}];
       const result = IcrcAccountsSchema.safeParse(invalidAccounts);
-      expect(result.success).toBe(false);
+
+      expect(result.success).toBeFalsy();
     });
   });
 });

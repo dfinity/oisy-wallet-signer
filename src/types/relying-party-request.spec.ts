@@ -8,14 +8,16 @@ describe('RelyingPartyRequests', () => {
       };
 
       const result = RelyingPartyRequestOptionsSchema.safeParse(validData);
-      expect(result.success).toBe(true);
+
+      expect(result.success).toBeTruthy();
     });
 
     it('should validate without specifying timeoutInMilliseconds', () => {
       const validData = {};
 
       const result = RelyingPartyRequestOptionsSchema.safeParse(validData);
-      expect(result.success).toBe(true);
+
+      expect(result.success).toBeTruthy();
     });
 
     it('should fail validation with a non-numeric timeoutInMilliseconds', () => {
@@ -24,7 +26,8 @@ describe('RelyingPartyRequests', () => {
       };
 
       const result = RelyingPartyRequestOptionsSchema.safeParse(invalidData);
-      expect(result.success).toBe(false);
+
+      expect(result.success).toBeFalsy();
     });
 
     it('should fail validation with a non-positive timeoutInMilliseconds', () => {
@@ -33,7 +36,8 @@ describe('RelyingPartyRequests', () => {
       };
 
       const result = RelyingPartyRequestOptionsSchema.safeParse(invalidData);
-      expect(result.success).toBe(false);
+
+      expect(result.success).toBeFalsy();
     });
 
     it('should fail validation with a zero timeoutInMilliseconds', () => {
@@ -42,7 +46,8 @@ describe('RelyingPartyRequests', () => {
       };
 
       const result = RelyingPartyRequestOptionsSchema.safeParse(invalidData);
-      expect(result.success).toBe(false);
+
+      expect(result.success).toBeFalsy();
     });
   });
 });

@@ -68,7 +68,9 @@ describe('Signer', () => {
 
   it('should init a signer', () => {
     const signer = Signer.init(signerOptions);
+
     expect(signer).toBeInstanceOf(Signer);
+
     signer.disconnect();
   });
 
@@ -76,7 +78,9 @@ describe('Signer', () => {
     const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
 
     const signer = Signer.init(signerOptions);
+
     expect(addEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
+
     signer.disconnect();
   });
 
@@ -469,6 +473,7 @@ describe('Signer', () => {
           );
         };
 
+        // eslint-disable-next-line vitest/expect-expect -- assertNotifyReady is called in the test
         it('should notify READY for icrc29_status', () => {
           const messageEvent = new MessageEvent('message', requestStatus);
           window.dispatchEvent(messageEvent);
@@ -517,7 +522,7 @@ describe('Signer', () => {
           });
         });
 
-        it('should not handle with busy', async () => {
+        it('should not handle with busy even if the answer to the status message has been notified', async () => {
           const handleWithBusySpy = vi.spyOn(
             signer as unknown as {handleWithBusy: () => void},
             'handleWithBusy'
@@ -2614,7 +2619,7 @@ describe('Signer', () => {
           method: 'something',
           prompt: mockPrompt
         });
-      }).toThrowError(
+      }).toThrow(
         'The specified method is not supported. Please ensure you are using a supported standard.'
       );
     });
