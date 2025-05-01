@@ -1,5 +1,5 @@
 import {uint8ArrayToBase64} from '@dfinity/utils';
-import {MockInstance} from 'vitest';
+import type {MockInstance} from 'vitest';
 import {
   ICRC25_PERMISSION_DENIED,
   ICRC25_PERMISSION_GRANTED,

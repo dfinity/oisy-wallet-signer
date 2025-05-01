@@ -1,8 +1,8 @@
+import type {RequestId, SubmitResponse} from '@dfinity/agent';
 import * as httpAgent from '@dfinity/agent';
-import {RequestId, SubmitResponse} from '@dfinity/agent';
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {base64ToUint8Array, nonNullish} from '@dfinity/utils';
-import {MockInstance} from 'vitest';
+import type {MockInstance} from 'vitest';
 import {
   mockLocalIcRootKey,
   mockRejectedLocalCallTime,

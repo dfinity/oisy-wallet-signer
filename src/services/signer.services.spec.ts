@@ -1,5 +1,5 @@
 import {Ed25519KeyIdentity} from '@dfinity/identity';
-import {IcrcTokenMetadata, mapTokenMetadata} from '@dfinity/ledger-icrc';
+import {mapTokenMetadata, type IcrcTokenMetadata} from '@dfinity/ledger-icrc';
 import {assertNonNullish, base64ToUint8Array} from '@dfinity/utils';
 import type {Mock, MockInstance} from 'vitest';
 import {Icrc21Canister} from '../api/icrc21-canister.api';
