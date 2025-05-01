@@ -1,6 +1,6 @@
 import * as httpAgent from '@dfinity/agent';
 import {Ed25519KeyIdentity} from '@dfinity/identity';
-import {SignerOptions} from 'src/types/signer-options';
+import type {SignerOptions} from 'src/types/signer-options';
 import {
   mockLocalIcRootKey,
   mockRepliedLocalCallTime
@@ -8,7 +8,7 @@ import {
 import {HttpAgentProvider} from './http-agent-provider';
 
 vi.mock('@dfinity/agent', async (importOriginal) => {
-  const originalModule = await importOriginal<typeof import('@dfinity/agent')>();
+  const originalModule = await importOriginal<typeof httpAgent>();
 
   class MockHttpAgent {
     call = vi.fn();

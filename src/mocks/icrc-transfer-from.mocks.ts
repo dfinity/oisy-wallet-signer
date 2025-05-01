@@ -1,6 +1,6 @@
 import {Principal} from '@dfinity/principal';
 import {TransferFromArgs} from '../constants/icrc-2.idl.constants';
-import {TransferFromArgs as TransferFromArgsType} from '../declarations/icrc-2';
+import type {TransferFromArgs as TransferFromArgsType} from '../declarations/icrc-2';
 import {encodeIdl} from '../utils/idl.utils';
 import {mockLocalRelyingPartyPrincipal} from './call-utils.mocks';
 import {mockPrincipalText} from './icrc-accounts.mocks';

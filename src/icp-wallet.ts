@@ -1,13 +1,13 @@
 import {
-  BlockHeight,
-  Icrc2ApproveRequest,
   mapIcrc1TransferError,
   mapIcrc2ApproveError,
   toIcrc1TransferRawRequest,
   toIcrc2ApproveRawRequest,
-  type Icrc1TransferRequest
+  type BlockHeight,
+  type Icrc1TransferRequest,
+  type Icrc2ApproveRequest
 } from '@dfinity/ledger-icp';
-import {
+import type {
   Icrc1TransferResult,
   ApproveResult as Icrc2ApproveResult
 } from '@dfinity/ledger-icp/dist/candid/ledger';
@@ -18,7 +18,7 @@ import {RelyingParty} from './relying-party';
 import type {IcrcAccount} from './types/icrc-accounts';
 import type {IcrcCallCanisterRequestParams} from './types/icrc-requests';
 import type {Origin} from './types/post-message';
-import {RelyingPartyOptions} from './types/relying-party-options';
+import type {RelyingPartyOptions} from './types/relying-party-options';
 import type {RelyingPartyRequestOptions} from './types/relying-party-requests';
 import {decodeResponse} from './utils/call.utils';
 import {encodeIdl} from './utils/idl.utils';

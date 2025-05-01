@@ -1,8 +1,8 @@
+import type {RequestId, SubmitResponse} from '@dfinity/agent';
 import * as httpAgent from '@dfinity/agent';
-import {RequestId, SubmitResponse} from '@dfinity/agent';
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {base64ToUint8Array, nonNullish} from '@dfinity/utils';
-import {MockInstance} from 'vitest';
+import type {MockInstance} from 'vitest';
 import {
   mockLocalIcRootKey,
   mockRejectedLocalCallTime,
@@ -30,7 +30,7 @@ import {
 import * as transformAgent from './custom-transform-agent';
 
 vi.mock('@dfinity/agent', async (importOriginal) => {
-  const originalModule = await importOriginal<typeof import('@dfinity/agent')>();
+  const originalModule = await importOriginal<typeof httpAgent>();
 
   class MockHttpAgent {
     call = vi.fn();

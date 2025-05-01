@@ -1,6 +1,6 @@
 import {Principal} from '@dfinity/principal';
 import {ApproveArgs} from '../constants/icrc-2.idl.constants';
-import {ApproveArgs as ApproveArgsType} from '../declarations/icrc-2';
+import type {ApproveArgs as ApproveArgsType} from '../declarations/icrc-2';
 import {encodeIdl} from '../utils/idl.utils';
 import {mockPrincipalText} from './icrc-accounts.mocks';
 

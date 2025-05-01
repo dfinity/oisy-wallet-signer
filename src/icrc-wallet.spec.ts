@@ -1,5 +1,6 @@
+import type * as agent from '@dfinity/agent';
 import {Ed25519KeyIdentity} from '@dfinity/identity';
-import {ApproveParams, TransferFromParams, TransferParams} from '@dfinity/ledger-icrc';
+import type {ApproveParams, TransferFromParams, TransferParams} from '@dfinity/ledger-icrc';
 import {toNullable} from '@dfinity/utils';
 import {IcrcWallet} from './icrc-wallet';
 import {
@@ -23,14 +24,14 @@ import {
   mockIcrc2TransferFromLocalCallResult,
   mockIcrc2TransferFromLocalCallTime
 } from './mocks/icrc2-call-utils.mocks';
-import {RelyingPartyOptions} from './types/relying-party-options';
+import type {RelyingPartyOptions} from './types/relying-party-options';
 import {JSON_RPC_VERSION_2} from './types/rpc';
 import * as callUtils from './utils/call.utils';
 
 const mocks = vi.hoisted(() => ({getRootKey: vi.fn()}));
 
 vi.mock('@dfinity/agent', async (importOriginal) => {
-  const originalModule = await importOriginal<typeof import('@dfinity/agent')>();
+  const originalModule = await importOriginal<typeof agent>();
 
   class MockHttpAgent {
     call = vi.fn();

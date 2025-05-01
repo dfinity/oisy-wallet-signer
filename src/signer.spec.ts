@@ -28,7 +28,7 @@ import {mockAccounts} from './mocks/icrc-accounts.mocks';
 import {mockErrorNotify} from './mocks/signer-error.mocks';
 import {saveSessionScopes} from './sessions/signer.sessions';
 import {Signer} from './signer';
-import {
+import type {
   IcrcAccountsRequest,
   IcrcCallCanisterRequest,
   IcrcPermissionsRequest,
