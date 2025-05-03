@@ -138,7 +138,7 @@ s3oqv-3j7id-xjhbm-3owbe-fvwly-oso6u-vej6n-bexck-koyu2-bxb6y-wae
         token
       });
 
-      expect('Ok' in result);
+      expect('Ok' in result).toBeTruthy();
 
       const {Ok} = result as SignerBuildersResultOk;
 
@@ -157,7 +157,7 @@ s3oqv-3j7id-xjhbm-3owbe-fvwly-oso6u-vej6n-bexck-koyu2-bxb6y-wae
         token
       });
 
-      expect('Ok' in result);
+      expect('Ok' in result).toBeTruthy();
 
       const {Ok} = result as SignerBuildersResultOk;
 
@@ -336,7 +336,7 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.t
         token
       });
 
-      expect('Ok' in result);
+      expect('Ok' in result).toBeTruthy();
 
       const {Ok} = result as SignerBuildersResultOk;
 
@@ -350,7 +350,7 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.t
         token
       });
 
-      expect('Ok' in result);
+      expect('Ok' in result).toBeTruthy();
 
       const {Ok} = result as SignerBuildersResultOk;
 
@@ -635,7 +635,7 @@ ${encodeIcrcAccount({owner: owner.getPrincipal()})}`
         token
       });
 
-      expect('Ok' in result);
+      expect('Ok' in result).toBeTruthy();
 
       const {Ok} = result as SignerBuildersResultOk;
 
@@ -649,7 +649,7 @@ ${encodeIcrcAccount({owner: owner.getPrincipal()})}`
         token
       });
 
-      expect('Ok' in result);
+      expect('Ok' in result).toBeTruthy();
 
       const {Ok} = result as SignerBuildersResultOk;
 

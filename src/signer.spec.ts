@@ -521,7 +521,7 @@ describe('Signer', () => {
           });
         });
 
-        it('should not handle with busy', async () => {
+        it('should not handle with busy even if the answer to the status message has been notified', async () => {
           const handleWithBusySpy = vi.spyOn(
             signer as unknown as {handleWithBusy: () => void},
             'handleWithBusy'
