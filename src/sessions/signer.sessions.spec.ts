@@ -284,7 +284,7 @@ describe('Signer sessions', () => {
       expect(state).toBe(ICRC25_PERMISSION_ASK_ON_USE);
     });
 
-    it('should return ask on use if the requested method does not exist', () => {
+    it('should return ask on use if the requested method is not supported', () => {
       const state = sessionScopeState({
         owner,
         origin,
