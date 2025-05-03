@@ -324,34 +324,6 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.t
     });
 
     it('should throw error if arg is too long', async () => {
-      const TestArgs = IDL.Record({
-        test: IDL.Text
-      });
-
-      const arg = encodeIdl({
-        recordClass: TestArgs,
-        rawArgs: {
-          test: [...Array(500)].map(() => 'A').join('')
-        }
-      });
-
-      const result = await buildContentMessageIcrc1Transfer({
-        arg: base64ToUint8Array(arg),
-        owner: owner.getPrincipal(),
-        token
-      });
-
-      expect('Err' in result).toBeTruthy();
-
-      const {Err} = result as SignerBuildersResultError;
-
-      expect(Err).toBeInstanceOf(ArgSizeError);
-      expect((Err as ArgSizeError).message).toEqual(
-        `The argument size is too large. The maximum allowed size is ${MAX_CONSENT_MESSAGE_ARG_SIZE_BYTES} bytes.`
-      );
-    });
-
-    it('should throw error if arg is too long', async () => {
       await assertArgSize(buildContentMessageIcrc1Transfer);
     });
   });
