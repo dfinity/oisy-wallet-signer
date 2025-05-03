@@ -1881,7 +1881,7 @@ describe('Signer', () => {
 
                   const prompt = ({status, ...rest}: ConsentMessagePromptPayload): void => {
                     if (status === 'result' && 'reject' in rest) {
-                      reject = rest.reject;
+                      ({reject} = rest);
                     }
                   };
 
@@ -2097,7 +2097,7 @@ describe('Signer', () => {
 
                   const prompt = ({status, ...rest}: ConsentMessagePromptPayload): void => {
                     if (status === 'result' && 'reject' in rest) {
-                      reject = rest.reject;
+                      ({reject} = rest);
                     }
                   };
 
@@ -2136,7 +2136,7 @@ describe('Signer', () => {
 
                   const prompt = ({status, ...rest}: ConsentMessagePromptPayload): void => {
                     if (status === 'result' && 'reject' in rest) {
-                      approve = rest.approve;
+                      ({approve} = rest);
                     }
                   };
 
