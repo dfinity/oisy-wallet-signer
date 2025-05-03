@@ -396,7 +396,7 @@ describe('icrc-responses', () => {
       expect(() => IcrcSupportedStandardsResponseSchema.parse(invalidResponse)).toThrow();
     });
 
-    it('should throw if response has no valid url', () => {
+    it('should throw if response has no url', () => {
       const invalidResponse: IcrcSupportedStandardsResponse = {
         ...validResponse,
         result: {
