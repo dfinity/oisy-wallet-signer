@@ -473,6 +473,7 @@ describe('Signer services', () => {
 
                 if ('Err' in result) {
                   expect(true).toBeFalsy();
+
                   return;
                 }
 

@@ -46,6 +46,7 @@ describe('icrc-requests', () => {
           ]
         }
       };
+
       expect(() => IcrcRequestAnyPermissionsRequestSchema.parse(randomMethodRequest)).not.toThrow();
     });
 
@@ -56,6 +57,7 @@ describe('icrc-requests', () => {
           scopes: []
         }
       };
+
       expect(() => IcrcRequestAnyPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
 
@@ -65,6 +67,7 @@ describe('icrc-requests', () => {
         // @ts-expect-error: we are testing this on purpose
         params: {}
       };
+
       expect(() => IcrcRequestAnyPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
 
@@ -73,6 +76,7 @@ describe('icrc-requests', () => {
 
       // @ts-expect-error: we are testing this on purpose
       const invalidRequest: IcrcRequestAnyPermissionsRequest = rest;
+
       expect(() => IcrcRequestAnyPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
 
@@ -82,6 +86,7 @@ describe('icrc-requests', () => {
         // @ts-expect-error: we are testing this on purpose
         method: 'test'
       };
+
       expect(() => IcrcRequestAnyPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
 
@@ -89,6 +94,7 @@ describe('icrc-requests', () => {
       const {id: _, ...rest} = validRequest;
 
       const invalidRequest: Partial<IcrcRequestAnyPermissionsRequest> = rest;
+
       expect(() => IcrcRequestAnyPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
 
@@ -96,6 +102,7 @@ describe('icrc-requests', () => {
       const {jsonrpc: _, ...rest} = validRequest;
 
       const invalidRequest: Partial<IcrcRequestAnyPermissionsRequest> = rest;
+
       expect(() => IcrcRequestAnyPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
   });
@@ -117,6 +124,7 @@ describe('icrc-requests', () => {
         // @ts-expect-error: we are testing this on purpose
         params: {}
       };
+
       expect(() => IcrcPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
 
@@ -126,6 +134,7 @@ describe('icrc-requests', () => {
         // @ts-expect-error: we are testing this on purpose
         method: 'test'
       };
+
       expect(() => IcrcPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
 
@@ -133,6 +142,7 @@ describe('icrc-requests', () => {
       const {id: _, ...rest} = validRequest;
 
       const invalidRequest: Partial<IcrcPermissionsRequest> = rest;
+
       expect(() => IcrcPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
 
@@ -140,6 +150,7 @@ describe('icrc-requests', () => {
       const {jsonrpc: _, ...rest} = validRequest;
 
       const invalidRequest: Partial<IcrcPermissionsRequest> = rest;
+
       expect(() => IcrcPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
   });
@@ -165,6 +176,7 @@ describe('icrc-requests', () => {
         ...validRequest,
         params: {}
       };
+
       expect(() => schema.parse(invalidRequest)).toThrow();
     });
 
@@ -173,6 +185,7 @@ describe('icrc-requests', () => {
         ...validRequest,
         method: 'test'
       };
+
       expect(() => schema.parse(invalidRequest)).toThrow();
     });
 
@@ -180,6 +193,7 @@ describe('icrc-requests', () => {
       const {id: _, ...rest} = validRequest;
 
       const invalidRequest = rest;
+
       expect(() => schema.parse(invalidRequest)).toThrow();
     });
 
@@ -187,6 +201,7 @@ describe('icrc-requests', () => {
       const {jsonrpc: _, ...rest} = validRequest;
 
       const invalidRequest = rest;
+
       expect(() => schema.parse(invalidRequest)).toThrow();
     });
   });
@@ -208,6 +223,7 @@ describe('icrc-requests', () => {
         // @ts-expect-error: we are testing this on purpose
         params: {}
       };
+
       expect(() => IcrcAccountsRequestSchema.parse(invalidRequest)).toThrow();
     });
 
@@ -217,6 +233,7 @@ describe('icrc-requests', () => {
         // @ts-expect-error: we are testing this on purpose
         method: 'test'
       };
+
       expect(() => IcrcAccountsRequestSchema.parse(invalidRequest)).toThrow();
     });
 
@@ -224,6 +241,7 @@ describe('icrc-requests', () => {
       const {id: _, ...rest} = validRequest;
 
       const invalidRequest = rest;
+
       expect(() => IcrcAccountsRequestSchema.parse(invalidRequest)).toThrow();
     });
 
@@ -231,6 +249,7 @@ describe('icrc-requests', () => {
       const {jsonrpc: _, ...rest} = validRequest;
 
       const invalidRequest = rest;
+
       expect(() => IcrcAccountsRequestSchema.parse(invalidRequest)).toThrow();
     });
   });
@@ -255,6 +274,7 @@ describe('icrc-requests', () => {
           canisterId: 'invalid-principal'
         }
       };
+
       expect(() => IcrcCallCanisterRequestSchema.parse(invalidRequest)).toThrow();
     });
 
@@ -266,6 +286,7 @@ describe('icrc-requests', () => {
           sender: 'invalid-principal'
         }
       };
+
       expect(() => IcrcCallCanisterRequestSchema.parse(invalidRequest)).toThrow();
     });
 
@@ -277,6 +298,7 @@ describe('icrc-requests', () => {
           method: ''
         }
       };
+
       expect(() => IcrcCallCanisterRequestSchema.parse(invalidRequest)).toThrow();
     });
 
@@ -288,6 +310,7 @@ describe('icrc-requests', () => {
           arg: 'not-a-Uint8Array'
         }
       };
+
       expect(() => IcrcCallCanisterRequestSchema.parse(invalidRequest)).toThrow();
     });
 
@@ -299,6 +322,7 @@ describe('icrc-requests', () => {
           nonce: uint8ArrayToBase64(new Uint8Array(20))
         }
       };
+
       expect(() => IcrcCallCanisterRequestSchema.parse(validMemoRequest)).not.toThrow();
     });
 
@@ -310,6 +334,7 @@ describe('icrc-requests', () => {
           nonce: uint8ArrayToBase64(new Uint8Array(32))
         }
       };
+
       expect(() => IcrcCallCanisterRequestSchema.parse(validMemoRequest)).not.toThrow();
     });
 
@@ -321,6 +346,7 @@ describe('icrc-requests', () => {
           nonce: new Uint8Array(33)
         }
       };
+
       expect(() => IcrcCallCanisterRequestSchema.parse(invalidMemoRequest)).toThrow();
     });
 
@@ -328,6 +354,7 @@ describe('icrc-requests', () => {
       const {params: _, ...rest} = validRequest;
 
       const invalidRequest = rest;
+
       expect(() => IcrcCallCanisterRequestSchema.parse(invalidRequest)).toThrow();
     });
 
@@ -338,6 +365,7 @@ describe('icrc-requests', () => {
         ...rest,
         params: validRequest.params
       };
+
       expect(() => IcrcCallCanisterRequestSchema.parse(invalidRequest)).toThrow();
     });
 
@@ -348,6 +376,7 @@ describe('icrc-requests', () => {
         ...rest,
         params: validRequest.params
       };
+
       expect(() => IcrcCallCanisterRequestSchema.parse(invalidRequest)).toThrow();
     });
 
@@ -356,6 +385,7 @@ describe('icrc-requests', () => {
         ...validRequest,
         method: 'invalid_method'
       };
+
       expect(() => IcrcCallCanisterRequestSchema.parse(invalidRequest)).toThrow();
     });
   });
@@ -370,6 +400,7 @@ describe('icrc-requests', () => {
         ...mockCallCanisterParams,
         canisterId: 'invalid-principal'
       };
+
       expect(() => IcrcCallCanisterRequestParamsSchema.parse(invalidParams)).toThrow();
     });
 
@@ -378,6 +409,7 @@ describe('icrc-requests', () => {
         ...mockCallCanisterParams,
         sender: 'invalid-principal'
       };
+
       expect(() => IcrcCallCanisterRequestParamsSchema.parse(invalidParams)).toThrow();
     });
 
@@ -386,6 +418,7 @@ describe('icrc-requests', () => {
         ...mockCallCanisterParams,
         method: ''
       };
+
       expect(() => IcrcCallCanisterRequestParamsSchema.parse(invalidParams)).toThrow();
     });
 
@@ -394,6 +427,7 @@ describe('icrc-requests', () => {
         ...mockCallCanisterParams,
         arg: 'not-a-Uint8Array'
       };
+
       expect(() => IcrcCallCanisterRequestParamsSchema.parse(invalidParams)).toThrow();
     });
 
@@ -402,6 +436,7 @@ describe('icrc-requests', () => {
         ...mockCallCanisterParams,
         nonce: uint8ArrayToBase64(new Uint8Array(20))
       };
+
       expect(() => IcrcCallCanisterRequestParamsSchema.parse(validMemoParams)).not.toThrow();
     });
 
@@ -410,6 +445,7 @@ describe('icrc-requests', () => {
         ...mockCallCanisterParams,
         nonce: uint8ArrayToBase64(new Uint8Array(32))
       };
+
       expect(() => IcrcCallCanisterRequestParamsSchema.parse(validMemoParams)).not.toThrow();
     });
 
@@ -418,6 +454,7 @@ describe('icrc-requests', () => {
         ...mockCallCanisterParams,
         nonce: new Uint8Array(33)
       };
+
       expect(() => IcrcCallCanisterRequestParamsSchema.parse(invalidMemoParams)).toThrow();
     });
 

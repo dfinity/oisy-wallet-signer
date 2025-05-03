@@ -58,6 +58,7 @@ describe('SignerOptions', () => {
       };
 
       const result = SignerOptionsSchema.parse(validSignerOptions);
+
       expect(result.host).toBeUndefined();
     });
 
@@ -98,6 +99,7 @@ describe('SignerOptions', () => {
       };
 
       const result = SignerOptionsSchema.parse(validSignerOptions);
+
       expect(result.sessionOptions).toBeUndefined();
     });
 

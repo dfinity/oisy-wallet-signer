@@ -80,6 +80,7 @@ describe('SignerApi', () => {
 
       expect(spy).toHaveBeenCalledWith(expect.objectContaining({nonce}));
     });
+
     it('should return an instance of CustomHttpAgent from getCustomAgent', async () => {
       // @ts-expect-error: accessing protected method for test
       const agent = await signerApi.getCustomAgent({
@@ -95,6 +96,7 @@ describe('SignerApi', () => {
       const ledgerCanisterMock = {
         metadata: () => Promise.resolve(mockIcrcLedgerMetadata)
       } as unknown as IcrcLedgerCanister;
+
       beforeEach(() => {
         vi.mock('../agent/http-agent-provider', () => {
           class HttpAgentProvider {
@@ -160,6 +162,7 @@ describe('SignerApi', () => {
 
         expect(result).toEqual(mockIcrcLedgerMetadata);
       });
+
       it('should return an instance of HttpAgentProvider from getDefaultAgent', async () => {
         // @ts-expect-error: accessing protected method for test
         const agent = await signerApi.getDefaultAgent({
@@ -181,8 +184,8 @@ describe('SignerApi', () => {
         vi.spyOn(IcrcLedgerCanister, 'create').mockImplementation(() => ledgerCanisterMock);
       });
 
-      it('should bubble error with metadata', () => {
-        expect(
+      it('should bubble error with metadata', async () => {
+        await expect(
           signerApi.ledgerMetadata({
             params: {
               canisterId: mockRequestPayload.canisterId

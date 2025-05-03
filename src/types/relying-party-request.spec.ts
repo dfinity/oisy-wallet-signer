@@ -8,6 +8,7 @@ describe('RelyingPartyRequests', () => {
       };
 
       const result = RelyingPartyRequestOptionsSchema.safeParse(validData);
+
       expect(result.success).toBe(true);
     });
 
@@ -15,6 +16,7 @@ describe('RelyingPartyRequests', () => {
       const validData = {};
 
       const result = RelyingPartyRequestOptionsSchema.safeParse(validData);
+
       expect(result.success).toBe(true);
     });
 
@@ -24,6 +26,7 @@ describe('RelyingPartyRequests', () => {
       };
 
       const result = RelyingPartyRequestOptionsSchema.safeParse(invalidData);
+
       expect(result.success).toBe(false);
     });
 
@@ -33,6 +36,7 @@ describe('RelyingPartyRequests', () => {
       };
 
       const result = RelyingPartyRequestOptionsSchema.safeParse(invalidData);
+
       expect(result.success).toBe(false);
     });
 
@@ -42,6 +46,7 @@ describe('RelyingPartyRequests', () => {
       };
 
       const result = RelyingPartyRequestOptionsSchema.safeParse(invalidData);
+
       expect(result.success).toBe(false);
     });
   });

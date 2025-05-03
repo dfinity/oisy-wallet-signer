@@ -93,6 +93,7 @@ describe('CustomHttpAgent', () => {
     expect(agent).toBeInstanceOf(CustomHttpAgent);
 
     expect(spyCustomAddTransform).toHaveBeenCalledOnce();
+
     spyCustomAddTransform.mockRestore();
   });
 
@@ -113,6 +114,7 @@ describe('CustomHttpAgent', () => {
 
   it('should expose the wrapped agent', async () => {
     const customAgent = await CustomHttpAgent.create({});
+
     expect(customAgent.agent).toBeDefined();
     expect(customAgent.agent).toBeInstanceOf(httpAgent.HttpAgent);
   });
@@ -328,6 +330,7 @@ describe('CustomHttpAgent', () => {
 
       it('should throw an exception if the agent root key is not defined', async () => {
         vi.spyOn(agent.agent, 'rootKey', 'get').mockReturnValue(null);
+
         await expect(agent.request(mockRequestPayload)).rejects.toThrow(UndefinedRootKeyError);
       });
     });
@@ -476,6 +479,7 @@ describe('CustomHttpAgent', () => {
 
   it('should throw an error if the arguments are not well formatted', async () => {
     const agent = await CustomHttpAgent.create();
+
     await expect(
       agent.request({
         arg: 'base64-encoded-argument',

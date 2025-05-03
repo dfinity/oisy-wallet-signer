@@ -41,24 +41,28 @@ describe('format.utils', () => {
     it('formats a valid date correctly', () => {
       const input = 1704032400000000000n;
       const result = formatDate(input);
+
       expect(result).toBe('Sun, Dec 31, 2023, 14:20:00 UTC');
     });
 
     it('formats a different valid date correctly', () => {
       const input = 1693526400000000000n;
       const result = formatDate(input);
+
       expect(result).toBe('Fri, Sep 1, 2023, 00:00:00 UTC');
     });
 
     it('handles zero timestamp (epoch)', () => {
       const input = 0n;
       const result = formatDate(input);
+
       expect(result).toBe('Thu, Jan 1, 1970, 00:00:00 UTC');
     });
 
     it('handles large timestamps correctly', () => {
       const input = 253402300799000000000n;
       const result = formatDate(input);
+
       expect(result).toBe('Fri, Dec 31, 9999, 23:59:59 UTC');
     });
   });

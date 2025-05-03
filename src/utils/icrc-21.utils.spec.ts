@@ -11,6 +11,7 @@ describe('icrc-21.utils', () => {
         }
       };
       const result = mapIcrc21ErrorToString(error);
+
       expect(result).toBe('Error: Something went wrong (Code: 1001)');
     });
 
@@ -21,6 +22,7 @@ describe('icrc-21.utils', () => {
         }
       };
       const result = mapIcrc21ErrorToString(error);
+
       expect(result).toBe('Insufficient Payment: Not enough funds');
     });
 
@@ -31,6 +33,7 @@ describe('icrc-21.utils', () => {
         }
       };
       const result = mapIcrc21ErrorToString(error);
+
       expect(result).toBe('Unsupported Canister Call: Canister call is not supported');
     });
 
@@ -41,12 +44,14 @@ describe('icrc-21.utils', () => {
         }
       };
       const result = mapIcrc21ErrorToString(error);
+
       expect(result).toBe('Consent Message Unavailable: Consent message is not available');
     });
 
     it('should return "Unknown error" for an unrecognized error type', () => {
       const error = {} as unknown as icrc21_error;
       const result = mapIcrc21ErrorToString(error);
+
       expect(result).toBe('Unknown error');
     });
   });

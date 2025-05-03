@@ -60,6 +60,7 @@ describe('icrc-responses', () => {
           ]
         }
       };
+
       expect(() => schema.parse(invalidResponse)).toThrow();
     });
 
@@ -77,6 +78,7 @@ describe('icrc-responses', () => {
           ]
         }
       };
+
       expect(() => schema.parse(invalidResponse)).toThrow();
     });
 
@@ -94,6 +96,7 @@ describe('icrc-responses', () => {
           ]
         }
       };
+
       expect(() => schema.parse(invalidResponse)).toThrow();
     });
 
@@ -109,6 +112,7 @@ describe('icrc-responses', () => {
           ]
         }
       };
+
       expect(() => schema.parse(invalidResponse)).toThrow();
     });
 
@@ -123,6 +127,7 @@ describe('icrc-responses', () => {
           ]
         }
       };
+
       expect(() => schema.parse(invalidResponse)).toThrow();
     });
 
@@ -133,6 +138,7 @@ describe('icrc-responses', () => {
           scopes: [{}]
         }
       };
+
       expect(() => schema.parse(invalidResponse)).toThrow();
     });
 
@@ -378,6 +384,7 @@ describe('icrc-responses', () => {
           ]
         }
       };
+
       expect(() => IcrcSupportedStandardsResponseSchema.parse(invalidResponse)).toThrow();
     });
 
@@ -393,6 +400,7 @@ describe('icrc-responses', () => {
           ]
         }
       };
+
       expect(() => IcrcSupportedStandardsResponseSchema.parse(invalidResponse)).toThrow();
     });
 
@@ -408,6 +416,7 @@ describe('icrc-responses', () => {
           ]
         }
       };
+
       expect(() => IcrcSupportedStandardsResponseSchema.parse(invalidResponse)).toThrow();
     });
 
@@ -423,6 +432,7 @@ describe('icrc-responses', () => {
           ]
         }
       };
+
       expect(() => IcrcSupportedStandardsResponseSchema.parse(invalidResponse)).toThrow();
     });
 
@@ -438,6 +448,7 @@ describe('icrc-responses', () => {
           ]
         }
       };
+
       expect(() => IcrcSupportedStandardsResponseSchema.parse(invalidResponse)).toThrow();
     });
 
@@ -448,6 +459,7 @@ describe('icrc-responses', () => {
           supportedStandards: []
         }
       };
+
       expect(() => IcrcSupportedStandardsResponseSchema.parse(invalidResponse)).toThrow();
     });
 
@@ -505,6 +517,7 @@ describe('icrc-responses', () => {
         // @ts-expect-error: we are testing this on purpose
         result: 'test'
       };
+
       expect(() => IcrcReadyResponseSchema.parse(invalidResponse)).toThrow();
     });
 
@@ -516,6 +529,7 @@ describe('icrc-responses', () => {
           hello: 'world'
         }
       };
+
       expect(() => IcrcReadyResponseSchema.parse(invalidResponse)).toThrow();
     });
 
@@ -568,6 +582,7 @@ describe('icrc-responses', () => {
           ]
         }
       };
+
       expect(() => IcrcAccountsResponseSchema.parse(invalidResponse)).toThrow();
     });
 
@@ -583,6 +598,7 @@ describe('icrc-responses', () => {
           ]
         }
       };
+
       expect(() => IcrcAccountsResponseSchema.parse(invalidResponse)).toThrow();
     });
 
@@ -598,6 +614,7 @@ describe('icrc-responses', () => {
           ]
         }
       };
+
       expect(() => IcrcAccountsResponseSchema.parse(invalidResponse)).toThrow();
     });
 
@@ -668,6 +685,7 @@ describe('icrc-responses', () => {
           ...validResponse.result,
           contentMap: 'invalid-content'
         };
+
         expect(() => IcrcCallCanisterResultSchema.parse(invalidPayload)).toThrow();
       });
 
@@ -676,16 +694,19 @@ describe('icrc-responses', () => {
           ...validResponse.result,
           certificate: 'invalid-certificate'
         };
+
         expect(() => IcrcCallCanisterResultSchema.parse(invalidPayload)).toThrow();
       });
 
       it('should throw if contentMap is missing', () => {
         const {contentMap: _, ...rest} = validResponse.result;
+
         expect(() => IcrcCallCanisterResultSchema.parse(rest)).toThrow();
       });
 
       it('should throw if certificate is missing', () => {
         const {certificate: _, ...rest} = validResponse.result;
+
         expect(() => IcrcCallCanisterResultSchema.parse(rest)).toThrow();
       });
 
@@ -694,6 +715,7 @@ describe('icrc-responses', () => {
           ...validResponse.result,
           extraField: 'unexpected'
         };
+
         expect(() => IcrcCallCanisterResultSchema.parse(invalidPayload)).toThrow();
       });
     });
@@ -711,6 +733,7 @@ describe('icrc-responses', () => {
             contentMap: 'invalid-content'
           }
         };
+
         expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
       });
 
@@ -722,6 +745,7 @@ describe('icrc-responses', () => {
             certificate: 'invalid-certificate'
           }
         };
+
         expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
       });
 
@@ -732,6 +756,7 @@ describe('icrc-responses', () => {
           ...validResponse,
           result: rest
         };
+
         expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
       });
 
@@ -742,6 +767,7 @@ describe('icrc-responses', () => {
           ...validResponse,
           result: rest
         };
+
         expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
       });
 
@@ -753,6 +779,7 @@ describe('icrc-responses', () => {
             extraField: 'unexpected'
           }
         };
+
         expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
       });
 
@@ -760,6 +787,7 @@ describe('icrc-responses', () => {
         const {result: _, ...rest} = validResponse;
 
         const invalidResponse = rest;
+
         expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
       });
 
@@ -767,6 +795,7 @@ describe('icrc-responses', () => {
         const {id: _, ...rest} = validResponse;
 
         const invalidResponse = rest;
+
         expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
       });
 
@@ -774,6 +803,7 @@ describe('icrc-responses', () => {
         const {jsonrpc: _, ...rest} = validResponse;
 
         const invalidResponse = rest;
+
         expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
       });
     });
