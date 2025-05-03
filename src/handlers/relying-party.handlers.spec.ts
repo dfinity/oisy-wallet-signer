@@ -245,7 +245,7 @@ describe('Relying Party handlers', () => {
     });
   });
 
-  describe('Request accounts', () => {
+  describe('Request call canister', () => {
     it('should send the correct message to the popup', () => {
       requestCallCanister({id: testId, popup, origin: testOrigin, params: mockCallCanisterParams});
 
