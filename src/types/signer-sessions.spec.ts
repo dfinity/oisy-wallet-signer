@@ -26,6 +26,7 @@ describe('Signer-sessions', () => {
     };
 
     const parsedData = SessionPermissionsSchema.parse(validData);
+
     expect(parsedData).toEqual(validData);
   });
 
@@ -203,6 +204,7 @@ describe('Signer-sessions', () => {
     };
 
     const parsedData = SessionPermissionsSchema.parse(validData);
+
     expect(parsedData).toEqual(validData);
   });
 });

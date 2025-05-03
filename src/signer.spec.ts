@@ -68,7 +68,9 @@ describe('Signer', () => {
 
   it('should init a signer', () => {
     const signer = Signer.init(signerOptions);
+
     expect(signer).toBeInstanceOf(Signer);
+
     signer.disconnect();
   });
 
@@ -76,7 +78,9 @@ describe('Signer', () => {
     const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
 
     const signer = Signer.init(signerOptions);
+
     expect(addEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
+
     signer.disconnect();
   });
 

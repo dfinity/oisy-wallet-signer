@@ -1595,12 +1595,14 @@ describe('Relying Party', () => {
           ]);
 
           const result = await relyingParty.requestPermissionsNotGranted();
+
           expect(result).toEqual({allPermissionsGranted: true});
           expect(relyingParty.requestPermissions).not.toHaveBeenCalled();
         });
 
         it('should request only missing permissions if some are not granted', async () => {
           const result = await relyingParty.requestPermissionsNotGranted();
+
           expect(result).toEqual({allPermissionsGranted: true});
           expect(relyingParty.requestPermissions).toHaveBeenCalledWith({
             params: {scopes: [{method: ICRC49_CALL_CANISTER}]}
@@ -1614,6 +1616,7 @@ describe('Relying Party', () => {
           ]);
 
           const result = await relyingParty.requestPermissionsNotGranted();
+
           expect(result).toEqual({allPermissionsGranted: false});
         });
 

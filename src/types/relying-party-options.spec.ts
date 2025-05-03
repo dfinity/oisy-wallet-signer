@@ -17,6 +17,7 @@ describe('RelyingPartyOptions', () => {
     };
 
     const result = RelyingPartyOptionsSchema.safeParse(validData);
+
     expect(result.success).toBe(true);
   });
 
@@ -29,6 +30,7 @@ describe('RelyingPartyOptions', () => {
     };
 
     const result = RelyingPartyOptionsSchema.safeParse(invalidData);
+
     expect(result.success).toBe(false);
   });
 
@@ -41,6 +43,7 @@ describe('RelyingPartyOptions', () => {
     };
 
     const result = RelyingPartyOptionsSchema.safeParse(invalidData);
+
     expect(result.success).toBe(false);
   });
 
@@ -53,6 +56,7 @@ describe('RelyingPartyOptions', () => {
     };
 
     const result = RelyingPartyOptionsSchema.safeParse(invalidData);
+
     expect(result.success).toBe(false);
   });
 
@@ -65,6 +69,7 @@ describe('RelyingPartyOptions', () => {
     };
 
     const result = RelyingPartyOptionsSchema.safeParse(invalidData);
+
     expect(result.success).toBe(false);
   });
 
@@ -75,6 +80,7 @@ describe('RelyingPartyOptions', () => {
     };
 
     const result = RelyingPartyOptionsSchema.safeParse(validData);
+
     expect(result.success).toBe(true);
   });
 
@@ -84,6 +90,7 @@ describe('RelyingPartyOptions', () => {
     };
 
     const result = RelyingPartyOptionsSchema.safeParse(invalidData);
+
     expect(result.success).toBe(false);
   });
 
@@ -98,6 +105,7 @@ describe('RelyingPartyOptions', () => {
     };
 
     const result = RelyingPartyOptionsSchema.safeParse(invalidData);
+
     expect(result.success).toBe(false);
   });
 
@@ -112,6 +120,7 @@ describe('RelyingPartyOptions', () => {
     };
 
     const result = RelyingPartyOptionsSchema.safeParse(invalidData);
+
     expect(result.success).toBe(false);
   });
 
@@ -126,6 +135,7 @@ describe('RelyingPartyOptions', () => {
     };
 
     const result = RelyingPartyOptionsSchema.safeParse(invalidData);
+
     expect(result.success).toBe(false);
   });
 
@@ -140,6 +150,7 @@ describe('RelyingPartyOptions', () => {
     };
 
     const result = RelyingPartyOptionsSchema.safeParse(validData);
+
     expect(result.success).toBe(true);
   });
 
@@ -152,6 +163,7 @@ describe('RelyingPartyOptions', () => {
     };
 
     const result = RelyingPartyOptionsSchema.safeParse(invalidData);
+
     expect(result.success).toBe(false);
   });
 
@@ -161,6 +173,7 @@ describe('RelyingPartyOptions', () => {
     };
 
     const result = RelyingPartyOptionsSchema.safeParse(validData);
+
     expect(result.success).toBe(true);
   });
 
@@ -173,6 +186,7 @@ describe('RelyingPartyOptions', () => {
     };
 
     const result = RelyingPartyOptionsSchema.safeParse(validData);
+
     expect(result.success).toBe(true);
   });
 
@@ -183,6 +197,7 @@ describe('RelyingPartyOptions', () => {
     };
 
     const result = RelyingPartyOptionsSchema.safeParse(invalidData);
+
     expect(result.success).toBe(false);
   });
 
@@ -196,6 +211,7 @@ describe('RelyingPartyOptions', () => {
         ...validData,
         host: 'http://localhost:4943'
       });
+
       expect(result.success).toBe(true);
     });
 
@@ -204,6 +220,7 @@ describe('RelyingPartyOptions', () => {
         ...validData,
         host: 'https://localhost:4943'
       });
+
       expect(result.success).toBe(true);
     });
 
@@ -212,6 +229,7 @@ describe('RelyingPartyOptions', () => {
         ...validData,
         host: 'https://example.com'
       });
+
       expect(result.success).toBe(true);
     });
 
@@ -220,6 +238,7 @@ describe('RelyingPartyOptions', () => {
         ...validData,
         host: 'http://example.com'
       });
+
       expect(result.success).toBe(false);
       expect(result.error?.errors[0]?.message).toBe('Invalid URL.');
     });
@@ -228,6 +247,7 @@ describe('RelyingPartyOptions', () => {
       const result = RelyingPartyOptionsSchema.safeParse({
         ...validData
       });
+
       expect(result.success).toBe(true);
     });
 
@@ -236,6 +256,7 @@ describe('RelyingPartyOptions', () => {
         ...validData,
         host: 'not-a-url'
       });
+
       expect(result.success).toBe(false);
       expect(result.error?.errors[0]?.message).toBe('Invalid url');
     });

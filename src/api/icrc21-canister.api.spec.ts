@@ -138,7 +138,7 @@ describe('icrc-21.canister.api', () => {
   });
 
   describe('Actors cache', () => {
-    it('should create a new actor when none exists ', async () => {
+    it('should create a new actor when none exists', async () => {
       const result = await canister['getIcrc21Actor']({
         canisterId: mockCanisterId,
         ...signerOptions

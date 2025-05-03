@@ -46,6 +46,7 @@ describe('Http-Agent-Provider', () => {
     const agentOptions = {shouldFetchRootKey: true};
     const spyCreate = vi.spyOn(httpAgent.HttpAgent, 'create');
     const agent = await HttpAgentProvider.create(agentOptions);
+
     expect(spyCreate).toHaveBeenCalledWith(agentOptions);
     expect(agent).toBeInstanceOf(HttpAgentProvider);
   });
@@ -57,12 +58,14 @@ describe('Http-Agent-Provider', () => {
     };
     const spyCreate = vi.spyOn(httpAgent.HttpAgent, 'create');
     const agent = await HttpAgentProvider.create(agentOptions);
+
     expect(spyCreate).toHaveBeenCalledWith(agentOptions);
     expect(agent).toBeInstanceOf(HttpAgentProvider);
   });
 
   it('should expose the wrapped agent', async () => {
     const agent = await HttpAgentProvider.create({});
+
     expect(agent.agent).toBeDefined();
     expect(agent.agent).toBeInstanceOf(httpAgent.HttpAgent);
   });

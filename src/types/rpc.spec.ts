@@ -17,6 +17,7 @@ describe('rpc', () => {
         jsonrpc: JSON_RPC_VERSION_2,
         method: 'test'
       };
+
       expect(() => RpcNotificationSchema.parse(validRpcNotification)).not.toThrow();
     });
 
@@ -28,6 +29,7 @@ describe('rpc', () => {
           hello: 'world'
         }
       };
+
       expect(() => RpcNotificationSchema.parse(validRpcNotification)).not.toThrow();
     });
 
@@ -55,6 +57,7 @@ describe('rpc', () => {
         method: 'test',
         hello: 'world'
       };
+
       expect(() => RpcNotificationSchema.parse(invalidRpcNotification)).toThrow();
     });
 
@@ -75,6 +78,7 @@ describe('rpc', () => {
           id: 1,
           method: 'test'
         };
+
         expect(() => RpcRequestSchema.parse(validRpcRequest)).not.toThrow();
       });
 
@@ -85,6 +89,7 @@ describe('rpc', () => {
           method: 'test',
           hello: 'world'
         };
+
         expect(() => RpcRequestSchema.parse(invalidRpcRequest)).toThrow();
       });
 
@@ -94,6 +99,7 @@ describe('rpc', () => {
           method: 'test',
           params: {hello: 123}
         };
+
         expect(() => RpcRequestSchema.parse(invalidRpcRequest)).toThrow();
       });
 
@@ -103,6 +109,7 @@ describe('rpc', () => {
           method: 'test',
           params: {hello: 123}
         };
+
         expect(() => RpcRequestSchema.parse(invalidRpcRequest)).toThrow();
       });
 
@@ -112,6 +119,7 @@ describe('rpc', () => {
           id: 123,
           params: {hello: 123}
         };
+
         expect(() => RpcRequestSchema.parse(invalidRpcRequest)).toThrow();
       });
     });
@@ -125,6 +133,7 @@ describe('rpc', () => {
           id: 1,
           method: 'test'
         };
+
         expect(() => RpcCustomRequest.parse(validRpcRequest)).not.toThrow();
       });
 
@@ -135,6 +144,7 @@ describe('rpc', () => {
           method: 'test',
           hello: 'world'
         };
+
         expect(() => RpcCustomRequest.parse(invalidRpcRequest)).toThrow();
       });
 
@@ -144,6 +154,7 @@ describe('rpc', () => {
           method: 'test',
           params: {hello: 123}
         };
+
         expect(() => RpcCustomRequest.parse(invalidRpcRequest)).toThrow();
       });
 
@@ -153,6 +164,7 @@ describe('rpc', () => {
           method: 'test',
           params: {hello: 123}
         };
+
         expect(() => RpcCustomRequest.parse(invalidRpcRequest)).toThrow();
       });
 
@@ -162,6 +174,7 @@ describe('rpc', () => {
           id: 123,
           params: {hello: 123}
         };
+
         expect(() => RpcCustomRequest.parse(invalidRpcRequest)).toThrow();
       });
     });
@@ -180,6 +193,7 @@ describe('rpc', () => {
           method: 'test',
           params: {hello: 'world'}
         };
+
         expect(() => RpcCustomRequest.parse(validRpcRequest)).not.toThrow();
       });
 
@@ -190,6 +204,7 @@ describe('rpc', () => {
           method: 'test',
           params: {hello: 123}
         };
+
         expect(() => RpcCustomRequest.parse(invalidRpcRequest)).toThrow();
       });
 
@@ -199,6 +214,7 @@ describe('rpc', () => {
           id: 1,
           method: 'test'
         };
+
         expect(() => RpcCustomRequest.parse(invalidRpcRequest)).toThrow();
       });
 
@@ -208,6 +224,7 @@ describe('rpc', () => {
           method: 'test',
           params: {hello: 123}
         };
+
         expect(() => RpcCustomRequest.parse(invalidRpcRequest)).toThrow();
       });
 
@@ -218,6 +235,7 @@ describe('rpc', () => {
           method: 'test-invalid',
           params: {hello: 'world'}
         };
+
         expect(() => RpcCustomRequest.parse(invalidRpcRequest)).toThrow();
       });
 
@@ -227,6 +245,7 @@ describe('rpc', () => {
           method: 'test',
           params: {hello: 123}
         };
+
         expect(() => RpcCustomRequest.parse(invalidRpcRequest)).toThrow();
       });
 
@@ -236,6 +255,7 @@ describe('rpc', () => {
           id: 123,
           params: {hello: 123}
         };
+
         expect(() => RpcCustomRequest.parse(invalidRpcRequest)).toThrow();
       });
     });
@@ -248,6 +268,7 @@ describe('rpc', () => {
         id: 1,
         result: {success: true}
       };
+
       expect(() => RpcResponseWithResultOrErrorSchema.parse(validRpcResponse)).not.toThrow();
     });
 
@@ -260,6 +281,7 @@ describe('rpc', () => {
           message: 'An internal error occurred'
         }
       };
+
       expect(() => RpcResponseWithResultOrErrorSchema.parse(validRpcResponse)).not.toThrow();
     });
 
@@ -272,6 +294,7 @@ describe('rpc', () => {
           message: 'A custom application error occurred'
         }
       };
+
       expect(() => RpcResponseWithResultOrErrorSchema.parse(validRpcResponse)).not.toThrow();
     });
 
@@ -280,6 +303,7 @@ describe('rpc', () => {
         jsonrpc: JSON_RPC_VERSION_2,
         id: 1
       };
+
       expect(() => RpcResponseWithResultOrErrorSchema.parse(invalidRpcResponse)).toThrow(
         'Either result or error should be provided.'
       );
@@ -290,6 +314,7 @@ describe('rpc', () => {
         jsonrpc: JSON_RPC_VERSION_2,
         result: {success: true}
       };
+
       expect(() => RpcResponseWithResultOrErrorSchema.parse(validRpcResponse)).toThrow();
     });
 
@@ -301,6 +326,7 @@ describe('rpc', () => {
           message: 'An internal error occurred'
         }
       };
+
       expect(() => RpcResponseWithResultOrErrorSchema.parse(validRpcResponse)).toThrow();
     });
 
@@ -309,6 +335,7 @@ describe('rpc', () => {
         id: 1,
         result: {success: true}
       };
+
       expect(() => RpcResponseWithResultOrErrorSchema.parse(validRpcResponse)).toThrow();
     });
 
@@ -320,6 +347,7 @@ describe('rpc', () => {
           message: 'An internal error occurred'
         }
       };
+
       expect(() => RpcResponseWithResultOrErrorSchema.parse(validRpcResponse)).toThrow();
     });
 
@@ -330,6 +358,7 @@ describe('rpc', () => {
         result: {success: true},
         hello: 'world'
       };
+
       expect(() => RpcResponseWithResultOrErrorSchema.parse(invalidRpcResponse)).toThrow();
     });
   });
@@ -344,6 +373,7 @@ describe('rpc', () => {
           message: 'An internal error occurred'
         }
       };
+
       expect(() => RpcResponseWithErrorSchema.parse(validRpcResponseWithError)).not.toThrow();
     });
 
@@ -356,6 +386,7 @@ describe('rpc', () => {
           message: 'A custom error occurred'
         }
       };
+
       expect(() => RpcResponseWithErrorSchema.parse(validRpcResponseWithError)).not.toThrow();
     });
 
@@ -367,6 +398,7 @@ describe('rpc', () => {
           message: 'An error occurred without a code'
         }
       };
+
       expect(() => RpcResponseWithErrorSchema.parse(invalidRpcResponseWithError)).toThrow();
     });
 
@@ -378,6 +410,7 @@ describe('rpc', () => {
           code: RpcErrorCode.INTERNAL_ERROR
         }
       };
+
       expect(() => RpcResponseWithErrorSchema.parse(invalidRpcResponseWithError)).toThrow();
     });
 
@@ -389,6 +422,7 @@ describe('rpc', () => {
           message: 'An internal error occurred'
         }
       };
+
       expect(() => RpcResponseWithErrorSchema.parse(invalidRpcResponseWithError)).toThrow();
     });
 
@@ -400,6 +434,7 @@ describe('rpc', () => {
           message: 'An internal error occurred'
         }
       };
+
       expect(() => RpcResponseWithErrorSchema.parse(invalidRpcResponseWithError)).toThrow();
     });
 
@@ -413,6 +448,7 @@ describe('rpc', () => {
         },
         additionalField: 'not allowed'
       };
+
       expect(() => RpcResponseWithErrorSchema.parse(invalidRpcResponseWithError)).toThrow();
     });
   });
