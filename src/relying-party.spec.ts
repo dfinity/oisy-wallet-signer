@@ -457,7 +457,7 @@ describe('Relying Party', () => {
             message: errorMsg
           };
 
-          await expect(promise).rejects.toThrowError(new RelyingPartyResponseError(error));
+          await expect(promise).rejects.toThrow(new RelyingPartyResponseError(error));
         });
 
         it('should throw error if the signer popup is closed', async () => {
@@ -695,7 +695,7 @@ describe('Relying Party', () => {
               message: errorMsg
             };
 
-            await expect(promise).rejects.toThrowError(new RelyingPartyResponseError(error));
+            await expect(promise).rejects.toThrow(new RelyingPartyResponseError(error));
           });
 
           it('should throw error if the signer popup is closed', async () => {
@@ -914,7 +914,7 @@ describe('Relying Party', () => {
               message: errorMsg
             };
 
-            await expect(promise).rejects.toThrowError(new RelyingPartyResponseError(error));
+            await expect(promise).rejects.toThrow(new RelyingPartyResponseError(error));
           });
 
           it('should throw error if the signer popup is closed', async () => {
@@ -1176,7 +1176,7 @@ describe('Relying Party', () => {
             message: errorMsg
           };
 
-          await expect(promise).rejects.toThrowError(new RelyingPartyResponseError(error));
+          await expect(promise).rejects.toThrow(new RelyingPartyResponseError(error));
         });
 
         it('should throw error if the signer popup is closed', async () => {
@@ -1435,7 +1435,7 @@ describe('Relying Party', () => {
             message: errorMsg
           };
 
-          await expect(promise).rejects.toThrowError(new RelyingPartyResponseError(error));
+          await expect(promise).rejects.toThrow(new RelyingPartyResponseError(error));
         });
 
         it('should throw error if the signer popup is closed', async () => {

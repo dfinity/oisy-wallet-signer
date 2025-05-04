@@ -18,7 +18,7 @@ describe('RelyingPartyOptions', () => {
 
     const result = RelyingPartyOptionsSchema.safeParse(validData);
 
-    expect(result.success).toBe(true);
+    expect(result.success).toBeTruthy();
   });
 
   it('should fail validation with a negative pollingIntervalInMilliseconds', () => {
@@ -31,7 +31,7 @@ describe('RelyingPartyOptions', () => {
 
     const result = RelyingPartyOptionsSchema.safeParse(invalidData);
 
-    expect(result.success).toBe(false);
+    expect(result.success).toBeFalsy();
   });
 
   it('should fail validation with zero pollingIntervalInMilliseconds', () => {
@@ -44,7 +44,7 @@ describe('RelyingPartyOptions', () => {
 
     const result = RelyingPartyOptionsSchema.safeParse(invalidData);
 
-    expect(result.success).toBe(false);
+    expect(result.success).toBeFalsy();
   });
 
   it('should fail validation with a zero timeoutInMilliseconds', () => {
@@ -57,7 +57,7 @@ describe('RelyingPartyOptions', () => {
 
     const result = RelyingPartyOptionsSchema.safeParse(invalidData);
 
-    expect(result.success).toBe(false);
+    expect(result.success).toBeFalsy();
   });
 
   it('should fail validation with a negative timeoutInMilliseconds', () => {
@@ -70,7 +70,7 @@ describe('RelyingPartyOptions', () => {
 
     const result = RelyingPartyOptionsSchema.safeParse(invalidData);
 
-    expect(result.success).toBe(false);
+    expect(result.success).toBeFalsy();
   });
 
   it('should validate with correct relying party options and string window options', () => {
@@ -81,7 +81,7 @@ describe('RelyingPartyOptions', () => {
 
     const result = RelyingPartyOptionsSchema.safeParse(validData);
 
-    expect(result.success).toBe(true);
+    expect(result.success).toBeTruthy();
   });
 
   it('should fail validation with an invalid URL', () => {
@@ -91,7 +91,7 @@ describe('RelyingPartyOptions', () => {
 
     const result = RelyingPartyOptionsSchema.safeParse(invalidData);
 
-    expect(result.success).toBe(false);
+    expect(result.success).toBeFalsy();
   });
 
   it('should fail validation with incorrect windowOptions object', () => {
@@ -106,7 +106,7 @@ describe('RelyingPartyOptions', () => {
 
     const result = RelyingPartyOptionsSchema.safeParse(invalidData);
 
-    expect(result.success).toBe(false);
+    expect(result.success).toBeFalsy();
   });
 
   it('should fail validation with zero width for the signer window', () => {
@@ -121,7 +121,7 @@ describe('RelyingPartyOptions', () => {
 
     const result = RelyingPartyOptionsSchema.safeParse(invalidData);
 
-    expect(result.success).toBe(false);
+    expect(result.success).toBeFalsy();
   });
 
   it('should fail validation with zero height for the signer window', () => {
@@ -136,7 +136,7 @@ describe('RelyingPartyOptions', () => {
 
     const result = RelyingPartyOptionsSchema.safeParse(invalidData);
 
-    expect(result.success).toBe(false);
+    expect(result.success).toBeFalsy();
   });
 
   it('should pass validation with positive width and height for the signer window', () => {
@@ -151,7 +151,7 @@ describe('RelyingPartyOptions', () => {
 
     const result = RelyingPartyOptionsSchema.safeParse(validData);
 
-    expect(result.success).toBe(true);
+    expect(result.success).toBeTruthy();
   });
 
   it('should fail validation with incorrect connectionOptions object', () => {
@@ -164,7 +164,7 @@ describe('RelyingPartyOptions', () => {
 
     const result = RelyingPartyOptionsSchema.safeParse(invalidData);
 
-    expect(result.success).toBe(false);
+    expect(result.success).toBeFalsy();
   });
 
   it('should pass validation with only required fields', () => {
@@ -174,7 +174,7 @@ describe('RelyingPartyOptions', () => {
 
     const result = RelyingPartyOptionsSchema.safeParse(validData);
 
-    expect(result.success).toBe(true);
+    expect(result.success).toBeTruthy();
   });
 
   it('should validate with the optional onDisconnect callback', () => {
@@ -187,7 +187,7 @@ describe('RelyingPartyOptions', () => {
 
     const result = RelyingPartyOptionsSchema.safeParse(validData);
 
-    expect(result.success).toBe(true);
+    expect(result.success).toBeTruthy();
   });
 
   it('should fail validation if onDisconnect is not a function', () => {
@@ -198,7 +198,7 @@ describe('RelyingPartyOptions', () => {
 
     const result = RelyingPartyOptionsSchema.safeParse(invalidData);
 
-    expect(result.success).toBe(false);
+    expect(result.success).toBeFalsy();
   });
 
   describe('host', () => {
@@ -212,7 +212,7 @@ describe('RelyingPartyOptions', () => {
         host: 'http://localhost:4943'
       });
 
-      expect(result.success).toBe(true);
+      expect(result.success).toBeTruthy();
     });
 
     it('should validate with a valid localhost URL (https)', () => {
@@ -221,7 +221,7 @@ describe('RelyingPartyOptions', () => {
         host: 'https://localhost:4943'
       });
 
-      expect(result.success).toBe(true);
+      expect(result.success).toBeTruthy();
     });
 
     it('should validate with a valid https URL', () => {
@@ -230,7 +230,7 @@ describe('RelyingPartyOptions', () => {
         host: 'https://example.com'
       });
 
-      expect(result.success).toBe(true);
+      expect(result.success).toBeTruthy();
     });
 
     it('should invalidate with an http URL for non-localhost', () => {
@@ -239,7 +239,7 @@ describe('RelyingPartyOptions', () => {
         host: 'http://example.com'
       });
 
-      expect(result.success).toBe(false);
+      expect(result.success).toBeFalsy();
       expect(result.error?.errors[0]?.message).toBe('Invalid URL.');
     });
 
@@ -248,7 +248,7 @@ describe('RelyingPartyOptions', () => {
         ...validData
       });
 
-      expect(result.success).toBe(true);
+      expect(result.success).toBeTruthy();
     });
 
     it('should invalidate with an incorrect URL format', () => {
@@ -257,7 +257,7 @@ describe('RelyingPartyOptions', () => {
         host: 'not-a-url'
       });
 
-      expect(result.success).toBe(false);
+      expect(result.success).toBeFalsy();
       expect(result.error?.errors[0]?.message).toBe('Invalid url');
     });
   });

@@ -59,13 +59,13 @@ describe('SignerPrompts', () => {
     ];
 
     it.each(approveEnums)('should validate $title with IcrcApproveMethodSchema', ({validEnum}) => {
-      expect(PromptMethodSchema.safeParse(validEnum).success).toBe(true);
+      expect(PromptMethodSchema.safeParse(validEnum).success).toBeTruthy();
     });
 
     it.each(invalidApproveEnums)(
       'should not validate $title with IcrcApproveMethodSchema',
       ({validEnum}) => {
-        expect(PromptMethodSchema.safeParse(validEnum).success).toBe(false);
+        expect(PromptMethodSchema.safeParse(validEnum).success).toBeFalsy();
       }
     );
   });

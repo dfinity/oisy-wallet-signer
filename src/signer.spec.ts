@@ -473,6 +473,7 @@ describe('Signer', () => {
           );
         };
 
+        // eslint-disable-next-line vitest/expect-expect -- assertNotifyReady is called in the test
         it('should notify READY for icrc29_status', () => {
           const messageEvent = new MessageEvent('message', requestStatus);
           window.dispatchEvent(messageEvent);
@@ -2618,7 +2619,7 @@ describe('Signer', () => {
           method: 'something',
           prompt: mockPrompt
         });
-      }).toThrowError(
+      }).toThrow(
         'The specified method is not supported. Please ensure you are using a supported standard.'
       );
     });

@@ -185,9 +185,7 @@ describe('call.utils', () => {
             result: mockLocalCallResult,
             resultRecordClass: TransferResult
           })
-        ).rejects.toThrowError(
-          'Missing agent root key, which is required to certify the response.'
-        );
+        ).rejects.toThrow('Missing agent root key, which is required to certify the response.');
       });
     });
 

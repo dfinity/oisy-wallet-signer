@@ -1,3 +1,4 @@
+/* eslint-disable vitest/expect-expect -- This test suite uses functions with nested `expect` statements */
 import {IDL} from '@dfinity/candid';
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {encodeIcrcAccount} from '@dfinity/ledger-icrc';

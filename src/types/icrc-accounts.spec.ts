@@ -11,7 +11,7 @@ describe('ICRC accounts', () => {
       };
       const result = IcrcAccountSchema.safeParse(validAccount);
 
-      expect(result.success).toBe(true);
+      expect(result.success).toBeTruthy();
     });
 
     it('should pass validation with a valid owner and optional subaccount', () => {
@@ -21,7 +21,7 @@ describe('ICRC accounts', () => {
       };
       const result = IcrcAccountSchema.safeParse(validAccount);
 
-      expect(result.success).toBe(true);
+      expect(result.success).toBeTruthy();
     });
 
     it('should pass validation with an anonymous principal', () => {
@@ -30,7 +30,7 @@ describe('ICRC accounts', () => {
       };
       const result = IcrcAccountSchema.safeParse(validAccount);
 
-      expect(result.success).toBe(true);
+      expect(result.success).toBeTruthy();
     });
 
     it('should fail validation with an invalid Principal string', () => {
@@ -39,7 +39,7 @@ describe('ICRC accounts', () => {
       };
       const result = IcrcAccountSchema.safeParse(invalidAccount);
 
-      expect(result.success).toBe(false);
+      expect(result.success).toBeFalsy();
 
       if (!result.success) {
         expect(result.error.errors[0].message).toBe(
@@ -55,7 +55,7 @@ describe('ICRC accounts', () => {
       };
       const result = IcrcAccountSchema.safeParse(invalidAccount);
 
-      expect(result.success).toBe(false);
+      expect(result.success).toBeFalsy();
 
       if (!result.success) {
         expect(result.error.errors[0].message).toBe('Subaccount must be exactly 32 bytes long.');
@@ -69,7 +69,7 @@ describe('ICRC accounts', () => {
       };
       const result = IcrcAccountSchema.safeParse(invalidAccount);
 
-      expect(result.success).toBe(false);
+      expect(result.success).toBeFalsy();
     });
   });
 
@@ -78,7 +78,7 @@ describe('ICRC accounts', () => {
       const validAccounts = [{owner: mockPrincipalText}];
       const result = IcrcAccountsSchema.safeParse(validAccounts);
 
-      expect(result.success).toBe(true);
+      expect(result.success).toBeTruthy();
     });
 
     it('should pass validation with multiple valid accounts', () => {
@@ -88,13 +88,13 @@ describe('ICRC accounts', () => {
       ];
       const result = IcrcAccountsSchema.safeParse(validAccounts);
 
-      expect(result.success).toBe(true);
+      expect(result.success).toBeTruthy();
     });
 
     it('should fail validation with an empty array', () => {
       const result = IcrcAccountsSchema.safeParse([]);
 
-      expect(result.success).toBe(false);
+      expect(result.success).toBeFalsy();
 
       if (!result.success) {
         expect(result.error.errors[0].message).toContain('at least 1 element(s)');
@@ -108,7 +108,7 @@ describe('ICRC accounts', () => {
       ];
       const result = IcrcAccountsSchema.safeParse(invalidAccounts);
 
-      expect(result.success).toBe(false);
+      expect(result.success).toBeFalsy();
 
       if (!result.success) {
         expect(result.error.errors[0].message).toBe(
@@ -123,7 +123,7 @@ describe('ICRC accounts', () => {
       ];
       const result = IcrcAccountsSchema.safeParse(invalidAccounts);
 
-      expect(result.success).toBe(false);
+      expect(result.success).toBeFalsy();
 
       if (!result.success) {
         expect(result.error.errors[0].message).toBe('Subaccount must be exactly 32 bytes long.');
@@ -134,14 +134,14 @@ describe('ICRC accounts', () => {
       const validAccounts = [{owner: mockPrincipalText}];
       const result = IcrcAccountsSchema.safeParse(validAccounts);
 
-      expect(result.success).toBe(true);
+      expect(result.success).toBeTruthy();
     });
 
     it('should fail validation when subaccount is not a blob', () => {
       const invalidAccounts = [{owner: mockPrincipalText, subaccount: 'invalid-subaccount'}];
       const result = IcrcAccountsSchema.safeParse(invalidAccounts);
 
-      expect(result.success).toBe(false);
+      expect(result.success).toBeFalsy();
     });
   });
 });

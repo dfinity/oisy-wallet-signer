@@ -59,7 +59,7 @@ describe('idl.utils', () => {
           recordClass: mockRecordClass,
           bytes: invalidReply
         })
-      ).toThrowError(/Wrong magic number/);
+      ).toThrow(/Wrong magic number/);
     });
 
     it('should throw an error if more than one object is returned', () => {
