@@ -77,7 +77,7 @@
   "devDependencies": {
     "@dfinity/eslint-config-oisy-wallet": "^0.1.8",
     "@dfinity/identity": "^2.4.0",
-    "@dfinity/internet-identity-playwright": "^0.0.5",
+    "@dfinity/internet-identity-playwright": "^2.0.0",
     "@playwright/test": "^1.51.1",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.13.13",
