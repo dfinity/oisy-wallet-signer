@@ -20,7 +20,7 @@ describe('agentjs-cbor-copy.utils', () => {
 
     expect(callRequest.nonce).toBeInstanceOf(Uint8Array);
     expect(callRequest.nonce).toEqual(
-      arrayBufferToUint8Array(mockRequestDetails.nonce as ArrayBuffer)
+      arrayBufferToUint8Array(mockRequestDetails.nonce as unknown as ArrayBuffer)
     );
 
     expect(callRequest.request_type).toEqual(mockRequestDetails.request_type);

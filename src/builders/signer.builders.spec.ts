@@ -1,4 +1,5 @@
 /* eslint-disable vitest/expect-expect -- This test suite uses functions with nested `expect` statements */
+import {uint8ToBuf} from '@dfinity/agent';
 import {IDL} from '@dfinity/candid';
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {encodeIcrcAccount} from '@dfinity/ledger-icrc';
@@ -74,7 +75,7 @@ describe('Signer builders', () => {
     });
 
     const result = await fn({
-      arg: base64ToUint8Array(arg),
+      arg: uint8ToBuf(base64ToUint8Array(arg)),
       owner: owner.getPrincipal(),
       token
     });
@@ -104,7 +105,7 @@ describe('Signer builders', () => {
 
     it('should build a consent message for a defined arg (without fee)', async () => {
       const result = await buildContentMessageIcrc1Transfer({
-        arg: base64ToUint8Array(mockIcrcLocalCallParams.arg),
+        arg: uint8ToBuf(base64ToUint8Array(mockIcrcLocalCallParams.arg)),
         owner: Principal.fromText(mockPrincipalText),
         token
       });
@@ -134,7 +135,7 @@ s3oqv-3j7id-xjhbm-3owbe-fvwly-oso6u-vej6n-bexck-koyu2-bxb6y-wae
       });
 
       const result = await buildContentMessageIcrc1Transfer({
-        arg: base64ToUint8Array(arg),
+        arg: uint8ToBuf(base64ToUint8Array(arg)),
         owner: owner.getPrincipal(),
         token
       });
@@ -153,7 +154,7 @@ s3oqv-3j7id-xjhbm-3owbe-fvwly-oso6u-vej6n-bexck-koyu2-bxb6y-wae
       });
 
       const result = await buildContentMessageIcrc1Transfer({
-        arg: base64ToUint8Array(arg),
+        arg: uint8ToBuf(base64ToUint8Array(arg)),
         owner: owner.getPrincipal(),
         token
       });
@@ -177,7 +178,7 @@ s3oqv-3j7id-xjhbm-3owbe-fvwly-oso6u-vej6n-bexck-koyu2-bxb6y-wae
       });
 
       const result = await buildContentMessageIcrc1Transfer({
-        arg: base64ToUint8Array(arg),
+        arg: uint8ToBuf(base64ToUint8Array(arg)),
         owner: owner.getPrincipal(),
         token
       });
@@ -215,7 +216,7 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.t
       });
 
       const result = await buildContentMessageIcrc1Transfer({
-        arg: base64ToUint8Array(arg),
+        arg: uint8ToBuf(base64ToUint8Array(arg)),
         owner: owner.getPrincipal(),
         token
       });
@@ -250,7 +251,7 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount})}
       });
 
       const result = await buildContentMessageIcrc1Transfer({
-        arg: base64ToUint8Array(arg),
+        arg: uint8ToBuf(base64ToUint8Array(arg)),
         owner: owner.getPrincipal(),
         token
       });
@@ -278,7 +279,7 @@ PUPT`
 
     it('should not build a consent message for invalid arg', async () => {
       const result = await buildContentMessageIcrc1Transfer({
-        arg: base64ToUint8Array(mockCallCanisterParams.arg),
+        arg: uint8ToBuf(base64ToUint8Array(mockCallCanisterParams.arg)),
         owner: owner.getPrincipal(),
         token
       });
@@ -301,7 +302,7 @@ PUPT`
       });
 
       const result = await buildContentMessageIcrc1Transfer({
-        arg: base64ToUint8Array(arg),
+        arg: uint8ToBuf(base64ToUint8Array(arg)),
         owner: owner.getPrincipal(),
         token
       });
@@ -332,7 +333,7 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.t
   describe('icrc2_approve', () => {
     it('should build a consent message in english', async () => {
       const result = await buildContentMessageIcrc2Approve({
-        arg: base64ToUint8Array(mockIcrcApproveArg),
+        arg: uint8ToBuf(base64ToUint8Array(mockIcrcApproveArg)),
         owner: owner.getPrincipal(),
         token
       });
@@ -346,7 +347,7 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.t
 
     it('should build a consent message with no utc time information', async () => {
       const result = await buildContentMessageIcrc2Approve({
-        arg: base64ToUint8Array(mockIcrcApproveArg),
+        arg: uint8ToBuf(base64ToUint8Array(mockIcrcApproveArg)),
         owner: owner.getPrincipal(),
         token
       });
@@ -360,7 +361,7 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.t
 
     it('should build a consent message for owner', async () => {
       const result = await buildContentMessageIcrc2Approve({
-        arg: base64ToUint8Array(mockIcrcApproveArg),
+        arg: uint8ToBuf(base64ToUint8Array(mockIcrcApproveArg)),
         owner: owner.getPrincipal(),
         token
       });
@@ -403,7 +404,7 @@ ${encodeIcrcAccount({owner: owner.getPrincipal()})}`
       });
 
       const result = await buildContentMessageIcrc2Approve({
-        arg: base64ToUint8Array(arg),
+        arg: uint8ToBuf(base64ToUint8Array(arg)),
         owner: owner.getPrincipal(),
         token
       });
@@ -446,7 +447,7 @@ ${encodeIcrcAccount({owner: owner.getPrincipal(), subaccount})}`
       });
 
       const result = await buildContentMessageIcrc2Approve({
-        arg: base64ToUint8Array(arg),
+        arg: uint8ToBuf(base64ToUint8Array(arg)),
         owner: owner.getPrincipal(),
         token
       });
@@ -482,7 +483,7 @@ PUPT`
 
     it('should not build a consent message for invalid arg', async () => {
       const result = await buildContentMessageIcrc2Approve({
-        arg: base64ToUint8Array(mockCallCanisterParams.arg),
+        arg: uint8ToBuf(base64ToUint8Array(mockCallCanisterParams.arg)),
         owner: owner.getPrincipal(),
         token
       });
@@ -505,7 +506,7 @@ PUPT`
       });
 
       const result = await buildContentMessageIcrc2Approve({
-        arg: base64ToUint8Array(arg),
+        arg: uint8ToBuf(base64ToUint8Array(arg)),
         owner: owner.getPrincipal(),
         token
       });
@@ -548,7 +549,7 @@ ${encodeIcrcAccount({owner: owner.getPrincipal()})}`
       });
 
       const result = await buildContentMessageIcrc2Approve({
-        arg: base64ToUint8Array(arg),
+        arg: uint8ToBuf(base64ToUint8Array(arg)),
         owner: owner.getPrincipal(),
         token
       });
@@ -592,7 +593,7 @@ ${encodeIcrcAccount({owner: owner.getPrincipal()})}`
       });
 
       const result = await buildContentMessageIcrc2Approve({
-        arg: base64ToUint8Array(arg),
+        arg: uint8ToBuf(base64ToUint8Array(arg)),
         owner: owner.getPrincipal(),
         token
       });
@@ -631,7 +632,7 @@ ${encodeIcrcAccount({owner: owner.getPrincipal()})}`
   describe('icrc2_transfer_from', () => {
     it('should build a consent message in english', async () => {
       const result = await buildContentMessageIcrc2TransferFrom({
-        arg: base64ToUint8Array(mockIcrcTransferFromArg),
+        arg: uint8ToBuf(base64ToUint8Array(mockIcrcTransferFromArg)),
         owner: owner.getPrincipal(),
         token
       });
@@ -645,7 +646,7 @@ ${encodeIcrcAccount({owner: owner.getPrincipal()})}`
 
     it('should build a consent message with no utc time information', async () => {
       const result = await buildContentMessageIcrc2TransferFrom({
-        arg: base64ToUint8Array(mockIcrcTransferFromArg),
+        arg: uint8ToBuf(base64ToUint8Array(mockIcrcTransferFromArg)),
         owner: owner.getPrincipal(),
         token
       });
@@ -659,7 +660,7 @@ ${encodeIcrcAccount({owner: owner.getPrincipal()})}`
 
     it('should build a consent message for owner', async () => {
       const result = await buildContentMessageIcrc2TransferFrom({
-        arg: base64ToUint8Array(mockIcrcTransferFromArg),
+        arg: uint8ToBuf(base64ToUint8Array(mockIcrcTransferFromArg)),
         owner: owner.getPrincipal(),
         token
       });
@@ -697,7 +698,7 @@ ${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.to.owner, subaccount: fr
       });
 
       const result = await buildContentMessageIcrc2TransferFrom({
-        arg: base64ToUint8Array(arg),
+        arg: uint8ToBuf(base64ToUint8Array(arg)),
         owner: owner.getPrincipal(),
         token
       });
@@ -738,7 +739,7 @@ ${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.to.owner, subaccount: fr
       });
 
       const result = await buildContentMessageIcrc2TransferFrom({
-        arg: base64ToUint8Array(arg),
+        arg: uint8ToBuf(base64ToUint8Array(arg)),
         owner: owner.getPrincipal(),
         token
       });
@@ -779,7 +780,7 @@ ${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.to.owner, subaccount: fr
       });
 
       const result = await buildContentMessageIcrc2TransferFrom({
-        arg: base64ToUint8Array(arg),
+        arg: uint8ToBuf(base64ToUint8Array(arg)),
         owner: owner.getPrincipal(),
         token
       });
@@ -817,7 +818,7 @@ ${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.to.owner, subaccount})}
       });
 
       const result = await buildContentMessageIcrc2TransferFrom({
-        arg: base64ToUint8Array(arg),
+        arg: uint8ToBuf(base64ToUint8Array(arg)),
         owner: owner.getPrincipal(),
         token
       });
@@ -848,7 +849,7 @@ PUPT`
 
     it('should not build a consent message for invalid arg', async () => {
       const result = await buildContentMessageIcrc2TransferFrom({
-        arg: base64ToUint8Array(mockCallCanisterParams.arg),
+        arg: uint8ToBuf(base64ToUint8Array(mockCallCanisterParams.arg)),
         owner: owner.getPrincipal(),
         token
       });
@@ -871,7 +872,7 @@ PUPT`
       });
 
       const result = await buildContentMessageIcrc2TransferFrom({
-        arg: base64ToUint8Array(arg),
+        arg: uint8ToBuf(base64ToUint8Array(arg)),
         owner: owner.getPrincipal(),
         token
       });

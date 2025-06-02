@@ -1,5 +1,5 @@
-import type {RequestId, SubmitResponse} from '@dfinity/agent';
 import * as httpAgent from '@dfinity/agent';
+import {type RequestId, type SubmitResponse, uint8ToBuf} from '@dfinity/agent';
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {base64ToUint8Array, nonNullish} from '@dfinity/utils';
 import type {MockInstance} from 'vitest';
@@ -170,7 +170,7 @@ describe('CustomHttpAgent', () => {
 
           expect(spyCall).toHaveBeenCalledOnce();
           expect(spyCall).toHaveBeenCalledWith(mockCanisterId, {
-            arg: base64ToUint8Array(mockRequestPayload.arg),
+            arg: uint8ToBuf(base64ToUint8Array(mockRequestPayload.arg)),
             effectiveCanisterId: mockCanisterId,
             methodName: mockRequestMethod
           });
@@ -185,7 +185,7 @@ describe('CustomHttpAgent', () => {
 
           expect(spyCall).toHaveBeenCalledOnce();
           expect(spyCall).toHaveBeenCalledWith(mockCanisterId, {
-            arg: base64ToUint8Array(mockRequestPayload.arg),
+            arg: uint8ToBuf(base64ToUint8Array(mockRequestPayload.arg)),
             effectiveCanisterId: mockCanisterId,
             methodName: mockRequestMethod,
             nonce: mockedNonce
@@ -364,7 +364,7 @@ describe('CustomHttpAgent', () => {
 
             expect(spyCall).toHaveBeenCalledOnce();
             expect(spyCall).toHaveBeenCalledWith(mockCanisterId, {
-              arg: base64ToUint8Array(mockRequestPayload.arg),
+              arg: uint8ToBuf(base64ToUint8Array(mockRequestPayload.arg)),
               effectiveCanisterId: mockCanisterId,
               methodName: mockRequestMethod
             });
@@ -379,7 +379,7 @@ describe('CustomHttpAgent', () => {
 
             expect(spyCall).toHaveBeenCalledOnce();
             expect(spyCall).toHaveBeenCalledWith(mockCanisterId, {
-              arg: base64ToUint8Array(mockRequestPayload.arg),
+              arg: uint8ToBuf(base64ToUint8Array(mockRequestPayload.arg)),
               effectiveCanisterId: mockCanisterId,
               methodName: mockRequestMethod,
               nonce: mockedNonce
