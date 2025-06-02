@@ -117,7 +117,7 @@ class Uint8ArrayDecoder extends borc.Decoder {
       return new ArrayBuffer(0);
     }
 
-    // @ts-ignore TS2740: Type Uint8Array<any> is missing the following properties from type ArrayBuffe
+    // @ts-ignore TS2740: Type Uint8Array<any> is missing the following properties from type ArrayBuffer
     return new Uint8Array((this as any)._heap.slice(start, end));
   }
 }
