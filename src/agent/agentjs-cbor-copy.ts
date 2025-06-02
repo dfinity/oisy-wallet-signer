@@ -8,7 +8,7 @@
 
 // This file is based on:
 // https://github.com/dfinity-lab/dfinity/blob/9bca65f8edd65701ea6bdb00e0752f9186bbc893/docs/spec/public/index.adoc#cbor-encoding-of-requests-and-responses
-import {concat, fromHex, toHex} from '@dfinity/agent';
+import {concat, fromHex, toHex, uint8ToBuf} from '@dfinity/agent';
 import {Principal} from '@dfinity/principal';
 import borc from 'borc';
 import * as cbor from 'simple-cbor';
@@ -34,7 +34,7 @@ class PrincipalEncoder implements CborEncoder<Principal> {
   }
 
   public encode(v: Principal): cbor.CborValue {
-    return cbor.value.bytes(v.toUint8Array());
+    return cbor.value.bytes(uint8ToBuf(v.toUint8Array()));
   }
 }
 
@@ -52,7 +52,7 @@ class BufferEncoder implements CborEncoder<ArrayBuffer> {
   }
 
   public encode(v: ArrayBuffer): cbor.CborValue {
-    return cbor.value.bytes(new Uint8Array(v));
+    return cbor.value.bytes(v);
   }
 }
 
@@ -117,6 +117,7 @@ class Uint8ArrayDecoder extends borc.Decoder {
       return new ArrayBuffer(0);
     }
 
+    // @ts-ignore TS2740: Type Uint8Array<any> is missing the following properties from type ArrayBuffer
     return new Uint8Array((this as any)._heap.slice(start, end));
   }
 }
@@ -134,8 +135,9 @@ export function decode<T>(input: ArrayBuffer): T {
   });
 
   try {
+    // @ts-ignore incorrect types - Uint8Array excepted by decodeFirst
     return decoder.decodeFirst(buffer);
   } catch (e: unknown) {
-    throw new Error(`Failed to decode CBOR: ${e}, input: ${toHex(buffer)}`);
+    throw new Error(`Failed to decode CBOR: ${e}, input: ${toHex(uint8ToBuf(buffer))}`);
   }
 }

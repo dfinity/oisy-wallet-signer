@@ -1,3 +1,4 @@
+import {uint8ToBuf} from '@dfinity/agent';
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {mapTokenMetadata, type IcrcTokenMetadata} from '@dfinity/ledger-icrc';
 import {assertNonNullish, base64ToUint8Array} from '@dfinity/utils';
@@ -466,7 +467,7 @@ describe('Signer services', () => {
                 assertNonNullish(fn);
 
                 const result = await fn({
-                  arg: base64ToUint8Array(arg),
+                  arg: uint8ToBuf(base64ToUint8Array(arg)),
                   token: mapTokenMetadata(mockIcrcLedgerMetadata) as IcrcTokenMetadata,
                   owner: owner.getPrincipal()
                 });

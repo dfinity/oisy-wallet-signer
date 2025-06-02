@@ -1,3 +1,4 @@
+import {uint8ToBuf} from '@dfinity/agent';
 import {Principal} from '@dfinity/principal';
 import {uint8ArrayToBase64} from '@dfinity/utils';
 import {mockCanisterId, mockPrincipalText} from '../mocks/icrc-accounts.mocks';
@@ -35,7 +36,7 @@ describe('call.assert.utils', () => {
       expect(() =>
         assertCallArg({
           requestArg: requestArgBlob,
-          responseArg
+          responseArg: uint8ToBuf(responseArg)
         })
       ).not.toThrow();
     });
@@ -47,7 +48,7 @@ describe('call.assert.utils', () => {
       expect(() =>
         assertCallArg({
           requestArg: requestArgBlob,
-          responseArg
+          responseArg: uint8ToBuf(responseArg)
         })
       ).toThrow('The response does not contain the request arguments.');
     });

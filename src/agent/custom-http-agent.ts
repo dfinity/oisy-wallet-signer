@@ -4,6 +4,7 @@ import {
   defaultStrategy,
   lookupResultToBuffer,
   pollForResponse as pollForResponseAgent,
+  uint8ToBuf,
   type CallRequest,
   type HttpAgentOptions,
   type SubmitResponse
@@ -46,7 +47,7 @@ export class CustomHttpAgent extends HttpAgentProvider {
   }: Omit<IcrcCallCanisterRequestParams, 'sender'>): Promise<CustomHttpAgentResponse> => {
     const {requestDetails, ...restResponse} = await this._agent.call(canisterId, {
       methodName,
-      arg: base64ToUint8Array(arg),
+      arg: uint8ToBuf(base64ToUint8Array(arg)),
       // effectiveCanisterId is optional but, actually mandatory according SDK team.
       effectiveCanisterId: canisterId,
       nonce: nonNullish(nonce) ? base64ToUint8Array(nonce) : undefined
@@ -147,7 +148,7 @@ export class CustomHttpAgent extends HttpAgentProvider {
   }: {certificate: Certificate} & Pick<SubmitResponse, 'requestId'>): {
     result: 'valid' | 'invalid' | 'rejected' | 'empty';
   } {
-    const path = [new TextEncoder().encode('request_status'), requestId];
+    const path = [uint8ToBuf(new TextEncoder().encode('request_status')), requestId];
 
     const status = new TextDecoder().decode(
       lookupResultToBuffer(certificate.lookup([...path, 'status']))
