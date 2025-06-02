@@ -32,15 +32,15 @@ vi.mock('@dfinity/utils', async () => {
   };
 });
 
-beforeEach(() => {
-  vi.clearAllMocks();
-});
-
-afterEach(() => {
-  vi.restoreAllMocks();
-});
-
 describe('customAddTransform integration with HttpAgent', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it('should register transform before making a call', async () => {
     const agent = await httpAgent.HttpAgent.create();
     const spyCall = vi.spyOn(agent, 'call');

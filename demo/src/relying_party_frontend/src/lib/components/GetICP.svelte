@@ -68,7 +68,7 @@
 				duration: 3000
 			});
 		} catch (err: unknown) {
-			const message = (err as Error).message;
+			const { message } = err as Error;
 
 			alertStore.set({
 				type: 'error',
