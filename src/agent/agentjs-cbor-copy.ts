@@ -135,7 +135,8 @@ export function decode<T>(input: ArrayBuffer): T {
   });
 
   try {
-    return decoder.decodeFirst(uint8ToBuf(buffer));
+    // @ts-ignore incorrect types - Uint8Array excepted by decodeFirst
+    return decoder.decodeFirst(buffer);
   } catch (e: unknown) {
     throw new Error(`Failed to decode CBOR: ${e}, input: ${toHex(uint8ToBuf(buffer))}`);
   }
