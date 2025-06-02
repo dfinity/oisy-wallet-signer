@@ -75,7 +75,7 @@
     "i18n": "node scripts/i18n.mjs && prettier --write ./src/types/i18n.ts"
   },
   "devDependencies": {
-    "@dfinity/eslint-config-oisy-wallet": "^0.1.8",
+    "@dfinity/eslint-config-oisy-wallet": "^0.1.13",
     "@dfinity/identity": "^2.4.0",
     "@dfinity/internet-identity-playwright": "^2.0.0",
     "@playwright/test": "^1.51.1",

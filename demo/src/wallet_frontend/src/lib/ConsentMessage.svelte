@@ -53,7 +53,9 @@
 					case 'result': {
 						const result = rest as ResultConsentMessage;
 
+						// eslint-disable-next-line prefer-destructuring
 						approve = result.approve;
+						// eslint-disable-next-line prefer-destructuring
 						reject = result.reject;
 						consentInfo =
 							'Warn' in result.consentInfo

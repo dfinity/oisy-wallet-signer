@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { IcrcWallet } from '@dfinity/oisy-wallet-signer/icrc-wallet';
+	import type { IcrcWallet } from '@dfinity/oisy-wallet-signer/icrc-wallet';
 	import { isNullish } from '@dfinity/utils';
 	import { fade } from 'svelte/transition';
 	import Balance from '$core/components/Balance.svelte';

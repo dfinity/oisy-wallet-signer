@@ -1,5 +1,5 @@
-export const DEV = import.meta.env.DEV;
-export const PROD = import.meta.env.PROD;
+export const { DEV } = import.meta.env;
+export const { PROD } = import.meta.env;
 export const WALLET_URL = PROD ? 'https://oisy.com/sign' : 'http://localhost:5174/sign';
 
 export const LOCAL_REPLICA_HOST = 'localhost:4943';

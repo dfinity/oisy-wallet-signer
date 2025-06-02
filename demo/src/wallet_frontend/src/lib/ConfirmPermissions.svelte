@@ -6,7 +6,7 @@
 		type PermissionsPromptPayload
 	} from '@dfinity/oisy-wallet-signer';
 	import type { Signer } from '@dfinity/oisy-wallet-signer/signer';
-	import { isNullish, nonNullish } from '@dfinity/utils';
+	import { assertNonNullish, isNullish, nonNullish } from '@dfinity/utils';
 	import { fade } from 'svelte/transition';
 	import Article from '$core/components/Article.svelte';
 	import Button from '$core/components/Button.svelte';
@@ -51,7 +51,11 @@
 
 		// TODO: alert errors
 
-		confirm?.($state.snapshot(scopes)!);
+		const confirmScopes = $state.snapshot(scopes);
+
+		assertNonNullish(confirmScopes);
+
+		confirm?.(confirmScopes);
 
 		resetPrompt();
 	};
