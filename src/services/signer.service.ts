@@ -1,3 +1,4 @@
+import {uint8ToBuf} from '@dfinity/agent';
 import {mapTokenMetadata} from '@dfinity/ledger-icrc';
 import {Principal} from '@dfinity/principal';
 import {base64ToUint8Array, isNullish, notEmptyString} from '@dfinity/utils';
@@ -312,7 +313,7 @@ export class SignerService {
       }
 
       const result = await fn({
-        arg: base64ToUint8Array(arg),
+        arg: uint8ToBuf(base64ToUint8Array(arg)),
         token,
         owner: owner.getPrincipal()
       });

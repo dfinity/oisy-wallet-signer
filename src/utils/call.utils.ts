@@ -3,7 +3,8 @@ import {
   Certificate,
   HttpAgent,
   lookupResultToBuffer,
-  requestIdOf
+  requestIdOf,
+  uint8ToBuf
 } from '@dfinity/agent';
 import type {RecordClass, VariantClass} from '@dfinity/candid/lib/cjs/idl';
 import {Principal} from '@dfinity/principal';
@@ -84,14 +85,14 @@ export const decodeResponse = async <T>({
   );
 
   const certificate = await Certificate.create({
-    certificate: base64ToUint8Array(cert),
+    certificate: uint8ToBuf(base64ToUint8Array(cert)),
     rootKey: agent.rootKey,
     canisterId: Principal.fromText(canisterId)
   });
 
   const requestId = requestIdOf(callRequest);
 
-  const path = [new TextEncoder().encode('request_status'), requestId];
+  const path = [uint8ToBuf(new TextEncoder().encode('request_status')), requestId];
 
   const reply = lookupResultToBuffer(certificate.lookup([...path, 'reply']));
 
