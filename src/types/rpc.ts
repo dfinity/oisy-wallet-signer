@@ -1,4 +1,4 @@
-import * as z from 'zod';
+import * as z from "zod/v4";
 
 // JSON-RPC 2.0 Specification
 // https://www.jsonrpc.org/specification

@@ -1,6 +1,6 @@
 import {base64ToUint8Array} from '@dfinity/utils';
 import {PrincipalTextSchema} from '@dfinity/zod-schemas';
-import * as z from 'zod';
+import * as z from "zod/v4";
 import {IcrcBlobSchema} from './blob';
 
 const IcrcSubaccountSchema = IcrcBlobSchema.refine(

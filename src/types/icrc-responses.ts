@@ -1,5 +1,5 @@
 import {UrlSchema} from '@dfinity/zod-schemas';
-import * as z from 'zod';
+import * as z from "zod/v4";
 import {IcrcBlobSchema} from './blob';
 import {IcrcAccountsSchema} from './icrc-accounts';
 import {
@@ -68,7 +68,7 @@ const SupportedStandardsUrlSchema = z
 
       const [_, icrc] = match;
 
-      return Object.keys(IcrcStandardSchema.Values).includes(icrc);
+      return Object.keys(IcrcStandardSchema.enum).includes(icrc);
     },
     {
       message: 'The URL does not match any of the IcrcStandard values.'

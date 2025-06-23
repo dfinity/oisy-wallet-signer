@@ -1,4 +1,4 @@
-import * as z from 'zod';
+import * as z from "zod/v4";
 import {
   JSON_RPC_VERSION_2,
   RpcErrorCode,
