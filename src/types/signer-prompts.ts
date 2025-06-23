@@ -73,7 +73,7 @@ export type PermissionsPromptPayload = z.infer<typeof PermissionsPromptPayloadSc
  * @param {PermissionsConfirmation} params.confirm - A function to be called by the consumer to confirm (grant or deny) the requested, a subset, or none of the permissions. Skipping a permission is equivalent to preserving its current state.
  */
 export const PermissionsPromptSchema = z.function({
-  input: PermissionsPromptPayloadSchema,
+  input: z.tuple([PermissionsPromptPayloadSchema]),
   output: z.void()
 });
 
@@ -99,7 +99,7 @@ export type AccountsPromptPayload = z.infer<typeof AccountsPromptPayloadSchema>;
  * @param {IcrcAccounts[]} params.approve - A function to be called by the consumer to confirm (select or reject) the provided accounts.
  */
 export const AccountsPromptSchema = z.function({
-  input: AccountsPromptPayloadSchema,
+  input: z.tuple([AccountsPromptPayloadSchema]),
   output: z.void()
 });
 
@@ -172,7 +172,7 @@ export type ConsentMessagePromptPayload = z.infer<typeof ConsentMessagePromptPay
  * @param {() => void} params.reject - A function to be called by the consumer to reject the consent message.
  */
 export const ConsentMessagePromptSchema = z.function({
-  input: ConsentMessagePromptPayloadSchema,
+  input: z.tuple([ConsentMessagePromptPayloadSchema]),
   output: z.void()
 });
 
@@ -209,7 +209,7 @@ const CallCanisterPromptPayloadSchema = z.union([
 export type CallCanisterPromptPayload = z.infer<typeof CallCanisterPromptPayloadSchema>;
 
 export const CallCanisterPromptSchema = z.function({
-  input: CallCanisterPromptPayloadSchema,
+  input: z.tuple([CallCanisterPromptPayloadSchema]),
   output: z.void()
 });
 
