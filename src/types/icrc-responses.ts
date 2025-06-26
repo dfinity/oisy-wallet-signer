@@ -49,7 +49,6 @@ const urlRegex =
   /^https:\/\/github\.com\/dfinity\/ICRC\/blob\/main\/ICRCs\/ICRC-\d+\/ICRC-\d+\.md$/;
 
 const SupportedStandardsUrlSchema = z
-  .string()
   .url()
   .regex(urlRegex)
   .refine(
