@@ -1,6 +1,6 @@
 import {base64ToUint8Array, isNullish} from '@dfinity/utils';
 import {PrincipalTextSchema} from '@dfinity/zod-schemas';
-import * as z from "zod/v4";
+import * as z from 'zod/v4';
 import {
   ICRC25_PERMISSIONS,
   ICRC25_REQUEST_PERMISSIONS,

@@ -1,5 +1,5 @@
 import {UrlSchema} from '@dfinity/zod-schemas';
-import * as z from "zod/v4";
+import * as z from 'zod/v4';
 import {IcrcBlobSchema} from './blob';
 import {IcrcAccountsSchema} from './icrc-accounts';
 import {
