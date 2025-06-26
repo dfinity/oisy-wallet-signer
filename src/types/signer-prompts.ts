@@ -52,7 +52,7 @@ const ErrorSchema = PayloadOriginSchema.extend({
 // Prompt for permissions
 
 const PermissionsConfirmationSchema = createFunctionSchema(
-  z.function({input: IcrcScopesArraySchema, output: z.void()})
+  z.function({input: z.tuple([IcrcScopesArraySchema]), output: z.void()})
 );
 
 export type PermissionsConfirmation = z.infer<typeof PermissionsConfirmationSchema>;
@@ -87,7 +87,7 @@ export type PermissionsPrompt = z.infer<typeof PermissionsPromptSchema>;
 // Prompt for accounts
 
 const AccountsApprovalSchema = createFunctionSchema(
-  z.function({input: IcrcAccountsSchema, output: z.void()})
+  z.function({input: z.tuple([IcrcAccountsSchema]), output: z.void()})
 );
 
 export type AccountsApproval = z.infer<typeof AccountsApprovalSchema>;
