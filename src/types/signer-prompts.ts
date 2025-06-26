@@ -39,7 +39,7 @@ export type PayloadOrigin = z.infer<typeof PayloadOriginSchema>;
 
 const RejectionSchema = z.function({output: z.void()});
 
-export type Rejection = z.infer<typeof RejectionSchema>;
+export type Rejection = () => void;
 
 const StatusSchema = z.enum(['result', 'error']);
 
@@ -52,7 +52,7 @@ const ErrorSchema = PayloadOriginSchema.extend({
 
 const PermissionsConfirmationSchema = z.function({input: IcrcScopesArraySchema, output: z.void()});
 
-export type PermissionsConfirmation = z.infer<typeof PermissionsConfirmationSchema>;
+export type PermissionsConfirmation = (args: z.infer<typeof PermissionsConfirmationSchema>) => void;
 
 const PermissionsPromptPayloadSchema = PayloadOriginSchema.extend({
   requestedScopes: IcrcScopesArraySchema,
@@ -77,7 +77,7 @@ export const PermissionsPromptSchema = z.function({
   output: z.void()
 });
 
-export type PermissionsPrompt = z.infer<typeof PermissionsPromptSchema>;
+export type PermissionsPrompt = (args: z.infer<typeof PermissionsPromptSchema>) => void;
 
 // Prompt for accounts
 
@@ -103,13 +103,13 @@ export const AccountsPromptSchema = z.function({
   output: z.void()
 });
 
-export type AccountsPrompt = z.infer<typeof AccountsPromptSchema>;
+export type AccountsPrompt = (args: z.infer<typeof AccountsPromptSchema>) => void;
 
 // Prompt for consent message
 
 const ConsentMessageApprovalSchema = z.function({output: z.void()});
 
-export type ConsentMessageApproval = z.infer<typeof ConsentMessageApprovalSchema>;
+export type ConsentMessageApproval = () => void;
 
 const LoadingConsentMessageStatusSchema = z.enum(['loading']);
 
@@ -213,4 +213,4 @@ export const CallCanisterPromptSchema = z.function({
   output: z.void()
 });
 
-export type CallCanisterPrompt = z.infer<typeof CallCanisterPromptSchema>;
+export type CallCanisterPrompt = (args: z.infer<typeof CallCanisterPromptSchema>) => void;
