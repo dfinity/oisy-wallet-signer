@@ -42,9 +42,13 @@ describe('ICRC accounts', () => {
       expect(result.success).toBeFalsy();
 
       if (!result.success) {
-        expect(result.error.errors[0].message).toBe(
-          'Invalid textual representation of a Principal.'
-        );
+        expect(result.error.issues).toEqual([
+          {
+            code: 'custom',
+            message: 'Invalid textual representation of a Principal.',
+            path: ['owner']
+          }
+        ]);
       }
     });
 
@@ -58,7 +62,13 @@ describe('ICRC accounts', () => {
       expect(result.success).toBeFalsy();
 
       if (!result.success) {
-        expect(result.error.errors[0].message).toBe('Subaccount must be exactly 32 bytes long.');
+        expect(result.error.issues).toEqual([
+          {
+            code: 'custom',
+            message: 'Subaccount must be exactly 32 bytes long.',
+            path: ['subaccount']
+          }
+        ]);
       }
     });
 
@@ -97,7 +107,16 @@ describe('ICRC accounts', () => {
       expect(result.success).toBeFalsy();
 
       if (!result.success) {
-        expect(result.error.errors[0].message).toContain('at least 1 element(s)');
+        expect(result.error.issues).toEqual([
+          {
+            code: 'too_small',
+            inclusive: true,
+            message: 'Too small: expected array to have >=1 items',
+            minimum: 1,
+            origin: 'array',
+            path: []
+          }
+        ]);
       }
     });
 
@@ -111,9 +130,13 @@ describe('ICRC accounts', () => {
       expect(result.success).toBeFalsy();
 
       if (!result.success) {
-        expect(result.error.errors[0].message).toBe(
-          'Invalid textual representation of a Principal.'
-        );
+        expect(result.error.issues).toEqual([
+          {
+            code: 'custom',
+            message: 'Invalid textual representation of a Principal.',
+            path: [1, 'owner']
+          }
+        ]);
       }
     });
 
@@ -126,7 +149,13 @@ describe('ICRC accounts', () => {
       expect(result.success).toBeFalsy();
 
       if (!result.success) {
-        expect(result.error.errors[0].message).toBe('Subaccount must be exactly 32 bytes long.');
+        expect(result.error.issues).toEqual([
+          {
+            code: 'custom',
+            message: 'Subaccount must be exactly 32 bytes long.',
+            path: [0, 'subaccount']
+          }
+        ]);
       }
     });
 

@@ -61,14 +61,14 @@ export enum SignerErrorCode {
 }
 
 export const SIGNER_SUPPORTED_STANDARDS: IcrcSupportedStandards = Object.values(
-  IcrcStandardSchema.Values
+  IcrcStandardSchema.enum
 ).map((name) => ({
   name,
   url: `https://github.com/dfinity/ICRC/blob/main/ICRCs/${name}/${name}.md`
 }));
 
 export const SIGNER_DEFAULT_SCOPES: IcrcScopesArray = Object.values(
-  IcrcScopedMethodSchema.Values
+  IcrcScopedMethodSchema.enum
 ).map((method) => ({scope: {method}, state: ICRC25_PERMISSION_ASK_ON_USE}));
 
 export const SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS = 7 * 24 * 60 * 60 * 1000; // 7 days
