@@ -77,7 +77,22 @@ describe('SignerOptions', () => {
         host: 'invalid-url'
       };
 
-      expect(() => SignerOptionsSchema.parse(invalidSignerOptions)).toThrow('Invalid url');
+      const result = SignerOptionsSchema.safeParse(invalidSignerOptions);
+
+      expect(result.success).toBeFalsy();
+      expect(result.error?.issues).toEqual([
+        {
+          code: 'invalid_format',
+          format: 'url',
+          message: 'Invalid URL',
+          path: ['host']
+        },
+        {
+          code: 'custom',
+          message: 'Invalid URL.',
+          path: ['host']
+        }
+      ]);
     });
 
     it('should validate when localhost is used as host', () => {
