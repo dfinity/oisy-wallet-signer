@@ -196,9 +196,9 @@ describe('RelyingPartyOptions', () => {
       onDisconnect: 'not-a-function' // Invalid type for onDisconnect
     };
 
-    const result = RelyingPartyOptionsSchema.safeParse(invalidData);
-
-    expect(result.success).toBeFalsy();
+    expect(() => RelyingPartyOptionsSchema.parse(invalidData)).toThrow(
+      'implement() must be called with a function'
+    );
   });
 
   describe('host', () => {
@@ -240,7 +240,13 @@ describe('RelyingPartyOptions', () => {
       });
 
       expect(result.success).toBeFalsy();
-      expect(result.error?.errors[0]?.message).toBe('Invalid URL.');
+      expect(result.error?.issues).toEqual([
+        {
+          code: 'custom',
+          message: 'Invalid URL.',
+          path: ['host']
+        }
+      ]);
     });
 
     it('should validate without host (host optional)', () => {
@@ -258,7 +264,19 @@ describe('RelyingPartyOptions', () => {
       });
 
       expect(result.success).toBeFalsy();
-      expect(result.error?.errors[0]?.message).toBe('Invalid url');
+      expect(result.error?.issues).toEqual([
+        {
+          code: 'invalid_format',
+          format: 'url',
+          message: 'Invalid URL',
+          path: ['host']
+        },
+        {
+          code: 'custom',
+          message: 'Invalid URL.',
+          path: ['host']
+        }
+      ]);
     });
   });
 });

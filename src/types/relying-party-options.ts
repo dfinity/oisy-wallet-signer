@@ -1,5 +1,6 @@
 import {UrlSchema} from '@dfinity/zod-schemas';
-import * as z from 'zod';
+import * as z from 'zod/v4';
+import {createFunctionSchema} from '../utils/zod.utils';
 
 const ConnectionOptionsSchema = z.object({
   /**
@@ -46,7 +47,7 @@ const WindowOptionsSchema = z.object({
 
 export type WindowOptions = z.infer<typeof WindowOptionsSchema>;
 
-const OnDisconnectSchema = z.function().args().returns(z.void()).optional();
+const OnDisconnectSchema = createFunctionSchema(z.function({output: z.void()})).optional();
 
 export type OnDisconnect = z.infer<typeof OnDisconnectSchema>;
 
