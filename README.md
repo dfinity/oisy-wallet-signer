@@ -501,7 +501,7 @@ Navigate to the [demo](./demo) directory and start the environment:
 ```bash
 cd demo
 npm ci
-npx juno dev start
+npx @junobuild/cli dev start
 npm run dev:party
 npm run dev:wallet
 ```
