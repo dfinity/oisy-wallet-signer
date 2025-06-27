@@ -16,6 +16,7 @@
 		"./playwright.config.ts",
 		"./src/**/playwright.config.ts",
 		"./juno.dev.config.js",
+		"./juno.config.ts",
 		"./eslint.config.mjs",
 		"./eslint-local-rules.cjs"
 	],
