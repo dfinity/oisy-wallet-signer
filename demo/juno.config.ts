@@ -8,6 +8,10 @@ export default defineConfig({
 		source: 'build'
 	},
 	emulator: {
-		satellite: {}
+		satellite: {
+			ports: {
+				server: 4943
+			}
+		}
 	}
 });
