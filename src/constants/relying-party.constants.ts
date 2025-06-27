@@ -22,5 +22,5 @@ export const RELYING_PARTY_TIMEOUT_REQUEST_STATUS =
   RELYING_PARTY_TIMEOUT_IN_MILLISECONDS_WITHOUT_USER_INTERACTION;
 
 export const RELYING_PARTY_DEFAULT_SCOPES: IcrcRequestedScopes = {
-  scopes: Object.values(IcrcScopedMethodSchema.Values).map((method) => ({method}))
+  scopes: Object.values(IcrcScopedMethodSchema.enum).map((method) => ({method}))
 };
