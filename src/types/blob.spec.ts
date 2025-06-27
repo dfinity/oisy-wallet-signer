@@ -16,7 +16,14 @@ describe('IcrcBlob', () => {
     expect(result.success).toBeFalsy();
 
     if (!result.success) {
-      expect(result.error.errors[0].message).toBe('Expected string, received array');
+      expect(result.error.issues).toEqual([
+        {
+          code: 'invalid_type',
+          expected: 'string',
+          message: 'Invalid input: expected string, received array',
+          path: []
+        }
+      ]);
     }
   });
 
@@ -27,7 +34,13 @@ describe('IcrcBlob', () => {
     expect(result.success).toBeFalsy();
 
     if (!result.success) {
-      expect(result.error.errors[0].message).toBe('Invalid base64 string');
+      expect(result.error.issues).toEqual([
+        {
+          code: 'custom',
+          message: 'Invalid base64 string',
+          path: []
+        }
+      ]);
     }
   });
 
@@ -38,7 +51,14 @@ describe('IcrcBlob', () => {
     expect(result.success).toBeFalsy();
 
     if (!result.success) {
-      expect(result.error.errors[0].message).toBe('Expected string, received number');
+      expect(result.error.issues).toEqual([
+        {
+          code: 'invalid_type',
+          expected: 'string',
+          message: 'Invalid input: expected string, received number',
+          path: []
+        }
+      ]);
     }
   });
 
@@ -49,7 +69,14 @@ describe('IcrcBlob', () => {
     expect(result.success).toBeFalsy();
 
     if (!result.success) {
-      expect(result.error.errors[0].message).toBe('Expected string, received object');
+      expect(result.error.issues).toEqual([
+        {
+          code: 'invalid_type',
+          expected: 'string',
+          message: 'Invalid input: expected string, received object',
+          path: []
+        }
+      ]);
     }
   });
 
@@ -67,7 +94,13 @@ describe('IcrcBlob', () => {
     expect(result.success).toBeFalsy();
 
     if (!result.success) {
-      expect(result.error.errors[0].message).toBe('Invalid base64 string');
+      expect(result.error.issues).toEqual([
+        {
+          code: 'custom',
+          message: 'Invalid base64 string',
+          path: []
+        }
+      ]);
     }
   });
 });
