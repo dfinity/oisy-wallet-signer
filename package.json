@@ -101,6 +101,6 @@
     "@dfinity/zod-schemas": "^1.0.0",
     "borc": "^2.1.1",
     "simple-cbor": "^0.4.1",
-    "zod": "^3.25.67"
+    "zod": "^3.25"
   }
 }
