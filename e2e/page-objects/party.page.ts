@@ -153,7 +153,7 @@ export class PartyPage extends IdentityPage {
 
     const accounts = ul.locator('li');
 
-    expect(await accounts.count()).toBe(1);
+    await expect(accounts).toHaveCount(1);
 
     // TODO: check principal
   }
