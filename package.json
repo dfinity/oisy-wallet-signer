@@ -75,7 +75,7 @@
     "i18n": "node scripts/i18n.mjs && prettier --write ./src/types/i18n.ts"
   },
   "devDependencies": {
-    "@dfinity/eslint-config-oisy-wallet": "^0.1.13-next-2025-06-28",
+    "@dfinity/eslint-config-oisy-wallet": "^0.1.13-next-2025-06-28.4",
     "@dfinity/identity": "^3.0.0-beta.1",
     "@dfinity/internet-identity-playwright": "^2.0.0",
     "@playwright/test": "^1.53.1",
@@ -102,8 +102,5 @@
     "borc": "^2.1.1",
     "simple-cbor": "^0.4.1",
     "zod": "^3.25"
-  },
-  "overrides": {
-    "@dfinity/utils": "2.13.1-beta-2025-06-28"
   }
 }
