@@ -1,6 +1,6 @@
 {
   "name": "@dfinity/oisy-wallet-signer",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A library designed to facilitate communication between a dApp and the OISY Wallet on the Internet Computer. ",
   "license": "Apache-2.0",
   "type": "module",
