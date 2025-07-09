@@ -75,13 +75,13 @@
     "i18n": "node scripts/i18n.mjs && prettier --write ./src/types/i18n.ts"
   },
   "devDependencies": {
-    "@dfinity/eslint-config-oisy-wallet": "^0.1.13",
+    "@dfinity/eslint-config-oisy-wallet": "^0.1.14",
     "@dfinity/identity": "^2.4.0",
     "@dfinity/internet-identity-playwright": "^2.0.0",
-    "@playwright/test": "^1.53.1",
+    "@playwright/test": "^1.53.2",
     "@types/jest": "^30.0.0",
-    "@types/node": "^24.0.4",
-    "esbuild": "^0.25.5",
+    "@types/node": "^24.0.12",
+    "esbuild": "^0.25.6",
     "jsdom": "^26.1.0",
     "prettier": "^3.6.2",
     "prettier-plugin-organize-imports": "^4.1.0",
