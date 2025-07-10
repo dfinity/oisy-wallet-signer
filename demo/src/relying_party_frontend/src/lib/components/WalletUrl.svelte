@@ -22,7 +22,7 @@
 
 	let walletUrl = $state(WALLET_DEFAULT_URL);
 
-	let URLS = [
+	const URLS = [
 		WALLET_DEFAULT_URL,
 		...(PROD ? [OISY_STAGING_URL, OISY_BETA_URL] : [OISY_STAGING_URL, OISY_BETA_URL])
 	].map<SelectUrl>(mapUrl);
