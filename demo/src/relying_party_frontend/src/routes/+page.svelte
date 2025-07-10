@@ -10,8 +10,16 @@
 	import SendICP from '$lib/components/SendICP.svelte';
 	import Wallet from '$lib/components/Wallet.svelte';
 	import WalletUrl from '$lib/components/WalletUrl.svelte';
+	import { walletUrlStore } from '$lib/stores/wallet.store';
 
-	let account = $state<IcrcAccount | undefined>(undefined);
+	let account = $state<IcrcAccount | undefined | null>(undefined);
+
+	const resetAccount = () => (account = null);
+
+	$effect(() => {
+		$walletUrlStore;
+		resetAccount();
+	});
 </script>
 
 <p class="dark:text-white mb-4">Transfer 0.05 ICP (minus fees) to and from your Oisy Wallet.</p>

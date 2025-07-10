@@ -16,7 +16,6 @@ declare module 'svelte/elements' {
 	interface HTMLAttributes<T> {
 		onoisyDemoReloadPermissions?: (event: CustomEvent<any>) => void;
 		onoisyDemoReloadBalance?: (event: CustomEvent<any>) => void;
-		onoisyDemoDisconnectWallet?: (event: CustomEvent<any>) => void;
 	}
 }
 
