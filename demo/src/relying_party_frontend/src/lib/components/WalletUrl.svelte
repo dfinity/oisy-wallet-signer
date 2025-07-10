@@ -10,36 +10,36 @@
 	import { emit } from '$core/utils/events.utils';
 	import { walletUrlStore } from '$lib/stores/wallet.store';
 
-	let walletUrl = $state($walletUrlStore);
-
-	$effect(() => {
-		walletUrlStore.set(walletUrl);
-	});
-
 	interface SelectUrl {
 		name: string;
 		value: string;
 	}
 
-	let urls = $derived(
-		[WALLET_DEFAULT_URL, ...(PROD ? [OISY_STAGING_URL, OISY_BETA_URL] : [])].map<SelectUrl>(
-			(url) => ({
-				name: URL.parse(url)?.host ?? url,
-				value: url
-			})
-		)
-	);
+	const mapUrl = (url: string): SelectUrl => ({
+		name: URL.parse(url)?.host ?? url,
+		value: url
+	});
 
-	const disconnect = () =>
+	let walletUrl = $state(WALLET_DEFAULT_URL);
+
+	let URLS = [
+		WALLET_DEFAULT_URL,
+		...(PROD ? [OISY_STAGING_URL, OISY_BETA_URL] : [OISY_STAGING_URL, OISY_BETA_URL])
+	].map<SelectUrl>(mapUrl);
+
+	const onchange = () => {
+		walletUrlStore.set(walletUrl);
+
 		emit({
 			message: 'oisyDemoDisconnectWallet'
 		});
+	};
 </script>
 
 <div class="mt-12 md:mt-0">
 	<Value id="oisy-wallet-url" title="OISY URL">
-		<InputSelect value={walletUrl} name="The OISY Wallet URL to connect to" onchange={disconnect}>
-			{#each urls as { name, value } (value)}
+		<InputSelect bind:value={walletUrl} name="The OISY Wallet URL to connect to" {onchange}>
+			{#each URLS as { name, value }, index (index)}
 				<option {value}>{name}</option>
 			{/each}
 		</InputSelect>
