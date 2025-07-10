@@ -23,7 +23,7 @@ export default [
 	},
 	{
 		rules: {
-			"use-option-type-wrapper": "off"
+			'use-option-type-wrapper': 'off'
 		}
 	}
 ];
