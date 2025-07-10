@@ -16,7 +16,7 @@ export interface AuthStoreData {
 	identity: OptionIdentity;
 }
 
-let authClient: Option<AuthClient>;
+let authClient: AuthClient | undefined | null;
 
 export interface AuthSignInParams {
 	domain?: 'ic0.app' | 'internetcomputer.org';
