@@ -4,11 +4,14 @@
 	import { fade } from 'svelte/transition';
 	import Article from '$core/components/Article.svelte';
 	import Balance from '$core/components/Balance.svelte';
+	import InputSelect from '$core/components/InputSelect.svelte';
 	import UserId from '$core/components/UserId.svelte';
+	import Value from '$core/components/Value.svelte';
 	import { authStore } from '$core/stores/auth.store';
 	import ConnectAndRequestAccount from '$lib/components/ConnectAndRequestAccount.svelte';
 	import SendICP from '$lib/components/SendICP.svelte';
 	import Wallet from '$lib/components/Wallet.svelte';
+	import WalletUrl from '$lib/components/WalletUrl.svelte';
 
 	let account = $state<IcrcAccount | undefined>(undefined);
 </script>
@@ -44,3 +47,5 @@
 		{/if}
 	</section>
 </div>
+
+<WalletUrl />
