@@ -4,7 +4,7 @@
 	import IconChevronDown from '$core/components/IconChevronDown.svelte';
 
 	interface Props {
-		value: Option<string>;
+		value: string | undefined;
 		disabled?: boolean;
 		onchange?: () => void;
 		children: Snippet;
