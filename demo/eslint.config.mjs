@@ -20,5 +20,10 @@ export default [
 			'**/playwright-report',
 			'**/coverage'
 		]
+	},
+	{
+		rules: {
+			"use-option-type-wrapper": "off"
+		}
 	}
 ];
