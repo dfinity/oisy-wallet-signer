@@ -9,6 +9,7 @@
 	import ConnectAndRequestAccount from '$lib/components/ConnectAndRequestAccount.svelte';
 	import SendICP from '$lib/components/SendICP.svelte';
 	import Wallet from '$lib/components/Wallet.svelte';
+	import WalletUrl from '$lib/components/WalletUrl.svelte';
 
 	let account = $state<IcrcAccount | undefined>(undefined);
 </script>
@@ -44,3 +45,5 @@
 		{/if}
 	</section>
 </div>
+
+<WalletUrl />

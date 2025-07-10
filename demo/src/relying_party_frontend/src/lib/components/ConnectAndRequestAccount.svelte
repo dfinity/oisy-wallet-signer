@@ -1,9 +1,9 @@
 <script lang="ts">
 	import type { IcrcAccount } from '@dfinity/oisy-wallet-signer';
 	import { IcrcWallet } from '@dfinity/oisy-wallet-signer/icrc-wallet';
-	import { WALLET_URL } from '$core/constants/app.constants';
 	import { alertStore } from '$core/stores/alert.store';
 	import IconAdd from '$lib/components/IconAdd.svelte';
+	import { walletUrlStore } from '$lib/stores/wallet.store';
 
 	interface Props {
 		account: IcrcAccount | undefined;
@@ -11,12 +11,12 @@
 
 	let { account = $bindable() }: Props = $props();
 
-	const onclick = async () => {
-		let wallet: IcrcWallet | undefined;
+	let wallet = $state<IcrcWallet | undefined>(undefined);
 
+	const onclick = async () => {
 		try {
 			wallet = await IcrcWallet.connect({
-				url: WALLET_URL
+				url: $walletUrlStore
 			});
 
 			const { allPermissionsGranted } = await wallet.requestPermissionsNotGranted();
@@ -40,7 +40,11 @@
 			await wallet?.disconnect();
 		}
 	};
+
+	const disconnect = () => wallet?.disconnect();
 </script>
+
+<svelte:window onoisyDemoDisconnectWallet={disconnect} />
 
 <button
 	{onclick}

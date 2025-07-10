@@ -2,7 +2,7 @@
 	import type { OnDisconnect } from '@dfinity/oisy-wallet-signer';
 	import { IcrcWallet } from '@dfinity/oisy-wallet-signer/icrc-wallet';
 	import Button from '$core/components/Button.svelte';
-	import { WALLET_URL } from '$core/constants/app.constants';
+	import { walletUrlStore } from '$lib/stores/wallet.store';
 
 	interface Props {
 		wallet: IcrcWallet | undefined;
@@ -15,7 +15,7 @@
 
 	const onclick = async () => {
 		walletState = await IcrcWallet.connect({
-			url: WALLET_URL,
+			url: $walletUrlStore,
 			onDisconnect
 		});
 	};
