@@ -8,14 +8,14 @@
 	import { DEV, LOCAL_REPLICA_URL } from '$core/constants/app.constants';
 
 	interface Props {
-		owner: Principal | undefined | null;
+		owner: Option<Principal>;
 	}
 
 	let { owner }: Props = $props();
 
 	let balance = $state(0n);
 
-	const loadBalance = async (owner: Principal | undefined | null) => {
+	const loadBalance = async (owner: Option<Principal>) => {
 		if (isNullish(owner)) {
 			balance = 0n;
 			return;
