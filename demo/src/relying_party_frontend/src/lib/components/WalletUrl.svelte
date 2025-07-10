@@ -1,4 +1,6 @@
 <script lang="ts">
+	import type { UrlSchema } from '@dfinity/zod-schemas';
+	import type * as z from 'zod/v4';
 	import InputSelect from '$core/components/InputSelect.svelte';
 	import Value from '$core/components/Value.svelte';
 	import {
@@ -15,7 +17,9 @@
 		value: string;
 	}
 
-	const mapUrl = (url: string): SelectUrl => ({
+	type SignerUrl = z.infer<typeof UrlSchema>;
+
+	const mapUrl = (url: SignerUrl): SelectUrl => ({
 		name: URL.parse(url)?.host ?? url,
 		value: url
 	});
