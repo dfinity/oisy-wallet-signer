@@ -14,7 +14,7 @@
 	let { value = $bindable(), disabled = false, onchange, children, name }: Props = $props();
 </script>
 
-<div class="relative w-fit md:w-96" class:opacity-20={disabled}>
+<div class="relative w-fit md:w-64" class:opacity-20={disabled}>
 	<select
 		bind:value
 		{onchange}
