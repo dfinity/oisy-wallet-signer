@@ -9,7 +9,6 @@
 		PROD,
 		WALLET_DEFAULT_URL
 	} from '$core/constants/app.constants';
-	import { emit } from '$core/utils/events.utils';
 	import { walletUrlStore } from '$lib/stores/wallet.store';
 
 	interface SelectUrl {
@@ -33,10 +32,6 @@
 
 	const onchange = () => {
 		walletUrlStore.set(walletUrl);
-
-		emit({
-			message: 'oisyDemoDisconnectWallet'
-		});
 	};
 </script>
 

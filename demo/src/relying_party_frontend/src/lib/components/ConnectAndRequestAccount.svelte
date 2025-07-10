@@ -6,7 +6,7 @@
 	import { walletUrlStore } from '$lib/stores/wallet.store';
 
 	interface Props {
-		account: IcrcAccount | undefined;
+		account: IcrcAccount | undefined | null;
 	}
 
 	let { account = $bindable() }: Props = $props();
@@ -40,11 +40,7 @@
 			await wallet?.disconnect();
 		}
 	};
-
-	const disconnect = () => wallet?.disconnect();
 </script>
-
-<svelte:window onoisyDemoDisconnectWallet={disconnect} />
 
 <button
 	{onclick}
