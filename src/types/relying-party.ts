@@ -1,4 +1,4 @@
-import * as z from 'zod/v4';
+import * as z from 'zod';
 import {IcrcScopesSchema, IcrcSupportedStandardsSchema} from './icrc-responses';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
