@@ -35,28 +35,23 @@
   "exports": {
     ".": {
       "types": "./index.d.ts",
-      "import": "./index.js",
-      "require": "./index.mjs"
+      "import": "./index.js"
     },
     "./relying-party": {
       "types": "./relying-party.d.ts",
-      "import": "./relying-party.js",
-      "require": "./relying-party.mjs"
+      "import": "./relying-party.js"
     },
     "./icp-wallet": {
       "types": "./icp-wallet.d.ts",
-      "import": "./icp-wallet.js",
-      "require": "./icp-wallet.mjs"
+      "import": "./icp-wallet.js"
     },
     "./icrc-wallet": {
       "types": "./icrc-wallet.d.ts",
-      "import": "./icrc-wallet.js",
-      "require": "./icrc-wallet.mjs"
+      "import": "./icrc-wallet.js"
     },
     "./signer": {
       "types": "./signer.d.ts",
-      "import": "./signer.js",
-      "require": "./signer.mjs"
+      "import": "./signer.js"
     }
   },
   "scripts": {
