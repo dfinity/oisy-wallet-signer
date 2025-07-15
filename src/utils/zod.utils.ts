@@ -1,4 +1,4 @@
-import * as z from 'zod';
+import * as z from 'zod/v4';
 
 /**
  * In Zod v4, functions are no longer treated as standard Zod schemas (see: https://zod.dev/v4/changelog?id=zfunction).
