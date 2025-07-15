@@ -1,5 +1,5 @@
 import {UrlSchema} from '@dfinity/zod-schemas';
-import * as z from 'zod/v4';
+import * as z from 'zod';
 import {createFunctionSchema} from '../utils/zod.utils';
 
 const ConnectionOptionsSchema = z.object({
