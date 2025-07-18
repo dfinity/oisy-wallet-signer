@@ -2,10 +2,10 @@
 	import { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
 	import { isNullish, notEmptyString } from '@dfinity/utils';
 	import Button from '$core/components/Button.svelte';
-	import { WALLET_URL } from '$core/constants/app.constants';
 	import { alertStore } from '$core/stores/alert.store';
 	import { authStore } from '$core/stores/auth.store';
 	import { emit } from '$core/utils/events.utils';
+	import { walletUrlStore } from '$lib/stores/wallet.store';
 	import { getTransferRequest } from '$lib/utils/transfer.utils';
 
 	let wallet = $state<IcpWallet | undefined>(undefined);
@@ -25,7 +25,7 @@
 			}
 
 			wallet = await IcpWallet.connect({
-				url: WALLET_URL
+				url: $walletUrlStore
 			});
 
 			const accounts = await wallet?.accounts();

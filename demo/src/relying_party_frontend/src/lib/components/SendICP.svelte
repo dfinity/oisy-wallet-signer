@@ -4,10 +4,11 @@
 	import { Principal } from '@dfinity/principal';
 	import { createAgent, isNullish } from '@dfinity/utils';
 	import Button from '$core/components/Button.svelte';
-	import { DEV, LOCAL_REPLICA_URL, WALLET_URL } from '$core/constants/app.constants';
+	import { DEV, LOCAL_REPLICA_URL } from '$core/constants/app.constants';
 	import { alertStore } from '$core/stores/alert.store';
 	import { authStore } from '$core/stores/auth.store';
 	import { emit } from '$core/utils/events.utils';
+	import { walletUrlStore } from '$lib/stores/wallet.store';
 	import { getTransferRequest } from '$lib/utils/transfer.utils';
 
 	let wallet = $state<IcpWallet | undefined>(undefined);
@@ -23,7 +24,7 @@
 			}
 
 			wallet = await IcpWallet.connect({
-				url: WALLET_URL
+				url: $walletUrlStore
 			});
 
 			const accounts = await wallet?.accounts();

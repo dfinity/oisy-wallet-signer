@@ -1,6 +1,11 @@
 export const { DEV } = import.meta.env;
 export const { PROD } = import.meta.env;
-export const WALLET_URL = PROD ? 'https://oisy.com/sign' : 'http://localhost:5174/sign';
+
+export const OISY_PROD_URL = 'https://oisy.com/sign';
+export const OISY_STAGING_URL = 'https://staging.oisy.com/sign';
+export const OISY_BETA_URL = 'https://beta.oisy.com/sign';
+
+export const WALLET_DEFAULT_URL = PROD ? OISY_PROD_URL : 'http://localhost:5174/sign';
 
 export const LOCAL_REPLICA_HOST = 'localhost:4943';
 export const LOCAL_REPLICA_URL = `http://${LOCAL_REPLICA_HOST}`;

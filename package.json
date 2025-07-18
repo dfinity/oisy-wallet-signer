@@ -1,6 +1,6 @@
 {
   "name": "@dfinity/oisy-wallet-signer",
-  "version": "0.2.0",
+  "version": "0.2.3",
   "description": "A library designed to facilitate communication between a dApp and the OISY Wallet on the Internet Computer. ",
   "license": "Apache-2.0",
   "type": "module",
@@ -35,28 +35,23 @@
   "exports": {
     ".": {
       "types": "./index.d.ts",
-      "import": "./index.js",
-      "require": "./index.mjs"
+      "import": "./index.js"
     },
     "./relying-party": {
       "types": "./relying-party.d.ts",
-      "import": "./relying-party.js",
-      "require": "./relying-party.mjs"
+      "import": "./relying-party.js"
     },
     "./icp-wallet": {
       "types": "./icp-wallet.d.ts",
-      "import": "./icp-wallet.js",
-      "require": "./icp-wallet.mjs"
+      "import": "./icp-wallet.js"
     },
     "./icrc-wallet": {
       "types": "./icrc-wallet.d.ts",
-      "import": "./icrc-wallet.js",
-      "require": "./icrc-wallet.mjs"
+      "import": "./icrc-wallet.js"
     },
     "./signer": {
       "types": "./signer.d.ts",
-      "import": "./signer.js",
-      "require": "./signer.mjs"
+      "import": "./signer.js"
     }
   },
   "scripts": {
@@ -75,13 +70,13 @@
     "i18n": "node scripts/i18n.mjs && prettier --write ./src/types/i18n.ts"
   },
   "devDependencies": {
-    "@dfinity/eslint-config-oisy-wallet": "^0.1.13-next-2025-06-28.4",
-    "@dfinity/identity": "^3.0.0-beta.1",
+    "@dfinity/eslint-config-oisy-wallet": "^0.1.14",
+    "@dfinity/identity": "^2.4.0",
     "@dfinity/internet-identity-playwright": "^2.0.0",
-    "@playwright/test": "^1.53.1",
+    "@playwright/test": "^1.53.2",
     "@types/jest": "^30.0.0",
-    "@types/node": "^24.0.4",
-    "esbuild": "^0.25.5",
+    "@types/node": "^24.0.12",
+    "esbuild": "^0.25.6",
     "jsdom": "^26.1.0",
     "prettier": "^3.6.2",
     "prettier-plugin-organize-imports": "^4.1.0",
@@ -92,13 +87,13 @@
     "node": ">=22"
   },
   "peerDependencies": {
-    "@dfinity/agent": "^3.0.0-beta.1",
-    "@dfinity/candid": "^3.0.0-beta.1",
-    "@dfinity/ledger-icp": "^3.0.0-beta-2025-06-28",
-    "@dfinity/ledger-icrc": "^2.9.0-beta-2025-06-28",
-    "@dfinity/principal": "^3.0.0-beta.1",
-    "@dfinity/utils": "^2.13.1-beta-2025-06-28",
-    "@dfinity/zod-schemas": "^1.0.0-beta-2025-06-28",
+    "@dfinity/agent": "^2.4.0",
+    "@dfinity/candid": "^2.4.0",
+    "@dfinity/ledger-icp": ">=4",
+    "@dfinity/ledger-icrc": "^2",
+    "@dfinity/principal": "^2.4.0",
+    "@dfinity/utils": "^2.13.0",
+    "@dfinity/zod-schemas": "^1.0.0",
     "borc": "^2.1.1",
     "simple-cbor": "^0.4.1",
     "zod": "^3.25"
