@@ -73,7 +73,6 @@ import {
 export class Signer {
   readonly #signerOptions: SignerOptions;
 
-  // eslint-disable-next-line local-rules/use-option-type-wrapper
   #walletOrigin: string | undefined | null;
 
   #permissionsPrompt: PermissionsPrompt | undefined;
