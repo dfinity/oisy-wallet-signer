@@ -1,4 +1,3 @@
-import {describe, expect, it} from 'vitest';
 import {HexStringSchema} from './hex-string';
 
 describe('HexStringSchema', () => {

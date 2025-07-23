@@ -1,6 +1,5 @@
 import * as httpAgent from '@dfinity/agent';
 import {nonNullish} from '@dfinity/utils';
-import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import {createMockRequest, mockRequestPayload} from '../mocks/custom-http-agent.mocks';
 import {customAddTransform} from './custom-transform-agent';
 
