@@ -70,8 +70,8 @@
     "i18n": "node scripts/i18n.mjs && prettier --write ./src/types/i18n.ts"
   },
   "devDependencies": {
-    "@dfinity/eslint-config-oisy-wallet": "^0.2.0",
-    "@dfinity/identity": "^3.0.0",
+    "@dfinity/eslint-config-oisy-wallet": "^0.2.1",
+    "@dfinity/identity": "^3.0.2",
     "@dfinity/internet-identity-playwright": "^2.0.0",
     "@playwright/test": "^1.53.2",
     "@types/jest": "^30.0.0",
@@ -87,18 +87,15 @@
     "node": ">=22"
   },
   "peerDependencies": {
-    "@dfinity/agent": "^3.0.0",
-    "@dfinity/candid": "^3.0.0",
-    "@dfinity/ledger-icp": "^4.0.0-beta-2025-07-18.1",
-    "@dfinity/ledger-icrc": "^2.9.1-beta-2025-07-18.1",
-    "@dfinity/principal": "^3.0.0",
-    "@dfinity/utils": "2.13.2-beta-2025-07-18.1",
-    "@dfinity/zod-schemas": "^1.0.0-beta-2025-07-18",
+    "@dfinity/agent": "^3.0.2",
+    "@dfinity/candid": "^3.0.2",
+    "@dfinity/ledger-icp": "^4.0.0-beta-2025-07-23.2",
+    "@dfinity/ledger-icrc": "^2.9.1-beta-2025-07-23.2",
+    "@dfinity/principal": "^3.0.2",
+    "@dfinity/utils": "^2.13.2-beta-2025-07-23.2",
+    "@dfinity/zod-schemas": "^2.0.0-beta-2025-07-23.1",
     "borc": "^2.1.1",
     "simple-cbor": "^0.4.1",
     "zod": "^3.25"
-  },
-  "overrides": {
-    "@dfinity/utils": "2.13.2-beta-2025-07-18.1"
   }
 }
