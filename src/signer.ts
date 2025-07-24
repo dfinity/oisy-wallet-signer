@@ -73,7 +73,7 @@ import {
 export class Signer {
   readonly #signerOptions: SignerOptions;
 
-  #walletOrigin: Option<string>;
+  #walletOrigin: string | undefined | null;
 
   #permissionsPrompt: PermissionsPrompt | undefined;
   #accountsPrompt: AccountsPrompt | undefined;
