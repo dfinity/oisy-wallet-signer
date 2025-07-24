@@ -43,6 +43,7 @@ Additionally, it includes opinionated clients that enable interactions with the 
   - [Running Tests Locally](#running-tests-locally)
   - [Running E2E Tests Locally](#running-e2e-tests-locally)
   - [Developing with OISY Wallet](#developing-with-oisy-wallet)
+  - [Running the Pseudo Wallet Signer Locally](#running-the-pseudo-wallet-signer-locally)
 - [:couple: Community](#couple-community)
 
 ## :computer: Installation
@@ -550,6 +551,34 @@ In `oisy-wallet` project, run the local development server on port `5174`:
 ```bash
 npm run dev
 ```
+
+### Running the Pseudo Wallet Signer Locally
+
+If you're building a relying party (client) application—regardless of which library you’re using—and want to test signer interactions without deploying on mainnet, you can run the pseudo wallet signer included in this repo for demo and E2E testing purposes.
+
+This pseudo wallet implements all the features provided by the signer, allowing you to test account listing, permission requests, and canister calls entirely in your local environment.
+
+1. Install the demo
+
+```bash
+git clone https://github.com/dfinity/oisy-wallet-signer
+cd oisy-wallet-signer/demo
+npm ci
+```
+
+2. Adapt port (if needed)
+
+If your local replica is not running on the default port `4943` used by the demo, make sure to update the `LOCAL_REPLICA_HOST` variable in the [.env](demo/.env) file accordingly.
+
+3. Start the pseudo wallet
+
+```bash
+npm run dev:wallet
+```
+
+This will launch the pseudo wallet interface on port `5174` (or another available port).
+
+From your client application, you can now connect to this signer using `http://localhost:5174/sign`.
 
 ## :couple: Community
 
