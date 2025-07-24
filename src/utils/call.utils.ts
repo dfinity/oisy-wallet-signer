@@ -6,7 +6,7 @@ import {
   requestIdOf,
   uint8ToBuf
 } from '@dfinity/agent';
-import type {RecordClass, VariantClass} from '@dfinity/candid/lib/cjs/idl';
+import type {IDL} from '@dfinity/candid';
 import {Principal} from '@dfinity/principal';
 import {assertNonNullish, base64ToUint8Array} from '@dfinity/utils';
 import {LOCAL_REPLICA_URL, MAINNET_REPLICA_URL} from '../constants/core.constants';
@@ -60,7 +60,7 @@ export const decodeResponse = async <T>({
 }: {
   params: IcrcCallCanisterRequestParams;
   result: IcrcCallCanisterResult;
-  resultRecordClass: RecordClass | VariantClass;
+  resultRecordClass: IDL.RecordClass | IDL.VariantClass;
   host?: RelyingPartyHost;
 }): Promise<T> => {
   // TODO: improve performance by avoiding the need to decode the call requests multiple times. For example. IcpWallet and IcrcWallet could use a new protected function of RelyingParty that would extend call and return the callRequest that is asserted.
