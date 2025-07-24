@@ -50,7 +50,7 @@ export const buildContentMessageIcrc1Transfer: SignerBuilderFn = async ({
       memo
     } = decodeIdl<IcrcTransferArg>({
       recordClass: TransferArgs,
-      bytes: arg
+      bytes: new Uint8Array(arg)
     });
 
     const {
@@ -131,7 +131,7 @@ export const buildContentMessageIcrc2Approve: SignerBuilderFn = async ({
       memo
     } = decodeIdl<IcrcApproveArgs>({
       recordClass: ApproveArgs,
-      bytes: arg
+      bytes: new Uint8Array(arg)
     });
 
     const {
@@ -242,7 +242,7 @@ export const buildContentMessageIcrc2TransferFrom: SignerBuilderFn = async ({
       memo
     } = decodeIdl<IcrcTransferFromArgs>({
       recordClass: TransferFromArgs,
-      bytes: arg
+      bytes: new Uint8Array(arg)
     });
 
     const {

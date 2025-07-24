@@ -43,7 +43,7 @@ export const customAddTransform = (): HttpAgentRequestTransformFn => {
       return request;
     }
 
-    if (cachedExpiry['_value'] <= nowInBigIntNanoSeconds()) {
+    if (cachedExpiry.toBigInt() <= nowInBigIntNanoSeconds()) {
       throw Error(
         'The request has expired and is no longer valid. Please try again with a new request.'
       );

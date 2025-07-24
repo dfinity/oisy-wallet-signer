@@ -15,8 +15,8 @@ vi.mock('@dfinity/agent', async (importOriginal) => {
     create = vi.fn();
     addTransform = vi.fn();
 
-    get rootKey(): ArrayBuffer {
-      return mockLocalIcRootKey.buffer;
+    get rootKey(): Uint8Array {
+      return mockLocalIcRootKey;
     }
   }
 

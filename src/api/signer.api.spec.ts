@@ -3,6 +3,7 @@ import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {IcrcLedgerCanister} from '@dfinity/ledger-icrc';
 import {Principal} from '@dfinity/principal';
 import {uint8ArrayToBase64} from '@dfinity/utils';
+import {hexToBytes} from '@noble/hashes/utils';
 import * as customAgent from '../agent/custom-http-agent';
 import * as defaultAgent from '../agent/http-agent-provider';
 import {mockCallCanisterSuccess} from '../mocks/call-canister.mocks';
@@ -39,7 +40,7 @@ describe('SignerApi', () => {
           }
 
           request = vi.fn(() => ({
-            certificate: httpAgent.fromHex(mockRepliedLocalCertificate),
+            certificate: hexToBytes(mockRepliedLocalCertificate),
             requestDetails: mockRequestDetails
           }));
 
@@ -105,7 +106,7 @@ describe('SignerApi', () => {
             }
 
             request = vi.fn(() => ({
-              certificate: httpAgent.fromHex(mockRepliedLocalCertificate),
+              certificate: hexToBytes(mockRepliedLocalCertificate),
               requestDetails: mockRequestDetails
             }));
 

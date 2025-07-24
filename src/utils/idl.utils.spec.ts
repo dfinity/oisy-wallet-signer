@@ -52,7 +52,7 @@ describe('idl.utils', () => {
     });
 
     it('should throw an error when IDL.decode fails due to invalid reply', () => {
-      const invalidReply = new ArrayBuffer(10);
+      const invalidReply = new Uint8Array(10);
 
       expect(() =>
         decodeIdl({
@@ -63,12 +63,13 @@ describe('idl.utils', () => {
     });
 
     it('should throw an error if more than one object is returned', () => {
-      const mockReply = new ArrayBuffer(10);
+      const mockReply = new Uint8Array(10);
 
       // I'm not sure what pattern would lead decode to return a decoded JsonValue[] with more than one element.
       // I wonder if the type is correct; maybe the correct type should actually be [JsonValue].
       // Therefore, mocking agent-js decode for this particular test.
-      vi.spyOn(IDL, 'decode').mockReturnValue([{someField: 'value1'}, {someField: 'value2'}]);
+      vi.mock('@dfinity/candid', {spy: true});
+      vi.mocked(IDL.decode).mockReturnValue([{someField: 'value1'}, {someField: 'value2'}]);
 
       expect(() =>
         decodeIdl({

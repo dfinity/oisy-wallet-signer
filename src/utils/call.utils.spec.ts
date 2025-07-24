@@ -21,8 +21,8 @@ vi.mock('@dfinity/agent', async (importOriginal) => {
     call = vi.fn();
     create = vi.fn();
 
-    get rootKey(): ArrayBuffer {
-      return mockLocalIcRootKey.buffer;
+    get rootKey(): Uint8Array {
+      return mockLocalIcRootKey;
     }
   }
 
@@ -133,7 +133,7 @@ describe('call.utils', () => {
     describe('With agent root key', () => {
       beforeEach(() => {
         createSpy = vi.spyOn(agent.HttpAgent, 'create').mockResolvedValue({
-          rootKey: mockLocalIcRootKey.buffer
+          rootKey: mockLocalIcRootKey
         } as unknown as agent.HttpAgent);
       });
 
