@@ -1,5 +1,4 @@
 import {IDL} from '@dfinity/candid';
-import type {RecordClass, VariantClass} from '@dfinity/candid/lib/cjs/idl';
 import {uint8ArrayToBase64} from '@dfinity/utils';
 import type {IcrcBlob} from '../types/blob';
 
@@ -7,7 +6,7 @@ export const encodeIdl = <T>({
   recordClass,
   rawArgs
 }: {
-  recordClass: RecordClass | VariantClass;
+  recordClass: IDL.RecordClass | IDL.VariantClass;
   rawArgs: T;
 }): IcrcBlob => uint8ArrayToBase64(new Uint8Array(IDL.encode([recordClass], [rawArgs])));
 
@@ -15,8 +14,8 @@ export const decodeIdl = <T>({
   recordClass,
   bytes
 }: {
-  recordClass: RecordClass | VariantClass;
-  bytes: ArrayBuffer;
+  recordClass: IDL.RecordClass | IDL.VariantClass;
+  bytes: Uint8Array;
 }): T => {
   const result = IDL.decode([recordClass], bytes);
 

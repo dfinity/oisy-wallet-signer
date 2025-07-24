@@ -4,12 +4,10 @@ import {
   defaultStrategy,
   lookupResultToBuffer,
   pollForResponse as pollForResponseAgent,
-  uint8ToBuf,
   type CallRequest,
   type HttpAgentOptions,
   type SubmitResponse
 } from '@dfinity/agent';
-import {bufFromBufLike} from '@dfinity/candid';
 import {Principal} from '@dfinity/principal';
 import {base64ToUint8Array, isNullish, nonNullish} from '@dfinity/utils';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
@@ -47,7 +45,7 @@ export class CustomHttpAgent extends HttpAgentProvider {
   }: Omit<IcrcCallCanisterRequestParams, 'sender'>): Promise<CustomHttpAgentResponse> => {
     const {requestDetails, ...restResponse} = await this._agent.call(canisterId, {
       methodName,
-      arg: uint8ToBuf(base64ToUint8Array(arg)),
+      arg: base64ToUint8Array(arg),
       // effectiveCanisterId is optional but, actually mandatory according SDK team.
       effectiveCanisterId: canisterId,
       nonce: nonNullish(nonce) ? base64ToUint8Array(nonce) : undefined
@@ -119,7 +117,7 @@ export class CustomHttpAgent extends HttpAgentProvider {
     }
 
     const certificate = await Certificate.create({
-      certificate: bufFromBufLike(cert),
+      certificate: cert,
       rootKey: this._agent.rootKey,
       canisterId: Principal.fromText(canisterId)
     });
@@ -148,17 +146,17 @@ export class CustomHttpAgent extends HttpAgentProvider {
   }: {certificate: Certificate} & Pick<SubmitResponse, 'requestId'>): {
     result: 'valid' | 'invalid' | 'rejected' | 'empty';
   } {
-    const path = [uint8ToBuf(new TextEncoder().encode('request_status')), requestId];
+    const path = [new TextEncoder().encode('request_status'), requestId];
 
     const status = new TextDecoder().decode(
-      lookupResultToBuffer(certificate.lookup([...path, 'status']))
+      lookupResultToBuffer(certificate.lookup_path([...path, 'status']))
     );
 
     switch (status) {
       case 'replied':
         // ESLint disabled because this code is copy/pasted without changes from agent-js.
         // eslint-disable-next-line no-case-declarations
-        const reply = lookupResultToBuffer(certificate.lookup([...path, 'reply']));
+        const reply = lookupResultToBuffer(certificate.lookup_path([...path, 'reply']));
         return {result: nonNullish(reply) ? 'valid' : 'invalid'};
       case 'rejected':
         return {result: 'rejected'};
@@ -180,7 +178,9 @@ export class CustomHttpAgent extends HttpAgentProvider {
       this._agent,
       Principal.fromText(canisterId),
       requestId,
-      defaultStrategy()
+      {
+        strategy: defaultStrategy()
+      }
     );
 
     return {certificate, requestDetails};

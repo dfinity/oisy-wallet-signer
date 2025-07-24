@@ -1,5 +1,5 @@
 import {Principal} from '@dfinity/principal';
-import {arrayBufferToUint8Array, base64ToUint8Array} from '@dfinity/utils';
+import {base64ToUint8Array} from '@dfinity/utils';
 import type {PrincipalText} from '@dfinity/zod-schemas';
 import type {IcrcBlob} from '../types/blob';
 import type {Method} from '../types/icrc-requests';
@@ -20,11 +20,11 @@ export const assertCallArg = ({
   responseArg,
   requestArg: requestArgBlob
 }: {
-  responseArg: ArrayBuffer;
+  responseArg: Uint8Array;
   requestArg: IcrcBlob;
 }) => {
   const requestArg = base64ToUint8Array(requestArgBlob);
-  const callRequestArg = arrayBufferToUint8Array(responseArg);
+  const callRequestArg = responseArg;
 
   const uint8ArrayEqual = ({first, second}: {first: Uint8Array; second: Uint8Array}): boolean =>
     first.length === second.length && first.every((value, index) => value === second[index]);

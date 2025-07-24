@@ -49,7 +49,7 @@ describe('customAddTransform integration with HttpAgent', () => {
 
     const callOptions = {
       methodName: mockRequestPayload.method,
-      arg: new Uint8Array([68, 73, 68, 76, 6, 109, 123, 110, 0, 108]).buffer,
+      arg: new Uint8Array([68, 73, 68, 76, 6, 109, 123, 110, 0, 108]),
       effectiveCanisterId: mockRequestPayload.canisterId,
       nonce: new Uint8Array([9, 9, 9])
     };
@@ -65,7 +65,7 @@ describe('customAddTransform integration with HttpAgent', () => {
 
 describe('customAddTransform core logic', () => {
   it('throws if cached expiry is older than now', async () => {
-    const ingress_expiry = new httpAgent.Expiry(1);
+    const ingress_expiry = httpAgent.Expiry.fromDeltaInMilliseconds(1);
     const mockRequest = createMockRequest({ingress_expiry, nonce: new Uint8Array([9, 9, 9])});
     const transform = customAddTransform();
 
@@ -83,8 +83,8 @@ describe('customAddTransform core logic', () => {
   });
 
   it('should cache and re-use ingress_expiry if same hash', async () => {
-    const expiry1 = new httpAgent.Expiry(5 * 60 * 1000);
-    const expiry2 = new httpAgent.Expiry(5 * 60 * 1000);
+    const expiry1 = httpAgent.Expiry.fromDeltaInMilliseconds(5 * 60 * 1000);
+    const expiry2 = httpAgent.Expiry.fromDeltaInMilliseconds(5 * 60 * 1000);
     const mockRequest1 = createMockRequest({
       ingress_expiry: expiry1,
       nonce: new Uint8Array([1, 1, 1])
@@ -114,7 +114,7 @@ describe('customAddTransform core logic', () => {
   });
 
   it('should add ingress_expiry to cache if it does not exist and use cache for subsequent calls', async () => {
-    const ingress_expiry = new httpAgent.Expiry(5 * 60 * 1000);
+    const ingress_expiry = httpAgent.Expiry.fromDeltaInMilliseconds(5 * 60 * 1000);
     const mockRequest = createMockRequest({ingress_expiry, nonce: new Uint8Array([9, 9, 9])});
     const transform = customAddTransform();
 

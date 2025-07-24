@@ -1,8 +1,8 @@
+import {encode, encodeWithSelfDescribedTag} from '@dfinity/cbor';
 import {IcrcLedgerCanister} from '@dfinity/ledger-icrc';
 import type {IcrcTokenMetadataResponse} from '@dfinity/ledger-icrc/dist/types/types/ledger.responses';
 import {Principal} from '@dfinity/principal';
-import {arrayBufferToUint8Array, uint8ArrayToBase64} from '@dfinity/utils';
-import {encode} from '../agent/agentjs-cbor-copy';
+import {uint8ArrayToBase64} from '@dfinity/utils';
 import type {CustomHttpAgentResponse} from '../agent/custom-http-agent';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import type {IcrcCallCanisterResult} from '../types/icrc-responses';
@@ -51,11 +51,9 @@ export class SignerApi extends Icrc21Canister {
     requestDetails: contentMap,
     certificate
   }: CustomHttpAgentResponse): IcrcCallCanisterResult {
-    const encodedCertificate = uint8ArrayToBase64(
-      arrayBufferToUint8Array(encode(certificate.cert))
-    );
+    const encodedCertificate = uint8ArrayToBase64(encodeWithSelfDescribedTag(certificate.cert));
 
-    const encodedContentMap = uint8ArrayToBase64(arrayBufferToUint8Array(encode(contentMap)));
+    const encodedContentMap = uint8ArrayToBase64(encode(contentMap));
 
     return {
       certificate: encodedCertificate,

@@ -1,6 +1,6 @@
-import {fromHex} from '@dfinity/agent';
-import {arrayBufferToUint8Array, uint8ArrayToBase64} from '@dfinity/utils';
-import {encode} from '../agent/agentjs-cbor-copy';
+import {encode} from '@dfinity/cbor';
+import {uint8ArrayToBase64} from '@dfinity/utils';
+import {hexToBytes} from '@noble/hashes/utils';
 import type {icrc21_consent_info} from '../declarations/icrc-21';
 import type {IcrcCallCanisterResult} from '../types/icrc-responses';
 import {mockRepliedLocalCertificate} from './custom-http-agent-responses.mocks';
@@ -15,8 +15,6 @@ export const mockConsentInfo: icrc21_consent_info = {
 };
 
 export const mockCanisterCallSuccess: IcrcCallCanisterResult = {
-  certificate: uint8ArrayToBase64(
-    arrayBufferToUint8Array(encode(fromHex(mockRepliedLocalCertificate)))
-  ),
-  contentMap: uint8ArrayToBase64(arrayBufferToUint8Array(encode(mockRequestDetails)))
+  certificate: uint8ArrayToBase64(encode(hexToBytes(mockRepliedLocalCertificate))),
+  contentMap: uint8ArrayToBase64(encode(mockRequestDetails))
 };
