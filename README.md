@@ -554,7 +554,7 @@ npm run dev
 
 ### Running the Pseudo Wallet Signer Locally
 
-If you're building a relying party (client) application—regardless of which library you’re using—and want to test signer interactions without deploying on mainnet, you can run the pseudo wallet signer included in this repo for demo and E2E testing purposes.
+If you're building a relying party (client) application—regardless of which library you're using—and want to test signer interactions without deploying on mainnet, you can run the pseudo wallet signer included in this repo for demo and E2E testing purposes.
 
 This pseudo wallet implements all the features provided by the signer, allowing you to test account listing, permission requests, and canister calls entirely in your local environment.
 
