@@ -19,10 +19,6 @@ build/
 .svelte-kit/
 package/
 
-# environment variables
-.env
-.env.*
-
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
