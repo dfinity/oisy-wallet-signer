@@ -580,6 +580,17 @@ This will launch the pseudo wallet interface on port `5174` (or another availabl
 
 From your client application, you can now connect to this signer using `http://localhost:5174/sign`.
 
+If you're using one of the opinionated clients from this library and your replica runs on a non-standard port, you can also pass the host parameter:
+
+```typescript
+import {IcpWallet} from '@dfinity/oisy-wallet-signer/icp-wallet';
+
+const wallet = await IcpWallet.connect({
+  url: 'http://localhost:5174/sign',
+  host: 'http://localhost:5987'
+});
+```
+
 ## :couple: Community
 
 - [Identity and Wallet Standards](https://github.com/dfinity/wg-identity-authentication/)
