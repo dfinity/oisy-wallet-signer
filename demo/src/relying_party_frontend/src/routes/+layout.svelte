@@ -11,7 +11,7 @@
 </script>
 
 {#snippet title()}
-	Give me my ICP
+	Give me my ICP (old CBOR)
 {/snippet}
 
 {#snippet description()}
