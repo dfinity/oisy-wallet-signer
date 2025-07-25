@@ -21,6 +21,7 @@ export const decodeCallRequest = (contentMap: IcrcBlob): CallRequest => {
     ...callRequestRest,
     canister_id: Principal.fromUint8Array(canister_id),
     // There is no constructor or setter to create an agent-js Expiry from a bigint. Type which is expected by CallRequest. Given that we solely require the wrapped BigInt in this function, we can resolve the issue with an ugly cast.
-    ingress_expiry: BigInt(ingress_expiry.toFixed()) as unknown as Expiry
+    // We use toString(10) to convert the value for future-proofing. This ensures that when `ingress_expiry` is serialized as a bigint with Agent-JS v3, existing clients will still be able to deserialize the value.
+    ingress_expiry: BigInt(ingress_expiry.toString(10)) as unknown as Expiry
   } as CallRequest;
 };
