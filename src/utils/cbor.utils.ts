@@ -1,5 +1,5 @@
 import {Expiry} from '@dfinity/agent';
-import type {CborValue} from '@dfinity/cbor/dist/cbor-value';
+import type {CborValue} from '@dfinity/cbor';
 import {nonNullish} from '@dfinity/utils';
 import {PrincipalObjSchema} from '../types/principal';
 
