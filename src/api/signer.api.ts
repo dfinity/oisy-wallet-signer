@@ -1,8 +1,9 @@
 import {encode, encodeWithSelfDescribedTag} from '@dfinity/cbor';
+import {CborValue, ReplacedCborValue} from '@dfinity/cbor/dist/cbor-value';
 import {IcrcLedgerCanister} from '@dfinity/ledger-icrc';
 import type {IcrcTokenMetadataResponse} from '@dfinity/ledger-icrc/dist/types/types/ledger.responses';
 import {Principal} from '@dfinity/principal';
-import {uint8ArrayToBase64} from '@dfinity/utils';
+import {nonNullish, uint8ArrayToBase64} from '@dfinity/utils';
 import type {CustomHttpAgentResponse} from '../agent/custom-http-agent';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import type {IcrcCallCanisterResult} from '../types/icrc-responses';
@@ -53,7 +54,20 @@ export class SignerApi extends Icrc21Canister {
   }: CustomHttpAgentResponse): IcrcCallCanisterResult {
     const encodedCertificate = uint8ArrayToBase64(encodeWithSelfDescribedTag(certificate.cert));
 
-    const encodedContentMap = uint8ArrayToBase64(encode(contentMap));
+    const customReplacer = <T>(value?: CborValue<T>, key?: string): ReplacedCborValue<T> => {
+      if (
+        key === 'ingress_expiry' &&
+        nonNullish(value) &&
+        typeof value === 'object' &&
+        '_value' in value
+      ) {
+        return value._value as ReplacedCborValue<T>;
+      }
+
+      return value as ReplacedCborValue<T>;
+    };
+
+    const encodedContentMap = uint8ArrayToBase64(encode(contentMap, customReplacer));
 
     return {
       certificate: encodedCertificate,
