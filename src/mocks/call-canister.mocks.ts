@@ -1,7 +1,8 @@
-import {arrayBufferToUint8Array, uint8ArrayToBase64} from '@dfinity/utils';
-import {encode} from '../agent/agentjs-cbor-copy';
+import {encode} from '@dfinity/cbor';
+import {uint8ArrayToBase64} from '@dfinity/utils';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import type {IcrcCallCanisterResult} from '../types/icrc-responses';
+import {contentMapReplacer} from '../utils/cbor.utils';
 import {mockRequestDetails} from './custom-http-agent.mocks';
 import {mockPrincipalText} from './icrc-accounts.mocks';
 
@@ -13,7 +14,7 @@ export const mockCallCanisterParams: IcrcCallCanisterRequestParams = {
 };
 
 export const mockEncodedContentMap = uint8ArrayToBase64(
-  arrayBufferToUint8Array(encode(mockRequestDetails))
+  encode(mockRequestDetails, contentMapReplacer)
 );
 
 export const mockCallCanisterSuccess: IcrcCallCanisterResult = {
