@@ -8,12 +8,14 @@ describe('cbor.utils', () => {
     it('replaces ingress_expiry with bigint from Expiry', () => {
       const expiry = new Expiry(5 * 60 * 1000);
       const result = contentMapReplacer(expiry, 'ingress_expiry');
+
       expect(result).toBe((expiry as unknown as {_value: bigint})._value);
     });
 
     it('replaces sender key with Uint8Array if valid Principal', () => {
       const principal = Principal.fromText(mockPrincipalText);
       const result = contentMapReplacer(principal, 'sender');
+
       expect(result).toBeInstanceOf(Uint8Array);
       expect(principal.toText()).toBe(Principal.fromUint8Array(result as Uint8Array).toText());
     });
@@ -21,6 +23,7 @@ describe('cbor.utils', () => {
     it('replaces canister_id key with Uint8Array if valid Principal', () => {
       const principal = Principal.fromText(mockPrincipalText);
       const result = contentMapReplacer(principal, 'canister_id');
+
       expect(result).toBeInstanceOf(Uint8Array);
       expect(principal.toText()).toBe(Principal.fromUint8Array(result as Uint8Array).toText());
     });
@@ -28,17 +31,20 @@ describe('cbor.utils', () => {
     it('returns original value for unrelated keys', () => {
       const value = 'some value';
       const result = contentMapReplacer(value, 'other_key');
+
       expect(result).toBe(value);
     });
 
     it('returns original value if sender/canister_id value is not a Principal', () => {
       const value = 'not a principal';
       const result = contentMapReplacer(value, 'sender');
+
       expect(result).toBe(value);
     });
 
     it('returns undefined if no value provided', () => {
       const result = contentMapReplacer(undefined, 'sender');
+
       expect(result).toBe(undefined);
     });
   });

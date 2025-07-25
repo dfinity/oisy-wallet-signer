@@ -1,17 +1,9 @@
 import {Principal} from '@dfinity/principal';
-import * as z from 'zod/v4';
+import {z} from 'zod/v4';
 
-// TODO: to be moved to zod-schemas
-export const PrincipalSchema = z.custom<Principal>().refine(
-  (value) => {
-    try {
-      Principal.from(value);
-      return true;
-    } catch (_err: unknown) {
-      return false;
-    }
-  },
-  {
-    error: 'Invalid Principal.'
-  }
-);
+export const PrincipalObjSchema = z
+  .strictObject({
+    _isPrincipal: z.literal(true),
+    _arr: z.instanceof(Uint8Array)
+  })
+  .transform((value) => Principal.from(value));

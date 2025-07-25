@@ -1,7 +1,7 @@
 import {Expiry} from '@dfinity/agent';
 import type {CborValue} from '@dfinity/cbor/dist/cbor-value';
 import {nonNullish} from '@dfinity/utils';
-import {PrincipalSchema} from '../types/principal';
+import {PrincipalObjSchema} from '../types/principal';
 
 // eslint-disable-next-line local-rules/prefer-object-params
 export const contentMapReplacer = <T>(value?: CborValue<T>, key?: string): CborValue<T> => {
@@ -10,7 +10,7 @@ export const contentMapReplacer = <T>(value?: CborValue<T>, key?: string): CborV
   }
 
   if (['sender', 'canister_id'].includes(key ?? '')) {
-    const {success, data} = PrincipalSchema.safeParse(value);
+    const {success, data} = PrincipalObjSchema.safeParse(value);
 
     if (success) {
       return data.toUint8Array();
