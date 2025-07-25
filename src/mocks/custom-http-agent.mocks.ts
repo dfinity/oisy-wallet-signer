@@ -1,5 +1,4 @@
-import {Expiry, type Nonce} from '@dfinity/agent';
-import {SubmitRequestType, type CallRequest} from '@dfinity/agent/lib/cjs/agent/http/types';
+import {Expiry, SubmitRequestType, type CallRequest, type Nonce} from '@dfinity/agent';
 import {Principal} from '@dfinity/principal';
 import {uint8ArrayToBase64} from '@dfinity/utils';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
