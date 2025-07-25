@@ -1,5 +1,6 @@
+import {Expiry} from '@dfinity/agent';
 import {encode, encodeWithSelfDescribedTag} from '@dfinity/cbor';
-import {CborValue, ReplacedCborValue} from '@dfinity/cbor/dist/cbor-value';
+import type {CborValue} from '@dfinity/cbor/dist/cbor-value';
 import {IcrcLedgerCanister} from '@dfinity/ledger-icrc';
 import type {IcrcTokenMetadataResponse} from '@dfinity/ledger-icrc/dist/types/types/ledger.responses';
 import {Principal} from '@dfinity/principal';
@@ -7,6 +8,7 @@ import {nonNullish, uint8ArrayToBase64} from '@dfinity/utils';
 import type {CustomHttpAgentResponse} from '../agent/custom-http-agent';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import type {IcrcCallCanisterResult} from '../types/icrc-responses';
+import {PrincipalSchema} from '../types/principal';
 import type {SignerOptions} from '../types/signer-options';
 import {Icrc21Canister} from './icrc21-canister.api';
 
@@ -54,17 +56,20 @@ export class SignerApi extends Icrc21Canister {
   }: CustomHttpAgentResponse): IcrcCallCanisterResult {
     const encodedCertificate = uint8ArrayToBase64(encodeWithSelfDescribedTag(certificate.cert));
 
-    const customReplacer = <T>(value?: CborValue<T>, key?: string): ReplacedCborValue<T> => {
-      if (
-        key === 'ingress_expiry' &&
-        nonNullish(value) &&
-        typeof value === 'object' &&
-        '_value' in value
-      ) {
-        return value._value as ReplacedCborValue<T>;
+    const customReplacer = <T>(value?: CborValue<T>, key?: string): CborValue<T> => {
+      if (key === 'ingress_expiry' && nonNullish(value) && value instanceof Expiry) {
+        return (value as {_value: bigint})._value;
       }
 
-      return value as ReplacedCborValue<T>;
+      if (['sender', 'canister_id'].includes(key ?? '')) {
+        const {success, data} = PrincipalSchema.safeParse(value);
+
+        if (success) {
+          return data.toUint8Array();
+        }
+      }
+
+      return value;
     };
 
     const encodedContentMap = uint8ArrayToBase64(encode(contentMap, customReplacer));
