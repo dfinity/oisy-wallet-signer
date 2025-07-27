@@ -574,11 +574,11 @@ npm ci
 npm run sync:all
 ```
 
-2. Adapt port (if needed)
+3. Adapt port (if needed)
 
 If your local replica is not running on the default port `4943` used by the demo, make sure to update the `LOCAL_REPLICA_HOST` variable in the [.env](demo/.env) file accordingly.
 
-3. Start the pseudo wallet
+4. Start the pseudo wallet
 
 ```bash
 npm run dev:wallet
