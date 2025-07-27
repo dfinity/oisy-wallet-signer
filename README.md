@@ -558,19 +558,27 @@ If you're building a relying party (client) application—regardless of which li
 
 This pseudo wallet implements all the features provided by the signer, allowing you to test account listing, permission requests, and canister calls entirely in your local environment.
 
-1. Install the demo
+1. Clone the repository and install the library dependencies:
 
 ```bash
 git clone https://github.com/dfinity/oisy-wallet-signer
-cd oisy-wallet-signer/demo
+cd oisy-wallet-signer
 npm ci
 ```
 
-2. Adapt port (if needed)
+2. Navigate to the demo directory and prepare the environment:
+
+```bash
+cd demo
+npm ci
+npm run sync:all
+```
+
+3. Adapt port (if needed)
 
 If your local replica is not running on the default port `4943` used by the demo, make sure to update the `LOCAL_REPLICA_HOST` variable in the [.env](demo/.env) file accordingly.
 
-3. Start the pseudo wallet
+4. Start the pseudo wallet
 
 ```bash
 npm run dev:wallet
