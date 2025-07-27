@@ -20,8 +20,13 @@ import {PrincipalObjSchema} from '../types/principal';
  */
 // eslint-disable-next-line local-rules/prefer-object-params
 export const contentMapReplacer = <T>(value?: CborValue<T>, key?: string): CborValue<T> => {
-  if (key === 'ingress_expiry' && nonNullish(value) && value instanceof Expiry) {
-    return (value as unknown as {_value: bigint})._value;
+  if (key === 'ingress_expiry' && nonNullish(value)) {
+    if (Expiry.isExpiry(value)) {
+      return value['__expiry__'];
+    }
+    if (typeof value === 'object' && value !== null && '_value' in value) {
+      return value._value;
+    }
   }
 
   if (['sender', 'canister_id'].includes(key ?? '')) {
