@@ -1,8 +1,7 @@
 import type {RequestId, SubmitResponse} from '@dfinity/agent';
 import * as httpAgent from '@dfinity/agent';
 import {Ed25519KeyIdentity} from '@dfinity/identity';
-import {base64ToUint8Array, nonNullish} from '@dfinity/utils';
-import {hexToBytes} from '@noble/hashes/utils';
+import {base64ToUint8Array, hexStringToUint8Array, nonNullish} from '@dfinity/utils';
 import type {MockInstance} from 'vitest';
 import {
   mockLocalIcRootKey,
@@ -139,7 +138,7 @@ describe('CustomHttpAgent', () => {
       agent = await CustomHttpAgent.create();
 
       certificate = await httpAgent.Certificate.create({
-        certificate: hexToBytes(mockRepliedLocalCertificate),
+        certificate: hexStringToUint8Array(mockRepliedLocalCertificate),
         canisterId: mockRequestDetails.canister_id,
         rootKey: mockLocalIcRootKey
       });
@@ -147,7 +146,7 @@ describe('CustomHttpAgent', () => {
 
     describe('API v3 / certificate is defined', () => {
       const mockRepliedBody = {
-        certificate: hexToBytes(mockRepliedLocalCertificate),
+        certificate: hexStringToUint8Array(mockRepliedLocalCertificate),
         status: 'replied'
       };
 
@@ -255,7 +254,7 @@ describe('CustomHttpAgent', () => {
             response: {
               ...mockResponse,
               body: {
-                certificate: hexToBytes(mockRepliedLocalCertificate)
+                certificate: hexStringToUint8Array(mockRepliedLocalCertificate)
               }
             }
           });
@@ -289,7 +288,7 @@ describe('CustomHttpAgent', () => {
 
       describe('Rejected response', () => {
         const mockBody = {
-          certificate: hexToBytes(mockRejectedLocalCertificate),
+          certificate: hexStringToUint8Array(mockRejectedLocalCertificate),
           status: 'rejected'
         };
 

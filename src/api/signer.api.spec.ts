@@ -2,8 +2,7 @@ import * as httpAgent from '@dfinity/agent';
 import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {IcrcLedgerCanister} from '@dfinity/ledger-icrc';
 import {Principal} from '@dfinity/principal';
-import {uint8ArrayToBase64} from '@dfinity/utils';
-import {hexToBytes} from '@noble/hashes/utils';
+import {hexStringToUint8Array, uint8ArrayToBase64} from '@dfinity/utils';
 import * as customAgent from '../agent/custom-http-agent';
 import * as defaultAgent from '../agent/http-agent-provider';
 import {mockCallCanisterSuccess} from '../mocks/call-canister.mocks';
@@ -40,7 +39,7 @@ describe('SignerApi', () => {
           }
 
           request = vi.fn(() => ({
-            certificate: hexToBytes(mockRepliedLocalCertificate),
+            certificate: hexStringToUint8Array(mockRepliedLocalCertificate),
             requestDetails: mockRequestDetails
           }));
 
@@ -106,7 +105,7 @@ describe('SignerApi', () => {
             }
 
             request = vi.fn(() => ({
-              certificate: hexToBytes(mockRepliedLocalCertificate),
+              certificate: hexStringToUint8Array(mockRepliedLocalCertificate),
               requestDetails: mockRequestDetails
             }));
 
