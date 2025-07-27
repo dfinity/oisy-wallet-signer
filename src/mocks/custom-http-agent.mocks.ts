@@ -1,4 +1,4 @@
-import {type CallRequest, Expiry, type Nonce, SubmitRequestType} from '@dfinity/agent';
+import {Expiry, SubmitRequestType, type CallRequest, type Nonce} from '@dfinity/agent';
 import {Principal} from '@dfinity/principal';
 import {uint8ArrayToBase64} from '@dfinity/utils';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';

@@ -7,7 +7,7 @@ export const OISY_BETA_URL = 'https://beta.oisy.com/sign';
 
 export const WALLET_DEFAULT_URL = PROD ? OISY_PROD_URL : 'http://localhost:5174/sign';
 
-export const LOCAL_REPLICA_HOST = 'localhost:4943';
+export const LOCAL_REPLICA_HOST = import.meta.env.VITE_LOCAL_REPLICA_HOST;
 export const LOCAL_REPLICA_URL = `http://${LOCAL_REPLICA_HOST}`;
 
 // How long the delegation identity should remain valid?

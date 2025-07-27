@@ -7,6 +7,7 @@ import type {CustomHttpAgentResponse} from '../agent/custom-http-agent';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import type {IcrcCallCanisterResult} from '../types/icrc-responses';
 import type {SignerOptions} from '../types/signer-options';
+import {contentMapReplacer} from '../utils/cbor.utils';
 import {Icrc21Canister} from './icrc21-canister.api';
 
 export class SignerApi extends Icrc21Canister {
@@ -53,7 +54,7 @@ export class SignerApi extends Icrc21Canister {
   }: CustomHttpAgentResponse): IcrcCallCanisterResult {
     const encodedCertificate = uint8ArrayToBase64(encodeWithSelfDescribedTag(certificate.cert));
 
-    const encodedContentMap = uint8ArrayToBase64(encode(contentMap));
+    const encodedContentMap = uint8ArrayToBase64(encode(contentMap, contentMapReplacer));
 
     return {
       certificate: encodedCertificate,

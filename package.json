@@ -1,6 +1,6 @@
 {
   "name": "@dfinity/oisy-wallet-signer",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "description": "A library designed to facilitate communication between a dApp and the OISY Wallet on the Internet Computer. ",
   "license": "Apache-2.0",
   "type": "module",
@@ -89,13 +89,12 @@
   "peerDependencies": {
     "@dfinity/agent": "^3.1.0",
     "@dfinity/candid": "^3.1.0",
+    "@dfinity/cbor": "^0.2.2",
     "@dfinity/ledger-icp": "^4.0.0-beta-2025-07-23.2",
     "@dfinity/ledger-icrc": "^2.9.1-beta-2025-07-23.2",
     "@dfinity/principal": "^3.1.0",
     "@dfinity/utils": "^2.13.2-beta-2025-07-23.2",
     "@dfinity/zod-schemas": "^1.0.0-beta-2025-07-23",
-    "borc": "^2.1.1",
-    "simple-cbor": "^0.4.1",
     "zod": "^3.25"
   }
 }

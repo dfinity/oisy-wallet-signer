@@ -5,6 +5,7 @@ import tailwindcss from '@tailwindcss/vite';
 import type { UserConfig } from 'vite';
 
 export const defineConfig = ({ port }: { port?: number } = {}): UserConfig => ({
+	envDir: __dirname,
 	build: {
 		emptyOutDir: true,
 		rollupOptions: {
