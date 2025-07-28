@@ -20,13 +20,9 @@ import {PrincipalObjSchema} from '../types/principal';
  */
 // eslint-disable-next-line local-rules/prefer-object-params
 export const contentMapReplacer = <T>(value?: CborValue<T>, key?: string): CborValue<T> => {
-  if (key === 'ingress_expiry' && nonNullish(value)) {
-    if (Expiry.isExpiry(value)) {
-      return value['__expiry__'];
-    }
-    if (typeof value === 'object' && value !== null && '_value' in value) {
-      return value._value;
-    }
+  // TODO: do we need to handle old expiries (value._value) as well?
+  if (key === 'ingress_expiry' && nonNullish(value) && Expiry.isExpiry(value)) {
+    return value['__expiry__'];
   }
 
   if (['sender', 'canister_id'].includes(key ?? '')) {

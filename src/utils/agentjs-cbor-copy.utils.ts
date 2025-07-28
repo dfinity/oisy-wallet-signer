@@ -5,6 +5,7 @@ import {base64ToUint8Array} from '@dfinity/utils';
 import type {IcrcBlob} from '../types/blob';
 
 // Expiry doesn't have a fromBigInt static method yet
+// TODO: extract to utils and test it
 const bigIntToExpiry = (val: bigint) => {
   const jsonExpiry = JSON.stringify({[JSON_KEY_EXPIRY]: val.toString()});
   return Expiry.fromJSON(jsonExpiry);
