@@ -6,4 +6,4 @@ export const ExpiryObjSchema = z
     _isExpiry: z.literal(true),
     __expiry__: z.bigint()
   })
-  .transform((value) => bigIntToExpiry(value.__expiry__));
+  .transform(({__expiry__}) => bigIntToExpiry(__expiry__));
