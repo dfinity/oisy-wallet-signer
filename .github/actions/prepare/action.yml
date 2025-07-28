@@ -17,5 +17,5 @@ runs:
         registry-url: 'https://registry.npmjs.org'
     - name: Install dependencies
       shell: bash
-      run: npm ci
+      run: npm ci --force
       working-directory: ${{ inputs.folder }}
