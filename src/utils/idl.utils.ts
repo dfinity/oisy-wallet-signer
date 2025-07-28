@@ -15,7 +15,7 @@ export const decodeIdl = <T>({
   bytes
 }: {
   recordClass: IDL.RecordClass | IDL.VariantClass;
-  bytes: ArrayBuffer;
+  bytes: Uint8Array;
 }): T => {
   const result = IDL.decode([recordClass], bytes);
 

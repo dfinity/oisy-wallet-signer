@@ -37,8 +37,8 @@ vi.mock('@dfinity/agent', async (importOriginal) => {
     call = vi.fn();
     create = vi.fn();
 
-    get rootKey(): ArrayBuffer {
-      return mocks.getRootKey().buffer;
+    get rootKey(): Uint8Array {
+      return mocks.getRootKey();
     }
   }
 

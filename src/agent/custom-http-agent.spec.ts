@@ -1,7 +1,7 @@
+import type {RequestId, SubmitResponse} from '@dfinity/agent';
 import * as httpAgent from '@dfinity/agent';
-import {type RequestId, type SubmitResponse, uint8ToBuf} from '@dfinity/agent';
 import {Ed25519KeyIdentity} from '@dfinity/identity';
-import {base64ToUint8Array, nonNullish} from '@dfinity/utils';
+import {base64ToUint8Array, hexStringToUint8Array, nonNullish} from '@dfinity/utils';
 import type {MockInstance} from 'vitest';
 import {
   mockLocalIcRootKey,
@@ -37,8 +37,8 @@ vi.mock('@dfinity/agent', async (importOriginal) => {
     create = vi.fn();
     addTransform = vi.fn();
 
-    get rootKey(): ArrayBuffer {
-      return mockLocalIcRootKey.buffer;
+    get rootKey(): Uint8Array {
+      return mockLocalIcRootKey;
     }
   }
 
@@ -67,7 +67,7 @@ describe('CustomHttpAgent', () => {
   };
 
   const mockSubmitRestResponse: Omit<SubmitResponse, 'requestDetails'> = {
-    requestId: mockRepliedLocalRequestId.buffer as RequestId,
+    requestId: mockRepliedLocalRequestId as RequestId,
     response: mockResponse
   };
 
@@ -138,15 +138,15 @@ describe('CustomHttpAgent', () => {
       agent = await CustomHttpAgent.create();
 
       certificate = await httpAgent.Certificate.create({
-        certificate: httpAgent.fromHex(mockRepliedLocalCertificate),
+        certificate: hexStringToUint8Array(mockRepliedLocalCertificate),
         canisterId: mockRequestDetails.canister_id,
-        rootKey: mockLocalIcRootKey.buffer
+        rootKey: mockLocalIcRootKey
       });
     });
 
     describe('API v3 / certificate is defined', () => {
       const mockRepliedBody = {
-        certificate: httpAgent.fromHex(mockRepliedLocalCertificate),
+        certificate: hexStringToUint8Array(mockRepliedLocalCertificate),
         status: 'replied'
       };
 
@@ -157,7 +157,7 @@ describe('CustomHttpAgent', () => {
           ...mockResponse,
           body: mockRepliedBody
         },
-        requestId: mockRepliedLocalRequestId.buffer as RequestId
+        requestId: mockRepliedLocalRequestId as RequestId
       };
 
       describe('Replied (success) response', () => {
@@ -170,7 +170,7 @@ describe('CustomHttpAgent', () => {
 
           expect(spyCall).toHaveBeenCalledOnce();
           expect(spyCall).toHaveBeenCalledWith(mockCanisterId, {
-            arg: uint8ToBuf(base64ToUint8Array(mockRequestPayload.arg)),
+            arg: base64ToUint8Array(mockRequestPayload.arg),
             effectiveCanisterId: mockCanisterId,
             methodName: mockRequestMethod
           });
@@ -185,7 +185,7 @@ describe('CustomHttpAgent', () => {
 
           expect(spyCall).toHaveBeenCalledOnce();
           expect(spyCall).toHaveBeenCalledWith(mockCanisterId, {
-            arg: uint8ToBuf(base64ToUint8Array(mockRequestPayload.arg)),
+            arg: base64ToUint8Array(mockRequestPayload.arg),
             effectiveCanisterId: mockCanisterId,
             methodName: mockRequestMethod,
             nonce: mockedNonce
@@ -254,7 +254,7 @@ describe('CustomHttpAgent', () => {
             response: {
               ...mockResponse,
               body: {
-                certificate: httpAgent.fromHex(mockRepliedLocalCertificate)
+                certificate: hexStringToUint8Array(mockRepliedLocalCertificate)
               }
             }
           });
@@ -288,7 +288,7 @@ describe('CustomHttpAgent', () => {
 
       describe('Rejected response', () => {
         const mockBody = {
-          certificate: httpAgent.fromHex(mockRejectedLocalCertificate),
+          certificate: hexStringToUint8Array(mockRejectedLocalCertificate),
           status: 'rejected'
         };
 
@@ -308,7 +308,7 @@ describe('CustomHttpAgent', () => {
         it('should throw an error if the certificate is rejected', async () => {
           spyCall = vi.spyOn(agent.agent, 'call').mockResolvedValue({
             ...mockCallSubmitResponse,
-            requestId: mockRejectedLocalRequestId.buffer as RequestId
+            requestId: mockRejectedLocalRequestId as RequestId
           });
 
           await expect(agent.request(mockRequestPayload)).rejects.toThrow(
@@ -364,7 +364,7 @@ describe('CustomHttpAgent', () => {
 
             expect(spyCall).toHaveBeenCalledOnce();
             expect(spyCall).toHaveBeenCalledWith(mockCanisterId, {
-              arg: uint8ToBuf(base64ToUint8Array(mockRequestPayload.arg)),
+              arg: base64ToUint8Array(mockRequestPayload.arg),
               effectiveCanisterId: mockCanisterId,
               methodName: mockRequestMethod
             });
@@ -379,7 +379,7 @@ describe('CustomHttpAgent', () => {
 
             expect(spyCall).toHaveBeenCalledOnce();
             expect(spyCall).toHaveBeenCalledWith(mockCanisterId, {
-              arg: uint8ToBuf(base64ToUint8Array(mockRequestPayload.arg)),
+              arg: base64ToUint8Array(mockRequestPayload.arg),
               effectiveCanisterId: mockCanisterId,
               methodName: mockRequestMethod,
               nonce: mockedNonce

@@ -6,11 +6,11 @@ import {contentMapReplacer} from './cbor.utils';
 describe('cbor.utils', () => {
   describe('contentMapReplacer', () => {
     it('replaces ingress_expiry with bigint from Expiry', () => {
-      const expiry = new Expiry(5 * 60 * 1000);
+      const expiry = Expiry.fromDeltaInMilliseconds(5 * 60 * 1000);
       const result = contentMapReplacer(expiry, 'ingress_expiry');
 
       expect(result instanceof Expiry).toBeFalsy();
-      expect(result).toBe((expiry as unknown as {_value: bigint})._value);
+      expect(result).toBe(expiry.toBigInt());
     });
 
     it('replaces sender key with Uint8Array if valid Principal', () => {
@@ -81,7 +81,7 @@ describe('cbor.utils', () => {
     });
 
     it('returns original Expiry if undefined key', () => {
-      const expiry = new Expiry(5 * 60 * 1000);
+      const expiry = Expiry.fromDeltaInMilliseconds(5 * 60 * 1000);
       const result = contentMapReplacer(expiry, undefined);
 
       expect(result instanceof Expiry).toBeTruthy();
@@ -91,7 +91,7 @@ describe('cbor.utils', () => {
     });
 
     it('returns original Expiry if misspelled ingress_expiry key', () => {
-      const expiry = new Expiry(5 * 60 * 1000);
+      const expiry = Expiry.fromDeltaInMilliseconds(5 * 60 * 1000);
       const result = contentMapReplacer(expiry, 'ingress_expiryy');
 
       expect(result instanceof Expiry).toBeTruthy();

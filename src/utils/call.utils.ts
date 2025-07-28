@@ -3,8 +3,7 @@ import {
   Certificate,
   HttpAgent,
   lookupResultToBuffer,
-  requestIdOf,
-  uint8ToBuf
+  requestIdOf
 } from '@dfinity/agent';
 import type {IDL} from '@dfinity/candid';
 import {Principal} from '@dfinity/principal';
@@ -85,16 +84,16 @@ export const decodeResponse = async <T>({
   );
 
   const certificate = await Certificate.create({
-    certificate: uint8ToBuf(base64ToUint8Array(cert)),
+    certificate: base64ToUint8Array(cert),
     rootKey: agent.rootKey,
     canisterId: Principal.fromText(canisterId)
   });
 
   const requestId = requestIdOf(callRequest);
 
-  const path = [uint8ToBuf(new TextEncoder().encode('request_status')), requestId];
+  const path = [new TextEncoder().encode('request_status'), requestId];
 
-  const reply = lookupResultToBuffer(certificate.lookup([...path, 'reply']));
+  const reply = lookupResultToBuffer(certificate.lookup_path([...path, 'reply']));
 
   // TODO: Instead of blindly throwing a general exception we can read the rejection and provide an error that contains details such as reject_message, error_code and reject_code.
   assertNonNullish(

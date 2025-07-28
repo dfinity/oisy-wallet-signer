@@ -21,13 +21,11 @@ export const mockRequestPayloadWithNonce: Omit<IcrcCallCanisterRequestParams, 's
 };
 
 export const mockRequestDetails: CallRequest = {
-  // TODO: This is corrected in next version of the agent.
-  // @ts-expect-error arg is currently incorrectly typed in Agent-js. Instead of an ArrayBuffer it actually uses and provides an Uint8Array.
   arg: new Uint8Array([68, 73, 68, 76, 6, 109, 123, 110, 0, 108]),
   canister_id: Principal.fromText(mockCanisterId),
-  ingress_expiry: new Expiry(5 * 60 * 1000),
+  ingress_expiry: Expiry.fromDeltaInMilliseconds(5 * 60 * 1000),
   method_name: mockRequestMethod,
-  nonce: new Uint8Array([1, 2, 3]).buffer as unknown as Nonce,
+  nonce: new Uint8Array([1, 2, 3]) as Nonce,
   request_type: SubmitRequestType.Call,
   sender: Principal.fromText(mockPrincipalText)
 };
