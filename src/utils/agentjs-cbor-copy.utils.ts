@@ -1,4 +1,4 @@
-import {type CallRequest} from '@dfinity/agent';
+import type {CallRequest} from '@dfinity/agent';
 import {decode} from '@dfinity/cbor';
 import {Principal} from '@dfinity/principal';
 import {base64ToUint8Array} from '@dfinity/utils';
