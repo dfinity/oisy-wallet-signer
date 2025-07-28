@@ -85,9 +85,7 @@ describe('cbor.utils', () => {
       const result = contentMapReplacer(expiry, undefined);
 
       expect(result instanceof Expiry).toBeTruthy();
-      expect((result as unknown as {_value: bigint})._value).toBe(
-        (expiry as unknown as {_value: bigint})._value
-      );
+      expect((result as Expiry).toBigInt()).toBe(expiry.toBigInt());
     });
 
     it('returns original Expiry if misspelled ingress_expiry key', () => {
@@ -95,9 +93,7 @@ describe('cbor.utils', () => {
       const result = contentMapReplacer(expiry, 'ingress_expiryy');
 
       expect(result instanceof Expiry).toBeTruthy();
-      expect((result as unknown as {_value: bigint})._value).toBe(
-        (expiry as unknown as {_value: bigint})._value
-      );
+      expect((result as Expiry).toBigInt()).toBe(expiry.toBigInt());
     });
   });
 });
