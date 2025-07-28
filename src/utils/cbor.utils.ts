@@ -1,6 +1,5 @@
-import {Expiry} from '@dfinity/agent';
 import type {CborValue} from '@dfinity/cbor';
-import {nonNullish} from '@dfinity/utils';
+import {ExpiryObjSchema} from '../types/expiry';
 import {PrincipalObjSchema} from '../types/principal';
 
 /**
@@ -20,9 +19,12 @@ import {PrincipalObjSchema} from '../types/principal';
  */
 // eslint-disable-next-line local-rules/prefer-object-params
 export const contentMapReplacer = <T>(value?: CborValue<T>, key?: string): CborValue<T> => {
-  // TODO: do we need to handle old expiries (value._value) as well?
-  if (key === 'ingress_expiry' && nonNullish(value) && Expiry.isExpiry(value)) {
-    return value['__expiry__'];
+  if (key === 'ingress_expiry') {
+    const {success, data} = ExpiryObjSchema.safeParse(value);
+
+    if (success) {
+      return data.toBigInt();
+    }
   }
 
   if (['sender', 'canister_id'].includes(key ?? '')) {
