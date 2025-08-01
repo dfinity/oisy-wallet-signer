@@ -58,7 +58,7 @@
 		"@dfinity/principal": "^3.1.0",
 		"@dfinity/utils": "^2.13.2-beta-2025-07-23.2",
 		"@dfinity/zod-schemas": "^1.0.0-beta-2025-07-23",
-		"zod": "^3.25"
+		"zod": "^4.0"
 	},
 	"overrides": {
 		"cookie": "^0.7.0"
