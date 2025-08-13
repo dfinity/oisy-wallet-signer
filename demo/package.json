@@ -53,10 +53,10 @@
 		"@dfinity/agent": "^3.2.0",
 		"@dfinity/auth-client": "^3.2.0",
 		"@dfinity/candid": "^3.2.0",
-		"@dfinity/ledger-icp": "^5.0.0-beta-2025-08-13",
-		"@dfinity/ledger-icrc": "^3.0.0-beta-2025-08-13",
+		"@dfinity/ledger-icp": "5.0.0-beta-2025-08-13",
+		"@dfinity/ledger-icrc": "3.0.0-beta-2025-08-13",
 		"@dfinity/principal": "^3.2.0",
-		"@dfinity/utils": "^3.0.0-beta-2025-08-13",
+		"@dfinity/utils": "3.0.0-beta-2025-08-13",
 		"@dfinity/zod-schemas": "^1.1.0",
 		"zod": "^3.25"
 	},
