@@ -20,5 +20,10 @@ export default [
 			'**/playwright-report',
 			'**/coverage'
 		]
+	},
+	{
+		rules: {
+			'svelte/sort-attributes': 'off'
+		}
 	}
 ];
