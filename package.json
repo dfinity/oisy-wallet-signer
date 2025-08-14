@@ -84,7 +84,8 @@
     "vitest": "^3.2.4"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=22",
+    "npm": ">=10.9.0 <11.0.0"
   },
   "peerDependencies": {
     "@dfinity/agent": "^3",
