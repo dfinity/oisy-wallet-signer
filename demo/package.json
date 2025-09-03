@@ -1,6 +1,6 @@
 {
 	"name": "@dfinity/oisy-wallet-signer-demo",
-	"version": "0.0.1",
+	"version": "0.4.0",
 	"private": true,
 	"workspaces": [
 		"src/relying_party_frontend",
@@ -50,13 +50,13 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@dfinity/agent": "^3.2.0",
-		"@dfinity/auth-client": "^3.2.0",
-		"@dfinity/candid": "^3.2.0",
-		"@dfinity/ledger-icp": "^5.0.0-next-2025-08-14",
-		"@dfinity/ledger-icrc": "^3.0.0-next-2025-08-14",
-		"@dfinity/principal": "^3.2.0",
-		"@dfinity/utils": "3.0.0-beta-2025-08-13",
+		"@dfinity/agent": "^3.2.4",
+		"@dfinity/auth-client": "^3.2.4",
+		"@dfinity/candid": "^3.2.4",
+		"@dfinity/ledger-icp": "^5.0.0",
+		"@dfinity/ledger-icrc": "^3.0.0",
+		"@dfinity/principal": "^3.2.4",
+		"@dfinity/utils": "^3.0.1",
 		"@dfinity/zod-schemas": "^1.1.0",
 		"zod": "^3.25"
 	},
