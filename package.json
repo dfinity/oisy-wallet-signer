@@ -90,8 +90,8 @@
   "peerDependencies": {
     "@dfinity/agent": "^3",
     "@dfinity/candid": "^3",
-    "@dfinity/ledger-icp": "^5",
-    "@dfinity/ledger-icrc": "^3",
+    "@dfinity/ledger-icp": "^6",
+    "@dfinity/ledger-icrc": "^4",
     "@dfinity/principal": "^3",
     "@dfinity/utils": "^3",
     "@dfinity/zod-schemas": "^1.1.0",
