@@ -57,8 +57,8 @@
 		"@dfinity/ledger-icrc": "^3.0.0",
 		"@dfinity/principal": "^3.2.4",
 		"@dfinity/utils": "^3.0.1",
-        "@dfinity/zod-schemas": "^1.1.0",
-        "zod": "^3.25"
+		"@dfinity/zod-schemas": "^1.1.0",
+		"zod": "^3.25"
 	},
 	"overrides": {
 		"cookie": "^0.7.0"
