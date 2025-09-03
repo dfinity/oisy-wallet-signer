@@ -1,13 +1,35 @@
 import type {ActorMethod} from '@dfinity/agent';
 import type {IDL} from '@dfinity/candid';
 
+export interface DurationSeconds {
+  amount: bigint;
+}
+export interface TextValue {
+  content: string;
+}
+export interface TimestampSeconds {
+  amount: bigint;
+}
+export interface TokenAmount {
+  decimals: number;
+  amount: bigint;
+  symbol: string;
+}
+export type Value =
+  | {Text: TextValue}
+  | {TokenAmount: TokenAmount}
+  | {TimestampSeconds: TimestampSeconds}
+  | {DurationSeconds: DurationSeconds};
 export interface icrc21_consent_info {
   metadata: icrc21_consent_message_metadata;
   consent_message: icrc21_consent_message;
 }
 export type icrc21_consent_message =
   | {
-      LineDisplayMessage: {pages: Array<{lines: Array<string>}>};
+      FieldsDisplayMessage: {
+        fields: Array<[string, Value]>;
+        intent: string;
+      };
     }
   | {GenericDisplayMessage: string};
 export interface icrc21_consent_message_metadata {
@@ -22,17 +44,7 @@ export interface icrc21_consent_message_request {
 export type icrc21_consent_message_response = {Ok: icrc21_consent_info} | {Err: icrc21_error};
 export interface icrc21_consent_message_spec {
   metadata: icrc21_consent_message_metadata;
-  device_spec:
-    | []
-    | [
-        | {GenericDisplay: null}
-        | {
-            LineDisplay: {
-              characters_per_line: number;
-              lines_per_page: number;
-            };
-          }
-      ];
+  device_spec: [] | [{GenericDisplay: null} | {FieldsDisplay: null}];
 }
 export type icrc21_error =
   | {

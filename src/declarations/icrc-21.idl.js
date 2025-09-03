@@ -6,24 +6,31 @@ export const idlFactory = ({IDL}) => {
   });
   const icrc21_consent_message_spec = IDL.Record({
     metadata: icrc21_consent_message_metadata,
-    device_spec: IDL.Opt(
-      IDL.Variant({
-        GenericDisplay: IDL.Null,
-        LineDisplay: IDL.Record({
-          characters_per_line: IDL.Nat16,
-          lines_per_page: IDL.Nat16
-        })
-      })
-    )
+    device_spec: IDL.Opt(IDL.Variant({GenericDisplay: IDL.Null, FieldsDisplay: IDL.Null}))
   });
   const icrc21_consent_message_request = IDL.Record({
     arg: IDL.Vec(IDL.Nat8),
     method: IDL.Text,
     user_preferences: icrc21_consent_message_spec
   });
+  const TextValue = IDL.Record({content: IDL.Text});
+  const TokenAmount = IDL.Record({
+    decimals: IDL.Nat8,
+    amount: IDL.Nat64,
+    symbol: IDL.Text
+  });
+  const TimestampSeconds = IDL.Record({amount: IDL.Nat64});
+  const DurationSeconds = IDL.Record({amount: IDL.Nat64});
+  const Value = IDL.Variant({
+    Text: TextValue,
+    TokenAmount: TokenAmount,
+    TimestampSeconds: TimestampSeconds,
+    DurationSeconds: DurationSeconds
+  });
   const icrc21_consent_message = IDL.Variant({
-    LineDisplayMessage: IDL.Record({
-      pages: IDL.Vec(IDL.Record({lines: IDL.Vec(IDL.Text)}))
+    FieldsDisplayMessage: IDL.Record({
+      fields: IDL.Vec(IDL.Tuple(IDL.Text, Value)),
+      intent: IDL.Text
     }),
     GenericDisplayMessage: IDL.Text
   });
