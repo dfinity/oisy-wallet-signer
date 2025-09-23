@@ -214,12 +214,6 @@ export class Signer {
     // We do not reassign the origin with the same value if it is already set. It is not a significant performance win.
     // In addition, requesting the status is now triggered periodically.
     if (nonNullish(this.#walletOrigin)) {
-      console.log('setWalletOrigin:')
-      console.log(this.#walletOrigin);
-      console.log(origin);
-      console.log(this.isPWAEnvironment());
-      console.log('-----------------------------');
-
       if (this.isPWAEnvironment()) {
         this.#walletOrigin = origin;
       }
@@ -244,13 +238,6 @@ export class Signer {
   private assertUndefinedOrSameOrigin({data: msgData, origin}: SignerMessageEvent): {
     valid: boolean;
   } {
-
-    console.log('assertUndefinedOrSameOrigin:')
-    console.log(this.#walletOrigin)
-    console.log(origin)
-    console.log(this.isPWAEnvironment())
-    console.log('-----------------------------');
-
     if (nonNullish(this.#walletOrigin) && this.#walletOrigin !== origin && !this.isPWAEnvironment()) {
       const {data} = RpcRequestSchema.safeParse(msgData);
 
@@ -329,13 +316,6 @@ export class Signer {
   private assertNotUndefinedAndSameOrigin({data: msgData, origin}: SignerMessageEvent): {
     valid: boolean;
   } {
-
-    console.log('assertNotUndefinedAndSameOrigin:')
-    console.log(this.#walletOrigin)
-    console.log(origin)
-    console.log(this.isPWAEnvironment())
-    console.log('-----------------------------');
-
     const isOriginValid = this.isPWAEnvironment() || (nonNullish(this.#walletOrigin) && this.#walletOrigin === origin);
 
     if (!isOriginValid) {
