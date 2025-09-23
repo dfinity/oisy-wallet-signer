@@ -1,4 +1,4 @@
-import * as z from 'zod/v4';
+import * as z from 'zod';
 import {
   ICRC21_CALL_CONSENT_MESSAGE,
   ICRC25_REQUEST_PERMISSIONS,
