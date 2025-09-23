@@ -207,14 +207,17 @@ export class Signer {
   }
 
   private isPWAEnvironment(): boolean {
-    return window.matchMedia('(display-mode: standalone)').matches || ('standalone' in navigator) && navigator.standalone === true;
+    return (
+      window.matchMedia('(display-mode: standalone)').matches ||
+      ('standalone' in navigator && navigator.standalone === true)
+    );
   }
 
   private setWalletOrigin({origin}: Pick<SignerMessageEvent, 'origin'>) {
     // We do not reassign the origin with the same value if it is already set. It is not a significant performance win.
     // In addition, requesting the status is now triggered periodically.
     if (nonNullish(this.#walletOrigin)) {
-      console.warn('setWalletOrigin:')
+      console.warn('setWalletOrigin:');
       console.warn(this.#walletOrigin);
       console.warn(origin);
       console.warn(this.isPWAEnvironment());
@@ -244,14 +247,17 @@ export class Signer {
   private assertUndefinedOrSameOrigin({data: msgData, origin}: SignerMessageEvent): {
     valid: boolean;
   } {
-
-    console.warn('assertUndefinedOrSameOrigin:')
-    console.warn(this.#walletOrigin)
-    console.warn(origin)
-    console.warn(this.isPWAEnvironment())
+    console.warn('assertUndefinedOrSameOrigin:');
+    console.warn(this.#walletOrigin);
+    console.warn(origin);
+    console.warn(this.isPWAEnvironment());
     console.warn('-----------------------------');
 
-    if (nonNullish(this.#walletOrigin) && this.#walletOrigin !== origin && !this.isPWAEnvironment()) {
+    if (
+      nonNullish(this.#walletOrigin) &&
+      this.#walletOrigin !== origin &&
+      !this.isPWAEnvironment()
+    ) {
       const {data} = RpcRequestSchema.safeParse(msgData);
 
       notifyError({
@@ -329,14 +335,14 @@ export class Signer {
   private assertNotUndefinedAndSameOrigin({data: msgData, origin}: SignerMessageEvent): {
     valid: boolean;
   } {
-
-    console.warn('assertNotUndefinedAndSameOrigin:')
-    console.warn(this.#walletOrigin)
-    console.warn(origin)
-    console.warn(this.isPWAEnvironment())
+    console.warn('assertNotUndefinedAndSameOrigin:');
+    console.warn(this.#walletOrigin);
+    console.warn(origin);
+    console.warn(this.isPWAEnvironment());
     console.warn('-----------------------------');
 
-    const isOriginValid = this.isPWAEnvironment() || (nonNullish(this.#walletOrigin) && this.#walletOrigin === origin);
+    const isOriginValid =
+      this.isPWAEnvironment() || (nonNullish(this.#walletOrigin) && this.#walletOrigin === origin);
 
     if (!isOriginValid) {
       const {data} = RpcRequestSchema.safeParse(msgData);
