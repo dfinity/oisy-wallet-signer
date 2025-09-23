@@ -207,7 +207,7 @@ export class Signer {
   }
 
   private isPWAEnvironment(): boolean {
-    return window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone === true;
+    return window.matchMedia('(display-mode: standalone)').matches || ('standalone' in navigator) && navigator.standalone === true;
   }
 
   private setWalletOrigin({origin}: Pick<SignerMessageEvent, 'origin'>) {
