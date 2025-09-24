@@ -4,6 +4,7 @@ export const { PROD } = import.meta.env;
 export const OISY_PROD_URL = 'https://oisy.com/sign';
 export const OISY_STAGING_URL = 'https://staging.oisy.com/sign';
 export const OISY_BETA_URL = 'https://beta.oisy.com/sign';
+export const OISY_FE1_URL = 'https://fe1.oisy.com/sign';
 
 export const WALLET_DEFAULT_URL = PROD ? OISY_PROD_URL : 'http://localhost:5174/sign';
 
