@@ -5,6 +5,7 @@
 	import Value from '$core/components/Value.svelte';
 	import {
 		OISY_BETA_URL,
+		OISY_FE1_URL,
 		OISY_STAGING_URL,
 		PROD,
 		WALLET_DEFAULT_URL
@@ -27,7 +28,7 @@
 
 	const URLS = [
 		WALLET_DEFAULT_URL,
-		...(PROD ? [OISY_STAGING_URL, OISY_BETA_URL] : [])
+		...(PROD ? [OISY_STAGING_URL, OISY_BETA_URL, OISY_FE1_URL] : [])
 	].map<SelectUrl>(mapUrl);
 
 	const onchange = () => {
