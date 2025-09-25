@@ -195,9 +195,16 @@ describe('RelyingPartyOptions', () => {
       onDisconnect: 'not-a-function' // Invalid type for onDisconnect
     };
 
-    expect(() => RelyingPartyOptionsSchema.parse(invalidData)).toThrow(
-      'implement() must be called with a function'
-    );
+    const result = RelyingPartyOptionsSchema.safeParse(invalidData)
+
+    expect(result.error?.issues).toEqual([
+      {
+        code: 'invalid_type',
+        "expected": "function",
+        path: ['onDisconnect'],
+        message: 'Invalid input: expected function, received string'
+      }
+    ]);
   });
 
   describe('host', () => {
