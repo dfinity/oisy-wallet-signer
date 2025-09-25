@@ -1,5 +1,5 @@
-import type {Expiry, HttpAgentRequest, HttpAgentRequestTransformFn} from '@icp-sdk/core/agent';
 import {hashObject, isNullish, nowInBigIntNanoSeconds, uint8ArrayToBase64} from '@dfinity/utils';
+import type {Expiry, HttpAgentRequest, HttpAgentRequestTransformFn} from '@icp-sdk/core/agent';
 import type {HexString} from '../types/hex-string';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 

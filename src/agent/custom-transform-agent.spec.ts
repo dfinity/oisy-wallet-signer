@@ -1,5 +1,5 @@
-import * as httpAgent from '@icp-sdk/core/agent';
 import {nonNullish} from '@dfinity/utils';
+import * as httpAgent from '@icp-sdk/core/agent';
 import {createMockRequest, mockRequestPayload} from '../mocks/custom-http-agent.mocks';
 import {customAddTransform} from './custom-transform-agent';
 

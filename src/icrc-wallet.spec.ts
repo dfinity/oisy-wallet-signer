@@ -1,7 +1,7 @@
-import type * as agent from '@icp-sdk/core/agent';
-import {Ed25519KeyIdentity} from '@icp-sdk/core/identity';
 import type {ApproveParams, TransferFromParams, TransferParams} from '@dfinity/ledger-icrc';
 import {toNullable} from '@dfinity/utils';
+import type * as agent from '@icp-sdk/core/agent';
+import {Ed25519KeyIdentity} from '@icp-sdk/core/identity';
 import {IcrcWallet} from './icrc-wallet';
 import {
   mockLocalBlockHeight,

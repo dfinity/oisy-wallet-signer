@@ -1,6 +1,6 @@
-import type {Identity} from '@icp-sdk/core/agent';
 import {isNullish} from '@dfinity/utils';
 import {UrlSchema} from '@dfinity/zod-schemas';
+import type {Identity} from '@icp-sdk/core/agent';
 import * as z from 'zod/v4';
 
 const IdentitySchema = z.custom<Identity>((value: unknown): boolean => {

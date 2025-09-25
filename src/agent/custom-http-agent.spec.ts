@@ -1,7 +1,7 @@
+import {base64ToUint8Array, hexStringToUint8Array, nonNullish} from '@dfinity/utils';
 import type {RequestId, SubmitResponse} from '@icp-sdk/core/agent';
 import * as httpAgent from '@icp-sdk/core/agent';
 import {Ed25519KeyIdentity} from '@icp-sdk/core/identity';
-import {base64ToUint8Array, hexStringToUint8Array, nonNullish} from '@dfinity/utils';
 import type {MockInstance} from 'vitest';
 import {
   mockLocalIcRootKey,

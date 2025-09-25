@@ -1,3 +1,4 @@
+import {assertNonNullish, base64ToUint8Array} from '@dfinity/utils';
 import {
   AnonymousIdentity,
   Certificate,
@@ -7,7 +8,6 @@ import {
 } from '@icp-sdk/core/agent';
 import type {IDL} from '@icp-sdk/core/candid';
 import {Principal} from '@icp-sdk/core/principal';
-import {assertNonNullish, base64ToUint8Array} from '@dfinity/utils';
 import {LOCAL_REPLICA_URL, MAINNET_REPLICA_URL} from '../constants/core.constants';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import type {IcrcCallCanisterResult} from '../types/icrc-responses';

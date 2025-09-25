@@ -1,5 +1,5 @@
-import {Ed25519KeyIdentity} from '@icp-sdk/core/identity';
 import {assertNonNullish} from '@dfinity/utils';
+import {Ed25519KeyIdentity} from '@icp-sdk/core/identity';
 import type {MockInstance} from 'vitest';
 import {
   ICRC25_PERMISSION_ASK_ON_USE,
