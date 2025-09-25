@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Principal } from '@dfinity/principal';
+	import type { Principal } from '@icp-sdk/core/principal';
 	import Value from '$core/components/Value.svelte';
 	import { shortenWithMiddleEllipsis } from '$core/utils/format.utils';
 
