@@ -1,4 +1,4 @@
-import {Principal} from '@dfinity/principal';
+import {Principal} from '@icp-sdk/core/principal';
 import {TransferFromArgs} from '../constants/icrc-2.idl.constants';
 import type {TransferFromArgs as TransferFromArgsType} from '../declarations/icrc-2';
 import {encodeIdl} from '../utils/idl.utils';

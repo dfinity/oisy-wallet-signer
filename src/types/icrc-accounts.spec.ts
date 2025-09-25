@@ -1,4 +1,4 @@
-import {Principal} from '@dfinity/principal';
+import {Principal} from '@icp-sdk/core/principal';
 import {uint8ArrayToBase64} from '@dfinity/utils';
 import {mockPrincipalText} from '../mocks/icrc-accounts.mocks';
 import {IcrcAccountSchema, IcrcAccountsSchema} from './icrc-accounts';

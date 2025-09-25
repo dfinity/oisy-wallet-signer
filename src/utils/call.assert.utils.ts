@@ -1,4 +1,4 @@
-import {Principal} from '@dfinity/principal';
+import {Principal} from '@icp-sdk/core/principal';
 import {base64ToUint8Array} from '@dfinity/utils';
 import type {PrincipalText} from '@dfinity/zod-schemas';
 import type {IcrcBlob} from '../types/blob';

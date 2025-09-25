@@ -1,5 +1,5 @@
-import {uint8ToBuf} from '@dfinity/agent';
-import {Ed25519KeyIdentity} from '@dfinity/identity';
+import {uint8ToBuf} from '@icp-sdk/core/agent';
+import {Ed25519KeyIdentity} from '@icp-sdk/core/identity';
 import {mapTokenMetadata, type IcrcTokenMetadata} from '@dfinity/ledger-icrc';
 import {assertNonNullish, base64ToUint8Array} from '@dfinity/utils';
 import type {Mock, MockInstance} from 'vitest';

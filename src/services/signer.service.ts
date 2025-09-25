@@ -1,6 +1,6 @@
-import {uint8ToBuf} from '@dfinity/agent';
+import {uint8ToBuf} from '@icp-sdk/core/agent';
 import {mapTokenMetadata} from '@dfinity/ledger-icrc';
-import {Principal} from '@dfinity/principal';
+import {Principal} from '@icp-sdk/core/principal';
 import {base64ToUint8Array, isNullish, notEmptyString} from '@dfinity/utils';
 import {SignerApi} from '../api/signer.api';
 import {SIGNER_BUILDERS} from '../constants/signer.builders.constants';

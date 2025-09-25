@@ -1,5 +1,5 @@
-import type * as agent from '@dfinity/agent';
-import {Ed25519KeyIdentity} from '@dfinity/identity';
+import type * as agent from '@icp-sdk/core/agent';
+import {Ed25519KeyIdentity} from '@icp-sdk/core/identity';
 import type {ApproveParams, TransferFromParams, TransferParams} from '@dfinity/ledger-icrc';
 import {toNullable} from '@dfinity/utils';
 import {IcrcWallet} from './icrc-wallet';
@@ -30,7 +30,7 @@ import * as callUtils from './utils/call.utils';
 
 const mocks = vi.hoisted(() => ({getRootKey: vi.fn()}));
 
-vi.mock('@dfinity/agent', async (importOriginal) => {
+vi.mock('@icp-sdk/core/agent', async (importOriginal) => {
   const originalModule = await importOriginal<typeof agent>();
 
   class MockHttpAgent {

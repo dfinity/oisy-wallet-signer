@@ -1,4 +1,4 @@
-import type {Principal} from '@dfinity/principal';
+import type {Principal} from '@icp-sdk/core/principal';
 import {isNullish} from '@dfinity/utils';
 import {ICRC25_PERMISSION_ASK_ON_USE} from '../constants/icrc.constants';
 import {SIGNER_PERMISSION_VALIDITY_PERIOD_IN_MILLISECONDS} from '../constants/signer.constants';

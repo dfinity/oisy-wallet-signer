@@ -1,6 +1,6 @@
-import {Actor, type ActorMethod, type ActorSubclass} from '@dfinity/agent';
-import type {IDL} from '@dfinity/candid';
-import {Principal} from '@dfinity/principal';
+import {Actor, type ActorMethod, type ActorSubclass} from '@icp-sdk/core/agent';
+import type {IDL} from '@icp-sdk/core/candid';
+import {Principal} from '@icp-sdk/core/principal';
 import {isNullish} from '@dfinity/utils';
 import type {PrincipalText} from '@dfinity/zod-schemas';
 import type {

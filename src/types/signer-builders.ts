@@ -1,5 +1,5 @@
 import type {IcrcTokenMetadata} from '@dfinity/ledger-icrc';
-import type {Principal} from '@dfinity/principal';
+import type {Principal} from '@icp-sdk/core/principal';
 import type {icrc21_consent_info} from '../declarations/icrc-21';
 
 export interface SignerBuildersResultOk {

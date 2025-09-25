@@ -7,8 +7,8 @@ import {
   type CallRequest,
   type HttpAgentOptions,
   type SubmitResponse
-} from '@dfinity/agent';
-import {Principal} from '@dfinity/principal';
+} from '@icp-sdk/core/agent';
+import {Principal} from '@icp-sdk/core/principal';
 import {base64ToUint8Array, isNullish, nonNullish} from '@dfinity/utils';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import {customAddTransform} from './custom-transform-agent';

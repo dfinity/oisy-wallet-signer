@@ -1,6 +1,6 @@
-import type {CallRequest} from '@dfinity/agent';
+import type {CallRequest} from '@icp-sdk/core/agent';
 import {decode} from '@dfinity/cbor';
-import {Principal} from '@dfinity/principal';
+import {Principal} from '@icp-sdk/core/principal';
 import {base64ToUint8Array} from '@dfinity/utils';
 import type {IcrcBlob} from '../types/blob';
 import {bigIntToExpiry} from './expiry.utils';

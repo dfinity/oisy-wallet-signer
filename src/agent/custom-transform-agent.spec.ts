@@ -1,9 +1,9 @@
-import * as httpAgent from '@dfinity/agent';
+import * as httpAgent from '@icp-sdk/core/agent';
 import {nonNullish} from '@dfinity/utils';
 import {createMockRequest, mockRequestPayload} from '../mocks/custom-http-agent.mocks';
 import {customAddTransform} from './custom-transform-agent';
 
-vi.mock('@dfinity/agent', async (importOriginal) => {
+vi.mock('@icp-sdk/core/agent', async (importOriginal) => {
   const actual = await importOriginal<typeof httpAgent>();
 
   class MockHttpAgent {

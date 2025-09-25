@@ -1,4 +1,4 @@
-import {Ed25519KeyIdentity} from '@dfinity/identity';
+import {Ed25519KeyIdentity} from '@icp-sdk/core/identity';
 import {CustomHttpAgent} from '../agent/custom-http-agent';
 import {HttpAgentProvider} from '../agent/http-agent-provider';
 import type {SignerOptions} from '../types/signer-options';

@@ -1,4 +1,4 @@
-import {IDL} from '@dfinity/candid';
+import {IDL} from '@icp-sdk/core/candid';
 import {uint8ArrayToBase64} from '@dfinity/utils';
 import type {IcrcBlob} from '../types/blob';
 
