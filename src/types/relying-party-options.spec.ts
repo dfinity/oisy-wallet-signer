@@ -195,12 +195,12 @@ describe('RelyingPartyOptions', () => {
       onDisconnect: 'not-a-function' // Invalid type for onDisconnect
     };
 
-    const result = RelyingPartyOptionsSchema.safeParse(invalidData)
+    const result = RelyingPartyOptionsSchema.safeParse(invalidData);
 
     expect(result.error?.issues).toEqual([
       {
         code: 'invalid_type',
-        "expected": "function",
+        expected: 'function',
         path: ['onDisconnect'],
         message: 'Invalid input: expected function, received string'
       }
