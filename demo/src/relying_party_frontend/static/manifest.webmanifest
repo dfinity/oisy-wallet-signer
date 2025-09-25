@@ -1,0 +1,24 @@
+{
+	"name": "OISY Wallet Signer Demo",
+	"short_name": "OISY Demo",
+	"start_url": ".",
+	"display": "standalone",
+	"theme_color": "#FFFFFF",
+	"background_color": "#FFFFFF",
+	"description": "A demo app showcasing communication between dApps and the OISY Wallet on the Internet Computer",
+	"orientation": "portrait-primary",
+	"prefer_related_applications": false,
+	"categories": ["finance"],
+	"icons": [
+		{
+			"src": "./favicon.png",
+			"sizes": "192x192",
+			"type": "image/png"
+		},
+		{
+			"src": "./favicon.png",
+			"sizes": "512x512",
+			"type": "image/png"
+		}
+	]
+}
