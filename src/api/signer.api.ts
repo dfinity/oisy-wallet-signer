@@ -1,6 +1,5 @@
 import {encode, encodeWithSelfDescribedTag} from '@dfinity/cbor';
-import {IcrcLedgerCanister} from '@dfinity/ledger-icrc';
-import type {IcrcTokenMetadataResponse} from '@dfinity/ledger-icrc/dist/types/types/ledger.responses';
+import {type IcrcTokenMetadataResponse, IcrcLedgerCanister} from '@dfinity/ledger-icrc';
 import {Principal} from '@dfinity/principal';
 import {uint8ArrayToBase64} from '@dfinity/utils';
 import type {CustomHttpAgentResponse} from '../agent/custom-http-agent';
