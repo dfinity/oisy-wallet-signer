@@ -88,13 +88,11 @@
     "npm": ">=10.9.0 <11.0.0"
   },
   "peerDependencies": {
-    "@dfinity/agent": "^3",
-    "@dfinity/candid": "^3",
-    "@dfinity/ledger-icp": "^6",
-    "@dfinity/ledger-icrc": "^4",
-    "@dfinity/principal": "^3",
-    "@dfinity/utils": "^3",
+    "@dfinity/ledger-icp": "^6.0.0-beta-2025-09-25",
+    "@dfinity/ledger-icrc": "^4.0.1-beta-2025-09-25",
+    "@dfinity/utils": "^3.1.0-beta-2025-09-25",
     "@dfinity/zod-schemas": "^1.1.0",
+    "@icp-sdk/core": "^4.0.4",
     "zod": "^3.25"
   }
 }
