@@ -1,8 +1,7 @@
 import {encode, encodeWithSelfDescribedTag} from '@dfinity/cbor';
-import {IcrcLedgerCanister} from '@dfinity/ledger-icrc';
-import type {IcrcTokenMetadataResponse} from '@dfinity/ledger-icrc/dist/types/types/ledger.responses';
-import {uint8ArrayToBase64} from '@dfinity/utils';
+import {type IcrcTokenMetadataResponse, IcrcLedgerCanister} from '@dfinity/ledger-icrc';
 import {Principal} from '@icp-sdk/core/principal';
+import {uint8ArrayToBase64} from '@dfinity/utils';
 import type {CustomHttpAgentResponse} from '../agent/custom-http-agent';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import type {IcrcCallCanisterResult} from '../types/icrc-responses';

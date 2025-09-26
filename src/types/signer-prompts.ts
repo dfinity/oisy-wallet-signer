@@ -1,4 +1,4 @@
-import * as z from 'zod/v4';
+import * as z from 'zod';
 import {
   ICRC21_CALL_CONSENT_MESSAGE,
   ICRC25_REQUEST_PERMISSIONS,
@@ -6,7 +6,6 @@ import {
   ICRC49_CALL_CANISTER
 } from '../constants/icrc.constants';
 import type {icrc21_consent_info} from '../declarations/icrc-21';
-import {createFunctionSchema} from '../utils/zod.utils';
 import {IcrcAccountsSchema} from './icrc-accounts';
 import {IcrcCallCanisterRequestParamsSchema} from './icrc-requests';
 import {IcrcCallCanisterResultSchema, IcrcScopesArraySchema} from './icrc-responses';
@@ -38,7 +37,7 @@ const PayloadOriginSchema = z.object({
 
 export type PayloadOrigin = z.infer<typeof PayloadOriginSchema>;
 
-const RejectionSchema = createFunctionSchema(z.function({output: z.void()}));
+const RejectionSchema = z.function({output: z.void()});
 
 export type Rejection = z.infer<typeof RejectionSchema>;
 
@@ -51,9 +50,10 @@ const ErrorSchema = PayloadOriginSchema.extend({
 
 // Prompt for permissions
 
-const PermissionsConfirmationSchema = createFunctionSchema(
-  z.function({input: z.tuple([IcrcScopesArraySchema]), output: z.void()})
-);
+const PermissionsConfirmationSchema = z.function({
+  input: z.tuple([IcrcScopesArraySchema]),
+  output: z.void()
+});
 
 export type PermissionsConfirmation = z.infer<typeof PermissionsConfirmationSchema>;
 
@@ -75,20 +75,16 @@ export type PermissionsPromptPayload = z.infer<typeof PermissionsPromptPayloadSc
  * @param {IcrcScopes[]} params.requestedScopes - An array of IcrcScopes representing the permissions being requested.
  * @param {PermissionsConfirmation} params.confirm - A function to be called by the consumer to confirm (grant or deny) the requested, a subset, or none of the permissions. Skipping a permission is equivalent to preserving its current state.
  */
-export const PermissionsPromptSchema = createFunctionSchema(
-  z.function({
-    input: z.tuple([PermissionsPromptPayloadSchema]),
-    output: z.void()
-  })
-);
+export const PermissionsPromptSchema = z.function({
+  input: z.tuple([PermissionsPromptPayloadSchema]),
+  output: z.void()
+});
 
 export type PermissionsPrompt = z.infer<typeof PermissionsPromptSchema>;
 
 // Prompt for accounts
 
-const AccountsApprovalSchema = createFunctionSchema(
-  z.function({input: z.tuple([IcrcAccountsSchema]), output: z.void()})
-);
+const AccountsApprovalSchema = z.function({input: z.tuple([IcrcAccountsSchema]), output: z.void()});
 
 export type AccountsApproval = z.infer<typeof AccountsApprovalSchema>;
 
@@ -105,18 +101,16 @@ export type AccountsPromptPayload = z.infer<typeof AccountsPromptPayloadSchema>;
  * @param {AccountsPromptPayload} params - An object containing a function to confirm the accounts.
  * @param {IcrcAccounts[]} params.approve - A function to be called by the consumer to confirm (select or reject) the provided accounts.
  */
-export const AccountsPromptSchema = createFunctionSchema(
-  z.function({
-    input: z.tuple([AccountsPromptPayloadSchema]),
-    output: z.void()
-  })
-);
+export const AccountsPromptSchema = z.function({
+  input: z.tuple([AccountsPromptPayloadSchema]),
+  output: z.void()
+});
 
 export type AccountsPrompt = z.infer<typeof AccountsPromptSchema>;
 
 // Prompt for consent message
 
-const ConsentMessageApprovalSchema = createFunctionSchema(z.function({output: z.void()}));
+const ConsentMessageApprovalSchema = z.function({output: z.void()});
 
 export type ConsentMessageApproval = z.infer<typeof ConsentMessageApprovalSchema>;
 
@@ -180,12 +174,10 @@ export type ConsentMessagePromptPayload = z.infer<typeof ConsentMessagePromptPay
  * @param {() => void} params.approve - A function to be called by the consumer to approve the consent message.
  * @param {() => void} params.reject - A function to be called by the consumer to reject the consent message.
  */
-export const ConsentMessagePromptSchema = createFunctionSchema(
-  z.function({
-    input: z.tuple([ConsentMessagePromptPayloadSchema]),
-    output: z.void()
-  })
-);
+export const ConsentMessagePromptSchema = z.function({
+  input: z.tuple([ConsentMessagePromptPayloadSchema]),
+  output: z.void()
+});
 
 export type ConsentMessagePrompt = z.infer<typeof ConsentMessagePromptSchema>;
 
@@ -217,11 +209,9 @@ const CallCanisterPromptPayloadSchema = z.union([
 
 export type CallCanisterPromptPayload = z.infer<typeof CallCanisterPromptPayloadSchema>;
 
-export const CallCanisterPromptSchema = createFunctionSchema(
-  z.function({
-    input: z.tuple([CallCanisterPromptPayloadSchema]),
-    output: z.void()
-  })
-);
+export const CallCanisterPromptSchema = z.function({
+  input: z.tuple([CallCanisterPromptPayloadSchema]),
+  output: z.void()
+});
 
 export type CallCanisterPrompt = z.infer<typeof CallCanisterPromptSchema>;
