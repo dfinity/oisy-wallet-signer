@@ -1,6 +1,6 @@
 {
 	"name": "@dfinity/oisy-wallet-signer-demo",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"private": true,
 	"workspaces": [
 		"src/relying_party_frontend",
@@ -45,7 +45,7 @@
 		"tailwindcss": "^4.1.12",
 		"tslib": "^2.8.1",
 		"typescript": "^5.9.2",
-		"vite": "^7.1.4",
+		"vite": "^7.1.7",
 		"vitest": "^3.2.4"
 	},
 	"type": "module",
