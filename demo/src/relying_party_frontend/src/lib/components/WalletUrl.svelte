@@ -3,13 +3,11 @@
 	import type * as z from 'zod/v4';
 	import InputSelect from '$core/components/InputSelect.svelte';
 	import Value from '$core/components/Value.svelte';
-	import {
-		OISY_BETA_URL,
-		OISY_FE1_URL,
-		OISY_STAGING_URL,
-		PROD,
-		WALLET_DEFAULT_URL
-	} from '$core/constants/app.constants';
+    import {
+        WALLET_TEST_DOMAINS,
+        PROD,
+        WALLET_DEFAULT_URL
+    } from '$core/constants/app.constants';
 	import { walletUrlStore } from '$lib/stores/wallet.store';
 
 	interface SelectUrl {
@@ -28,7 +26,7 @@
 
 	const URLS = [
 		WALLET_DEFAULT_URL,
-		...(PROD ? [OISY_STAGING_URL, OISY_BETA_URL, OISY_FE1_URL] : [])
+		...(PROD ? WALLET_TEST_DOMAINS.map(domain => `https://${domain}/sign`) : [])
 	].map<SelectUrl>(mapUrl);
 
 	const onchange = () => {
