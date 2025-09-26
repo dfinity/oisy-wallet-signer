@@ -22,7 +22,7 @@ jobs:
       - name: Run tests
         run: |
           cd demo
-          juno dev start --headless &
+          juno emulator start --headless &
           cd ..
           npm run e2e:ci
       - name: Upload Playwright report on failure

@@ -24,7 +24,7 @@ jobs:
       - name: Deploy to Juno
         uses: junobuild/juno-action@main
         with:
-          args: deploy
+          args: hosting deploy
         env:
           JUNO_TOKEN: ${{ secrets.JUNO_TOKEN }}
           PROJECT_PATH: demo/src/relying_party_frontend

@@ -26,7 +26,7 @@ jobs:
       - name: Run tests and update Snapshots
         run: |
           cd demo
-          juno dev start --headless &
+          juno emulator start --headless &
           cd ..
           npm run e2e:ci:snapshots
       - name: Commit Playwright updated snapshots
