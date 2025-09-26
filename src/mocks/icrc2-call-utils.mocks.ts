@@ -1,4 +1,4 @@
-import {Principal} from '@dfinity/principal';
+import {Principal} from '@icp-sdk/core/principal';
 import type {IcrcCallCanisterResult} from '../types/icrc-responses';
 import {mockLedgerCanisterId} from './icrc-call-utils.mocks';
 

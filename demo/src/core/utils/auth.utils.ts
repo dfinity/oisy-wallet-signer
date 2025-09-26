@@ -1,5 +1,5 @@
-import type { Identity } from '@dfinity/agent';
-import { AuthClient } from '@dfinity/auth-client';
+import { AuthClient } from '@icp-sdk/auth/client';
+import type { Identity } from '@icp-sdk/core/agent';
 
 export const createAuthClient = (): Promise<AuthClient> =>
 	AuthClient.create({

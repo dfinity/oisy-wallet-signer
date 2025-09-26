@@ -1,7 +1,7 @@
 /**
  * These values were copied from a test performed locally against a local replica of Juno Docker.
  */
-import {Principal} from '@dfinity/principal';
+import {Principal} from '@icp-sdk/core/principal';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import type {IcrcCallCanisterResult} from '../types/icrc-responses';
 

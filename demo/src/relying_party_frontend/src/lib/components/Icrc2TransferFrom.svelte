@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { IcrcBlockIndex, TransferFromParams } from '@dfinity/ledger-icrc';
 	import type { IcrcWallet } from '@dfinity/oisy-wallet-signer/icrc-wallet';
-	import { Principal } from '@dfinity/principal';
 	import { isNullish, nonNullish } from '@dfinity/utils';
+	import { Principal } from '@icp-sdk/core/principal';
 	import Button from '$core/components/Button.svelte';
 	import { E8S_PER_ICP, ICP_LEDGER_CANISTER_ID } from '$core/constants/app.constants';
 	import { authStore } from '$core/stores/auth.store';

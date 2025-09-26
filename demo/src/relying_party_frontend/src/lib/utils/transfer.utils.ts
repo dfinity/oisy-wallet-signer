@@ -1,5 +1,5 @@
 import type { Icrc1TransferRequest } from '@dfinity/ledger-icp';
-import type { Principal } from '@dfinity/principal';
+import type { Principal } from '@icp-sdk/core/principal';
 
 export const getTransferRequest = ({
 	minusFees,

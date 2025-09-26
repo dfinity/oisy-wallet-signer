@@ -1,5 +1,5 @@
-import {Expiry} from '@dfinity/agent';
-import {Principal} from '@dfinity/principal';
+import {Expiry} from '@icp-sdk/core/agent';
+import {Principal} from '@icp-sdk/core/principal';
 import {mockEncodedContentMap} from '../mocks/call-canister.mocks';
 import {mockRequestDetails} from '../mocks/custom-http-agent.mocks';
 import {decodeCallRequest} from './agentjs-cbor-copy.utils';

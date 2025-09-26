@@ -1,4 +1,4 @@
-import {IDL} from '@dfinity/candid';
+import {IDL} from '@icp-sdk/core/candid';
 
 /**
  * TODO: All the constants of this module should be exposed by the IDL files - i.e. should be generated as exposed by didc

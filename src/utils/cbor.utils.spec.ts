@@ -1,5 +1,5 @@
-import {Expiry} from '@dfinity/agent';
-import {Principal} from '@dfinity/principal';
+import {Expiry} from '@icp-sdk/core/agent';
+import {Principal} from '@icp-sdk/core/principal';
 import {mockPrincipalText} from '../mocks/icrc-accounts.mocks';
 import {contentMapReplacer} from './cbor.utils';
 
