@@ -1,4 +1,4 @@
-name: Setup E2EEnvironment
+name: Setup E2E Environment
 
 description: Installs the Juno CLI and caches Docker layers
 
