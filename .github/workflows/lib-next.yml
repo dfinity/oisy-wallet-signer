@@ -24,5 +24,7 @@ jobs:
       - name: Build next version
         run: ./scripts/build-next
 
-      - run: npm publish --provenance --access public --tag next
+      - run: |
+          npm install -g npm@latest
+          npm publish --provenance --access public --tag next
         working-directory: ${{env.dist-directory}}
