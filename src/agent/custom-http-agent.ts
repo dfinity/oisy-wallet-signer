@@ -1,3 +1,4 @@
+import {base64ToUint8Array, isNullish, nonNullish} from '@dfinity/utils';
 import {
   Certificate,
   HttpAgent,
@@ -7,9 +8,8 @@ import {
   type CallRequest,
   type HttpAgentOptions,
   type SubmitResponse
-} from '@dfinity/agent';
-import {Principal} from '@dfinity/principal';
-import {base64ToUint8Array, isNullish, nonNullish} from '@dfinity/utils';
+} from '@icp-sdk/core/agent';
+import {Principal} from '@icp-sdk/core/principal';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import {customAddTransform} from './custom-transform-agent';
 import {HttpAgentProvider} from './http-agent-provider';

@@ -1,6 +1,6 @@
-import * as agent from '@dfinity/agent';
-import {AnonymousIdentity} from '@dfinity/agent';
-import {Principal} from '@dfinity/principal';
+import * as agent from '@icp-sdk/core/agent';
+import {AnonymousIdentity} from '@icp-sdk/core/agent';
+import {Principal} from '@icp-sdk/core/principal';
 import type {MockInstance} from 'vitest';
 import {TransferResult} from '../constants/icrc-1.idl.constants';
 import {
@@ -14,7 +14,7 @@ import {decodeCallRequest} from './agentjs-cbor-copy.utils';
 import * as callUtils from './call.assert.utils';
 import {assertCallResponse, decodeResponse} from './call.utils';
 
-vi.mock('@dfinity/agent', async (importOriginal) => {
+vi.mock('@icp-sdk/core/agent', async (importOriginal) => {
   const originalModule = await importOriginal<typeof agent>();
 
   class MockHttpAgent {

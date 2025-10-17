@@ -1,6 +1,6 @@
-import {Expiry, SubmitRequestType, type CallRequest, type Nonce} from '@dfinity/agent';
-import {Principal} from '@dfinity/principal';
 import {uint8ArrayToBase64} from '@dfinity/utils';
+import {Expiry, SubmitRequestType, type CallRequest, type Nonce} from '@icp-sdk/core/agent';
+import {Principal} from '@icp-sdk/core/principal';
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import {mockCanisterId, mockPrincipalText} from './icrc-accounts.mocks';
 
