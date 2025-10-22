@@ -5,12 +5,10 @@ import {
   toIcrc2ApproveRawRequest,
   type BlockHeight,
   type Icrc1TransferRequest,
-  type Icrc2ApproveRequest
+  type Icrc1TransferResult,
+  type Icrc2ApproveRequest,
+  type Icrc2ApproveResult
 } from '@dfinity/ledger-icp';
-import type {
-  Icrc1TransferResult,
-  ApproveResult as Icrc2ApproveResult
-} from '@dfinity/ledger-icp/dist/candid/ledger';
 import type {PrincipalText} from '@dfinity/zod-schemas';
 import {TransferArgs, TransferResult} from './constants/icrc-1.idl.constants';
 import {ApproveArgs, ApproveResult} from './constants/icrc-2.idl.constants';
