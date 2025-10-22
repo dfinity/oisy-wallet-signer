@@ -67,7 +67,13 @@ export class WalletPage extends IdentityPage {
   }: {
     partyUserId: string;
     tokenSymbol: 'ICP' | 'TKN';
-    fn: (params: {walletUserId: string; partyUserId: string; tokenSymbol: 'ICP' | 'TKN'}) => string;
+    tokenName: 'Internet Computer' | 'Token';
+    fn: (params: {
+      walletUserId: string;
+      partyUserId: string;
+      tokenSymbol: 'ICP' | 'TKN';
+      tokenName: 'Internet Computer' | 'Token';
+    }) => string;
     level: 'Warning' | 'Ok';
   }): Promise<void> {
     const walletUserId = await this.getUserId();
