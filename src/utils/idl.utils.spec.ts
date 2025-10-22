@@ -1,5 +1,5 @@
-import {IDL} from '@dfinity/candid';
-import {Principal} from '@dfinity/principal';
+import {IDL} from '@icp-sdk/core/candid';
+import {Principal} from '@icp-sdk/core/principal';
 import {TransferArgs} from '../constants/icrc-1.idl.constants';
 import type {TransferArgs as TransferArgsType} from '../declarations/icrc-1';
 import {decodeIdl, encodeIdl} from './idl.utils';
@@ -68,7 +68,7 @@ describe('idl.utils', () => {
       // I'm not sure what pattern would lead decode to return a decoded JsonValue[] with more than one element.
       // I wonder if the type is correct; maybe the correct type should actually be [JsonValue].
       // Therefore, mocking agent-js decode for this particular test.
-      vi.mock('@dfinity/candid', {spy: true});
+      vi.mock('@icp-sdk/core/candid', {spy: true});
       vi.mocked(IDL.decode).mockReturnValue([{someField: 'value1'}, {someField: 'value2'}]);
 
       expect(() =>

@@ -1,5 +1,5 @@
-import * as httpAgent from '@dfinity/agent';
-import {Ed25519KeyIdentity} from '@dfinity/identity';
+import * as httpAgent from '@icp-sdk/core/agent';
+import {Ed25519KeyIdentity} from '@icp-sdk/core/identity';
 import type {SignerOptions} from 'src/types/signer-options';
 import {
   mockLocalIcRootKey,
@@ -7,7 +7,7 @@ import {
 } from '../mocks/custom-http-agent-responses.mocks';
 import {HttpAgentProvider} from './http-agent-provider';
 
-vi.mock('@dfinity/agent', async (importOriginal) => {
+vi.mock('@icp-sdk/core/agent', async (importOriginal) => {
   const originalModule = await importOriginal<typeof httpAgent>();
 
   class MockHttpAgent {

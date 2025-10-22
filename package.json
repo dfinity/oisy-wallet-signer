@@ -67,11 +67,11 @@
     "e2e:ci:snapshots": "playwright test --update-snapshots --reporter=html",
     "did": "./scripts/download-did && ./scripts/compile-idl-js",
     "prepublishOnly": "if [ $(basename $PWD) != 'dist' ]; then echo 'Publishing is only allowed from the dist directory.' && exit 1; fi",
-    "i18n": "node scripts/i18n.mjs && prettier --write ./src/types/i18n.ts"
+    "i18n": "node scripts/i18n.mjs && prettier --write ./src/types/i18n.ts",
+    "prepack": "node ../scripts/publish-strip-engines.mjs"
   },
   "devDependencies": {
     "@dfinity/eslint-config-oisy-wallet": "^0.2.2",
-    "@dfinity/identity": "^3",
     "@dfinity/internet-identity-playwright": "^2.0.0",
     "@playwright/test": "^1.56.1",
     "@types/jest": "^30.0.0",
@@ -88,13 +88,11 @@
     "npm": ">=11.5.1 <12.0.0"
   },
   "peerDependencies": {
-    "@dfinity/agent": "^3",
-    "@dfinity/candid": "^3",
-    "@dfinity/ledger-icp": "^6",
-    "@dfinity/ledger-icrc": "^4",
-    "@dfinity/principal": "^3",
-    "@dfinity/utils": "^3",
-    "@dfinity/zod-schemas": "^2",
+    "@dfinity/ledger-icp": "^7.0.0-next-2025-10-22",
+    "@dfinity/ledger-icrc": "^5.0.0-next-2025-10-22",
+    "@dfinity/utils": "^4.0.0-next-2025-10-22",
+    "@dfinity/zod-schemas": "^3.0.0-next-2025-10-22",
+    "@icp-sdk/core": "^4.1.1",
     "zod": "^4"
   }
 }

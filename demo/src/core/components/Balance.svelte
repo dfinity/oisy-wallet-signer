@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { AnonymousIdentity } from '@dfinity/agent';
 	import { AccountIdentifier, LedgerCanister } from '@dfinity/ledger-icp';
-	import type { Principal } from '@dfinity/principal';
 	import { createAgent, isNullish } from '@dfinity/utils';
+	import { AnonymousIdentity } from '@icp-sdk/core/agent';
+	import type { Principal } from '@icp-sdk/core/principal';
 	import { formatE8sICP } from '../utils/icp.utils';
 	import Value from '$core/components/Value.svelte';
 	import { DEV, LOCAL_REPLICA_URL } from '$core/constants/app.constants';

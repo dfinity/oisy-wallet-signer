@@ -1,7 +1,7 @@
-import type * as agent from '@dfinity/agent';
-import {Actor} from '@dfinity/agent';
-import {Ed25519KeyIdentity} from '@dfinity/identity';
-import {Principal} from '@dfinity/principal';
+import type * as agent from '@icp-sdk/core/agent';
+import {Actor} from '@icp-sdk/core/agent';
+import {Ed25519KeyIdentity} from '@icp-sdk/core/identity';
+import {Principal} from '@icp-sdk/core/principal';
 import * as httpAgentProvider from '../agent/http-agent-provider';
 import type {
   _SERVICE as Icrc21Actor,
@@ -14,7 +14,7 @@ import {mockCanisterId} from '../mocks/icrc-accounts.mocks';
 import type {SignerOptions} from '../types/signer-options';
 import {Icrc21Canister} from './icrc21-canister.api';
 
-vi.mock('@dfinity/agent', async (importOriginal) => {
+vi.mock('@icp-sdk/core/agent', async (importOriginal) => {
   const originalModule = await importOriginal<typeof agent>();
 
   const mockActor = {test: 123};
