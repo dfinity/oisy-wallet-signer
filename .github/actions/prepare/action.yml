@@ -15,7 +15,10 @@ runs:
       with:
         node-version: 22
         registry-url: 'https://registry.npmjs.org'
+    - name: Install last npm v11
+      shell: bash
+      run: npm i -g npm@11
     - name: Install dependencies
       shell: bash
-      run: npm ci --force
+      run: npm ci
       working-directory: ${{ inputs.folder }}
