@@ -67,7 +67,9 @@
     "e2e:ci:snapshots": "playwright test --update-snapshots --reporter=html",
     "did": "./scripts/download-did && ./scripts/compile-idl-js",
     "prepublishOnly": "if [ $(basename $PWD) != 'dist' ]; then echo 'Publishing is only allowed from the dist directory.' && exit 1; fi",
-    "i18n": "node scripts/i18n.mjs && prettier --write ./src/types/i18n.ts"
+    "i18n": "node scripts/i18n.mjs && prettier --write ./src/types/i18n.ts",
+    "prepack": "node scripts/publish-engines.mjs strip",
+    "postpack": "node scripts/publish-engines.mjs redo"
   },
   "devDependencies": {
     "@dfinity/eslint-config-oisy-wallet": "^0.2.2",
