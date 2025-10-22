@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { TransferParams, ApproveParams } from '@dfinity/ledger-icrc';
 	import type { IcrcWallet } from '@dfinity/oisy-wallet-signer/icrc-wallet';
 	import { isNullish, nonNullish } from '@dfinity/utils';
+	import type { TransferParams, ApproveParams } from '@icp-sdk/canisters/ledger/icrc';
 	import { fade } from 'svelte/transition';
 	import Button from '$core/components/Button.svelte';
 	import Value from '$core/components/Value.svelte';

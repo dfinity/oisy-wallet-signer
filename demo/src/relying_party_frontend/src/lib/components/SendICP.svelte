@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { LedgerCanister } from '@dfinity/ledger-icp';
 	import { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
 	import { createAgent, isNullish } from '@dfinity/utils';
+	import { LedgerCanister } from '@icp-sdk/canisters/ledger/icp';
 	import { Principal } from '@icp-sdk/core/principal';
 	import Button from '$core/components/Button.svelte';
 	import { DEV, LOCAL_REPLICA_URL } from '$core/constants/app.constants';

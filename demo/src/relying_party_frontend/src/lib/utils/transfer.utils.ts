@@ -1,4 +1,4 @@
-import type { Icrc1TransferRequest } from '@dfinity/ledger-icp';
+import type { Icrc1TransferRequest } from '@icp-sdk/canisters/ledger/icp';
 import type { Principal } from '@icp-sdk/core/principal';
 
 export const getTransferRequest = ({

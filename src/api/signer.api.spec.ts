@@ -1,5 +1,5 @@
-import {IcrcLedgerCanister} from '@dfinity/ledger-icrc';
 import {hexStringToUint8Array, uint8ArrayToBase64} from '@dfinity/utils';
+import {IcrcLedgerCanister} from '@icp-sdk/canisters/ledger/icrc';
 import * as httpAgent from '@icp-sdk/core/agent';
 import {Ed25519KeyIdentity} from '@icp-sdk/core/identity';
 import {Principal} from '@icp-sdk/core/principal';

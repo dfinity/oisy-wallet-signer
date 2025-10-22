@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { AccountIdentifier, LedgerCanister } from '@dfinity/ledger-icp';
 	import { createAgent, isNullish } from '@dfinity/utils';
+	import { AccountIdentifier, LedgerCanister } from '@icp-sdk/canisters/ledger/icp';
 	import { AnonymousIdentity } from '@icp-sdk/core/agent';
 	import type { Principal } from '@icp-sdk/core/principal';
 	import { formatE8sICP } from '../utils/icp.utils';

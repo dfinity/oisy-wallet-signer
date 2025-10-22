@@ -1,5 +1,5 @@
-import type {Icrc1TransferRequest, Icrc2ApproveRequest} from '@dfinity/ledger-icp';
 import {toNullable} from '@dfinity/utils';
+import type {Icrc1TransferRequest, Icrc2ApproveRequest} from '@icp-sdk/canisters/ledger/icp';
 import type * as agent from '@icp-sdk/core/agent';
 import {Ed25519KeyIdentity} from '@icp-sdk/core/identity';
 import {IcpWallet} from './icp-wallet';

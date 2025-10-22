@@ -1,5 +1,5 @@
-import {mapTokenMetadata} from '@dfinity/ledger-icrc';
 import {base64ToUint8Array, isNullish, notEmptyString} from '@dfinity/utils';
+import {mapTokenMetadata} from '@icp-sdk/canisters/ledger/icrc';
 import {uint8ToBuf} from '@icp-sdk/core/agent';
 import {Principal} from '@icp-sdk/core/principal';
 import {SignerApi} from '../api/signer.api';
