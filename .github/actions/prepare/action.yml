@@ -20,5 +20,5 @@ runs:
       run: npm i -g npm@11
     - name: Install dependencies
       shell: bash
-      run: npm ci --force
+      run: npm ci
       working-directory: ${{ inputs.folder }}
