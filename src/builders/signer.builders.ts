@@ -1,5 +1,5 @@
-import {encodeIcrcAccount} from '@dfinity/ledger-icrc';
 import {fromNullable, isNullish, nonNullish} from '@dfinity/utils';
+import {encodeIcrcAccount} from '@icp-sdk/canisters/ledger/icrc';
 import {TransferArgs} from '../constants/icrc-1.idl.constants';
 import {ApproveArgs, TransferFromArgs} from '../constants/icrc-2.idl.constants';
 import {MAX_CONSENT_MESSAGE_ARG_SIZE_BYTES} from '../constants/signer.builders.constants';

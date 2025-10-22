@@ -1,3 +1,4 @@
+import type {PrincipalText} from '@dfinity/zod-schemas';
 import {
   IcrcTransferError,
   toApproveArgs,
@@ -10,8 +11,7 @@ import {
   type IcrcTransferVariantError,
   type TransferFromParams,
   type TransferParams
-} from '@dfinity/ledger-icrc';
-import type {PrincipalText} from '@dfinity/zod-schemas';
+} from '@icp-sdk/canisters/ledger/icrc';
 import {TransferArgs, TransferResult} from './constants/icrc-1.idl.constants';
 import {
   ApproveArgs,
