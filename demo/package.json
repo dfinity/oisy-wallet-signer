@@ -51,7 +51,7 @@
 	"type": "module",
 	"dependencies": {
 		"@dfinity/agent": "^3.2.4",
-		"@dfinity/auth-client": "^3.2.4",
+		"@dfinity/auth-client": "^3.3.1",
 		"@dfinity/candid": "^3.2.4",
 		"@dfinity/ledger-icp": "^6.0.0",
 		"@dfinity/ledger-icrc": "^4.0.0",
