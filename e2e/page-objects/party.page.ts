@@ -172,6 +172,7 @@ export class PartyPage extends IdentityPage {
     await this.#walletPage?.assertConsentMessage({
       partyUserId,
       tokenSymbol: 'ICP',
+      tokenName: 'Internet Computer',
       fn: mockConsentMessageIcrc1Transfer,
       level: 'Ok'
     });
@@ -191,6 +192,7 @@ export class PartyPage extends IdentityPage {
     await this.#walletPage?.assertConsentMessage({
       partyUserId,
       tokenSymbol: 'ICP',
+      tokenName: 'Internet Computer',
       fn: mockConsentMessageIcrc2Approve,
       level: 'Ok'
     });
@@ -208,6 +210,7 @@ export class PartyPage extends IdentityPage {
     await this.#walletPage?.assertConsentMessage({
       partyUserId,
       tokenSymbol: 'ICP',
+      tokenName: 'Internet Computer',
       fn: mockConsentMessageIcrc2TransferFrom,
       level: 'Ok'
     });
@@ -227,6 +230,7 @@ export class PartyPage extends IdentityPage {
     await this.#walletPage?.assertConsentMessage({
       partyUserId,
       tokenSymbol: 'TKN',
+      tokenName: 'Token',
       fn: mockConsentMessageIcrc1Transfer,
       level: 'Warning'
     });
@@ -246,6 +250,7 @@ export class PartyPage extends IdentityPage {
     await this.#walletPage?.assertConsentMessage({
       partyUserId,
       tokenSymbol: 'TKN',
+      tokenName: 'Token',
       fn: mockConsentMessageIcrc2Approve,
       level: 'Warning'
     });

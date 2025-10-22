@@ -1,24 +1,27 @@
 export const mockConsentMessageIcrc1Transfer = ({
   walletUserId,
   partyUserId,
-  tokenSymbol
+  tokenSymbol,
+  tokenName
 }: {
   walletUserId: string;
   partyUserId: string;
   tokenSymbol: 'ICP' | 'TKN';
-}): string => `# Approve the transfer of funds
+  tokenName: 'Internet Computer' | 'Token';
+}): string => `# Send ${tokenName}
 
-**Amount:**
-0.5 ${tokenSymbol}
+You are approving a transfer of funds from your account.
 
 **From:**
-${walletUserId}
+\`${walletUserId}\`
+
+**Amount:** \`0.5 ${tokenSymbol}\`
 
 **To:**
-${partyUserId}
+\`${partyUserId}\`
 
-**Fee:**
-0.0001 ${tokenSymbol}`;
+**Fees:** \`0.0001 ${tokenSymbol}\`
+Charged for processing the transfer.`;
 
 export const mockConsentMessageIcrc2Approve = ({
   walletUserId,
@@ -28,49 +31,52 @@ export const mockConsentMessageIcrc2Approve = ({
   walletUserId: string;
   partyUserId: string;
   tokenSymbol: 'ICP' | 'TKN';
-}): string => `# Authorize another address to withdraw from your account
+  tokenName: 'Internet Computer' | 'Token';
+}): string => `# Approve spending
 
-**The following address is allowed to withdraw from your account:**
-${partyUserId}
+You are authorizing another address to withdraw funds from your account.
 
-**Your account:**
-${walletUserId}
+**From:**
+\`${walletUserId}\`
 
-**Requested withdrawal allowance:**
-0.5 ${tokenSymbol}
+**Approve to spender:**
+\`${partyUserId}\`
 
-⚠ The allowance will be set to 0.5 ${tokenSymbol} independently of any previous allowance. Until this transaction has been executed the spender can still exercise the previous allowance (if any) to it's full amount.
+**Requested allowance:** \`0.5 ${tokenSymbol}\`
+This is the withdrawal limit that will apply upon approval.
 
-**Expiration date:**
-No expiration.
+**Approval expiration:**
+This approval does not have an expiration.
 
-**Approval fee:**
-0.0001 ${tokenSymbol}
+**Approval fees:** \`0.0001 ${tokenSymbol}\`
+Charged for processing the approval.
  
-**Transaction fees to be paid by:**
-${walletUserId}`;
+**Fees paid by:**
+\`${walletUserId}\``;
 
 export const mockConsentMessageIcrc2TransferFrom = ({
   walletUserId,
   partyUserId,
-  tokenSymbol
+  tokenSymbol,
+  tokenName
 }: {
   walletUserId: string;
   partyUserId: string;
   tokenSymbol: 'ICP' | 'TKN';
-}): string => `# Transfer from a withdrawal account
+  tokenName: 'Internet Computer' | 'Token';
+}): string => `# Spend ${tokenName}
 
-**Withdrawal account:**
-${walletUserId}
+You are approving a transfer of funds from a withdrawal account.
 
-**Account sending the transfer request:**
-${walletUserId}
+**From:**
+\`${walletUserId}\`
 
-**Amount to withdraw:**
-0.25 ${tokenSymbol}
+**Amount:** \`0.25 ${tokenSymbol}\`
+
+**Spender:**
+\`${walletUserId}\`
 
 **To:**
-${partyUserId}
+\`${partyUserId}\`
 
-**Fee paid by withdrawal account:**
-0.0001 ${tokenSymbol}`;
+**Fees:** \`0.0001 ${tokenSymbol}\` Charged for processing the transfer.`;
