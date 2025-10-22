@@ -64,7 +64,6 @@ describe('AgentApi', () => {
       expect(agent).toEqual({test: 'mockCustomAgent'});
 
       await agentApi.getAgentTest({options: signerOptions, type: 'custom'});
-
     });
 
     it('should create and cache a new agent for a different identity', async () => {
@@ -108,7 +107,6 @@ describe('AgentApi', () => {
       expect(agent).toEqual({test: 'mockDefaultAgent'});
 
       await agentApi.getAgentTest({options: signerOptions, type: 'default'});
-
     });
 
     it('should call createAgent and cache the result for the first call(default)', async () => {
@@ -123,7 +121,6 @@ describe('AgentApi', () => {
       expect(agent).toEqual({test: 'mockDefaultAgent'});
 
       await agentApi.getAgentTest({options: signerOptions, type: 'default'});
-
     });
 
     it('should create and cache a new agent for a different identity', async () => {

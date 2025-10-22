@@ -1,4 +1,4 @@
-import {Ed25519KeyIdentity} from '@icp-sdk/core/identity';
+import {Ed25519KeyIdentity} from '@dfinity/identity';
 import type {MockInstance} from 'vitest';
 import {Icrc21Canister} from './api/icrc21-canister.api';
 import {SignerApi} from './api/signer.api';
@@ -880,12 +880,14 @@ describe('Signer', () => {
             const messageEvent = new MessageEvent('message', requestPermissionsMsg);
             window.dispatchEvent(messageEvent);
 
-            expect(postMessageMock).toHaveBeenCalledExactlyOnceWith({
+            expect(postMessageMock).toHaveBeenCalledExactlyOnceWith(
+              {
                 jsonrpc: JSON_RPC_VERSION_2,
                 id: testId,
                 result: 'ready'
-              }, testOrigin);
-
+              },
+              testOrigin
+            );
 
             promptSpy.mockClear();
           });
@@ -910,7 +912,6 @@ describe('Signer', () => {
               origin: testOrigin
             });
 
-
             promptSpy.mockClear();
           });
 
@@ -933,7 +934,6 @@ describe('Signer', () => {
               confirm: expect.any(Function),
               origin: testOrigin
             });
-
 
             promptSpy.mockClear();
           });
@@ -971,7 +971,6 @@ describe('Signer', () => {
               confirm: expect.any(Function),
               origin: testOrigin
             });
-
 
             promptSpy.mockClear();
           });
@@ -2193,7 +2192,6 @@ describe('Signer', () => {
                       }
                     });
 
-
                     expect(notifyCallCanisterSpy).toHaveBeenCalledWith({
                       id: testId,
                       origin: testOrigin,
@@ -2229,7 +2227,6 @@ describe('Signer', () => {
                         sender: owner.getPrincipal().toText()
                       }
                     });
-
 
                     expect(notifyErrorSpy).toHaveBeenCalledWith({
                       id: testId,

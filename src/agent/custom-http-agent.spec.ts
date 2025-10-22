@@ -1,7 +1,7 @@
+import type {RequestId, SubmitResponse} from '@dfinity/agent';
+import * as httpAgent from '@dfinity/agent';
+import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {base64ToUint8Array, hexStringToUint8Array, nonNullish} from '@dfinity/utils';
-import type {RequestId, SubmitResponse} from '@icp-sdk/core/agent';
-import * as httpAgent from '@icp-sdk/core/agent';
-import {Ed25519KeyIdentity} from '@icp-sdk/core/identity';
 import type {MockInstance} from 'vitest';
 import {
   mockLocalIcRootKey,
@@ -29,7 +29,7 @@ import {
 } from './custom-http-agent';
 import * as transformAgent from './custom-transform-agent';
 
-vi.mock('@icp-sdk/core/agent', async (importOriginal) => {
+vi.mock('@dfinity/agent', async (importOriginal) => {
   const originalModule = await importOriginal<typeof httpAgent>();
 
   class MockHttpAgent {
@@ -125,7 +125,6 @@ describe('CustomHttpAgent', () => {
     await CustomHttpAgent.create(agentOptions);
 
     expect(httpAgent.HttpAgent.create).toHaveBeenCalledExactlyOnceWith(agentOptions);
-
   });
 
   describe('Success call', () => {

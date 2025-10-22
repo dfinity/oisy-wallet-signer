@@ -1,68 +1,70 @@
 {
-	"name": "@dfinity/oisy-wallet-signer-demo",
-	"version": "1.1.0",
-	"private": true,
-	"workspaces": [
-		"src/relying_party_frontend",
-		"src/wallet_frontend"
-	],
-	"scripts": {
-		"dev:party": "npm run dev -w src/relying_party_frontend",
-		"dev:wallet": "npm run dev -w src/wallet_frontend",
-		"build:party": "npm run build -w src/relying_party_frontend",
-		"build:wallet": "npm run build -w src/wallet_frontend",
-		"build": "npm run build:party && npm run build:wallet",
-		"preview": "npm run preview --workspaces --if-present",
-		"test": "npm run test --workspaces --if-present",
-		"test:integration": "npm run test:integration --workspaces --if-present",
-		"test:unit": "npm run test:unit --workspaces --if-present",
-		"check:party": "npm run check -w src/relying_party_frontend",
-		"check:wallet": "npm run check -w src/wallet_frontend",
-		"check": "npm run check:party && npm run check:wallet",
-		"sync:party": "npm run sync -w src/relying_party_frontend",
-		"sync:wallet": "npm run sync -w src/wallet_frontend",
-		"sync:all": "npm run sync:party && npm run sync:wallet",
-		"lint": "prettier --check . && npm run sync:all && eslint .",
-		"format": "prettier --write ."
-	},
-	"devDependencies": {
-		"@dfinity/eslint-config-oisy-wallet": "^0.2.2",
-		"@junobuild/config": "^2.5.0-next-2025-10-22",
-		"@junobuild/vite-plugin": "^4.3.0",
-		"@sveltejs/adapter-static": "^3.0.10",
-		"@sveltejs/kit": "^2.47.2",
-		"@sveltejs/vite-plugin-svelte": "^6.2.1",
-		"@tailwindcss/vite": "^4.1.15",
-		"@types/node": "^24.9.1",
-		"autoprefixer": "^10.4.21",
-		"postcss": "^8.5.6",
-		"prettier": "^3.6.2",
-		"prettier-plugin-organize-imports": "^4.3.0",
-		"prettier-plugin-svelte": "^3.4.0",
-		"sass": "^1.93.2",
-		"svelte": "^5.41.1",
-		"svelte-check": "^4.3.3",
-		"tailwindcss": "^4.1.15",
-		"tslib": "^2.8.1",
-		"typescript": "^5.9.3",
-		"vite": "^7.1.11",
-		"vitest": "^3.2.4"
-	},
-	"type": "module",
-	"dependencies": {
-		"@dfinity/ledger-icp": "^7.0.0-next-2025-10-22",
-		"@dfinity/ledger-icrc": "^5.0.0-next-2025-10-22",
-		"@dfinity/utils": "^4.0.0-next-2025-10-22",
-		"@dfinity/zod-schemas": "^3.0.0-next-2025-10-22",
-		"@icp-sdk/auth": "^4.1.1",
-		"@icp-sdk/core": "^4.1.1",
-		"zod": "^4.1.11"
-	},
-	"overrides": {
-		"cookie": "^0.7.0"
-	},
-	"engines": {
-		"node": ">=22",
-		"npm": ">=11.5.1 <12.0.0"
-	}
+  "name": "@dfinity/oisy-wallet-signer-demo",
+  "version": "1.1.0",
+  "private": true,
+  "workspaces": [
+    "src/relying_party_frontend",
+    "src/wallet_frontend"
+  ],
+  "scripts": {
+    "dev:party": "npm run dev -w src/relying_party_frontend",
+    "dev:wallet": "npm run dev -w src/wallet_frontend",
+    "build:party": "npm run build -w src/relying_party_frontend",
+    "build:wallet": "npm run build -w src/wallet_frontend",
+    "build": "npm run build:party && npm run build:wallet",
+    "preview": "npm run preview --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "test:integration": "npm run test:integration --workspaces --if-present",
+    "test:unit": "npm run test:unit --workspaces --if-present",
+    "check:party": "npm run check -w src/relying_party_frontend",
+    "check:wallet": "npm run check -w src/wallet_frontend",
+    "check": "npm run check:party && npm run check:wallet",
+    "sync:party": "npm run sync -w src/relying_party_frontend",
+    "sync:wallet": "npm run sync -w src/wallet_frontend",
+    "sync:all": "npm run sync:party && npm run sync:wallet",
+    "lint": "prettier --check . && npm run sync:all && eslint .",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@dfinity/eslint-config-oisy-wallet": "^0.2.2",
+    "@junobuild/config": "^2.5.0",
+    "@junobuild/vite-plugin": "^4.3.0",
+    "@sveltejs/adapter-static": "^3.0.10",
+    "@sveltejs/kit": "^2.47.2",
+    "@sveltejs/vite-plugin-svelte": "^6.2.1",
+    "@tailwindcss/vite": "^4.1.15",
+    "@types/node": "^24.9.1",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "prettier": "^3.6.2",
+    "prettier-plugin-organize-imports": "^4.3.0",
+    "prettier-plugin-svelte": "^3.4.0",
+    "sass": "^1.93.2",
+    "svelte": "^5.41.1",
+    "svelte-check": "^4.3.3",
+    "tailwindcss": "^4.1.15",
+    "tslib": "^2.8.1",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.11",
+    "vitest": "^3.2.4"
+  },
+  "type": "module",
+  "dependencies": {
+    "@dfinity/agent": "^3.2.4",
+    "@dfinity/auth-client": "^3.2.4",
+    "@dfinity/candid": "^3.2.4",
+    "@dfinity/ledger-icp": "^6.0.0",
+    "@dfinity/ledger-icrc": "^4.0.0",
+    "@dfinity/principal": "^3.2.4",
+    "@dfinity/utils": "^3.0.1",
+    "@dfinity/zod-schemas": "^2.1.0",
+    "zod": "^4.1.11"
+  },
+  "overrides": {
+    "cookie": "^0.7.0"
+  },
+  "engines": {
+    "node": ">=22",
+    "npm": ">=11.5.1 <12.0.0"
+  }
 }
