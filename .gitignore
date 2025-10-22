@@ -44,3 +44,5 @@ dist/
 /playwright/.cache/
 
 e2e/*-snapshots/*Chrome-darwin.png
+
+package.json.backup
