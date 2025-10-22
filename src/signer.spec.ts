@@ -880,16 +880,12 @@ describe('Signer', () => {
             const messageEvent = new MessageEvent('message', requestPermissionsMsg);
             window.dispatchEvent(messageEvent);
 
-            expect(postMessageMock).toHaveBeenCalledOnce();
-
-            expect(postMessageMock).toHaveBeenCalledWith(
-              {
+            expect(postMessageMock).toHaveBeenCalledExactlyOnceWith({
                 jsonrpc: JSON_RPC_VERSION_2,
                 id: testId,
                 result: 'ready'
-              },
-              testOrigin
-            );
+              }, testOrigin);
+
 
             promptSpy.mockClear();
           });
@@ -905,9 +901,7 @@ describe('Signer', () => {
             const messageEvent = new MessageEvent('message', requestPermissionsMsg);
             window.dispatchEvent(messageEvent);
 
-            expect(promptSpy).toHaveBeenCalledOnce();
-
-            expect(promptSpy).toHaveBeenCalledWith({
+            expect(promptSpy).toHaveBeenCalledExactlyOnceWith({
               requestedScopes: requestPermissionsDataSortedScopes.map((scope) => ({
                 scope: {...scope},
                 state: IcrcPermissionStateSchema.enum.denied
@@ -915,6 +909,7 @@ describe('Signer', () => {
               confirm: expect.any(Function),
               origin: testOrigin
             });
+
 
             promptSpy.mockClear();
           });
@@ -930,9 +925,7 @@ describe('Signer', () => {
             const messageEvent = new MessageEvent('message', requestPermissionsMsg);
             window.dispatchEvent(messageEvent);
 
-            expect(promptSpy).toHaveBeenCalledOnce();
-
-            expect(promptSpy).toHaveBeenCalledWith({
+            expect(promptSpy).toHaveBeenCalledExactlyOnceWith({
               requestedScopes: requestPermissionsDataSortedScopes.map((scope) => ({
                 scope: {...scope},
                 state: IcrcPermissionStateSchema.enum.denied
@@ -940,6 +933,7 @@ describe('Signer', () => {
               confirm: expect.any(Function),
               origin: testOrigin
             });
+
 
             promptSpy.mockClear();
           });
@@ -969,9 +963,7 @@ describe('Signer', () => {
             const messageEvent = new MessageEvent('message', requestPermissionsMsg);
             window.dispatchEvent(messageEvent);
 
-            expect(promptSpy).toHaveBeenCalledOnce();
-
-            expect(promptSpy).toHaveBeenCalledWith({
+            expect(promptSpy).toHaveBeenCalledExactlyOnceWith({
               requestedScopes: requestPermissionsDataSortedScopes.map((scope) => ({
                 scope: {...scope},
                 state: IcrcPermissionStateSchema.enum.denied
@@ -979,6 +971,7 @@ describe('Signer', () => {
               confirm: expect.any(Function),
               origin: testOrigin
             });
+
 
             promptSpy.mockClear();
           });
@@ -2192,15 +2185,14 @@ describe('Signer', () => {
                   });
 
                   it('should call canister and notify success', () => {
-                    expect(spyCanisterCall).toHaveBeenCalledOnce();
-
-                    expect(spyCanisterCall).toHaveBeenCalledWith({
+                    expect(spyCanisterCall).toHaveBeenCalledExactlyOnceWith({
                       ...signerOptions,
                       params: {
                         ...mockCallCanisterParams,
                         sender: owner.getPrincipal().toText()
                       }
                     });
+
 
                     expect(notifyCallCanisterSpy).toHaveBeenCalledWith({
                       id: testId,
@@ -2230,15 +2222,14 @@ describe('Signer', () => {
                   });
 
                   it('should call canister and notify error', () => {
-                    expect(spyCanisterCall).toHaveBeenCalledOnce();
-
-                    expect(spyCanisterCall).toHaveBeenCalledWith({
+                    expect(spyCanisterCall).toHaveBeenCalledExactlyOnceWith({
                       ...signerOptions,
                       params: {
                         ...mockCallCanisterParams,
                         sender: owner.getPrincipal().toText()
                       }
                     });
+
 
                     expect(notifyErrorSpy).toHaveBeenCalledWith({
                       id: testId,
