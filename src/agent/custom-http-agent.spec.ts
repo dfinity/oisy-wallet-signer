@@ -125,7 +125,6 @@ describe('CustomHttpAgent', () => {
     await CustomHttpAgent.create(agentOptions);
 
     expect(httpAgent.HttpAgent.create).toHaveBeenCalledExactlyOnceWith(agentOptions);
-
   });
 
   describe('Success call', () => {

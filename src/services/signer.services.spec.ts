@@ -705,7 +705,6 @@ describe('Signer services', () => {
         params
       });
 
-
       expect(notifyCallCanisterSpy).toHaveBeenCalledWith({
         id: requestId,
         origin: testOrigin,

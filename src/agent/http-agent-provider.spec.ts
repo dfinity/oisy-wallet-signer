@@ -76,6 +76,5 @@ describe('Http-Agent-Provider', () => {
     await HttpAgentProvider.create(agentOptions);
 
     expect(httpAgent.HttpAgent.create).toHaveBeenCalledExactlyOnceWith(agentOptions);
-
   });
 });
