@@ -54,7 +54,7 @@
 		"@dfinity/auth-client": "^3.2.4",
 		"@dfinity/candid": "^3.2.4",
 		"@dfinity/ledger-icp": "^6.0.0",
-		"@dfinity/ledger-icrc": "^4.0.0",
+		"@dfinity/ledger-icrc": "^4.1.2",
 		"@dfinity/principal": "^3.2.4",
 		"@dfinity/utils": "^3.0.1",
 		"@dfinity/zod-schemas": "^2.1.0",
