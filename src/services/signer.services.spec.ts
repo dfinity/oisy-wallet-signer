@@ -700,9 +700,7 @@ describe('Signer services', () => {
         prompt
       });
 
-      expect(spySignerApiCall).toHaveBeenCalledOnce();
-
-      expect(spySignerApiCall).toHaveBeenCalledWith({
+      expect(spySignerApiCall).toHaveBeenCalledExactlyOnceWith({
         ...signerOptions,
         params
       });

@@ -124,9 +124,7 @@ describe('CustomHttpAgent', () => {
 
     await CustomHttpAgent.create(agentOptions);
 
-    expect(httpAgent.HttpAgent.create).toHaveBeenCalledOnce();
-
-    expect(httpAgent.HttpAgent.create).toHaveBeenCalledWith(agentOptions);
+    expect(httpAgent.HttpAgent.create).toHaveBeenCalledExactlyOnceWith(agentOptions);
   });
 
   describe('Success call', () => {
@@ -168,8 +166,7 @@ describe('CustomHttpAgent', () => {
         it('should call agent on request without nonce', async () => {
           await agent.request(mockRequestPayload);
 
-          expect(spyCall).toHaveBeenCalledOnce();
-          expect(spyCall).toHaveBeenCalledWith(mockCanisterId, {
+          expect(spyCall).toHaveBeenCalledExactlyOnceWith(mockCanisterId, {
             arg: base64ToUint8Array(mockRequestPayload.arg),
             effectiveCanisterId: mockCanisterId,
             methodName: mockRequestMethod
@@ -183,8 +180,7 @@ describe('CustomHttpAgent', () => {
             nonNullish(mockRequestPayloadWithNonce.nonce) &&
             base64ToUint8Array(mockRequestPayloadWithNonce.nonce);
 
-          expect(spyCall).toHaveBeenCalledOnce();
-          expect(spyCall).toHaveBeenCalledWith(mockCanisterId, {
+          expect(spyCall).toHaveBeenCalledExactlyOnceWith(mockCanisterId, {
             arg: base64ToUint8Array(mockRequestPayload.arg),
             effectiveCanisterId: mockCanisterId,
             methodName: mockRequestMethod,
@@ -362,8 +358,7 @@ describe('CustomHttpAgent', () => {
           it('should call agent on request without nonce', async () => {
             await agent.request(mockRequestPayload);
 
-            expect(spyCall).toHaveBeenCalledOnce();
-            expect(spyCall).toHaveBeenCalledWith(mockCanisterId, {
+            expect(spyCall).toHaveBeenCalledExactlyOnceWith(mockCanisterId, {
               arg: base64ToUint8Array(mockRequestPayload.arg),
               effectiveCanisterId: mockCanisterId,
               methodName: mockRequestMethod
@@ -377,8 +372,7 @@ describe('CustomHttpAgent', () => {
               nonNullish(mockRequestPayloadWithNonce.nonce) &&
               base64ToUint8Array(mockRequestPayloadWithNonce.nonce);
 
-            expect(spyCall).toHaveBeenCalledOnce();
-            expect(spyCall).toHaveBeenCalledWith(mockCanisterId, {
+            expect(spyCall).toHaveBeenCalledExactlyOnceWith(mockCanisterId, {
               arg: base64ToUint8Array(mockRequestPayload.arg),
               effectiveCanisterId: mockCanisterId,
               methodName: mockRequestMethod,

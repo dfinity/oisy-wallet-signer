@@ -56,10 +56,8 @@ describe('customAddTransform integration with HttpAgent', () => {
 
     await agent.call(mockRequestPayload.canisterId, callOptions);
 
-    expect(spyTransform).toHaveBeenCalledOnce();
-    expect(spyTransform).toHaveBeenCalledWith('update', expect.any(Function));
-    expect(spyCall).toHaveBeenCalledOnce();
-    expect(spyCall).toHaveBeenCalledWith(mockRequestPayload.canisterId, callOptions);
+    expect(spyTransform).toHaveBeenCalledExactlyOnceWith('update', expect.any(Function));
+    expect(spyCall).toHaveBeenCalledExactlyOnceWith(mockRequestPayload.canisterId, callOptions);
   });
 });
 

@@ -165,12 +165,11 @@ describe('Relying Party', () => {
 
           expect(relyingParty).toBeInstanceOf(RelyingParty);
 
-          expect(window.open).toHaveBeenCalledWith(
+          expect(window.open).toHaveBeenCalledExactlyOnceWith(
             mockParameters.url,
             'relyingPartyWindow',
             expectedOptions
           );
-          expect(window.open).toHaveBeenCalledOnce();
 
           expect(addEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
           expect(removeEventListenerSpy).toHaveBeenCalledWith('message', expect.any(Function));
@@ -506,9 +505,7 @@ describe('Relying Party', () => {
           await promise;
 
           expect(spy).toHaveBeenCalledOnce();
-          expect(spyPostMessage).toHaveBeenCalledOnce();
-
-          expect(spyPostMessage).toHaveBeenCalledWith(
+          expect(spyPostMessage).toHaveBeenCalledExactlyOnceWith(
             expect.objectContaining({
               jsonrpc: JSON_RPC_VERSION_2,
               method: ICRC25_SUPPORTED_STANDARDS
@@ -744,9 +741,7 @@ describe('Relying Party', () => {
             await promise;
 
             expect(spy).toHaveBeenCalledOnce();
-            expect(spyPostMessage).toHaveBeenCalledOnce();
-
-            expect(spyPostMessage).toHaveBeenCalledWith(
+            expect(spyPostMessage).toHaveBeenCalledExactlyOnceWith(
               expect.objectContaining({
                 jsonrpc: JSON_RPC_VERSION_2,
                 method: ICRC25_PERMISSIONS
@@ -963,9 +958,7 @@ describe('Relying Party', () => {
             await promise;
 
             expect(spy).toHaveBeenCalledOnce();
-            expect(spyPostMessage).toHaveBeenCalledOnce();
-
-            expect(spyPostMessage).toHaveBeenCalledWith(
+            expect(spyPostMessage).toHaveBeenCalledExactlyOnceWith(
               expect.objectContaining({
                 jsonrpc: JSON_RPC_VERSION_2,
                 method: ICRC25_REQUEST_PERMISSIONS,
@@ -991,9 +984,7 @@ describe('Relying Party', () => {
             await promise;
 
             expect(spy).toHaveBeenCalledOnce();
-            expect(spyPostMessage).toHaveBeenCalledOnce();
-
-            expect(spyPostMessage).toHaveBeenCalledWith(
+            expect(spyPostMessage).toHaveBeenCalledExactlyOnceWith(
               expect.objectContaining({
                 jsonrpc: JSON_RPC_VERSION_2,
                 method: ICRC25_REQUEST_PERMISSIONS,
@@ -1225,9 +1216,7 @@ describe('Relying Party', () => {
           await promise;
 
           expect(spy).toHaveBeenCalledOnce();
-          expect(spyPostMessage).toHaveBeenCalledOnce();
-
-          expect(spyPostMessage).toHaveBeenCalledWith(
+          expect(spyPostMessage).toHaveBeenCalledExactlyOnceWith(
             expect.objectContaining({
               jsonrpc: JSON_RPC_VERSION_2,
               method: ICRC27_ACCOUNTS
@@ -1495,9 +1484,7 @@ describe('Relying Party', () => {
           await promise;
 
           expect(spy).toHaveBeenCalledOnce();
-          expect(spyPostMessage).toHaveBeenCalledOnce();
-
-          expect(spyPostMessage).toHaveBeenCalledWith(
+          expect(spyPostMessage).toHaveBeenCalledExactlyOnceWith(
             expect.objectContaining({
               jsonrpc: JSON_RPC_VERSION_2,
               method: ICRC49_CALL_CANISTER,
@@ -1530,9 +1517,7 @@ describe('Relying Party', () => {
 
           const callResult = await promise;
 
-          expect(spyAssertCallResponse).toHaveBeenCalledOnce();
-
-          expect(spyAssertCallResponse).toHaveBeenCalledWith({
+          expect(spyAssertCallResponse).toHaveBeenCalledExactlyOnceWith({
             result: callResult,
             params: mockCallCanisterParams
           });

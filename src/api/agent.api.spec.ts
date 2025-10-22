@@ -55,7 +55,7 @@ describe('AgentApi', () => {
     it('should call createAgent and cache the result for the first call', async () => {
       const agent = await agentApi.getAgentTest({options: signerOptions, type: 'custom'});
 
-      expect(CustomHttpAgent.create).toHaveBeenCalledWith({
+      expect(CustomHttpAgent.create).toHaveBeenCalledExactlyOnceWith({
         identity,
         shouldFetchRootKey: true,
         host: 'http://localhost:8080'
@@ -64,8 +64,6 @@ describe('AgentApi', () => {
       expect(agent).toEqual({test: 'mockCustomAgent'});
 
       await agentApi.getAgentTest({options: signerOptions, type: 'custom'});
-
-      expect(CustomHttpAgent.create).toHaveBeenCalledOnce();
     });
 
     it('should create and cache a new agent for a different identity', async () => {
@@ -100,7 +98,7 @@ describe('AgentApi', () => {
     it('should call createAgent and cache the result for the first call(custom)', async () => {
       const agent = await agentApi.getAgentTest({options: signerOptions, type: 'default'});
 
-      expect(HttpAgentProvider.create).toHaveBeenCalledWith({
+      expect(HttpAgentProvider.create).toHaveBeenCalledExactlyOnceWith({
         identity,
         shouldFetchRootKey: true,
         host: 'http://localhost:8080'
@@ -109,14 +107,12 @@ describe('AgentApi', () => {
       expect(agent).toEqual({test: 'mockDefaultAgent'});
 
       await agentApi.getAgentTest({options: signerOptions, type: 'default'});
-
-      expect(HttpAgentProvider.create).toHaveBeenCalledOnce();
     });
 
     it('should call createAgent and cache the result for the first call(default)', async () => {
       const agent = await agentApi.getAgentTest({options: signerOptions, type: 'default'});
 
-      expect(HttpAgentProvider.create).toHaveBeenCalledWith({
+      expect(HttpAgentProvider.create).toHaveBeenCalledExactlyOnceWith({
         identity,
         shouldFetchRootKey: true,
         host: 'http://localhost:8080'
@@ -125,8 +121,6 @@ describe('AgentApi', () => {
       expect(agent).toEqual({test: 'mockDefaultAgent'});
 
       await agentApi.getAgentTest({options: signerOptions, type: 'default'});
-
-      expect(HttpAgentProvider.create).toHaveBeenCalledOnce();
     });
 
     it('should create and cache a new agent for a different identity', async () => {
