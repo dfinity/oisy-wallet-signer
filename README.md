@@ -601,6 +601,9 @@ const wallet = await IcpWallet.connect({
 
 ## :couple: Community
 
+- OISY:
+  - [Discord](https://discord.com/invite/ejBT7dQneK)
+  - [Docs](https://docs.oisy.com)
+  - [Support](https://docs.oisy.com/using-oisy-wallet/faq#what-do-i-do-if-i-have-an-issue-or-a-problem)
 - [Identity and Wallet Standards](https://github.com/dfinity/wg-identity-authentication/)
 - [Forum](https://forum.dfinity.org/)
-- [Discord](https://discord.gg/E9FxceAg2j)
