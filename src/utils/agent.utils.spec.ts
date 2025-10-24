@@ -7,6 +7,18 @@ describe('agent.utils', () => {
     expect(result).toEqual({shouldFetchRootKey: true});
   });
 
+  it('should set shouldFetchRootKey to true for subdomain.localhost', () => {
+    const result = shouldFetchRootKey({hostname: 'lxzze-o7777-77777-aaaaa-cai.localhost'});
+
+    expect(result).toEqual({shouldFetchRootKey: true});
+  });
+
+  it('should not set shouldFetchRootKey to true if domain contains keyword localhost', () => {
+    expect(shouldFetchRootKey({hostname: 'mylocalhost.com'})).toEqual({});
+    expect(shouldFetchRootKey({hostname: 'localhost.yolo.com'})).toEqual({});
+    expect(shouldFetchRootKey({hostname: 'localhost.hello.world.dev'})).toEqual({});
+  });
+
   it('should set shouldFetchRootKey to true for 127.0.0.1', () => {
     const result = shouldFetchRootKey({hostname: '127.0.0.1'});
 
