@@ -4,15 +4,13 @@ import {
   toTransferArg,
   toTransferFromArgs,
   type ApproveParams,
+  type IcrcApproveError,
   type IcrcBlockIndex,
+  type IcrcTransferFromError,
+  type IcrcTransferVariantError,
   type TransferFromParams,
   type TransferParams
 } from '@dfinity/ledger-icrc';
-import type {
-  ApproveError,
-  TransferError,
-  TransferFromError
-} from '@dfinity/ledger-icrc/dist/candid/icrc_ledger';
 import type {PrincipalText} from '@dfinity/zod-schemas';
 import {TransferArgs, TransferResult} from './constants/icrc-1.idl.constants';
 import {
@@ -91,7 +89,7 @@ export class IcrcWallet extends RelyingParty {
       options
     });
 
-    type TransferResult = {Ok: IcrcBlockIndex} | {Err: TransferError};
+    type TransferResult = {Ok: IcrcBlockIndex} | {Err: IcrcTransferVariantError};
 
     const response = await decodeResponse<TransferResult>({
       params: callParams,
@@ -152,7 +150,7 @@ export class IcrcWallet extends RelyingParty {
       options
     });
 
-    type ApproveResult = {Ok: IcrcBlockIndex} | {Err: ApproveError};
+    type ApproveResult = {Ok: IcrcBlockIndex} | {Err: IcrcApproveError};
 
     const response = await decodeResponse<ApproveResult>({
       params: callParams,
@@ -213,7 +211,7 @@ export class IcrcWallet extends RelyingParty {
       options
     });
 
-    type TransferFromResult = {Ok: IcrcBlockIndex} | {Err: TransferFromError};
+    type TransferFromResult = {Ok: IcrcBlockIndex} | {Err: IcrcTransferFromError};
 
     const response = await decodeResponse<TransferFromResult>({
       params: callParams,
