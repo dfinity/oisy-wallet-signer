@@ -1,5 +1,5 @@
 import {isNullish} from '@dfinity/utils';
-import {CustomHttpAgent} from '../agent/custom-http-agent'; // Corrected import path
+import {CustomHttpAgent} from '../agent/custom-http-agent';
 import {HttpAgentProvider} from '../agent/http-agent-provider';
 import {MAINNET_REPLICA_URL} from '../constants/core.constants';
 import type {SignerOptions} from '../types/signer-options';
