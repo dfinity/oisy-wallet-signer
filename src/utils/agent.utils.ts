@@ -5,7 +5,8 @@ export const shouldFetchRootKey = ({
 }: {
   hostname: string;
 }): Pick<HttpAgentOptions, 'shouldFetchRootKey' | 'host'> => {
-  const localhost = ['localhost', '127.0.0.1'].includes(hostname);
+  const localhost =
+    ['localhost', '127.0.0.1'].includes(hostname) || hostname.endsWith('.localhost');
 
   return {
     ...(localhost && {shouldFetchRootKey: true})
