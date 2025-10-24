@@ -1,6 +1,6 @@
 {
 	"name": "@dfinity/oisy-wallet-signer-demo",
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"private": true,
 	"workspaces": [
 		"src/relying_party_frontend",
