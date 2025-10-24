@@ -170,8 +170,7 @@ describe('AgentApi', () => {
 
       expect(CustomHttpAgent.create).toHaveBeenCalledWith({
         identity,
-        host: 'https://icp-api.io',
-        shouldFetchRootKey: false
+        host: 'https://icp-api.io'
       });
     });
 
@@ -184,8 +183,7 @@ describe('AgentApi', () => {
 
       expect(CustomHttpAgent.create).toHaveBeenCalledWith({
         identity,
-        host: 'https://icp-api.io',
-        shouldFetchRootKey: false
+        host: 'https://icp-api.io'
       });
     });
 
@@ -226,8 +224,7 @@ describe('AgentApi', () => {
 
       expect(HttpAgentProvider.create).toHaveBeenCalledWith({
         identity,
-        host: 'https://icp-api.io',
-        shouldFetchRootKey: false
+        host: 'https://icp-api.io'
       });
     });
 
@@ -240,8 +237,7 @@ describe('AgentApi', () => {
 
       expect(HttpAgentProvider.create).toHaveBeenCalledWith({
         identity,
-        host: 'https://icp-api.io',
-        shouldFetchRootKey: false
+        host: 'https://icp-api.io'
       });
     });
 
