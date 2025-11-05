@@ -1,6 +1,6 @@
 {
 	"name": "@dfinity/oisy-wallet-signer-demo",
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"private": true,
 	"workspaces": [
 		"src/relying_party_frontend",
@@ -27,7 +27,7 @@
 	},
 	"devDependencies": {
 		"@dfinity/eslint-config-oisy-wallet": "^0.2.2",
-		"@junobuild/config": "^2.5.0-next-2025-10-22",
+		"@junobuild/config": "^2.5.0",
 		"@junobuild/vite-plugin": "^4.3.0",
 		"@sveltejs/adapter-static": "^3.0.10",
 		"@sveltejs/kit": "^2.47.2",
@@ -50,19 +50,19 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@dfinity/ledger-icp": "^7.0.0-next-2025-10-22",
-		"@dfinity/ledger-icrc": "^5.0.0-next-2025-10-22",
-		"@dfinity/utils": "^4.0.0-next-2025-10-22",
-		"@dfinity/zod-schemas": "^3.0.0-next-2025-10-22",
-		"@icp-sdk/auth": "^4.1.1",
-		"@icp-sdk/core": "^4.1.1",
+		"@dfinity/ledger-icp": "^6.0.0",
+		"@dfinity/ledger-icrc": "^4.0.0",
+		"@dfinity/utils": "^3.0.1",
+		"@dfinity/zod-schemas": "^2.1.0",
+		"@icp-sdk/auth": "^4.2.0",
+		"@icp-sdk/core": "^4.2.1",
 		"zod": "^4.1.11"
 	},
 	"overrides": {
 		"cookie": "^0.7.0"
 	},
 	"engines": {
-		"node": ">=22",
+		"node": ">=24",
 		"npm": ">=11.5.1 <12.0.0"
 	}
 }
