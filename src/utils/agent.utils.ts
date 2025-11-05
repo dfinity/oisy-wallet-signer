@@ -1,4 +1,4 @@
-import type {HttpAgentOptions} from '@dfinity/agent';
+import type {HttpAgentOptions} from '@icp-sdk/core/agent';
 
 export const shouldFetchRootKey = ({
   hostname
