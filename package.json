@@ -74,6 +74,7 @@
     "@dfinity/eslint-config-oisy-wallet": "^0.2.2",
     "@dfinity/identity": "^3",
     "@dfinity/internet-identity-playwright": "^2.0.0",
+    "@icp-sdk/bindgen": "0.2.0-patch-typed-arrays",
     "@playwright/test": "^1.56.1",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.9.1",
