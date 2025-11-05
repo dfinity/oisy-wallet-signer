@@ -1,6 +1,6 @@
 {
   "name": "@dfinity/oisy-wallet-signer",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A library designed to facilitate communication between a dApp and the OISY Wallet on the Internet Computer. ",
   "license": "Apache-2.0",
   "type": "module",
@@ -58,7 +58,7 @@
     "format": "prettier . --write",
     "format:check": "prettier --check .",
     "ts-declaration": "tsc --emitDeclarationOnly --outDir dist && ./scripts/copy-idl-ts",
-    "build": "tsc --noEmit && node rmdir.mjs && node esbuild.mjs && npm run ts-declaration",
+    "build": "tsc --noEmit && node rmdir.mjs && node scripts/esbuild.mjs && npm run ts-declaration",
     "lint": "eslint --max-warnings 0 \"src/**/*\"",
     "test": "tsc --noEmit -p ./tsconfig.spec.json && vitest",
     "e2e": "NODE_ENV=development playwright test",
@@ -84,7 +84,7 @@
     "vitest": "^3.2.4"
   },
   "engines": {
-    "node": ">=22",
+    "node": ">=24",
     "npm": ">=11.5.1 <12.0.0"
   },
   "peerDependencies": {

@@ -1,6 +1,6 @@
 {
 	"name": "@dfinity/oisy-wallet-signer-demo",
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"private": true,
 	"workspaces": [
 		"src/relying_party_frontend",
@@ -62,7 +62,7 @@
 		"cookie": "^0.7.0"
 	},
 	"engines": {
-		"node": ">=22",
+		"node": ">=24",
 		"npm": ">=11.5.1 <12.0.0"
 	}
 }

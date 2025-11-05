@@ -10,7 +10,7 @@ const stripEngines = async () => {
 
   await writeFile(packagePath, JSON.stringify(rest, null, 2), 'utf-8');
 
-  console.log('engines field stripped from package.json');
+  console.log('Engines field stripped from package.json');
 };
 
 await stripEngines();
