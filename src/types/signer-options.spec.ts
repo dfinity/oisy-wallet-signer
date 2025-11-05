@@ -1,5 +1,5 @@
-import {AnonymousIdentity} from '@dfinity/agent';
-import {Ed25519KeyIdentity} from '@dfinity/identity';
+import {AnonymousIdentity} from '@icp-sdk/core/agent';
+import {Ed25519KeyIdentity} from '@icp-sdk/core/identity';
 import {SignerOptionsSchema} from './signer-options';
 
 describe('SignerOptions', () => {

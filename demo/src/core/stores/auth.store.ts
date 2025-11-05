@@ -8,8 +8,8 @@ import {
 import type { OptionIdentity } from '$core/types/identity';
 import { createAuthClient } from '$core/utils/auth.utils';
 import { popupCenter } from '$core/utils/window.utils';
-import type { AuthClient } from '@dfinity/auth-client';
 import { nonNullish } from '@dfinity/utils';
+import type { AuthClient } from '@icp-sdk/auth/client';
 import { writable, type Readable } from 'svelte/store';
 
 export interface AuthStoreData {

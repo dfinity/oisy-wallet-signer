@@ -1,10 +1,10 @@
 /* eslint-disable vitest/expect-expect -- This test suite uses functions with nested `expect` statements */
-import {uint8ToBuf} from '@dfinity/agent';
-import {IDL} from '@dfinity/candid';
-import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {encodeIcrcAccount} from '@dfinity/ledger-icrc';
-import {Principal} from '@dfinity/principal';
 import {asciiStringToByteArray, base64ToUint8Array, fromNullable} from '@dfinity/utils';
+import {uint8ToBuf} from '@icp-sdk/core/agent';
+import {IDL} from '@icp-sdk/core/candid';
+import {Ed25519KeyIdentity} from '@icp-sdk/core/identity';
+import {Principal} from '@icp-sdk/core/principal';
 import {TransferArgs} from '../constants/icrc-1.idl.constants';
 import {ApproveArgs, TransferFromArgs} from '../constants/icrc-2.idl.constants';
 import {MAX_CONSENT_MESSAGE_ARG_SIZE_BYTES} from '../constants/signer.builders.constants';

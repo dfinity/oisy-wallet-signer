@@ -1,8 +1,8 @@
-import * as httpAgent from '@dfinity/agent';
-import {Ed25519KeyIdentity} from '@dfinity/identity';
 import {IcrcLedgerCanister} from '@dfinity/ledger-icrc';
-import {Principal} from '@dfinity/principal';
 import {hexStringToUint8Array, uint8ArrayToBase64} from '@dfinity/utils';
+import * as httpAgent from '@icp-sdk/core/agent';
+import {Ed25519KeyIdentity} from '@icp-sdk/core/identity';
+import {Principal} from '@icp-sdk/core/principal';
 import * as customAgent from '../agent/custom-http-agent';
 import * as defaultAgent from '../agent/http-agent-provider';
 import {mockCallCanisterSuccess} from '../mocks/call-canister.mocks';

@@ -1,4 +1,4 @@
-import {Principal} from '@dfinity/principal';
+import {Principal} from '@icp-sdk/core/principal';
 import {mockPrincipalText} from '../mocks/icrc-accounts.mocks';
 import {PrincipalObjSchema} from './principal';
 

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { IcrcAccount } from '@dfinity/oisy-wallet-signer';
-	import { Principal } from '@dfinity/principal';
 	import { nonNullish } from '@dfinity/utils';
+	import { Principal } from '@icp-sdk/core/principal';
 	import { fade } from 'svelte/transition';
 	import Article from '$core/components/Article.svelte';
 	import Balance from '$core/components/Balance.svelte';

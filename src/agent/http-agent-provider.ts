@@ -1,4 +1,4 @@
-import {HttpAgent, type HttpAgentOptions} from '@dfinity/agent';
+import {HttpAgent, type HttpAgentOptions} from '@icp-sdk/core/agent';
 
 /**
  * HttpAgentProvider class provides access to the HttpAgent instance and

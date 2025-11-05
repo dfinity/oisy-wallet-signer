@@ -1,4 +1,4 @@
-import {Expiry} from '@dfinity/agent';
+import {Expiry} from '@icp-sdk/core/agent';
 
 import {ExpiryObjSchema} from './expiry';
 
