@@ -89,10 +89,9 @@
     "npm": ">=11.5.1 <12.0.0"
   },
   "peerDependencies": {
-    "@dfinity/ledger-icp": "^7",
-    "@dfinity/ledger-icrc": "^5",
     "@dfinity/utils": "^4",
     "@dfinity/zod-schemas": "^3",
+    "@icp-sdk/canisters": "^1",
     "@icp-sdk/core": "^4",
     "zod": "^4"
   }
