@@ -7,12 +7,12 @@ on:
 
 run-name: >-
   ${{
-    github.event_name == 'release' && 'Lib Publish'
+    github.event_name == 'release' && format('Lib Publish {0}', github.event.release.tag_name)
     || github.event_name == 'workflow_dispatch' && 'Lib Next'
     || 'Lib Publish' }}
 
 jobs:
-  build:
+  publish-release:
     if: github.event_name == 'release'
 
     runs-on: ubuntu-latest
@@ -39,7 +39,7 @@ jobs:
       - run: npm publish --provenance --access public
         working-directory: ${{env.dist-directory}}
 
-  build-next:
+  publish-next:
     if: github.event_name == 'workflow_dispatch'
 
     runs-on: ubuntu-latest
