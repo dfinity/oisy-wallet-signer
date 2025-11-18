@@ -91,7 +91,7 @@
   "peerDependencies": {
     "@dfinity/utils": "^4",
     "@dfinity/zod-schemas": "^3",
-    "@icp-sdk/canisters": "^1",
+    "@icp-sdk/canisters": "^2",
     "@icp-sdk/core": "^4",
     "zod": "^4"
   }
