@@ -1,4 +1,3 @@
-import type {PrincipalText} from '@dfinity/zod-schemas';
 import {
   mapIcrc1TransferError,
   mapIcrc2ApproveError,
@@ -9,7 +8,8 @@ import {
   type Icrc1TransferResult,
   type Icrc2ApproveRequest,
   type Icrc2ApproveResult
-} from '@icp-sdk/canisters/ledger/icp';
+} from '@dfinity/ledger-icp';
+import type {PrincipalText} from '@dfinity/zod-schemas';
 import {TransferArgs, TransferResult} from './constants/icrc-1.idl.constants';
 import {ApproveArgs, ApproveResult} from './constants/icrc-2.idl.constants';
 import {RelyingParty} from './relying-party';

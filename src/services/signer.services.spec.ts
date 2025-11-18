@@ -1,5 +1,5 @@
+import {mapTokenMetadata, type IcrcTokenMetadata} from '@dfinity/ledger-icrc';
 import {assertNonNullish, base64ToUint8Array} from '@dfinity/utils';
-import {mapTokenMetadata, type IcrcTokenMetadata} from '@icp-sdk/canisters/ledger/icrc';
 import {uint8ToBuf} from '@icp-sdk/core/agent';
 import {Ed25519KeyIdentity} from '@icp-sdk/core/identity';
 import type {Mock, MockInstance} from 'vitest';

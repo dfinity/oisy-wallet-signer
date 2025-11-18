@@ -1,8 +1,9 @@
 import {isNullish} from '@dfinity/utils';
-import {CustomHttpAgent} from '../agent/custom-http-agent'; // Corrected import path
+import {CustomHttpAgent} from '../agent/custom-http-agent';
 import {HttpAgentProvider} from '../agent/http-agent-provider';
 import {MAINNET_REPLICA_URL} from '../constants/core.constants';
 import type {SignerOptions} from '../types/signer-options';
+import {shouldFetchRootKey} from '../utils/agent.utils';
 
 export abstract class AgentApi {
   #agents: Record<string, HttpAgentProvider> | undefined = undefined;
@@ -39,11 +40,11 @@ export abstract class AgentApi {
     type: 'default' | 'custom';
   }): Promise<HttpAgentProvider | CustomHttpAgent> {
     const {hostname} = new URL(host ?? MAINNET_REPLICA_URL);
-    const shouldFetchRootKey = ['localhost', '127.0.0.1'].includes(hostname);
+
     const createOptions = {
       identity,
       host: host ?? MAINNET_REPLICA_URL,
-      shouldFetchRootKey
+      ...shouldFetchRootKey({hostname})
     };
 
     if (type === 'default') {

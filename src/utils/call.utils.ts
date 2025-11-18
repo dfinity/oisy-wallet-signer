@@ -12,6 +12,7 @@ import {LOCAL_REPLICA_URL, MAINNET_REPLICA_URL} from '../constants/core.constant
 import type {IcrcCallCanisterRequestParams} from '../types/icrc-requests';
 import type {IcrcCallCanisterResult} from '../types/icrc-responses';
 import type {RelyingPartyHost} from '../types/relying-party-options';
+import {shouldFetchRootKey} from './agent.utils';
 import {decodeCallRequest} from './agentjs-cbor-copy.utils';
 import {
   assertCallArg,
@@ -70,12 +71,13 @@ export const decodeResponse = async <T>({
     location: {hostname}
   } = window;
 
-  const localhost = ['localhost', '127.0.0.1'].includes(hostname);
+  const withRootKey = shouldFetchRootKey({hostname});
 
   const agent = await HttpAgent.create({
     identity: new AnonymousIdentity(),
-    host: localhost ? (host ?? LOCAL_REPLICA_URL) : MAINNET_REPLICA_URL,
-    ...(localhost && {shouldFetchRootKey: true})
+    host:
+      withRootKey?.shouldFetchRootKey === true ? (host ?? LOCAL_REPLICA_URL) : MAINNET_REPLICA_URL,
+    ...withRootKey
   });
 
   assertNonNullish(
