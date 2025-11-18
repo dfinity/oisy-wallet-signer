@@ -167,7 +167,7 @@ s3oqv-3j7id-xjhbm-3owbe-fvwly-oso6u-vej6n-bexck-koyu2-bxb6y-wae
     });
 
     it('should build a consent message with a from label even if a subaccount is used', async () => {
-      const subaccount = [1, 2, 3];
+      const subaccount = Uint8Array.from([1, 2, 3]);
 
       const arg = encodeIdl({
         recordClass: TransferArgs,
@@ -202,7 +202,7 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.t
     });
 
     it('should build a consent message with a to subaccount', async () => {
-      const subaccount = [1, 2, 3];
+      const subaccount = Uint8Array.from([1, 2, 3]);
 
       const arg = encodeIdl({
         recordClass: TransferArgs,
@@ -393,7 +393,7 @@ ${encodeIcrcAccount({owner: owner.getPrincipal()})}`
     });
 
     it('should build a consent message with a from subaccount', async () => {
-      const subaccount = [1, 2, 3];
+      const subaccount = Uint8Array.from([1, 2, 3]);
 
       const arg = encodeIdl({
         recordClass: ApproveArgs,
@@ -687,7 +687,7 @@ ${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.to.owner, subaccount: fr
     });
 
     it('should build a consent message with a spender subaccount', async () => {
-      const subaccount = [1, 2, 3];
+      const subaccount = Uint8Array.from([1, 2, 3]);
 
       const arg = encodeIdl({
         recordClass: TransferFromArgs,
@@ -725,7 +725,7 @@ ${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.to.owner, subaccount: fr
     });
 
     it('should build a consent message with a from subaccount', async () => {
-      const subaccount = [1, 2, 3];
+      const subaccount = Uint8Array.from([1, 2, 3]);
 
       const arg = encodeIdl({
         recordClass: TransferFromArgs,
@@ -766,7 +766,7 @@ ${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.to.owner, subaccount: fr
     });
 
     it('should build a consent message with a to subaccount', async () => {
-      const subaccount = [1, 2, 3];
+      const subaccount = Uint8Array.from([1, 2, 3]);
 
       const arg = encodeIdl({
         recordClass: TransferFromArgs,
