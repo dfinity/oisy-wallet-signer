@@ -26,7 +26,7 @@
 		"format": "prettier --write ."
 	},
 	"devDependencies": {
-		"@dfinity/eslint-config-oisy-wallet": "^0.2.2",
+		"@dfinity/eslint-config-oisy-wallet": "^0.2.3",
 		"@junobuild/config": "^2.6.0",
 		"@junobuild/vite-plugin": "^4.4.0",
 		"@sveltejs/adapter-static": "^3.0.10",
