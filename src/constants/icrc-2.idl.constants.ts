@@ -1,6 +1,5 @@
 import {IDL} from '@icp-sdk/core/candid';
-// eslint-disable-next-line import/no-relative-parent-imports
-import {ApproveError, TransferFromError} from '../declarations/icrc-2.idl';
+import {Icrc2Idl} from '../declarations';
 
-export const ApproveResult = IDL.Variant({Ok: IDL.Nat, Err: ApproveError});
-export const TransferFromResult = IDL.Variant({Ok: IDL.Nat, Err: TransferFromError});
+export const ApproveResult = IDL.Variant({Ok: IDL.Nat, Err: Icrc2Idl.ApproveError});
+export const TransferFromResult = IDL.Variant({Ok: IDL.Nat, Err: Icrc2Idl.TransferFromError});

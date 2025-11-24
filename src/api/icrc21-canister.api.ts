@@ -3,13 +3,7 @@ import type {PrincipalText} from '@dfinity/zod-schemas';
 import {Actor, type ActorMethod, type ActorSubclass} from '@icp-sdk/core/agent';
 import type {IDL} from '@icp-sdk/core/candid';
 import {Principal} from '@icp-sdk/core/principal';
-import type {
-  _SERVICE as Icrc21Actor,
-  icrc21_consent_message_request,
-  icrc21_consent_message_response
-} from '../declarations/icrc-21';
-// eslint-disable-next-line import/no-relative-parent-imports
-import {idlFactory} from '../declarations/icrc-21.idl';
+import {type Icrc21Actor, type Icrc21Did, idlFactoryIcrc21} from '../declarations';
 import type {SignerOptions} from '../types/signer-options';
 import {AgentApi} from './agent.api';
 
@@ -21,8 +15,8 @@ export class Icrc21Canister extends AgentApi {
     ...actorParams
   }: {
     canisterId: string | Principal;
-    request: icrc21_consent_message_request;
-  } & SignerOptions): Promise<icrc21_consent_message_response> {
+    request: Icrc21Did.icrc21_consent_message_request;
+  } & SignerOptions): Promise<Icrc21Did.icrc21_consent_message_response> {
     const {icrc21_canister_call_consent_message: canisterCallConsentMessage} =
       await this.getIcrc21Actor(actorParams);
     return await canisterCallConsentMessage(request);
@@ -41,7 +35,7 @@ export class Icrc21Canister extends AgentApi {
     if (isNullish(icrc21Actor)) {
       const actor = await this.createActor<Icrc21Actor>({
         canisterId,
-        idlFactory,
+        idlFactory: idlFactoryIcrc21,
         ...rest
       });
 
