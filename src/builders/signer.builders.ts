@@ -1,13 +1,15 @@
 import {fromNullable, isNullish, nonNullish} from '@dfinity/utils';
 import {encodeIcrcAccount} from '@icp-sdk/canisters/ledger/icrc';
-import {TransferArgs} from '../constants/icrc-1.idl.constants';
-import {ApproveArgs, TransferFromArgs} from '../constants/icrc-2.idl.constants';
 import {MAX_CONSENT_MESSAGE_ARG_SIZE_BYTES} from '../constants/signer.builders.constants';
 import type {TransferArgs as IcrcTransferArg} from '../declarations/icrc-1';
+// eslint-disable-next-line import/no-relative-parent-imports
+import {TransferArgs} from '../declarations/icrc-1.idl';
 import type {
   ApproveArgs as IcrcApproveArgs,
   TransferFromArgs as IcrcTransferFromArgs
 } from '../declarations/icrc-2';
+// eslint-disable-next-line import/no-relative-parent-imports
+import {ApproveArgs, TransferFromArgs} from '../declarations/icrc-2.idl';
 import type {icrc21_consent_info} from '../declarations/icrc-21';
 import type {I18n} from '../types/i18n';
 import type {

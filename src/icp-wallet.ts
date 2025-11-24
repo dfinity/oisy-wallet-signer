@@ -10,8 +10,10 @@ import {
   type Icrc2ApproveRequest,
   type Icrc2ApproveResult
 } from '@icp-sdk/canisters/ledger/icp';
-import {TransferArgs, TransferResult} from './constants/icrc-1.idl.constants';
-import {ApproveArgs, ApproveResult} from './constants/icrc-2.idl.constants';
+import {TransferResult} from './constants/icrc-1.idl.constants';
+import {ApproveResult} from './constants/icrc-2.idl.constants';
+import {TransferArgs} from './declarations/icrc-1.idl';
+import {ApproveArgs} from './declarations/icrc-2.idl';
 import {RelyingParty} from './relying-party';
 import type {IcrcAccount} from './types/icrc-accounts';
 import type {IcrcCallCanisterRequestParams} from './types/icrc-requests';

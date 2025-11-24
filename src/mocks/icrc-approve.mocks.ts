@@ -1,6 +1,7 @@
 import {Principal} from '@icp-sdk/core/principal';
-import {ApproveArgs} from '../constants/icrc-2.idl.constants';
 import type {ApproveArgs as ApproveArgsType} from '../declarations/icrc-2';
+// eslint-disable-next-line import/no-relative-parent-imports
+import {ApproveArgs} from '../declarations/icrc-2.idl';
 import {encodeIdl} from '../utils/idl.utils';
 import {mockPrincipalText} from './icrc-accounts.mocks';
 

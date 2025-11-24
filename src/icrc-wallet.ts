@@ -12,13 +12,10 @@ import {
   type TransferFromParams,
   type TransferParams
 } from '@icp-sdk/canisters/ledger/icrc';
-import {TransferArgs, TransferResult} from './constants/icrc-1.idl.constants';
-import {
-  ApproveArgs,
-  ApproveResult,
-  TransferFromArgs,
-  TransferFromResult
-} from './constants/icrc-2.idl.constants';
+import {TransferResult} from './constants/icrc-1.idl.constants';
+import {ApproveResult, TransferFromResult} from './constants/icrc-2.idl.constants';
+import {TransferArgs} from './declarations/icrc-1.idl';
+import {ApproveArgs, TransferFromArgs} from './declarations/icrc-2.idl';
 import {RelyingParty} from './relying-party';
 import type {IcrcAccount} from './types/icrc-accounts';
 import type {IcrcCallCanisterRequestParams} from './types/icrc-requests';

@@ -1,64 +1,6 @@
 import {IDL} from '@icp-sdk/core/candid';
-
-/**
- * TODO: All the constants of this module should be exposed by the IDL files - i.e. should be generated as exposed by didc
- */
-
-const Account = IDL.Record({
-  owner: IDL.Principal,
-  subaccount: IDL.Opt(IDL.Vec(IDL.Nat8))
-});
-
-export const ApproveArgs = IDL.Record({
-  fee: IDL.Opt(IDL.Nat),
-  memo: IDL.Opt(IDL.Vec(IDL.Nat8)),
-  from_subaccount: IDL.Opt(IDL.Vec(IDL.Nat8)),
-  created_at_time: IDL.Opt(IDL.Nat64),
-  amount: IDL.Nat,
-  expected_allowance: IDL.Opt(IDL.Nat),
-  expires_at: IDL.Opt(IDL.Nat64),
-  spender: Account
-});
-
-export const TransferFromArgs = IDL.Record({
-  to: Account,
-  fee: IDL.Opt(IDL.Nat),
-  spender_subaccount: IDL.Opt(IDL.Vec(IDL.Nat8)),
-  from: Account,
-  memo: IDL.Opt(IDL.Vec(IDL.Nat8)),
-  created_at_time: IDL.Opt(IDL.Nat64),
-  amount: IDL.Nat
-});
-
-const ApproveError = IDL.Variant({
-  GenericError: IDL.Record({
-    message: IDL.Text,
-    error_code: IDL.Nat
-  }),
-  TemporarilyUnavailable: IDL.Null,
-  Duplicate: IDL.Record({duplicate_of: IDL.Nat}),
-  BadFee: IDL.Record({expected_fee: IDL.Nat}),
-  AllowanceChanged: IDL.Record({current_allowance: IDL.Nat}),
-  CreatedInFuture: IDL.Record({ledger_time: IDL.Nat64}),
-  TooOld: IDL.Null,
-  Expired: IDL.Record({ledger_time: IDL.Nat64}),
-  InsufficientFunds: IDL.Record({balance: IDL.Nat})
-});
-
-const TransferFromError = IDL.Variant({
-  GenericError: IDL.Record({
-    message: IDL.Text,
-    error_code: IDL.Nat
-  }),
-  TemporarilyUnavailable: IDL.Null,
-  InsufficientAllowance: IDL.Record({allowance: IDL.Nat}),
-  BadBurn: IDL.Record({min_burn_amount: IDL.Nat}),
-  Duplicate: IDL.Record({duplicate_of: IDL.Nat}),
-  BadFee: IDL.Record({expected_fee: IDL.Nat}),
-  CreatedInFuture: IDL.Record({ledger_time: IDL.Nat64}),
-  TooOld: IDL.Null,
-  InsufficientFunds: IDL.Record({balance: IDL.Nat})
-});
+// eslint-disable-next-line import/no-relative-parent-imports
+import {ApproveError, TransferFromError} from '../declarations/icrc-2.idl';
 
 export const ApproveResult = IDL.Variant({Ok: IDL.Nat, Err: ApproveError});
 export const TransferFromResult = IDL.Variant({Ok: IDL.Nat, Err: TransferFromError});
