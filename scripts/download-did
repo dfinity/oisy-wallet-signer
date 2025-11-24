@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DIR=src/declarations
+DIR=src/declarations/icrc
 
 if [ ! -d "$DIR" ]; then
   mkdir "$DIR"

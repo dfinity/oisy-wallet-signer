@@ -5,7 +5,7 @@
 set -euo pipefail
 
 did_files_to_compile() {
-  local path=src/declarations
+  local path=src/declarations/icrc
 
   find ${path} -type f -name '*.did' |
     grep -vE ${path}/+payloads.did
