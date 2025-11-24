@@ -1,5 +1,6 @@
 import {Principal} from '@icp-sdk/core/principal';
 import type {TransferFromArgs as TransferFromArgsType} from '../declarations/icrc-2';
+// eslint-disable-next-line import/no-relative-parent-imports
 import {TransferFromArgs} from '../declarations/icrc-2.idl';
 import {encodeIdl} from '../utils/idl.utils';
 import {mockLocalRelyingPartyPrincipal} from './call-utils.mocks';

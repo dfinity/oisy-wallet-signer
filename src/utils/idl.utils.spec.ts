@@ -1,6 +1,7 @@
 import {IDL} from '@icp-sdk/core/candid';
 import {Principal} from '@icp-sdk/core/principal';
 import type {TransferArgs as TransferArgsType} from '../declarations/icrc-1';
+// eslint-disable-next-line import/no-relative-parent-imports
 import {TransferArgs} from '../declarations/icrc-1.idl';
 import {decodeIdl, encodeIdl} from './idl.utils';
 

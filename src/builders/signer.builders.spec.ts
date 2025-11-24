@@ -7,7 +7,9 @@ import {Ed25519KeyIdentity} from '@icp-sdk/core/identity';
 import {Principal} from '@icp-sdk/core/principal';
 import {MAX_CONSENT_MESSAGE_ARG_SIZE_BYTES} from '../constants/signer.builders.constants';
 import type {TransferArgs as TransferArgsType} from '../declarations/icrc-1';
+// eslint-disable-next-line import/no-relative-parent-imports
 import {TransferArgs} from '../declarations/icrc-1.idl';
+// eslint-disable-next-line import/no-relative-parent-imports
 import {ApproveArgs, TransferFromArgs} from '../declarations/icrc-2.idl';
 import {mockCallCanisterParams} from '../mocks/call-canister.mocks';
 import {mockPrincipalText} from '../mocks/icrc-accounts.mocks';

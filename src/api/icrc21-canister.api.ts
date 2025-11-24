@@ -8,7 +8,7 @@ import type {
   icrc21_consent_message_request,
   icrc21_consent_message_response
 } from '../declarations/icrc-21';
-
+// eslint-disable-next-line import/no-relative-parent-imports
 import {idlFactory} from '../declarations/icrc-21.idl';
 import type {SignerOptions} from '../types/signer-options';
 import {AgentApi} from './agent.api';
