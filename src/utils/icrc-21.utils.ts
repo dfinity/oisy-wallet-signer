@@ -1,6 +1,6 @@
-import type {icrc21_error} from '../declarations/icrc-21';
+import type {Icrc21Did} from '../declarations';
 
-export const mapIcrc21ErrorToString = (error: icrc21_error): string => {
+export const mapIcrc21ErrorToString = (error: Icrc21Did.icrc21_error): string => {
   if ('GenericError' in error) {
     return `Error: ${error.GenericError.description} (Code: ${error.GenericError.error_code})`;
   }

@@ -3,13 +3,7 @@ import {Actor} from '@icp-sdk/core/agent';
 import {Ed25519KeyIdentity} from '@icp-sdk/core/identity';
 import {Principal} from '@icp-sdk/core/principal';
 import * as httpAgentProvider from '../agent/http-agent-provider';
-import type {
-  _SERVICE as Icrc21Actor,
-  icrc21_consent_message_request,
-  icrc21_consent_message_response
-} from '../declarations/icrc-21';
-// eslint-disable-next-line import/no-relative-parent-imports
-import {idlFactory} from '../declarations/icrc-21.idl';
+import {type Icrc21Actor, type Icrc21Did, idlFactoryIcrc21} from '../declarations';
 import {mockCanisterId} from '../mocks/icrc-accounts.mocks';
 import type {SignerOptions} from '../types/signer-options';
 import {Icrc21Canister} from './icrc21-canister.api';
@@ -60,7 +54,7 @@ describe('icrc-21.canister.api', () => {
   });
 
   describe('consentMessage', () => {
-    const consentMessageRequest: icrc21_consent_message_request = {
+    const consentMessageRequest: Icrc21Did.icrc21_consent_message_request = {
       method: 'icrc1_transfer',
       arg: new Uint8Array([1, 2, 3]),
       user_preferences: {
@@ -76,7 +70,7 @@ describe('icrc-21.canister.api', () => {
       }
     };
 
-    const consentMessageResponse: icrc21_consent_message_response = {
+    const consentMessageResponse: Icrc21Did.icrc21_consent_message_response = {
       Ok: {
         consent_message: {
           GenericDisplayMessage: 'Transfer 1 ICP to account abcd'
@@ -121,7 +115,7 @@ describe('icrc-21.canister.api', () => {
       vi.spyOn(canister as any, 'getIcrc21Actor').mockResolvedValue({
         icrc21_canister_call_consent_message: vi
           .fn()
-          .mockImplementation(async (_request: icrc21_consent_message_request) => {
+          .mockImplementation(async (_request: Icrc21Did.icrc21_consent_message_request) => {
             await Promise.resolve();
             throw mockError;
           }) as unknown as Icrc21Actor['icrc21_canister_call_consent_message']
@@ -154,7 +148,7 @@ describe('icrc-21.canister.api', () => {
 
       // TODO: spyOn nor function does work with vitest and Actor.createActor. Not against a better idea than disabling eslint for next line.
 
-      expect(Actor.createActor).toHaveBeenCalledWith(idlFactory, {
+      expect(Actor.createActor).toHaveBeenCalledWith(idlFactoryIcrc21, {
         agent: expect.any(Object),
         canisterId: mockCanisterId
       });

@@ -1,11 +1,11 @@
 import {encode} from '@dfinity/cbor';
 import {hexStringToUint8Array, uint8ArrayToBase64} from '@dfinity/utils';
-import type {icrc21_consent_info} from '../declarations/icrc-21';
+import type {Icrc21Did} from '../declarations';
 import type {IcrcCallCanisterResult} from '../types/icrc-responses';
 import {mockRepliedLocalCertificate} from './custom-http-agent-responses.mocks';
 import {mockRequestDetails} from './custom-http-agent.mocks';
 
-export const mockConsentInfo: icrc21_consent_info = {
+export const mockConsentInfo: Icrc21Did.icrc21_consent_info = {
   consent_message: {GenericDisplayMessage: 'Test Consent Message'},
   metadata: {
     language: 'en',

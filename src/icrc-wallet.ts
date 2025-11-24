@@ -14,8 +14,7 @@ import {
 } from '@icp-sdk/canisters/ledger/icrc';
 import {TransferResult} from './constants/icrc-1.idl.constants';
 import {ApproveResult, TransferFromResult} from './constants/icrc-2.idl.constants';
-import {TransferArgs} from './declarations/icrc-1.idl';
-import {ApproveArgs, TransferFromArgs} from './declarations/icrc-2.idl';
+import {Icrc1Idl, Icrc2Idl} from './declarations';
 import {RelyingParty} from './relying-party';
 import type {IcrcAccount} from './types/icrc-accounts';
 import type {IcrcCallCanisterRequestParams} from './types/icrc-requests';
@@ -70,7 +69,7 @@ export class IcrcWallet extends RelyingParty {
     const rawArgs = toTransferArg(params);
 
     const arg = encodeIdl({
-      recordClass: TransferArgs,
+      recordClass: Icrc1Idl.TransferArgs,
       rawArgs
     });
 
@@ -131,7 +130,7 @@ export class IcrcWallet extends RelyingParty {
     const rawArgs = toApproveArgs(params);
 
     const arg = encodeIdl({
-      recordClass: ApproveArgs,
+      recordClass: Icrc2Idl.ApproveArgs,
       rawArgs
     });
 
@@ -192,7 +191,7 @@ export class IcrcWallet extends RelyingParty {
     const rawArgs = toTransferFromArgs(params);
 
     const arg = encodeIdl({
-      recordClass: TransferFromArgs,
+      recordClass: Icrc2Idl.TransferFromArgs,
       rawArgs
     });
 

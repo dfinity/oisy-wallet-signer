@@ -1,6 +1,6 @@
-import type {Value} from '../declarations/icrc-1';
+import type {Icrc1Did} from '../declarations';
 
-export const mockIcrcLedgerMetadata: [string, Value][] = [
+export const mockIcrcLedgerMetadata: [string, Icrc1Did.Value][] = [
   ['icrc1:name', {Text: 'Token'}],
   ['icrc1:symbol', {Text: 'TKN'}],
   ['icrc1:decimals', {Nat: 11n}],
