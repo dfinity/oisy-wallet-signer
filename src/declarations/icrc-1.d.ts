@@ -55,5 +55,7 @@ export interface _SERVICE {
   icrc1_total_supply: ActorMethod<[], bigint>;
   icrc1_transfer: ActorMethod<[TransferArgs], {Ok: bigint} | {Err: TransferError}>;
 }
+export declare const idlService: IDL.ServiceClass;
+export declare const idlInitArgs: IDL.Type[];
 export declare const idlFactory: IDL.InterfaceFactory;
 export declare const init: (args: {IDL: typeof IDL}) => IDL.Type[];
