@@ -1,7 +1,7 @@
 import {IDL} from '@icp-sdk/core/candid';
 import {Principal} from '@icp-sdk/core/principal';
-import {TransferArgs} from '../constants/icrc-1.idl.constants';
 import type {TransferArgs as TransferArgsType} from '../declarations/icrc-1';
+import {TransferArgs} from '../declarations/icrc-1.idl';
 import {decodeIdl, encodeIdl} from './idl.utils';
 
 describe('idl.utils', () => {
