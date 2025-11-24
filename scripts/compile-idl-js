@@ -48,14 +48,6 @@ generate_did() {
   mv "${generatedTsfile}" "${tsfile}"
   mv "${generatedJsfile}" "${jsFactoryFile}"
   rm -r "${declarationsfolder}"
-
-  generate_did_factory_ts "${tsFactoryFile}"
-}
-
-generate_did_factory_ts() {
-  local tsFactoryFile="$1"
-
-  echo "import type { IDL } from \"@icp-sdk/core/candid\";export const idlFactory: IDL.InterfaceFactory;" >"${tsFactoryFile}"
 }
 
 did_files_to_compile | while read line; do
