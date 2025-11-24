@@ -15,7 +15,7 @@ export default [
           patterns: [
             {
               group: ['**/declarations/icrc/*', '!./declarations/icrc/*'],
-              message: 'Direct usage of private ICRC declaration modules is not allowed.'
+              message: 'Direct usage of ICRC declaration modules is not allowed.'
             }
           ]
         }
