@@ -67,5 +67,7 @@ export interface _SERVICE {
   icrc2_approve: ActorMethod<[ApproveArgs], {Ok: bigint} | {Err: ApproveError}>;
   icrc2_transfer_from: ActorMethod<[TransferFromArgs], {Ok: bigint} | {Err: TransferFromError}>;
 }
+export declare const idlService: IDL.ServiceClass;
+export declare const idlInitArgs: IDL.Type[];
 export declare const idlFactory: IDL.InterfaceFactory;
 export declare const init: (args: {IDL: typeof IDL}) => IDL.Type[];

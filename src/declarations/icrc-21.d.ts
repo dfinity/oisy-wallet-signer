@@ -233,5 +233,7 @@ export interface _SERVICE {
     icrc21_consent_message_response
   >;
 }
+export declare const idlService: IDL.ServiceClass;
+export declare const idlInitArgs: IDL.Type[];
 export declare const idlFactory: IDL.InterfaceFactory;
 export declare const init: (args: {IDL: typeof IDL}) => IDL.Type[];
