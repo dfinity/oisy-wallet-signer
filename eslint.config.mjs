@@ -5,6 +5,21 @@ export default [
   ...config,
   ...vitestConfig,
   {
-    ignores: ['**/dist', 'src/declarations', 'src/tsconfig.json']
+    ignores: ['**/dist', 'src/declarations/icrc', 'src/tsconfig.json']
+  },
+  {
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['**/declarations/icrc/*', '!./declarations/icrc/*'],
+              message: 'Direct usage of ICRC declaration modules is not allowed.'
+            }
+          ]
+        }
+      ]
+    }
   }
 ];

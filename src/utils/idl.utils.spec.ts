@@ -1,7 +1,6 @@
 import {IDL} from '@icp-sdk/core/candid';
 import {Principal} from '@icp-sdk/core/principal';
-import {TransferArgs} from '../constants/icrc-1.idl.constants';
-import type {TransferArgs as TransferArgsType} from '../declarations/icrc-1';
+import {Icrc1Idl, type Icrc1Did} from '../declarations';
 import {decodeIdl, encodeIdl} from './idl.utils';
 
 describe('idl.utils', () => {
@@ -11,7 +10,7 @@ describe('idl.utils', () => {
 
   describe('encodeArg', () => {
     it('should encode arguments', () => {
-      const rawArgs: TransferArgsType = {
+      const rawArgs: Icrc1Did.TransferArgs = {
         amount: 5000000n,
         created_at_time: [1727696940356000000n],
         fee: [10000n],
@@ -26,7 +25,7 @@ describe('idl.utils', () => {
       };
 
       const arg = encodeIdl({
-        recordClass: TransferArgs,
+        recordClass: Icrc1Idl.TransferArgs,
         rawArgs
       });
 

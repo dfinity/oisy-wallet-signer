@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-DIR=dist/declarations
+DIR=dist/declarations/icrc
 
 if [ ! -d "$DIR" ]; then
   mkdir "$DIR"
 fi
 
-cp src/declarations/*.d.ts "$DIR"
+cp src/declarations/icrc/*.d.ts "$DIR"

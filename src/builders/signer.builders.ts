@@ -1,14 +1,7 @@
-import {encodeIcrcAccount} from '@dfinity/ledger-icrc';
 import {fromNullable, isNullish, nonNullish} from '@dfinity/utils';
-import {TransferArgs} from '../constants/icrc-1.idl.constants';
-import {ApproveArgs, TransferFromArgs} from '../constants/icrc-2.idl.constants';
+import {encodeIcrcAccount} from '@icp-sdk/canisters/ledger/icrc';
 import {MAX_CONSENT_MESSAGE_ARG_SIZE_BYTES} from '../constants/signer.builders.constants';
-import type {TransferArgs as IcrcTransferArg} from '../declarations/icrc-1';
-import type {
-  ApproveArgs as IcrcApproveArgs,
-  TransferFromArgs as IcrcTransferFromArgs
-} from '../declarations/icrc-2';
-import type {icrc21_consent_info} from '../declarations/icrc-21';
+import {Icrc1Idl, Icrc2Idl, type Icrc1Did, type Icrc21Did, type Icrc2Did} from '../declarations';
 import type {I18n} from '../types/i18n';
 import type {
   SignerBuilderFn,
@@ -48,8 +41,8 @@ export const buildContentMessageIcrc1Transfer: SignerBuilderFn = async ({
       to: {owner: toOwner, subaccount: toSubaccount},
       fee,
       memo
-    } = decodeIdl<IcrcTransferArg>({
-      recordClass: TransferArgs,
+    } = decodeIdl<Icrc1Did.TransferArgs>({
+      recordClass: Icrc1Idl.TransferArgs,
       bytes: new Uint8Array(arg)
     });
 
@@ -129,8 +122,8 @@ export const buildContentMessageIcrc2Approve: SignerBuilderFn = async ({
       expires_at,
       fee: approveFee,
       memo
-    } = decodeIdl<IcrcApproveArgs>({
-      recordClass: ApproveArgs,
+    } = decodeIdl<Icrc2Did.ApproveArgs>({
+      recordClass: Icrc2Idl.ApproveArgs,
       bytes: new Uint8Array(arg)
     });
 
@@ -240,8 +233,8 @@ export const buildContentMessageIcrc2TransferFrom: SignerBuilderFn = async ({
       amount,
       fee,
       memo
-    } = decodeIdl<IcrcTransferFromArgs>({
-      recordClass: TransferFromArgs,
+    } = decodeIdl<Icrc2Did.TransferFromArgs>({
+      recordClass: Icrc2Idl.TransferFromArgs,
       bytes: new Uint8Array(arg)
     });
 
@@ -334,7 +327,7 @@ const buildContentMessage = async ({
 
     const {message} = fn(en);
 
-    const consentMessage: icrc21_consent_info = {
+    const consentMessage: Icrc21Did.icrc21_consent_info = {
       metadata: {
         language: 'en',
         utc_offset_minutes: []

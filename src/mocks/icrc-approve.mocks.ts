@@ -1,10 +1,9 @@
 import {Principal} from '@icp-sdk/core/principal';
-import {ApproveArgs} from '../constants/icrc-2.idl.constants';
-import type {ApproveArgs as ApproveArgsType} from '../declarations/icrc-2';
+import {type Icrc2Did, Icrc2Idl} from '../declarations';
 import {encodeIdl} from '../utils/idl.utils';
 import {mockPrincipalText} from './icrc-accounts.mocks';
 
-export const mockIcrcApproveRawArgs: ApproveArgsType = {
+export const mockIcrcApproveRawArgs: Icrc2Did.ApproveArgs = {
   amount: 320_000_000_001n,
   created_at_time: [1727696940356000000n],
   fee: [100_330n],
@@ -19,6 +18,6 @@ export const mockIcrcApproveRawArgs: ApproveArgsType = {
 };
 
 export const mockIcrcApproveArg = encodeIdl({
-  recordClass: ApproveArgs,
+  recordClass: Icrc2Idl.ApproveArgs,
   rawArgs: mockIcrcApproveRawArgs
 });

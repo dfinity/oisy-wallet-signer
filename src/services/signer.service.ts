@@ -1,10 +1,10 @@
-import {mapTokenMetadata} from '@dfinity/ledger-icrc';
 import {base64ToUint8Array, isNullish, notEmptyString} from '@dfinity/utils';
+import {mapTokenMetadata} from '@icp-sdk/canisters/ledger/icrc';
 import {uint8ToBuf} from '@icp-sdk/core/agent';
 import {Principal} from '@icp-sdk/core/principal';
 import {SignerApi} from '../api/signer.api';
 import {SIGNER_BUILDERS} from '../constants/signer.builders.constants';
-import type {icrc21_consent_message_response} from '../declarations/icrc-21';
+import type {Icrc21Did} from '../declarations';
 import {
   notifyErrorActionAborted,
   notifyErrorMissingPrompt,
@@ -155,7 +155,7 @@ export class SignerService {
   }: {
     params: Omit<IcrcCallCanisterRequestParams, 'sender'>;
     options: SignerOptions;
-  }): Promise<icrc21_consent_message_response> {
+  }): Promise<Icrc21Did.icrc21_consent_message_response> {
     return await this.#signerApi.consentMessage({
       owner,
       host,
@@ -246,7 +246,7 @@ export class SignerService {
   private async loadConsentMessage(params: {
     params: Omit<IcrcCallCanisterRequestParams, 'sender'>;
     options: SignerOptions;
-  }): Promise<icrc21_consent_message_response | ConsentInfoWarn> {
+  }): Promise<Icrc21Did.icrc21_consent_message_response | ConsentInfoWarn> {
     try {
       return await this.callConsentMessage(params);
     } catch (err: unknown) {

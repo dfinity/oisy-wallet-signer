@@ -1,6 +1,6 @@
 {
   "name": "@dfinity/oisy-wallet-signer",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "A library designed to facilitate communication between a dApp and the OISY Wallet on the Internet Computer. ",
   "license": "Apache-2.0",
   "type": "module",
@@ -71,9 +71,9 @@
     "prepack": "node ../scripts/publish-strip-engines.mjs"
   },
   "devDependencies": {
-    "@dfinity/eslint-config-oisy-wallet": "^0.2.2",
+    "@dfinity/eslint-config-oisy-wallet": "^0.2.3",
     "@dfinity/internet-identity-playwright": "^2.0.0",
-    "@icp-sdk/bindgen": "0.2.0-patch-typed-arrays",
+    "@icp-sdk/bindgen": "^0.2.0",
     "@playwright/test": "^1.56.1",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.9.1",
@@ -89,10 +89,9 @@
     "npm": ">=11.5.1 <12.0.0"
   },
   "peerDependencies": {
-    "@dfinity/ledger-icp": "^7",
-    "@dfinity/ledger-icrc": "^5",
     "@dfinity/utils": "^4",
     "@dfinity/zod-schemas": "^3",
+    "@icp-sdk/canisters": "^2",
     "@icp-sdk/core": "^4",
     "zod": "^4"
   }

@@ -1,9 +1,9 @@
-import type {IcrcTokenMetadata} from '@dfinity/ledger-icrc';
+import type {IcrcTokenMetadata} from '@icp-sdk/canisters/ledger/icrc';
 import type {Principal} from '@icp-sdk/core/principal';
-import type {icrc21_consent_info} from '../declarations/icrc-21';
+import type {Icrc21Did} from '../declarations';
 
 export interface SignerBuildersResultOk {
-  Ok: icrc21_consent_info;
+  Ok: Icrc21Did.icrc21_consent_info;
 }
 
 export interface SignerBuildersResultError {

@@ -1,14 +1,12 @@
 /* eslint-disable vitest/expect-expect -- This test suite uses functions with nested `expect` statements */
-import {encodeIcrcAccount} from '@dfinity/ledger-icrc';
 import {asciiStringToByteArray, base64ToUint8Array, fromNullable} from '@dfinity/utils';
+import {encodeIcrcAccount} from '@icp-sdk/canisters/ledger/icrc';
 import {uint8ToBuf} from '@icp-sdk/core/agent';
 import {IDL} from '@icp-sdk/core/candid';
 import {Ed25519KeyIdentity} from '@icp-sdk/core/identity';
 import {Principal} from '@icp-sdk/core/principal';
-import {TransferArgs} from '../constants/icrc-1.idl.constants';
-import {ApproveArgs, TransferFromArgs} from '../constants/icrc-2.idl.constants';
 import {MAX_CONSENT_MESSAGE_ARG_SIZE_BYTES} from '../constants/signer.builders.constants';
-import type {TransferArgs as TransferArgsType} from '../declarations/icrc-1';
+import {Icrc1Idl, Icrc2Idl, type Icrc1Did} from '../declarations';
 import {mockCallCanisterParams} from '../mocks/call-canister.mocks';
 import {mockPrincipalText} from '../mocks/icrc-accounts.mocks';
 import {mockIcrcApproveArg, mockIcrcApproveRawArgs} from '../mocks/icrc-approve.mocks';
@@ -91,7 +89,7 @@ describe('Signer builders', () => {
   };
 
   describe('icrc1_transfer', () => {
-    const rawArgs: TransferArgsType = {
+    const rawArgs: Icrc1Did.TransferArgs = {
       amount: 320_000_000_001n,
       created_at_time: [1727696940356000000n],
       fee: [100_330n],
@@ -130,7 +128,7 @@ s3oqv-3j7id-xjhbm-3owbe-fvwly-oso6u-vej6n-bexck-koyu2-bxb6y-wae
 
     it('should build a consent message in english', async () => {
       const arg = encodeIdl({
-        recordClass: TransferArgs,
+        recordClass: Icrc1Idl.TransferArgs,
         rawArgs
       });
 
@@ -149,7 +147,7 @@ s3oqv-3j7id-xjhbm-3owbe-fvwly-oso6u-vej6n-bexck-koyu2-bxb6y-wae
 
     it('should build a consent message with no utc time information', async () => {
       const arg = encodeIdl({
-        recordClass: TransferArgs,
+        recordClass: Icrc1Idl.TransferArgs,
         rawArgs
       });
 
@@ -167,10 +165,10 @@ s3oqv-3j7id-xjhbm-3owbe-fvwly-oso6u-vej6n-bexck-koyu2-bxb6y-wae
     });
 
     it('should build a consent message with a from label even if a subaccount is used', async () => {
-      const subaccount = [1, 2, 3];
+      const subaccount = Uint8Array.from([1, 2, 3]);
 
       const arg = encodeIdl({
-        recordClass: TransferArgs,
+        recordClass: Icrc1Idl.TransferArgs,
         rawArgs: {
           ...rawArgs,
           from_subaccount: [subaccount]
@@ -202,10 +200,10 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.t
     });
 
     it('should build a consent message with a to subaccount', async () => {
-      const subaccount = [1, 2, 3];
+      const subaccount = Uint8Array.from([1, 2, 3]);
 
       const arg = encodeIdl({
-        recordClass: TransferArgs,
+        recordClass: Icrc1Idl.TransferArgs,
         rawArgs: {
           ...rawArgs,
           to: {
@@ -243,7 +241,7 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount})}
       const memo = asciiStringToByteArray('PUPT'); // Reverse top-up memo
 
       const arg = encodeIdl({
-        recordClass: TransferArgs,
+        recordClass: Icrc1Idl.TransferArgs,
         rawArgs: {
           ...rawArgs,
           memo: [memo]
@@ -294,7 +292,7 @@ PUPT`
 
     it('should build a consent message with token fee if no fee as arg', async () => {
       const arg = encodeIdl({
-        recordClass: TransferArgs,
+        recordClass: Icrc1Idl.TransferArgs,
         rawArgs: {
           ...rawArgs,
           fee: []
@@ -393,10 +391,10 @@ ${encodeIcrcAccount({owner: owner.getPrincipal()})}`
     });
 
     it('should build a consent message with a from subaccount', async () => {
-      const subaccount = [1, 2, 3];
+      const subaccount = Uint8Array.from([1, 2, 3]);
 
       const arg = encodeIdl({
-        recordClass: ApproveArgs,
+        recordClass: Icrc2Idl.ApproveArgs,
         rawArgs: {
           ...mockIcrcApproveRawArgs,
           from_subaccount: [subaccount]
@@ -439,7 +437,7 @@ ${encodeIcrcAccount({owner: owner.getPrincipal(), subaccount})}`
       const memo = asciiStringToByteArray('PUPT'); // Reverse top-up memo
 
       const arg = encodeIdl({
-        recordClass: ApproveArgs,
+        recordClass: Icrc2Idl.ApproveArgs,
         rawArgs: {
           ...mockIcrcApproveRawArgs,
           memo: [memo]
@@ -498,7 +496,7 @@ PUPT`
 
     it('should build a consent message with token fee if no fee as arg', async () => {
       const arg = encodeIdl({
-        recordClass: ApproveArgs,
+        recordClass: Icrc2Idl.ApproveArgs,
         rawArgs: {
           ...mockIcrcApproveRawArgs,
           fee: []
@@ -541,7 +539,7 @@ ${encodeIcrcAccount({owner: owner.getPrincipal()})}`
       const expectedAllowance = 1234567n;
 
       const arg = encodeIdl({
-        recordClass: ApproveArgs,
+        recordClass: Icrc2Idl.ApproveArgs,
         rawArgs: {
           ...mockIcrcApproveRawArgs,
           expected_allowance: [expectedAllowance]
@@ -585,7 +583,7 @@ ${encodeIcrcAccount({owner: owner.getPrincipal()})}`
       const expiresAt = 1735547416200000000n;
 
       const arg = encodeIdl({
-        recordClass: ApproveArgs,
+        recordClass: Icrc2Idl.ApproveArgs,
         rawArgs: {
           ...mockIcrcApproveRawArgs,
           expires_at: [expiresAt]
@@ -687,10 +685,10 @@ ${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.to.owner, subaccount: fr
     });
 
     it('should build a consent message with a spender subaccount', async () => {
-      const subaccount = [1, 2, 3];
+      const subaccount = Uint8Array.from([1, 2, 3]);
 
       const arg = encodeIdl({
-        recordClass: TransferFromArgs,
+        recordClass: Icrc2Idl.TransferFromArgs,
         rawArgs: {
           ...mockIcrcTransferFromRawArgs,
           spender_subaccount: [subaccount]
@@ -725,10 +723,10 @@ ${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.to.owner, subaccount: fr
     });
 
     it('should build a consent message with a from subaccount', async () => {
-      const subaccount = [1, 2, 3];
+      const subaccount = Uint8Array.from([1, 2, 3]);
 
       const arg = encodeIdl({
-        recordClass: TransferFromArgs,
+        recordClass: Icrc2Idl.TransferFromArgs,
         rawArgs: {
           ...mockIcrcTransferFromRawArgs,
           from: {
@@ -766,10 +764,10 @@ ${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.to.owner, subaccount: fr
     });
 
     it('should build a consent message with a to subaccount', async () => {
-      const subaccount = [1, 2, 3];
+      const subaccount = Uint8Array.from([1, 2, 3]);
 
       const arg = encodeIdl({
-        recordClass: TransferFromArgs,
+        recordClass: Icrc2Idl.TransferFromArgs,
         rawArgs: {
           ...mockIcrcTransferFromRawArgs,
           to: {
@@ -810,7 +808,7 @@ ${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.to.owner, subaccount})}
       const memo = asciiStringToByteArray('PUPT'); // Reverse top-up memo
 
       const arg = encodeIdl({
-        recordClass: TransferFromArgs,
+        recordClass: Icrc2Idl.TransferFromArgs,
         rawArgs: {
           ...mockIcrcTransferFromRawArgs,
           memo: [memo]
@@ -864,7 +862,7 @@ PUPT`
 
     it('should build a consent message with token fee if no fee as arg', async () => {
       const arg = encodeIdl({
-        recordClass: TransferFromArgs,
+        recordClass: Icrc2Idl.TransferFromArgs,
         rawArgs: {
           ...mockIcrcTransferFromRawArgs,
           fee: []

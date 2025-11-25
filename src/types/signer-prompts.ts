@@ -5,7 +5,7 @@ import {
   ICRC27_ACCOUNTS,
   ICRC49_CALL_CANISTER
 } from '../constants/icrc.constants';
-import type {icrc21_consent_info} from '../declarations/icrc-21';
+import type {Icrc21Did} from '../declarations';
 import {IcrcAccountsSchema} from './icrc-accounts';
 import {IcrcCallCanisterRequestParamsSchema} from './icrc-requests';
 import {IcrcCallCanisterResultSchema, IcrcScopesArraySchema} from './icrc-responses';
@@ -125,7 +125,7 @@ const LoadingConsentMessageSchema = PayloadOriginSchema.extend({
   status: z.literal(LoadingConsentMessageStatusSchema.enum.loading)
 });
 
-const ConsentInfoSchema = z.custom<icrc21_consent_info>();
+const ConsentInfoSchema = z.custom<Icrc21Did.icrc21_consent_info>();
 
 const ConsentInfoOkSchema = z.object({
   Ok: ConsentInfoSchema
