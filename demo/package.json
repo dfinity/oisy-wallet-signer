@@ -55,7 +55,7 @@
 		"@icp-sdk/auth": "^4.2.0",
 		"@icp-sdk/canisters": "^2.0.0",
 		"@icp-sdk/core": "^4.2.1",
-		"zod": "^4.1.11"
+		"zod": "^4.1.13"
 	},
 	"overrides": {
 		"cookie": "^0.7.0"
