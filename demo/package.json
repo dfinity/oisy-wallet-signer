@@ -34,7 +34,7 @@
 		"@sveltejs/vite-plugin-svelte": "^6.2.1",
 		"@tailwindcss/vite": "^4.1.15",
 		"@types/node": "^24.9.1",
-		"autoprefixer": "^10.4.21",
+		"autoprefixer": "^10.4.22",
 		"postcss": "^8.5.6",
 		"prettier": "^3.6.2",
 		"prettier-plugin-organize-imports": "^4.3.0",
