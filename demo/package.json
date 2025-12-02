@@ -51,7 +51,7 @@
 	"type": "module",
 	"dependencies": {
 		"@dfinity/utils": "^4.0.0",
-		"@dfinity/zod-schemas": "^3.0.0",
+		"@dfinity/zod-schemas": "^3.0.1",
 		"@icp-sdk/auth": "^4.2.0",
 		"@icp-sdk/canisters": "^2.0.0",
 		"@icp-sdk/core": "^4.2.1",
