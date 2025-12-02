@@ -1,7 +1,18 @@
-import {IDL} from '@icp-sdk/core/candid';
+import * as candid from '@icp-sdk/core/candid';
 import {Principal} from '@icp-sdk/core/principal';
 import {Icrc1Idl, type Icrc1Did} from '../declarations';
 import {decodeIdl, encodeIdl} from './idl.utils';
+
+vi.mock('@icp-sdk/core/candid', async (importOriginal) => {
+  const actual = await importOriginal<typeof candid>();
+  return {
+    ...actual,
+    IDL: {
+      ...actual.IDL,
+      decode: vi.fn(actual.IDL.decode)
+    }
+  };
+});
 
 describe('idl.utils', () => {
   beforeEach(() => {
@@ -36,11 +47,11 @@ describe('idl.utils', () => {
   });
 
   describe('decodeResult', () => {
-    const mockRecordClass = IDL.Record({someField: IDL.Text});
+    const mockRecordClass = candid.IDL.Record({someField: candid.IDL.Text});
 
     it('should decode the bytes and return the result', () => {
       const mockExpectedObject = {someField: 'test value'};
-      const mockReply = IDL.encode([mockRecordClass], [mockExpectedObject]);
+      const mockReply = candid.IDL.encode([mockRecordClass], [mockExpectedObject]);
 
       const result = decodeIdl<{someField: string}>({
         recordClass: mockRecordClass,
@@ -64,11 +75,10 @@ describe('idl.utils', () => {
     it('should throw an error if more than one object is returned', () => {
       const mockReply = new Uint8Array(10);
 
-      // I'm not sure what pattern would lead decode to return a decoded JsonValue[] with more than one element.
-      // I wonder if the type is correct; maybe the correct type should actually be [JsonValue].
-      // Therefore, mocking agent-js decode for this particular test.
-      vi.mock('@icp-sdk/core/candid', {spy: true});
-      vi.mocked(IDL.decode).mockReturnValue([{someField: 'value1'}, {someField: 'value2'}]);
+      vi.spyOn(candid.IDL, 'decode').mockReturnValue([
+        {someField: 'value1'},
+        {someField: 'value2'}
+      ]);
 
       expect(() =>
         decodeIdl({
