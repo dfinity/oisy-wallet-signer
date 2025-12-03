@@ -12,7 +12,8 @@ export {
   ICRC29,
   ICRC29_STATUS
 } from './constants/icrc.constants';
-export type * from './declarations/icrc/icrc-21';
+
+export type {Icrc1Did, Icrc21Did, Icrc2Did} from './declarations';
 export type * from './types/icrc-accounts';
 export type * from './types/icrc-requests';
 export type * from './types/icrc-responses';
