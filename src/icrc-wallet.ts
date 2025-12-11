@@ -5,10 +5,7 @@ import {
   toTransferArg,
   toTransferFromArgs,
   type ApproveParams,
-  type IcrcApproveError,
-  type IcrcBlockIndex,
-  type IcrcTransferFromError,
-  type IcrcTransferVariantError,
+  type IcrcLedgerDid,
   type TransferFromParams,
   type TransferParams
 } from '@icp-sdk/canisters/ledger/icrc';
@@ -65,7 +62,7 @@ export class IcrcWallet extends RelyingParty {
     params: TransferParams;
     ledgerCanisterId: PrincipalText;
     options?: RelyingPartyRequestOptions;
-  } & Pick<IcrcAccount, 'owner'>): Promise<IcrcBlockIndex> => {
+  } & Pick<IcrcAccount, 'owner'>): Promise<IcrcLedgerDid.BlockIndex> => {
     const rawArgs = toTransferArg(params);
 
     const arg = encodeIdl({
@@ -85,7 +82,7 @@ export class IcrcWallet extends RelyingParty {
       options
     });
 
-    type TransferResult = {Ok: IcrcBlockIndex} | {Err: IcrcTransferVariantError};
+    type TransferResult = {Ok: IcrcLedgerDid.BlockIndex} | {Err: IcrcLedgerDid.TransferError};
 
     const response = await decodeResponse<TransferResult>({
       params: callParams,
@@ -126,7 +123,7 @@ export class IcrcWallet extends RelyingParty {
     params: ApproveParams;
     ledgerCanisterId: PrincipalText;
     options?: RelyingPartyRequestOptions;
-  } & Pick<IcrcAccount, 'owner'>): Promise<IcrcBlockIndex> => {
+  } & Pick<IcrcAccount, 'owner'>): Promise<IcrcLedgerDid.BlockIndex> => {
     const rawArgs = toApproveArgs(params);
 
     const arg = encodeIdl({
@@ -146,7 +143,7 @@ export class IcrcWallet extends RelyingParty {
       options
     });
 
-    type ApproveResult = {Ok: IcrcBlockIndex} | {Err: IcrcApproveError};
+    type ApproveResult = {Ok: IcrcLedgerDid.BlockIndex} | {Err: IcrcLedgerDid.ApproveError};
 
     const response = await decodeResponse<ApproveResult>({
       params: callParams,
@@ -187,7 +184,7 @@ export class IcrcWallet extends RelyingParty {
     params: TransferFromParams;
     ledgerCanisterId: PrincipalText;
     options?: RelyingPartyRequestOptions;
-  } & Pick<IcrcAccount, 'owner'>): Promise<IcrcBlockIndex> => {
+  } & Pick<IcrcAccount, 'owner'>): Promise<IcrcLedgerDid.BlockIndex> => {
     const rawArgs = toTransferFromArgs(params);
 
     const arg = encodeIdl({
@@ -207,7 +204,9 @@ export class IcrcWallet extends RelyingParty {
       options
     });
 
-    type TransferFromResult = {Ok: IcrcBlockIndex} | {Err: IcrcTransferFromError};
+    type TransferFromResult =
+      | {Ok: IcrcLedgerDid.BlockIndex}
+      | {Err: IcrcLedgerDid.TransferFromError};
 
     const response = await decodeResponse<TransferFromResult>({
       params: callParams,

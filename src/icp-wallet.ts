@@ -5,10 +5,9 @@ import {
   toIcrc1TransferRawRequest,
   toIcrc2ApproveRawRequest,
   type BlockHeight,
+  type IcpLedgerDid,
   type Icrc1TransferRequest,
-  type Icrc1TransferResult,
-  type Icrc2ApproveRequest,
-  type Icrc2ApproveResult
+  type Icrc2ApproveRequest
 } from '@icp-sdk/canisters/ledger/icp';
 import {TransferResult} from './constants/icrc-1.idl.constants';
 import {ApproveResult} from './constants/icrc-2.idl.constants';
@@ -92,7 +91,7 @@ export class IcpWallet extends RelyingParty {
       options
     });
 
-    const response = await decodeResponse<Icrc1TransferResult>({
+    const response = await decodeResponse<IcpLedgerDid.Icrc1TransferResult>({
       params: callParams,
       result: callResult,
       resultRecordClass: TransferResult,
@@ -141,7 +140,7 @@ export class IcpWallet extends RelyingParty {
       options
     });
 
-    const response = await decodeResponse<Icrc2ApproveResult>({
+    const response = await decodeResponse<IcpLedgerDid.ApproveResult>({
       params: callParams,
       result: callResult,
       resultRecordClass: ApproveResult,

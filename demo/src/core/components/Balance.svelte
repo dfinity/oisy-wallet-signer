@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { createAgent, isNullish } from '@dfinity/utils';
-	import { AccountIdentifier, LedgerCanister } from '@icp-sdk/canisters/ledger/icp';
+	import { AccountIdentifier, IcpLedgerCanister } from '@icp-sdk/canisters/ledger/icp';
 	import { AnonymousIdentity } from '@icp-sdk/core/agent';
 	import type { Principal } from '@icp-sdk/core/principal';
 	import { formatE8sICP } from '../utils/icp.utils';
@@ -26,7 +26,7 @@
 			...(DEV && { host: LOCAL_REPLICA_URL, fetchRootKey: true })
 		});
 
-		const { accountBalance } = LedgerCanister.create({
+		const { accountBalance } = IcpLedgerCanister.create({
 			agent
 		});
 
