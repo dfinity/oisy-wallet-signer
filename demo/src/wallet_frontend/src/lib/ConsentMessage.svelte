@@ -3,7 +3,7 @@
 		type ConsentMessageApproval,
 		type ConsentMessagePromptPayload,
 		type ResultConsentMessage,
-		type icrc21_consent_info,
+		type Icrc21Did,
 		ICRC21_CALL_CONSENT_MESSAGE,
 		type Rejection
 	} from '@dfinity/oisy-wallet-signer';
@@ -24,7 +24,7 @@
 
 	let approve = $state<ConsentMessageApproval | undefined>(undefined);
 	let reject = $state<Rejection | undefined>(undefined);
-	let consentInfo = $state<icrc21_consent_info | undefined>(undefined);
+	let consentInfo = $state<Icrc21Did.icrc21_consent_info | undefined>(undefined);
 	let consentInfoLevel: 'Warning' | 'Ok' | undefined = $state(undefined);
 
 	let displayMessage: string | undefined = $derived(
