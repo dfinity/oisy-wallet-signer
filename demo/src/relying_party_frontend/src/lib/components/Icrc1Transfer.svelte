@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { IcrcWallet } from '@dfinity/oisy-wallet-signer/icrc-wallet';
 	import { isNullish, nonNullish } from '@dfinity/utils';
-	import type { IcrcBlockIndex, TransferParams } from '@icp-sdk/canisters/ledger/icrc';
+	import type { IcrcLedgerDid, TransferParams } from '@icp-sdk/canisters/ledger/icrc';
 	import Button from '$core/components/Button.svelte';
 	import { E8S_PER_ICP, ICP_LEDGER_CANISTER_ID } from '$core/constants/app.constants';
 	import { authStore } from '$core/stores/auth.store';
@@ -14,7 +14,7 @@
 
 	let { wallet }: Props = $props();
 
-	let result = $state<IcrcBlockIndex | undefined>(undefined);
+	let result = $state<IcrcLedgerDid.BlockIndex | undefined>(undefined);
 
 	const onclick = async () => {
 		// TODO: handle errors

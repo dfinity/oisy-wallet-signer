@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
 	import { createAgent, isNullish } from '@dfinity/utils';
-	import { LedgerCanister } from '@icp-sdk/canisters/ledger/icp';
+	import { IcpLedgerCanister } from '@icp-sdk/canisters/ledger/icp';
 	import { Principal } from '@icp-sdk/core/principal';
 	import Button from '$core/components/Button.svelte';
 	import { DEV, LOCAL_REPLICA_URL } from '$core/constants/app.constants';
@@ -48,7 +48,7 @@
 				identity: $authStore.identity
 			});
 
-			const { icrc1Transfer } = LedgerCanister.create({
+			const { icrc1Transfer } = IcpLedgerCanister.create({
 				agent
 			});
 
