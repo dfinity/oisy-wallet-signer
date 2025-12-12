@@ -33,7 +33,7 @@ describe('format.utils', () => {
     });
 
     it('throws an error for invalid decimals', () => {
-      expect(() => formatAmount({amount: 100n, decimals: -1})).toThrow();
+      expect(() => formatAmount({amount: 100n, decimals: -1})).toThrowError();
     });
   });
 

@@ -44,7 +44,7 @@ describe('icrc-responses', () => {
     };
 
     it('should validate a correct response', () => {
-      expect(() => schema.parse(validResponse)).not.toThrow();
+      expect(() => schema.parse(validResponse)).not.toThrowError();
     });
 
     it('should throw if response has no state', () => {
@@ -61,7 +61,7 @@ describe('icrc-responses', () => {
         }
       };
 
-      expect(() => schema.parse(invalidResponse)).toThrow();
+      expect(() => schema.parse(invalidResponse)).toThrowError();
     });
 
     it('should throw if response has invalid state', () => {
@@ -79,7 +79,7 @@ describe('icrc-responses', () => {
         }
       };
 
-      expect(() => schema.parse(invalidResponse)).toThrow();
+      expect(() => schema.parse(invalidResponse)).toThrowError();
     });
 
     it('should throw if response has invalid method', () => {
@@ -97,7 +97,7 @@ describe('icrc-responses', () => {
         }
       };
 
-      expect(() => schema.parse(invalidResponse)).toThrow();
+      expect(() => schema.parse(invalidResponse)).toThrowError();
     });
 
     it('should throw if response has no method', () => {
@@ -113,7 +113,7 @@ describe('icrc-responses', () => {
         }
       };
 
-      expect(() => schema.parse(invalidResponse)).toThrow();
+      expect(() => schema.parse(invalidResponse)).toThrowError();
     });
 
     it('should throw if response has no scope', () => {
@@ -128,7 +128,7 @@ describe('icrc-responses', () => {
         }
       };
 
-      expect(() => schema.parse(invalidResponse)).toThrow();
+      expect(() => schema.parse(invalidResponse)).toThrowError();
     });
 
     it('should throw if response has empty scope', () => {
@@ -139,7 +139,7 @@ describe('icrc-responses', () => {
         }
       };
 
-      expect(() => schema.parse(invalidResponse)).toThrow();
+      expect(() => schema.parse(invalidResponse)).toThrowError();
     });
 
     it('should throw if response has no scopes', () => {
@@ -150,7 +150,7 @@ describe('icrc-responses', () => {
         result: {}
       };
 
-      expect(() => schema.parse(response)).toThrow();
+      expect(() => schema.parse(response)).toThrowError();
     });
 
     it('should throw if response has no result', () => {
@@ -158,7 +158,7 @@ describe('icrc-responses', () => {
 
       const response = rest;
 
-      expect(() => schema.parse(response)).toThrow();
+      expect(() => schema.parse(response)).toThrowError();
     });
 
     it('should throw if response has no id', () => {
@@ -166,7 +166,7 @@ describe('icrc-responses', () => {
 
       const response = rest;
 
-      expect(() => schema.parse(response)).toThrow();
+      expect(() => schema.parse(response)).toThrowError();
     });
 
     it('should throw if response has no jsonrpc', () => {
@@ -174,7 +174,7 @@ describe('icrc-responses', () => {
 
       const response = rest;
 
-      expect(() => schema.parse(response)).toThrow();
+      expect(() => schema.parse(response)).toThrowError();
     });
   });
 
@@ -187,7 +187,7 @@ describe('icrc-responses', () => {
         state: ICRC25_PERMISSION_GRANTED
       };
 
-      expect(() => IcrcScopeSchema.parse(validPayload)).not.toThrow();
+      expect(() => IcrcScopeSchema.parse(validPayload)).not.toThrowError();
     });
 
     it('should invalidate a payload with missing scope', () => {
@@ -195,7 +195,7 @@ describe('icrc-responses', () => {
         state: ICRC25_PERMISSION_GRANTED
       };
 
-      expect(() => IcrcScopeSchema.parse(invalidPayload)).toThrow();
+      expect(() => IcrcScopeSchema.parse(invalidPayload)).toThrowError();
     });
 
     it('should invalidate a payload with missing state', () => {
@@ -205,7 +205,7 @@ describe('icrc-responses', () => {
         }
       };
 
-      expect(() => IcrcScopeSchema.parse(invalidPayload)).toThrow();
+      expect(() => IcrcScopeSchema.parse(invalidPayload)).toThrowError();
     });
 
     it('should invalidate a payload with an incorrect method', () => {
@@ -216,7 +216,7 @@ describe('icrc-responses', () => {
         state: ICRC25_PERMISSION_GRANTED
       };
 
-      expect(() => IcrcScopeSchema.parse(invalidPayload)).toThrow();
+      expect(() => IcrcScopeSchema.parse(invalidPayload)).toThrowError();
     });
 
     it('should invalidate a payload with an incorrect state', () => {
@@ -227,7 +227,7 @@ describe('icrc-responses', () => {
         state: 'INVALID_STATE'
       };
 
-      expect(() => IcrcScopeSchema.parse(invalidPayload)).toThrow();
+      expect(() => IcrcScopeSchema.parse(invalidPayload)).toThrowError();
     });
 
     it('should invalidate a payload with additional fields', () => {
@@ -239,7 +239,7 @@ describe('icrc-responses', () => {
         extraField: 'EXTRA' // Unwanted field
       };
 
-      expect(() => IcrcScopeSchema.parse(invalidPayload)).toThrow();
+      expect(() => IcrcScopeSchema.parse(invalidPayload)).toThrowError();
     });
   });
 
@@ -254,7 +254,7 @@ describe('icrc-responses', () => {
         ]
       };
 
-      expect(() => IcrcScopesSchema.parse(validPayload)).not.toThrow();
+      expect(() => IcrcScopesSchema.parse(validPayload)).not.toThrowError();
     });
 
     it('should validate a payload with an empty scopes array', () => {
@@ -262,13 +262,13 @@ describe('icrc-responses', () => {
         scopes: []
       };
 
-      expect(() => IcrcScopesSchema.parse(invalidPayload)).not.toThrow();
+      expect(() => IcrcScopesSchema.parse(invalidPayload)).not.toThrowError();
     });
 
     it('should invalidate a payload with missing scopes property', () => {
       const invalidPayload = {};
 
-      expect(() => IcrcScopesSchema.parse(invalidPayload)).toThrow();
+      expect(() => IcrcScopesSchema.parse(invalidPayload)).toThrowError();
     });
 
     it('should invalidate a payload with incorrect scope structure', () => {
@@ -278,7 +278,7 @@ describe('icrc-responses', () => {
         ]
       };
 
-      expect(() => IcrcScopesSchema.parse(invalidPayload)).toThrow();
+      expect(() => IcrcScopesSchema.parse(invalidPayload)).toThrowError();
     });
 
     it('should invalidate a payload with extra fields', () => {
@@ -292,7 +292,7 @@ describe('icrc-responses', () => {
         extraField: 'unexpected'
       };
 
-      expect(() => IcrcScopesSchema.parse(invalidPayload)).toThrow();
+      expect(() => IcrcScopesSchema.parse(invalidPayload)).toThrowError();
     });
   });
 
@@ -305,19 +305,19 @@ describe('icrc-responses', () => {
         }
       ];
 
-      expect(() => IcrcSupportedStandardsSchema.parse(validPayload)).not.toThrow();
+      expect(() => IcrcSupportedStandardsSchema.parse(validPayload)).not.toThrowError();
     });
 
     it('should invalidate an empty array', () => {
       const invalidPayload: unknown = [];
 
-      expect(() => IcrcSupportedStandardsSchema.parse(invalidPayload)).toThrow();
+      expect(() => IcrcSupportedStandardsSchema.parse(invalidPayload)).toThrowError();
     });
 
     it('should invalidate a payload with an invalid URL', () => {
       const invalidPayload = [{name: 'ICRC-27', url: 'invalid-url'}];
 
-      expect(() => IcrcSupportedStandardsSchema.parse(invalidPayload)).toThrow();
+      expect(() => IcrcSupportedStandardsSchema.parse(invalidPayload)).toThrowError();
     });
 
     it('should invalidate a payload with missing name', () => {
@@ -327,7 +327,7 @@ describe('icrc-responses', () => {
         }
       ];
 
-      expect(() => IcrcSupportedStandardsSchema.parse(invalidPayload)).toThrow();
+      expect(() => IcrcSupportedStandardsSchema.parse(invalidPayload)).toThrowError();
     });
 
     it('should invalidate a payload with extra fields', () => {
@@ -339,7 +339,7 @@ describe('icrc-responses', () => {
         }
       ];
 
-      expect(() => IcrcSupportedStandardsSchema.parse(invalidPayload)).toThrow();
+      expect(() => IcrcSupportedStandardsSchema.parse(invalidPayload)).toThrowError();
     });
 
     it('should invalidate a payload with incorrect name type', () => {
@@ -350,7 +350,7 @@ describe('icrc-responses', () => {
         }
       ];
 
-      expect(() => IcrcSupportedStandardsSchema.parse(invalidPayload)).toThrow();
+      expect(() => IcrcSupportedStandardsSchema.parse(invalidPayload)).toThrowError();
     });
   });
 
@@ -369,7 +369,7 @@ describe('icrc-responses', () => {
     };
 
     it('should validate a correct response', () => {
-      expect(() => IcrcSupportedStandardsResponseSchema.parse(validResponse)).not.toThrow();
+      expect(() => IcrcSupportedStandardsResponseSchema.parse(validResponse)).not.toThrowError();
     });
 
     it('should throw if response has no valid url', () => {
@@ -385,7 +385,7 @@ describe('icrc-responses', () => {
         }
       };
 
-      expect(() => IcrcSupportedStandardsResponseSchema.parse(invalidResponse)).toThrow();
+      expect(() => IcrcSupportedStandardsResponseSchema.parse(invalidResponse)).toThrowError();
     });
 
     it('should throw if response has no matching url pattern', () => {
@@ -401,7 +401,7 @@ describe('icrc-responses', () => {
         }
       };
 
-      expect(() => IcrcSupportedStandardsResponseSchema.parse(invalidResponse)).toThrow();
+      expect(() => IcrcSupportedStandardsResponseSchema.parse(invalidResponse)).toThrowError();
     });
 
     it('should throw if response has no url', () => {
@@ -417,7 +417,7 @@ describe('icrc-responses', () => {
         }
       };
 
-      expect(() => IcrcSupportedStandardsResponseSchema.parse(invalidResponse)).toThrow();
+      expect(() => IcrcSupportedStandardsResponseSchema.parse(invalidResponse)).toThrowError();
     });
 
     it('should throw if response has name not matching URL', () => {
@@ -433,7 +433,7 @@ describe('icrc-responses', () => {
         }
       };
 
-      expect(() => IcrcSupportedStandardsResponseSchema.parse(invalidResponse)).toThrow();
+      expect(() => IcrcSupportedStandardsResponseSchema.parse(invalidResponse)).toThrowError();
     });
 
     it('should throw if response has no name', () => {
@@ -449,7 +449,7 @@ describe('icrc-responses', () => {
         }
       };
 
-      expect(() => IcrcSupportedStandardsResponseSchema.parse(invalidResponse)).toThrow();
+      expect(() => IcrcSupportedStandardsResponseSchema.parse(invalidResponse)).toThrowError();
     });
 
     it('should throw if response has no empty supported standards', () => {
@@ -460,7 +460,7 @@ describe('icrc-responses', () => {
         }
       };
 
-      expect(() => IcrcSupportedStandardsResponseSchema.parse(invalidResponse)).toThrow();
+      expect(() => IcrcSupportedStandardsResponseSchema.parse(invalidResponse)).toThrowError();
     });
 
     it('should throw if response has no supported standards', () => {
@@ -472,7 +472,7 @@ describe('icrc-responses', () => {
         result: {}
       };
 
-      expect(() => IcrcSupportedStandardsResponseSchema.parse(response)).toThrow();
+      expect(() => IcrcSupportedStandardsResponseSchema.parse(response)).toThrowError();
     });
 
     it('should throw if response has no result', () => {
@@ -480,7 +480,7 @@ describe('icrc-responses', () => {
 
       const response: IcrcSupportedStandardsResponse = rest;
 
-      expect(() => IcrcSupportedStandardsResponseSchema.parse(response)).toThrow();
+      expect(() => IcrcSupportedStandardsResponseSchema.parse(response)).toThrowError();
     });
 
     it('should throw if response has no id', () => {
@@ -488,7 +488,7 @@ describe('icrc-responses', () => {
 
       const response: Partial<IcrcSupportedStandardsResponse> = rest;
 
-      expect(() => IcrcSupportedStandardsResponseSchema.parse(response)).toThrow();
+      expect(() => IcrcSupportedStandardsResponseSchema.parse(response)).toThrowError();
     });
 
     it('should throw if response has no jsonrpc', () => {
@@ -496,7 +496,7 @@ describe('icrc-responses', () => {
 
       const response: Partial<IcrcSupportedStandardsResponse> = rest;
 
-      expect(() => IcrcSupportedStandardsResponseSchema.parse(response)).toThrow();
+      expect(() => IcrcSupportedStandardsResponseSchema.parse(response)).toThrowError();
     });
   });
 
@@ -508,7 +508,7 @@ describe('icrc-responses', () => {
     };
 
     it('should validate a correct response', () => {
-      expect(() => IcrcReadyResponseSchema.parse(validResponse)).not.toThrow();
+      expect(() => IcrcReadyResponseSchema.parse(validResponse)).not.toThrowError();
     });
 
     it('should throw if response has no valid result string', () => {
@@ -518,7 +518,7 @@ describe('icrc-responses', () => {
         result: 'test'
       };
 
-      expect(() => IcrcReadyResponseSchema.parse(invalidResponse)).toThrow();
+      expect(() => IcrcReadyResponseSchema.parse(invalidResponse)).toThrowError();
     });
 
     it('should throw if response has no valid result type', () => {
@@ -530,7 +530,7 @@ describe('icrc-responses', () => {
         }
       };
 
-      expect(() => IcrcReadyResponseSchema.parse(invalidResponse)).toThrow();
+      expect(() => IcrcReadyResponseSchema.parse(invalidResponse)).toThrowError();
     });
 
     it('should throw if response has no result', () => {
@@ -538,7 +538,7 @@ describe('icrc-responses', () => {
 
       const response: IcrcReadyResponse = rest;
 
-      expect(() => IcrcReadyResponseSchema.parse(response)).toThrow();
+      expect(() => IcrcReadyResponseSchema.parse(response)).toThrowError();
     });
 
     it('should throw if response has no id', () => {
@@ -546,7 +546,7 @@ describe('icrc-responses', () => {
 
       const response: Partial<IcrcReadyResponse> = rest;
 
-      expect(() => IcrcReadyResponseSchema.parse(response)).toThrow();
+      expect(() => IcrcReadyResponseSchema.parse(response)).toThrowError();
     });
 
     it('should throw if response has no jsonrpc', () => {
@@ -554,7 +554,7 @@ describe('icrc-responses', () => {
 
       const response: Partial<IcrcReadyResponse> = rest;
 
-      expect(() => IcrcReadyResponseSchema.parse(response)).toThrow();
+      expect(() => IcrcReadyResponseSchema.parse(response)).toThrowError();
     });
   });
 
@@ -568,7 +568,7 @@ describe('icrc-responses', () => {
     };
 
     it('should validate a correct response', () => {
-      expect(() => IcrcAccountsResponseSchema.parse(validResponse)).not.toThrow();
+      expect(() => IcrcAccountsResponseSchema.parse(validResponse)).not.toThrowError();
     });
 
     it('should throw if response has an invalid Principal', () => {
@@ -583,7 +583,7 @@ describe('icrc-responses', () => {
         }
       };
 
-      expect(() => IcrcAccountsResponseSchema.parse(invalidResponse)).toThrow();
+      expect(() => IcrcAccountsResponseSchema.parse(invalidResponse)).toThrowError();
     });
 
     it('should throw if response has a subaccount that is not 32 bytes long', () => {
@@ -599,7 +599,7 @@ describe('icrc-responses', () => {
         }
       };
 
-      expect(() => IcrcAccountsResponseSchema.parse(invalidResponse)).toThrow();
+      expect(() => IcrcAccountsResponseSchema.parse(invalidResponse)).toThrowError();
     });
 
     it('should throw if response has an account with extra fields', () => {
@@ -615,7 +615,7 @@ describe('icrc-responses', () => {
         }
       };
 
-      expect(() => IcrcAccountsResponseSchema.parse(invalidResponse)).toThrow();
+      expect(() => IcrcAccountsResponseSchema.parse(invalidResponse)).toThrowError();
     });
 
     it('should throw if response has no accounts field', () => {
@@ -626,7 +626,7 @@ describe('icrc-responses', () => {
         result: {}
       };
 
-      expect(() => IcrcAccountsResponseSchema.parse(response)).toThrow();
+      expect(() => IcrcAccountsResponseSchema.parse(response)).toThrowError();
     });
 
     it('should throw if response has no result field', () => {
@@ -634,7 +634,7 @@ describe('icrc-responses', () => {
 
       const response = rest;
 
-      expect(() => IcrcAccountsResponseSchema.parse(response)).toThrow();
+      expect(() => IcrcAccountsResponseSchema.parse(response)).toThrowError();
     });
 
     it('should throw if response has no id', () => {
@@ -642,7 +642,7 @@ describe('icrc-responses', () => {
 
       const response = rest;
 
-      expect(() => IcrcAccountsResponseSchema.parse(response)).toThrow();
+      expect(() => IcrcAccountsResponseSchema.parse(response)).toThrowError();
     });
 
     it('should throw if response has no jsonrpc', () => {
@@ -650,7 +650,7 @@ describe('icrc-responses', () => {
 
       const response = rest;
 
-      expect(() => IcrcAccountsResponseSchema.parse(response)).toThrow();
+      expect(() => IcrcAccountsResponseSchema.parse(response)).toThrowError();
     });
 
     it('should throw if response has an empty accounts array', () => {
@@ -661,7 +661,7 @@ describe('icrc-responses', () => {
         }
       };
 
-      expect(() => IcrcAccountsResponseSchema.parse(invalidResponse)).toThrow();
+      expect(() => IcrcAccountsResponseSchema.parse(invalidResponse)).toThrowError();
     });
   });
 
@@ -677,7 +677,7 @@ describe('icrc-responses', () => {
 
     describe('Result', () => {
       it('should validate a correct result payload', () => {
-        expect(() => IcrcCallCanisterResultSchema.parse(validResponse.result)).not.toThrow();
+        expect(() => IcrcCallCanisterResultSchema.parse(validResponse.result)).not.toThrowError();
       });
 
       it('should throw if contentMap is invalid (not Base64 string)', () => {
@@ -686,7 +686,7 @@ describe('icrc-responses', () => {
           contentMap: 'invalid-content'
         };
 
-        expect(() => IcrcCallCanisterResultSchema.parse(invalidPayload)).toThrow();
+        expect(() => IcrcCallCanisterResultSchema.parse(invalidPayload)).toThrowError();
       });
 
       it('should throw if certificate is invalid (not Base64 string)', () => {
@@ -695,19 +695,19 @@ describe('icrc-responses', () => {
           certificate: 'invalid-certificate'
         };
 
-        expect(() => IcrcCallCanisterResultSchema.parse(invalidPayload)).toThrow();
+        expect(() => IcrcCallCanisterResultSchema.parse(invalidPayload)).toThrowError();
       });
 
       it('should throw if contentMap is missing', () => {
         const {contentMap: _, ...rest} = validResponse.result;
 
-        expect(() => IcrcCallCanisterResultSchema.parse(rest)).toThrow();
+        expect(() => IcrcCallCanisterResultSchema.parse(rest)).toThrowError();
       });
 
       it('should throw if certificate is missing', () => {
         const {certificate: _, ...rest} = validResponse.result;
 
-        expect(() => IcrcCallCanisterResultSchema.parse(rest)).toThrow();
+        expect(() => IcrcCallCanisterResultSchema.parse(rest)).toThrowError();
       });
 
       it('should throw if there are extra fields in the payload', () => {
@@ -716,13 +716,13 @@ describe('icrc-responses', () => {
           extraField: 'unexpected'
         };
 
-        expect(() => IcrcCallCanisterResultSchema.parse(invalidPayload)).toThrow();
+        expect(() => IcrcCallCanisterResultSchema.parse(invalidPayload)).toThrowError();
       });
     });
 
     describe('Response', () => {
       it('should validate a correct response', () => {
-        expect(() => IcrcCallCanisterResponseSchema.parse(validResponse)).not.toThrow();
+        expect(() => IcrcCallCanisterResponseSchema.parse(validResponse)).not.toThrowError();
       });
 
       it('should throw if response has invalid contentMap (not Base64 string)', () => {
@@ -734,7 +734,7 @@ describe('icrc-responses', () => {
           }
         };
 
-        expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
+        expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrowError();
       });
 
       it('should throw if response has invalid certificate (not Base64 string)', () => {
@@ -746,7 +746,7 @@ describe('icrc-responses', () => {
           }
         };
 
-        expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
+        expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrowError();
       });
 
       it('should throw if response has missing contentMap', () => {
@@ -757,7 +757,7 @@ describe('icrc-responses', () => {
           result: rest
         };
 
-        expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
+        expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrowError();
       });
 
       it('should throw if response has missing certificate', () => {
@@ -768,7 +768,7 @@ describe('icrc-responses', () => {
           result: rest
         };
 
-        expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
+        expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrowError();
       });
 
       it('should throw if response has extra fields in result', () => {
@@ -780,7 +780,7 @@ describe('icrc-responses', () => {
           }
         };
 
-        expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
+        expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrowError();
       });
 
       it('should throw if response has no result field', () => {
@@ -788,7 +788,7 @@ describe('icrc-responses', () => {
 
         const invalidResponse = rest;
 
-        expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
+        expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrowError();
       });
 
       it('should throw if response has no id', () => {
@@ -796,7 +796,7 @@ describe('icrc-responses', () => {
 
         const invalidResponse = rest;
 
-        expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
+        expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrowError();
       });
 
       it('should throw if response has no jsonrpc field', () => {
@@ -804,7 +804,7 @@ describe('icrc-responses', () => {
 
         const invalidResponse = rest;
 
-        expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrow();
+        expect(() => IcrcCallCanisterResponseSchema.parse(invalidResponse)).toThrowError();
       });
     });
   });
