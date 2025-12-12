@@ -137,7 +137,7 @@ describe('CustomHttpAgent', () => {
 
       certificate = await httpAgent.Certificate.create({
         certificate: hexStringToUint8Array(mockRepliedLocalCertificate),
-        canisterId: mockRequestDetails.canister_id,
+        principal: {canisterId: mockRequestDetails.canister_id},
         rootKey: mockLocalIcRootKey
       });
     });

@@ -27,7 +27,7 @@
 	},
 	"devDependencies": {
 		"@dfinity/eslint-config-oisy-wallet": "^0.2.3",
-		"@junobuild/config": "^2.6.0",
+		"@junobuild/config": "^2.7.0",
 		"@junobuild/vite-plugin": "^4.4.0",
 		"@sveltejs/adapter-static": "^3.0.10",
 		"@sveltejs/kit": "^2.49.0",
@@ -50,15 +50,17 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@dfinity/utils": "^4.0.0",
-		"@dfinity/zod-schemas": "^3.0.0",
-		"@icp-sdk/auth": "^4.2.0",
-		"@icp-sdk/canisters": "^3.0.0",
-		"@icp-sdk/core": "^4.2.1",
+		"@dfinity/utils": "4.0.2-beta-2025-12-11",
+		"@dfinity/zod-schemas": "3.0.2-beta-2025-12-11",
+		"@icp-sdk/auth": "5.0.0-beta.1",
+		"@icp-sdk/canisters": "3.0.0-beta-2025-12-11",
+		"@icp-sdk/core": "5.0.0-beta.1",
 		"zod": "^4.1.13"
 	},
 	"overrides": {
-		"cookie": "^0.7.0"
+		"cookie": "^0.7.0",
+		"@dfinity/utils": "4.0.2-beta-2025-12-11",
+		"@dfinity/zod-schemas": "3.0.2-beta-2025-12-11"
 	},
 	"engines": {
 		"node": ">=24",
