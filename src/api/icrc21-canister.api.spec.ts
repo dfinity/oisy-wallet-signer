@@ -127,7 +127,7 @@ describe('icrc-21.canister.api', () => {
           canisterId: mockCanisterId,
           request: consentMessageRequest
         })
-      ).rejects.toThrow(mockError);
+      ).rejects.toThrowError(mockError);
     });
   });
 

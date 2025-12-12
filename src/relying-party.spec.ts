@@ -84,7 +84,7 @@ describe('Relying Party', () => {
         it('should throw connection timeout error', async () => {
           vi.spyOn(relyingPartyHandlers, 'retryRequestStatus').mockResolvedValue('timeout');
 
-          await expect(RelyingParty.connect(mockParameters)).rejects.toThrow(
+          await expect(RelyingParty.connect(mockParameters)).rejects.toThrowError(
             'Connection timeout. Unable to connect to the signer.'
           );
         });
@@ -92,7 +92,7 @@ describe('Relying Party', () => {
         it('should assert edge case signer not defined but request status success', async () => {
           vi.spyOn(relyingPartyHandlers, 'retryRequestStatus').mockResolvedValue('ready');
 
-          await expect(RelyingParty.connect(mockParameters)).rejects.toThrow(
+          await expect(RelyingParty.connect(mockParameters)).rejects.toThrowError(
             'Unexpected error. The request status succeeded, but the signer response is not defined.'
           );
         });
@@ -114,7 +114,7 @@ describe('Relying Party', () => {
 
           window.dispatchEvent(messageEvent);
 
-          await expect(promise).rejects.toThrow(
+          await expect(promise).rejects.toThrowError(
             `The response origin ${hackerOrigin} does not match the requested signer URL ${mockParameters.url}.`
           );
         });
@@ -122,7 +122,7 @@ describe('Relying Party', () => {
         it('should throw error if the signer options are not well formatted', async () => {
           const incorrectOrigin = 'test';
 
-          await expect(RelyingParty.connect({url: incorrectOrigin})).rejects.toThrow(
+          await expect(RelyingParty.connect({url: incorrectOrigin})).rejects.toThrowError(
             'Options cannot be parsed:'
           );
         });
@@ -332,7 +332,7 @@ describe('Relying Party', () => {
           await expect(
             // @ts-expect-error: we are testing this on purpose
             relyingParty.supportedStandards({options: {timeoutInMilliseconds: 'test'}})
-          ).rejects.toThrow('Wallet request options cannot be parsed:');
+          ).rejects.toThrowError('Wallet request options cannot be parsed:');
         });
 
         const options = [
@@ -424,7 +424,7 @@ describe('Relying Party', () => {
 
           window.dispatchEvent(messageEvent);
 
-          await expect(promise).rejects.toThrow(
+          await expect(promise).rejects.toThrowError(
             `The response origin ${hackerOrigin} does not match the signer origin ${mockParameters.url}.`
           );
         });
@@ -456,7 +456,7 @@ describe('Relying Party', () => {
             message: errorMsg
           };
 
-          await expect(promise).rejects.toThrow(new RelyingPartyResponseError(error));
+          await expect(promise).rejects.toThrowError(new RelyingPartyResponseError(error));
         });
 
         it('should throw error if the signer popup is closed', async () => {
@@ -467,7 +467,7 @@ describe('Relying Party', () => {
 
           window.close();
 
-          await expect(relyingParty.supportedStandards()).rejects.toThrow(
+          await expect(relyingParty.supportedStandards()).rejects.toThrowError(
             'The signer has been closed. Your request cannot be processed.'
           );
 
@@ -536,7 +536,7 @@ describe('Relying Party', () => {
 
           window.dispatchEvent(messageEventWithDifferentSource);
 
-          await expect(async () => await promise).rejects.toThrow(
+          await expect(async () => await promise).rejects.toThrowError(
             'The response is not originating from the window that was opened.'
           );
         });
@@ -569,7 +569,7 @@ describe('Relying Party', () => {
             await expect(
               // @ts-expect-error: we are testing this on purpose
               relyingParty.permissions({options: {timeoutInMilliseconds: 'test'}})
-            ).rejects.toThrow('Wallet request options cannot be parsed:');
+            ).rejects.toThrowError('Wallet request options cannot be parsed:');
           });
 
           const options = [
@@ -660,7 +660,7 @@ describe('Relying Party', () => {
 
             window.dispatchEvent(messageEvent);
 
-            await expect(promise).rejects.toThrow(
+            await expect(promise).rejects.toThrowError(
               `The response origin ${hackerOrigin} does not match the signer origin ${mockParameters.url}.`
             );
           });
@@ -692,7 +692,7 @@ describe('Relying Party', () => {
               message: errorMsg
             };
 
-            await expect(promise).rejects.toThrow(new RelyingPartyResponseError(error));
+            await expect(promise).rejects.toThrowError(new RelyingPartyResponseError(error));
           });
 
           it('should throw error if the signer popup is closed', async () => {
@@ -703,7 +703,7 @@ describe('Relying Party', () => {
 
             window.close();
 
-            await expect(relyingParty.permissions()).rejects.toThrow(
+            await expect(relyingParty.permissions()).rejects.toThrowError(
               'The signer has been closed. Your request cannot be processed.'
             );
 
@@ -772,7 +772,7 @@ describe('Relying Party', () => {
 
             window.dispatchEvent(messageEventWithDifferentSource);
 
-            await expect(async () => await promise).rejects.toThrow(
+            await expect(async () => await promise).rejects.toThrowError(
               'The response is not originating from the window that was opened.'
             );
           });
@@ -785,7 +785,7 @@ describe('Relying Party', () => {
             await expect(
               // @ts-expect-error: we are testing this on purpose
               relyingParty.requestPermissions({options: {timeoutInMilliseconds: 'test'}})
-            ).rejects.toThrow('Wallet request options cannot be parsed:');
+            ).rejects.toThrowError('Wallet request options cannot be parsed:');
           });
 
           const options = [
@@ -877,7 +877,7 @@ describe('Relying Party', () => {
 
             window.dispatchEvent(messageEvent);
 
-            await expect(promise).rejects.toThrow(
+            await expect(promise).rejects.toThrowError(
               `The response origin ${hackerOrigin} does not match the signer origin ${mockParameters.url}.`
             );
           });
@@ -909,7 +909,7 @@ describe('Relying Party', () => {
               message: errorMsg
             };
 
-            await expect(promise).rejects.toThrow(new RelyingPartyResponseError(error));
+            await expect(promise).rejects.toThrowError(new RelyingPartyResponseError(error));
           });
 
           it('should throw error if the signer popup is closed', async () => {
@@ -920,7 +920,7 @@ describe('Relying Party', () => {
 
             window.close();
 
-            await expect(relyingParty.requestPermissions()).rejects.toThrow(
+            await expect(relyingParty.requestPermissions()).rejects.toThrowError(
               'The signer has been closed. Your request cannot be processed.'
             );
 
@@ -1016,7 +1016,7 @@ describe('Relying Party', () => {
 
             window.dispatchEvent(messageEventWithDifferentSource);
 
-            await expect(async () => await promise).rejects.toThrow(
+            await expect(async () => await promise).rejects.toThrowError(
               'The response is not originating from the window that was opened.'
             );
           });
@@ -1044,7 +1044,7 @@ describe('Relying Party', () => {
           await expect(
             // @ts-expect-error: we are testing this on purpose
             relyingParty.accounts({options: {timeoutInMilliseconds: 'test'}})
-          ).rejects.toThrow('Wallet request options cannot be parsed:');
+          ).rejects.toThrowError('Wallet request options cannot be parsed:');
         });
 
         const options = [
@@ -1135,7 +1135,7 @@ describe('Relying Party', () => {
 
           window.dispatchEvent(messageEvent);
 
-          await expect(promise).rejects.toThrow(
+          await expect(promise).rejects.toThrowError(
             `The response origin ${hackerOrigin} does not match the signer origin ${mockParameters.url}.`
           );
         });
@@ -1167,7 +1167,7 @@ describe('Relying Party', () => {
             message: errorMsg
           };
 
-          await expect(promise).rejects.toThrow(new RelyingPartyResponseError(error));
+          await expect(promise).rejects.toThrowError(new RelyingPartyResponseError(error));
         });
 
         it('should throw error if the signer popup is closed', async () => {
@@ -1178,7 +1178,7 @@ describe('Relying Party', () => {
 
           window.close();
 
-          await expect(relyingParty.accounts()).rejects.toThrow(
+          await expect(relyingParty.accounts()).rejects.toThrowError(
             'The signer has been closed. Your request cannot be processed.'
           );
 
@@ -1247,7 +1247,7 @@ describe('Relying Party', () => {
 
           window.dispatchEvent(messageEventWithDifferentSource);
 
-          await expect(async () => await promise).rejects.toThrow(
+          await expect(async () => await promise).rejects.toThrowError(
             'The response is not originating from the window that was opened.'
           );
         });
@@ -1300,7 +1300,7 @@ describe('Relying Party', () => {
           await expect(
             // @ts-expect-error: we are testing this on purpose
             relyingParty.call({options: {timeoutInMilliseconds: 'test'}})
-          ).rejects.toThrow('Wallet request options cannot be parsed:');
+          ).rejects.toThrowError('Wallet request options cannot be parsed:');
         });
 
         const options = [
@@ -1389,7 +1389,7 @@ describe('Relying Party', () => {
 
           window.dispatchEvent(messageEvent);
 
-          await expect(promise).rejects.toThrow(
+          await expect(promise).rejects.toThrowError(
             `The response origin ${hackerOrigin} does not match the signer origin ${mockParameters.url}.`
           );
         });
@@ -1424,7 +1424,7 @@ describe('Relying Party', () => {
             message: errorMsg
           };
 
-          await expect(promise).rejects.toThrow(new RelyingPartyResponseError(error));
+          await expect(promise).rejects.toThrowError(new RelyingPartyResponseError(error));
         });
 
         it('should throw error if the signer popup is closed', async () => {
@@ -1435,9 +1435,9 @@ describe('Relying Party', () => {
 
           window.close();
 
-          await expect(relyingParty.testCall({params: mockCallCanisterParams})).rejects.toThrow(
-            'The signer has been closed. Your request cannot be processed.'
-          );
+          await expect(
+            relyingParty.testCall({params: mockCallCanisterParams})
+          ).rejects.toThrowError('The signer has been closed. Your request cannot be processed.');
 
           spy.mockReset();
 
@@ -1538,7 +1538,7 @@ describe('Relying Party', () => {
 
           window.dispatchEvent(messageEventWithDifferentSource);
 
-          await expect(async () => await promise).rejects.toThrow(
+          await expect(async () => await promise).rejects.toThrowError(
             'The response is not originating from the window that was opened.'
           );
         });
@@ -1608,7 +1608,7 @@ describe('Relying Party', () => {
         it('should throw an error if no permissions data is returned by the signer', async () => {
           vi.spyOn(relyingParty, 'permissions').mockResolvedValue([]);
 
-          await expect(relyingParty.requestPermissionsNotGranted()).rejects.toThrow(
+          await expect(relyingParty.requestPermissionsNotGranted()).rejects.toThrowError(
             'The signer did not provide any data about the current set of permissions.'
           );
         });
@@ -1616,7 +1616,7 @@ describe('Relying Party', () => {
         it('should throw an error if no permissions data is returned after requesting permissions', async () => {
           vi.spyOn(relyingParty, 'requestPermissions').mockResolvedValue([]);
 
-          await expect(relyingParty.requestPermissionsNotGranted()).rejects.toThrow(
+          await expect(relyingParty.requestPermissionsNotGranted()).rejects.toThrowError(
             'The signer did not provide any data about the current set of permissions following the request.'
           );
         });
@@ -1626,7 +1626,7 @@ describe('Relying Party', () => {
             new Error('Permissions check failed')
           );
 
-          await expect(relyingParty.requestPermissionsNotGranted()).rejects.toThrow(
+          await expect(relyingParty.requestPermissionsNotGranted()).rejects.toThrowError(
             'Permissions check failed'
           );
         });
@@ -1636,7 +1636,7 @@ describe('Relying Party', () => {
             new Error('Request permissions failed')
           );
 
-          await expect(relyingParty.requestPermissionsNotGranted()).rejects.toThrow(
+          await expect(relyingParty.requestPermissionsNotGranted()).rejects.toThrowError(
             'Request permissions failed'
           );
         });
@@ -1662,7 +1662,7 @@ describe('Relying Party', () => {
     });
 
     it('should throw cannot open window', async () => {
-      await expect(RelyingParty.connect(mockParameters)).rejects.toThrow(
+      await expect(RelyingParty.connect(mockParameters)).rejects.toThrowError(
         'Unable to open the signer window.'
       );
     });
