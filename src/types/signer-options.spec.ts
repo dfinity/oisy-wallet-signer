@@ -11,7 +11,7 @@ describe('SignerOptions', () => {
         owner: identity
       };
 
-      expect(() => SignerOptionsSchema.parse(validSignerOptions)).not.toThrow();
+      expect(() => SignerOptionsSchema.parse(validSignerOptions)).not.toThrowError();
     });
 
     it('should throw an error for invalid identity', () => {
@@ -21,7 +21,7 @@ describe('SignerOptions', () => {
         owner: invalidIdentity
       };
 
-      expect(() => SignerOptionsSchema.parse(invalidSignerOptions)).toThrow(
+      expect(() => SignerOptionsSchema.parse(invalidSignerOptions)).toThrowError(
         'The value provided is not a valid Identity.'
       );
     });
@@ -33,7 +33,7 @@ describe('SignerOptions', () => {
         owner: invalidIdentity
       };
 
-      expect(() => SignerOptionsSchema.parse(invalidSignerOptions)).toThrow(
+      expect(() => SignerOptionsSchema.parse(invalidSignerOptions)).toThrowError(
         'The value provided is not a valid Identity.'
       );
     });
@@ -43,7 +43,7 @@ describe('SignerOptions', () => {
         owner: new AnonymousIdentity()
       };
 
-      expect(() => SignerOptionsSchema.parse(invalidSignerOptions)).toThrow(
+      expect(() => SignerOptionsSchema.parse(invalidSignerOptions)).toThrowError(
         'The Principal is anonymous and cannot be used.'
       );
     });
@@ -68,7 +68,7 @@ describe('SignerOptions', () => {
         host: 'https://test.com'
       };
 
-      expect(() => SignerOptionsSchema.parse(validSignerOptions)).not.toThrow();
+      expect(() => SignerOptionsSchema.parse(validSignerOptions)).not.toThrowError();
     });
 
     it('should throw an error for an invalid host URL', () => {
@@ -101,7 +101,7 @@ describe('SignerOptions', () => {
         host: 'http://localhost:4987'
       };
 
-      expect(() => SignerOptionsSchema.parse(validSignerOptions)).not.toThrow();
+      expect(() => SignerOptionsSchema.parse(validSignerOptions)).not.toThrowError();
     });
   });
 
@@ -126,7 +126,7 @@ describe('SignerOptions', () => {
         }
       };
 
-      expect(() => SignerOptionsSchema.parse(validSignerOptions)).not.toThrow();
+      expect(() => SignerOptionsSchema.parse(validSignerOptions)).not.toThrowError();
     });
 
     it('should throw an error for invalid sessionPermissionExpirationInMilliseconds (negative)', () => {
@@ -137,7 +137,7 @@ describe('SignerOptions', () => {
         }
       };
 
-      expect(() => SignerOptionsSchema.parse(invalidSignerOptions)).toThrow();
+      expect(() => SignerOptionsSchema.parse(invalidSignerOptions)).toThrowError();
     });
 
     it('should throw an error for invalid sessionPermissionExpirationInMilliseconds (zero)', () => {
@@ -148,7 +148,7 @@ describe('SignerOptions', () => {
         }
       };
 
-      expect(() => SignerOptionsSchema.parse(invalidSignerOptions)).toThrow();
+      expect(() => SignerOptionsSchema.parse(invalidSignerOptions)).toThrowError();
     });
 
     it('should throw an error for non-numeric sessionPermissionExpirationInMilliseconds', () => {
@@ -159,7 +159,7 @@ describe('SignerOptions', () => {
         }
       };
 
-      expect(() => SignerOptionsSchema.parse(invalidSignerOptions)).toThrow();
+      expect(() => SignerOptionsSchema.parse(invalidSignerOptions)).toThrowError();
     });
 
     it('should validate when sessionPermissionExpirationInMilliseconds is a positive number', () => {
@@ -170,7 +170,7 @@ describe('SignerOptions', () => {
         }
       };
 
-      expect(() => SignerOptionsSchema.parse(validSignerOptions)).not.toThrow();
+      expect(() => SignerOptionsSchema.parse(validSignerOptions)).not.toThrowError();
     });
   });
 });

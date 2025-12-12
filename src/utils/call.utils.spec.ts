@@ -58,7 +58,7 @@ describe('call.utils', () => {
           params: mockLocalCallParams,
           result: mockLocalCallResult
         })
-      ).not.toThrow();
+      ).not.toThrowError();
     });
 
     it('should call assertCallMethod with correct params', () => {
@@ -185,7 +185,9 @@ describe('call.utils', () => {
             result: mockLocalCallResult,
             resultRecordClass: TransferResult
           })
-        ).rejects.toThrow('Missing agent root key, which is required to certify the response.');
+        ).rejects.toThrowError(
+          'Missing agent root key, which is required to certify the response.'
+        );
       });
     });
 
