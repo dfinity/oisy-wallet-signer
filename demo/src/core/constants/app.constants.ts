@@ -4,7 +4,7 @@ export const { PROD } = import.meta.env;
 const OISY_PROD_URL = 'https://oisy.com/sign';
 export const WALLET_DEFAULT_URL = PROD ? OISY_PROD_URL : 'http://localhost:5174/sign';
 
-export const WALLET_TEST_SUBDOMAINS = ['staging', 'beta', 'fe1', 'audit'];
+export const WALLET_TEST_SUBDOMAINS = ['staging', 'beta', 'fe1', 'fe3', 'audit'];
 
 export const LOCAL_REPLICA_HOST = import.meta.env.VITE_LOCAL_REPLICA_HOST;
 export const LOCAL_REPLICA_URL = `http://${LOCAL_REPLICA_HOST}`;
