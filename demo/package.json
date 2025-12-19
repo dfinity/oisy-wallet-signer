@@ -50,11 +50,11 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@dfinity/utils": "^4.0.0",
+		"@dfinity/utils": "^4.1.0",
 		"@dfinity/zod-schemas": "^3.0.0",
-		"@icp-sdk/auth": "^4.2.0",
-		"@icp-sdk/canisters": "^3.0.0",
-		"@icp-sdk/core": "^4.2.1",
+		"@icp-sdk/auth": "^5.0.0",
+		"@icp-sdk/canisters": "^3.2.0",
+		"@icp-sdk/core": "^5.0.0",
 		"zod": "^4.1.13"
 	},
 	"overrides": {

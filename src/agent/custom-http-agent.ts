@@ -119,7 +119,7 @@ export class CustomHttpAgent extends HttpAgentProvider {
     const certificate = await Certificate.create({
       certificate: cert,
       rootKey: this._agent.rootKey,
-      canisterId: Principal.fromText(canisterId)
+      principal: {canisterId: Principal.fromText(canisterId)}
     });
 
     const {result: replyCheck} = this.assertReply({

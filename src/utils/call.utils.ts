@@ -88,7 +88,7 @@ export const decodeResponse = async <T>({
   const certificate = await Certificate.create({
     certificate: base64ToUint8Array(cert),
     rootKey: agent.rootKey,
-    canisterId: Principal.fromText(canisterId)
+    principal: {canisterId: Principal.fromText(canisterId)}
   });
 
   const requestId = requestIdOf(callRequest);
