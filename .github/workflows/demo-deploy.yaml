@@ -18,13 +18,21 @@ jobs:
         with:
           folder: 'demo'
       - name: Build
-        run: npm run build:party
+        run: npm run build
         working-directory: 'demo'
 
-      - name: Deploy to Juno
+      - name: Deploy Relying Party
         uses: junobuild/juno-action@27cee61ad0a0d5d5cd675f3638ce5a7c022099d2 # v0.4.22
         with:
           args: hosting deploy
         env:
           JUNO_TOKEN: ${{ secrets.JUNO_TOKEN }}
           PROJECT_PATH: demo/src/relying_party_frontend
+
+      - name: Deploy Signer
+        uses: junobuild/juno-action@27cee61ad0a0d5d5cd675f3638ce5a7c022099d2 # v0.4.22
+        with:
+          args: hosting deploy
+        env:
+          JUNO_TOKEN: ${{ secrets.JUNO_TOKEN }}
+          PROJECT_PATH: demo/src/wallet_frontend
