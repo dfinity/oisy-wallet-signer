@@ -11,7 +11,7 @@ export const WALLET_TEST_SUBDOMAINS = [
 	'audit'
 ];
 
-export const WALLET_SIGNER_DEMO_MAINNET_URL = 'https://lr6cl-oyaaa-aaaal-asuga-cai.icp0.io';
+export const WALLET_SIGNER_DEMO_MAINNET_URL = 'https://lr6cl-oyaaa-aaaal-asuga-cai.icp0.io/sign';
 
 export const LOCAL_REPLICA_HOST = import.meta.env.VITE_LOCAL_REPLICA_HOST;
 export const LOCAL_REPLICA_URL = `http://${LOCAL_REPLICA_HOST}`;
