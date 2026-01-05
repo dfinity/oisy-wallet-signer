@@ -3,7 +3,7 @@
 	import { isNullish } from '@dfinity/utils';
 	import Balance from '$core/components/Balance.svelte';
 	import UserId from '$core/components/UserId.svelte';
-	import { LOCAL_REPLICA_URL } from '$core/constants/app.constants';
+	import { LOCAL_REPLICA_URL, PROD } from '$core/constants/app.constants';
 	import { notSignedIn } from '$core/derived/auth.derived';
 	import { authStore } from '$core/stores/auth.store';
 	import CallCanister from '$lib/CallCanister.svelte';
@@ -27,7 +27,7 @@
 
 		signer = Signer.init({
 			owner: $authStore.identity,
-			host: LOCAL_REPLICA_URL
+			...(!PROD && { host: LOCAL_REPLICA_URL })
 		});
 
 		return () => {
