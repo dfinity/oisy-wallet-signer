@@ -28,7 +28,7 @@ export class PartyPage extends IdentityPage {
    * @override
    */
   async signIn(): Promise<void> {
-    this.identity = await this.#partyIIPage.signInWithNewIdentity();
+    await this.#partyIIPage.signIn();
   }
 
   async waitReady(): Promise<void> {
@@ -53,7 +53,6 @@ export class PartyPage extends IdentityPage {
     await expect(walletPage).toHaveTitle('Wallet');
 
     this.#walletPage = new WalletPage({
-      identity: this.identity,
       page: walletPage,
       context: this.context,
       browser: this.browser
