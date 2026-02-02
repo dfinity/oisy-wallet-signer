@@ -274,13 +274,11 @@ export class PartyPage extends IdentityPage {
   }
 
   async icrc2TransferFrom(): Promise<void> {
-    await this.#walletPage?.getICP();
-
-    await this.#walletPage?.assertBalance('55.0001');
+    await this.#walletPage?.assertBalance('54.4998');
 
     await this.#walletPage?.approveConsentMessage();
 
-    await this.#walletPage?.assertBalance('54.7500');
+    await this.#walletPage?.assertBalance('54.2497');
 
     await this.assertBalance('0.2500');
   }
