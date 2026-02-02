@@ -280,7 +280,7 @@ export class PartyPage extends IdentityPage {
 
     await this.#walletPage?.assertBalance('54.2497');
 
-    await this.assertBalance('0.2500');
+    await this.assertBalance('0.7500');
   }
 
   async closeWalletWindow(): Promise<void> {
