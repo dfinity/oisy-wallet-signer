@@ -26,7 +26,7 @@ testWithII.afterAll(async () => {
   await partyPage.close();
 });
 
-testWithII('should sign-in relying-party with a new user', async () => {
+testWithII('should sign-in relying-party', async () => {
   await partyPage.signIn();
 });
 
