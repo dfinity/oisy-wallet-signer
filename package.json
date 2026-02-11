@@ -1,6 +1,6 @@
 {
   "name": "@dfinity/oisy-wallet-signer",
-  "version": "3.0.0",
+  "version": "4.1.0",
   "description": "A library designed to facilitate communication between a dApp and the OISY Wallet on the Internet Computer. ",
   "license": "Apache-2.0",
   "type": "module",
@@ -72,27 +72,27 @@
   },
   "devDependencies": {
     "@dfinity/eslint-config-oisy-wallet": "^0.2.3",
-    "@dfinity/internet-identity-playwright": "^2.0.0",
-    "@icp-sdk/bindgen": "^0.2.0",
-    "@playwright/test": "^1.57.0",
+    "@dfinity/internet-identity-playwright": "^3.0.0",
+    "@icp-sdk/bindgen": "^0.2.1",
+    "@playwright/test": "^1.58.2",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.10.1",
-    "esbuild": "^0.27.0",
-    "jsdom": "^27.2.0",
-    "prettier": "^3.7.3",
+    "esbuild": "^0.27.3",
+    "jsdom": "^28.0.0",
+    "prettier": "^3.8.1",
     "prettier-plugin-organize-imports": "^4.3.0",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.14"
+    "vitest": "^4.0.18"
   },
   "engines": {
     "node": ">=24",
     "npm": ">=11.5.1 <12.0.0"
   },
   "peerDependencies": {
-    "@dfinity/utils": "^4",
+    "@dfinity/utils": "^4.1",
     "@dfinity/zod-schemas": "^3",
-    "@icp-sdk/canisters": "^2",
-    "@icp-sdk/core": "^4",
+    "@icp-sdk/canisters": "^3.2",
+    "@icp-sdk/core": "^5",
     "zod": "^4"
   }
 }

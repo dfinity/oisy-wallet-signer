@@ -137,7 +137,7 @@ describe('CustomHttpAgent', () => {
 
       certificate = await httpAgent.Certificate.create({
         certificate: hexStringToUint8Array(mockRepliedLocalCertificate),
-        canisterId: mockRequestDetails.canister_id,
+        principal: {canisterId: mockRequestDetails.canister_id},
         rootKey: mockLocalIcRootKey
       });
     });
@@ -210,7 +210,7 @@ describe('CustomHttpAgent', () => {
             requestDetails: null
           });
 
-          await expect(agent.request(mockRequestPayload)).rejects.toThrow(
+          await expect(agent.request(mockRequestPayload)).rejects.toThrowError(
             UndefinedRequestDetailsError
           );
         });
@@ -227,7 +227,7 @@ describe('CustomHttpAgent', () => {
             }
           });
 
-          await expect(agent.request(mockRequestPayload)).rejects.toThrow();
+          await expect(agent.request(mockRequestPayload)).rejects.toThrowError();
         });
 
         it('should bubble error if body does not contain certificate in readResponse', async () => {
@@ -240,7 +240,7 @@ describe('CustomHttpAgent', () => {
             }
           });
 
-          await expect(agent.request(mockRequestPayload)).rejects.toThrow();
+          await expect(agent.request(mockRequestPayload)).rejects.toThrowError();
         });
 
         it('should throw InvalidCertificateReplyError if Certificate.create throws an error', async () => {
@@ -259,7 +259,9 @@ describe('CustomHttpAgent', () => {
             .spyOn(httpAgent.Certificate, 'create')
             .mockRejectedValue(new Error('Invalid certificate'));
 
-          await expect(agent.request(mockRequestPayload)).rejects.toThrow('Invalid certificate');
+          await expect(agent.request(mockRequestPayload)).rejects.toThrowError(
+            'Invalid certificate'
+          );
 
           spy.mockRestore();
         });
@@ -275,7 +277,7 @@ describe('CustomHttpAgent', () => {
               }
             });
 
-            await expect(agent.request(mockRequestPayload)).rejects.toThrow(
+            await expect(agent.request(mockRequestPayload)).rejects.toThrowError(
               InvalidCertificateStatusError
             );
           }
@@ -307,7 +309,7 @@ describe('CustomHttpAgent', () => {
             requestId: mockRejectedLocalRequestId as RequestId
           });
 
-          await expect(agent.request(mockRequestPayload)).rejects.toThrow(
+          await expect(agent.request(mockRequestPayload)).rejects.toThrowError(
             InvalidCertificateReplyError
           );
         });
@@ -318,7 +320,7 @@ describe('CustomHttpAgent', () => {
           // @ts-expect-error: we are testing this on purpose
           spyCall = vi.spyOn(agent.agent, 'call').mockResolvedValue(mockCallSubmitResponse);
 
-          await expect(agent.request(mockRequestPayload)).rejects.toThrow(
+          await expect(agent.request(mockRequestPayload)).rejects.toThrowError(
             InvalidCertificateReplyError
           );
         });
@@ -327,7 +329,7 @@ describe('CustomHttpAgent', () => {
       it('should throw an exception if the agent root key is not defined', async () => {
         vi.spyOn(agent.agent, 'rootKey', 'get').mockReturnValue(null);
 
-        await expect(agent.request(mockRequestPayload)).rejects.toThrow(UndefinedRootKeyError);
+        await expect(agent.request(mockRequestPayload)).rejects.toThrowError(UndefinedRootKeyError);
       });
     });
 
@@ -401,7 +403,7 @@ describe('CustomHttpAgent', () => {
               requestDetails: null
             });
 
-            await expect(agent.request(mockRequestPayload)).rejects.toThrow(
+            await expect(agent.request(mockRequestPayload)).rejects.toThrowError(
               UndefinedRequestDetailsError
             );
           });
@@ -415,7 +417,7 @@ describe('CustomHttpAgent', () => {
               }
             });
 
-            await expect(agent.request(mockRequestPayload)).rejects.toThrow(RequestError);
+            await expect(agent.request(mockRequestPayload)).rejects.toThrowError(RequestError);
           });
 
           it('should throw RequestError even if status is 200', async () => {
@@ -427,7 +429,7 @@ describe('CustomHttpAgent', () => {
               }
             });
 
-            await expect(agent.request(mockRequestPayload)).rejects.toThrow(RequestError);
+            await expect(agent.request(mockRequestPayload)).rejects.toThrowError(RequestError);
           });
         });
       });
@@ -451,7 +453,7 @@ describe('CustomHttpAgent', () => {
             }
           });
 
-          await expect(agent.request(mockRequestPayload)).rejects.toThrow();
+          await expect(agent.request(mockRequestPayload)).rejects.toThrowError();
         });
       });
 
@@ -465,7 +467,7 @@ describe('CustomHttpAgent', () => {
         it('should bubble error if pollForResponse rejects', async () => {
           spyCall.mockResolvedValue(mockPollSubmitResponse);
 
-          await expect(agent.request(mockRequestPayload)).rejects.toThrow('Polling error');
+          await expect(agent.request(mockRequestPayload)).rejects.toThrowError('Polling error');
         });
       });
     });
@@ -480,6 +482,6 @@ describe('CustomHttpAgent', () => {
         canisterId: mockCanisterId,
         method: mockRequestMethod
       })
-    ).rejects.toThrow('Invalid character');
+    ).rejects.toThrowError('Invalid character');
   });
 });

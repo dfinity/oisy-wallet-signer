@@ -37,7 +37,7 @@ describe('Signer-sessions', () => {
       updatedAt: Date.now()
     };
 
-    expect(() => SessionPermissionsSchema.parse(invalidData)).toThrow();
+    expect(() => SessionPermissionsSchema.parse(invalidData)).toThrowError();
   });
 
   it('should fail validation if createdAt is missing', () => {
@@ -46,7 +46,7 @@ describe('Signer-sessions', () => {
       updatedAt: Date.now()
     };
 
-    expect(() => SessionPermissionsSchema.parse(invalidData)).toThrow();
+    expect(() => SessionPermissionsSchema.parse(invalidData)).toThrowError();
   });
 
   it('should fail validation with a negative createdAt', () => {
@@ -56,7 +56,7 @@ describe('Signer-sessions', () => {
       updatedAt: Date.now()
     };
 
-    expect(() => SessionPermissionsSchema.parse(invalidData)).toThrow();
+    expect(() => SessionPermissionsSchema.parse(invalidData)).toThrowError();
   });
 
   it('should fail validation with a zero createdAt', () => {
@@ -66,7 +66,7 @@ describe('Signer-sessions', () => {
       updatedAt: Date.now()
     };
 
-    expect(() => SessionPermissionsSchema.parse(invalidData)).toThrow();
+    expect(() => SessionPermissionsSchema.parse(invalidData)).toThrowError();
   });
 
   it('should fail validation if updatedAt is not a number', () => {
@@ -76,7 +76,7 @@ describe('Signer-sessions', () => {
       updatedAt: 'not-a-number'
     };
 
-    expect(() => SessionPermissionsSchema.parse(invalidData)).toThrow();
+    expect(() => SessionPermissionsSchema.parse(invalidData)).toThrowError();
   });
 
   it('should fail validation if updatedAt is missing', () => {
@@ -85,7 +85,7 @@ describe('Signer-sessions', () => {
       created: Date.now()
     };
 
-    expect(() => SessionPermissionsSchema.parse(invalidData)).toThrow();
+    expect(() => SessionPermissionsSchema.parse(invalidData)).toThrowError();
   });
 
   it('should fail validation with a negative updatedAt', () => {
@@ -95,7 +95,7 @@ describe('Signer-sessions', () => {
       updatedAt: -1000
     };
 
-    expect(() => SessionPermissionsSchema.parse(invalidData)).toThrow();
+    expect(() => SessionPermissionsSchema.parse(invalidData)).toThrowError();
   });
 
   it('should fail validation with a zero updatedAt', () => {
@@ -105,7 +105,7 @@ describe('Signer-sessions', () => {
       updatedAt: 0
     };
 
-    expect(() => SessionPermissionsSchema.parse(invalidData)).toThrow();
+    expect(() => SessionPermissionsSchema.parse(invalidData)).toThrowError();
   });
 
   it('should fail validation if scopes is missing', () => {
@@ -114,7 +114,7 @@ describe('Signer-sessions', () => {
       updatedAt: Date.now()
     };
 
-    expect(() => SessionPermissionsSchema.parse(invalidData)).toThrow();
+    expect(() => SessionPermissionsSchema.parse(invalidData)).toThrowError();
   });
 
   it('should fail validation if createdAt is not a number in a scope', () => {
@@ -130,7 +130,7 @@ describe('Signer-sessions', () => {
       updatedAt: Date.now()
     };
 
-    expect(() => SessionPermissionsSchema.parse(invalidData)).toThrow();
+    expect(() => SessionPermissionsSchema.parse(invalidData)).toThrowError();
   });
 
   it('should fail validation if createdAt is missing in a scope', () => {
@@ -145,7 +145,7 @@ describe('Signer-sessions', () => {
       updatedAt: Date.now()
     };
 
-    expect(() => SessionPermissionsSchema.parse(invalidData)).toThrow();
+    expect(() => SessionPermissionsSchema.parse(invalidData)).toThrowError();
   });
 
   it('should fail validation if updatedAt is not a number in a scope', () => {
@@ -161,7 +161,7 @@ describe('Signer-sessions', () => {
       updatedAt: Date.now()
     };
 
-    expect(() => SessionPermissionsSchema.parse(invalidData)).toThrow();
+    expect(() => SessionPermissionsSchema.parse(invalidData)).toThrowError();
   });
 
   it('should fail validation if updatedAt is missing in a scope', () => {
@@ -176,7 +176,7 @@ describe('Signer-sessions', () => {
       updatedAt: Date.now()
     };
 
-    expect(() => SessionPermissionsSchema.parse(invalidData)).toThrow();
+    expect(() => SessionPermissionsSchema.parse(invalidData)).toThrowError();
   });
 
   it('should pass validate if scopes array is empty', () => {
@@ -186,7 +186,7 @@ describe('Signer-sessions', () => {
       updatedAt: Date.now()
     };
 
-    expect(() => SessionPermissionsSchema.parse(invalidData)).not.toThrow();
+    expect(() => SessionPermissionsSchema.parse(invalidData)).not.toThrowError();
   });
 
   it('should validate a correct SessionPermissions object with multiple scopes', () => {

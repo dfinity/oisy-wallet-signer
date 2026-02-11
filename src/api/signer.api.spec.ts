@@ -192,7 +192,7 @@ describe('SignerApi', () => {
             },
             ...signerOptions
           })
-        ).rejects.toThrow(mockError);
+        ).rejects.toThrowError(mockError);
       });
     });
   });

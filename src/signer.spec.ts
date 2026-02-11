@@ -300,7 +300,7 @@ describe('Signer', () => {
 
       expect(() => {
         window.dispatchEvent(messageEventDiff);
-      }).not.toThrow();
+      }).not.toThrowError();
     });
   });
 
@@ -2357,6 +2357,7 @@ describe('Signer', () => {
 
           window.dispatchEvent(messageEvent);
 
+          // eslint-disable-next-line vitest/no-standalone-expect
           expect(notifyReadySpy).toHaveBeenCalledWith({
             id: testId,
             origin: testOrigin
@@ -2548,7 +2549,7 @@ describe('Signer', () => {
           method: ICRC25_REQUEST_PERMISSIONS,
           prompt: mockPermissionsPrompt
         });
-      }).not.toThrow();
+      }).not.toThrowError();
 
       expect(spy).toHaveBeenCalledWith(mockPermissionsPrompt);
     });
@@ -2563,7 +2564,7 @@ describe('Signer', () => {
           method: ICRC27_ACCOUNTS,
           prompt: mockAccountsPrompt
         });
-      }).not.toThrow();
+      }).not.toThrowError();
 
       expect(spy).toHaveBeenCalledWith(mockAccountsPrompt);
     });
@@ -2578,7 +2579,7 @@ describe('Signer', () => {
           method: ICRC21_CALL_CONSENT_MESSAGE,
           prompt: mockConsentMessagePrompt
         });
-      }).not.toThrow();
+      }).not.toThrowError();
 
       expect(spy).toHaveBeenCalledWith(mockConsentMessagePrompt);
     });
@@ -2593,7 +2594,7 @@ describe('Signer', () => {
           method: ICRC49_CALL_CANISTER,
           prompt: mockCallCanisterPrompt
         });
-      }).not.toThrow();
+      }).not.toThrowError();
 
       expect(spy).toHaveBeenCalledWith(mockCallCanisterPrompt);
     });
@@ -2607,7 +2608,7 @@ describe('Signer', () => {
           method: 'something',
           prompt: mockPrompt
         });
-      }).toThrow(
+      }).toThrowError(
         'The specified method is not supported. Please ensure you are using a supported standard.'
       );
     });
