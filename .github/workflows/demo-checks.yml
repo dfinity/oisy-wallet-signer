@@ -41,7 +41,7 @@ jobs:
         run: npm run check
         working-directory: 'demo'
 
-  may-merge:
+  demo-checks-pass:
     needs: ['check', 'lint']
     runs-on: ubuntu-latest
     steps:

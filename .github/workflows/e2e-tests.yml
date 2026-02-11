@@ -40,7 +40,7 @@ jobs:
           path: test-results/
           retention-days: 3
 
-  may-merge:
+  e2e-tests-pass:
     needs: ['e2e']
     runs-on: ubuntu-latest
     steps:
