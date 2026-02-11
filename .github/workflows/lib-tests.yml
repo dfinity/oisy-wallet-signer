@@ -16,7 +16,7 @@ jobs:
       - name: Tests
         run: npm run test
 
-  may-merge:
+  lib-tests-pass:
     needs: ['tests']
     runs-on: ubuntu-latest
     steps:

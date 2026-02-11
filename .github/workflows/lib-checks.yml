@@ -39,7 +39,7 @@ jobs:
       - name: Build
         run: npm run build
 
-  may-merge:
+  lib-checks-pass:
     needs: ['build', 'lint', 'format']
     runs-on: ubuntu-latest
     steps:
