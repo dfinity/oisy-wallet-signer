@@ -28,7 +28,7 @@ export class PartyPage extends IdentityPage {
    * @override
    */
   async signIn(): Promise<void> {
-    this.identity = await this.#partyIIPage.signInWithNewIdentity();
+    await this.#partyIIPage.signIn();
   }
 
   async waitReady(): Promise<void> {
@@ -53,7 +53,6 @@ export class PartyPage extends IdentityPage {
     await expect(walletPage).toHaveTitle('Wallet');
 
     this.#walletPage = new WalletPage({
-      identity: this.identity,
       page: walletPage,
       context: this.context,
       browser: this.browser
@@ -271,19 +270,17 @@ export class PartyPage extends IdentityPage {
   async icrc2Approve(): Promise<void> {
     await this.#walletPage?.approveConsentMessage();
 
-    await this.assertBalance('0.0000');
+    await this.assertBalance('0.5000');
   }
 
   async icrc2TransferFrom(): Promise<void> {
-    await this.#walletPage?.getICP();
-
-    await this.#walletPage?.assertBalance('55.0001');
+    await this.#walletPage?.assertBalance('54.4998');
 
     await this.#walletPage?.approveConsentMessage();
 
-    await this.#walletPage?.assertBalance('54.7500');
+    await this.#walletPage?.assertBalance('54.2497');
 
-    await this.assertBalance('0.2500');
+    await this.assertBalance('0.7500');
   }
 
   async closeWalletWindow(): Promise<void> {

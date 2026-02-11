@@ -1,13 +1,10 @@
 import {InternetIdentityPage} from '@dfinity/internet-identity-playwright';
-import {assertNonNullish} from '@dfinity/utils';
 import {expect} from '@playwright/test';
 import {IdentityPage, IdentityPageParams} from './identity.page';
 
 export class WalletPage extends IdentityPage {
-  constructor({identity, ...rest}: IdentityPageParams & {identity: number | undefined}) {
-    super(rest);
-
-    this.identity = identity;
+  constructor(params: IdentityPageParams) {
+    super(params);
   }
 
   /**
@@ -22,9 +19,7 @@ export class WalletPage extends IdentityPage {
       browser: this.browser
     });
 
-    assertNonNullish(this.identity);
-
-    await walletIIPage.signInWithIdentity({identity: this.identity});
+    await walletIIPage.signIn();
   }
 
   async approveRequestedPermissions(): Promise<void> {
