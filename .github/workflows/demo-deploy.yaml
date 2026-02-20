@@ -8,6 +8,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -22,17 +24,15 @@ jobs:
         working-directory: 'demo'
 
       - name: Deploy Relying Party
-        uses: junobuild/juno-action@27cee61ad0a0d5d5cd675f3638ce5a7c022099d2 # v0.4.22
+        uses: junobuild/juno-action@3735a47e3c9c24cb89d5a3ca091ed9949ce94fac # v0.6.4
         with:
           args: hosting deploy
         env:
-          JUNO_TOKEN: ${{ secrets.JUNO_TOKEN }}
           PROJECT_PATH: demo/src/relying_party_frontend
 
       - name: Deploy Signer
-        uses: junobuild/juno-action@27cee61ad0a0d5d5cd675f3638ce5a7c022099d2 # v0.4.22
+        uses: junobuild/juno-action@3735a47e3c9c24cb89d5a3ca091ed9949ce94fac # v0.6.4
         with:
           args: hosting deploy
         env:
-          JUNO_TOKEN: ${{ secrets.JUNO_TOKEN }}
           PROJECT_PATH: demo/src/wallet_frontend
