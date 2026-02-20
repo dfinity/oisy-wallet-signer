@@ -2,8 +2,7 @@ name: Lib Checks
 
 on:
   pull_request:
-    paths-ignore:
-      - 'demo/**'
+  workflow_dispatch:
 
 jobs:
   format:
