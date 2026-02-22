@@ -5,9 +5,14 @@ on:
     paths:
       - 'demo/**'
 
+permissions: {}
+
 jobs:
   lint:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
 
     env:
       NODE_OPTIONS: --max-old-space-size=8192
@@ -28,6 +33,9 @@ jobs:
   check:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -44,6 +52,8 @@ jobs:
   demo-checks-pass:
     needs: ['check', 'lint']
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Cleared for merging
         run: echo OK
