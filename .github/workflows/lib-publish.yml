@@ -11,6 +11,8 @@ run-name: >-
     || github.event_name == 'workflow_dispatch' && 'Lib Next'
     || 'Lib Publish' }}
 
+permissions: {}
+
 jobs:
   publish-release:
     if: github.event_name == 'release'
