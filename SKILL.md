@@ -143,7 +143,7 @@ import {IcrcWallet} from '@dfinity/oisy-wallet-signer/icrc-wallet';
 
 ```typescript
 const wallet = await IcrcWallet.connect({
-  url: 'https://your-wallet.example.com/sign',  // URL of the wallet implementing the signer
+  url: 'https://your-wallet.example.com/sign', // URL of the wallet implementing the signer
   host: 'https://icp-api.io',
   windowOptions: {width: 576, height: 625, position: 'center'},
   connectionOptions: {timeoutInMilliseconds: 120_000},
