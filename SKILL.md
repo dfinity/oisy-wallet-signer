@@ -377,45 +377,64 @@ const signer = Signer.init({
 });
 ```
 
-### Running Unit Tests
+### Build Your Project
 
 ```bash
-npm test
+npx tsc --noEmit   # TypeScript compiles without errors
+npm run build       # Your app builds successfully
 ```
-
-### Running E2E Tests
-
-Requires Playwright and a local replica:
-
-```bash
-npm run e2e
-```
-
-### Building the Library
-
-```bash
-npm run build
-```
-
-Output goes to `dist/` as ESM with TypeScript declarations and source maps.
 
 ## Verify It Works
 
-```bash
-# Unit tests pass
-npm test
+After integrating the library, verify each step of the flow works end-to-end:
 
-# E2E tests pass (connection, permissions, transfers, approvals, disconnect)
-npm run e2e
+### 1. Connection
 
-# TypeScript compiles without errors
-npx tsc --noEmit
+- `IcrcWallet.connect()` (or `IcpWallet.connect()`) opens a popup window
+- The signer popup loads and becomes interactive
+- `connect()` resolves without timeout (no `RelyingPartyDisconnectedError`)
 
-# Lint passes
-npm run lint
+### 2. Supported Standards
 
-# Build succeeds
-npm run build && ls dist/index.js dist/signer.js dist/relying-party.js dist/icp-wallet.js dist/icrc-wallet.js
-```
+- `wallet.supportedStandards()` returns an array containing at least ICRC-21, ICRC-25, ICRC-27, ICRC-29, ICRC-49
 
-After connecting in the browser: the signer popup opens, `icrc29_status` returns `"ready"`, permissions can be requested, and `wallet.accounts()` returns at least one account with a valid principal.
+### 3. Permissions
+
+- `wallet.requestPermissionsNotGranted()` triggers the signer's permissions prompt
+- After user approval, `wallet.permissions()` returns scopes with state `granted`
+- A second call to `requestPermissionsNotGranted()` returns `{allPermissionsGranted: true}` without prompting again
+
+### 4. Accounts
+
+- `wallet.accounts()` returns at least one account with a valid `owner` (principal text)
+- The returned `owner` matches the signer's identity principal
+
+### 5. ICRC-1 Transfer
+
+- `wallet.icrc1Transfer({...})` (or `wallet.transfer({...})`) triggers the consent message prompt on the signer
+- The consent message displays the correct amount, recipient, and fee
+- After user approval, the call resolves with a block height / block index (bigint)
+- The recipient's balance reflects the transferred amount
+
+### 6. ICRC-2 Approve
+
+- `wallet.icrc2Approve({...})` (or `wallet.approve({...})`) shows a consent message with spender and amount
+- After approval, resolves with a block height / block index
+- The spender's allowance is set correctly on the ledger
+
+### 7. ICRC-2 Transfer From
+
+- `wallet.transferFrom({...})` shows a consent message with from, to, and amount
+- After approval, resolves with a block index
+- Balances update correctly for both source and destination
+
+### 8. Rejection Handling
+
+- When the user rejects at the consent message prompt, the call throws with error code 3001 (`ACTION_ABORTED`)
+- When the user denies permissions, subsequent calls throw with error code 3000 (`PERMISSION_NOT_GRANTED`)
+
+### 9. Disconnect
+
+- `wallet.disconnect()` closes the popup window
+- Subsequent calls to `wallet.accounts()` or `wallet.transfer()` throw `RelyingPartyDisconnectedError`
+- The `onDisconnect` callback fires
