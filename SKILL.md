@@ -2,7 +2,7 @@
 id: oisy-wallet-signer
 name: OISY Wallet Signer
 category: IC-Wallet
-description: Guides integration with @dfinity/oisy-wallet-signer for building dApps (relying party) and wallet UIs (signer) on the Internet Computer using ICRC-21/25/27/29/49 standards. Load when the user mentions OISY, wallet signer, relying party, consent messages, token transfers via signer, or canister call signing.
+description: Guides integration with @dfinity/oisy-wallet-signer for building dApps (relying party) and wallet UIs (signer) on the Internet Computer using ICRC-21/25/27/29/49 standards. Load when the user mentions wallet signer, relying party, consent messages, token transfers via signer, or canister call signing.
 version: 4.1.0
 endpoints: 5
 status: stable
@@ -15,7 +15,7 @@ dependencies: [@dfinity/utils, @dfinity/zod-schemas, @icp-sdk/canisters, @icp-sd
 
 ## What This Is
 
-A TypeScript library that enables secure communication between dApps and wallets on the Internet Computer using JSON-RPC 2.0 over `window.postMessage`. OISY signer = **explicit per-action approval**. `connect()` establishes a channel. Nothing more.
+A TypeScript library that enables secure communication between dApps and wallets on the Internet Computer using JSON-RPC 2.0 over `window.postMessage`. The signer model = **explicit per-action approval**. `connect()` establishes a channel. Nothing more.
 
 **It is not:**
 
@@ -47,7 +47,7 @@ A TypeScript library that enables secure communication between dApps and wallets
 - **High-frequency interactions**: games, social actions, rapid write operations
 - **Invisible writes**: autosave, cron jobs, auto-compounding
 
-> **Decision test:** If your app still feels good when every meaningful update shows a confirmation dialogue, OISY Wallet Signer is appropriate. If not, use a delegation-capable model instead.
+> **Decision test:** If your app still feels good when every meaningful update shows a confirmation dialogue, this library is appropriate. If not, use a delegation-capable model instead.
 
 ## Prerequisites
 
@@ -143,7 +143,7 @@ import {IcrcWallet} from '@dfinity/oisy-wallet-signer/icrc-wallet';
 
 ```typescript
 const wallet = await IcrcWallet.connect({
-  url: 'https://oisy.com/sign',
+  url: 'https://your-wallet.example.com/sign',  // URL of the wallet implementing the signer
   host: 'https://icp-api.io',
   windowOptions: {width: 576, height: 625, position: 'center'},
   connectionOptions: {timeoutInMilliseconds: 120_000},
@@ -161,7 +161,7 @@ const {owner} = accounts[0];
 #### IcpWallet — ICP Transfers and Approvals
 
 ```typescript
-const wallet = await IcpWallet.connect({url: 'https://oisy.com/sign'});
+const wallet = await IcpWallet.connect({url: 'https://your-wallet.example.com/sign'});
 
 const blockHeightTransfer = await wallet.icrc1Transfer({
   owner,
@@ -183,7 +183,7 @@ const blockHeightApprove = await wallet.icrc2Approve({
 #### IcrcWallet — Any ICRC Ledger
 
 ```typescript
-const wallet = await IcrcWallet.connect({url: 'https://oisy.com/sign'});
+const wallet = await IcrcWallet.connect({url: 'https://your-wallet.example.com/sign'});
 
 const blockIndexTransfer = await wallet.transfer({
   owner,
@@ -403,38 +403,13 @@ const wallet = await IcpWallet.connect({
 });
 ```
 
-### Local Development — Testing Against OISY Wallet
-
-To test your dApp against the actual OISY Wallet running locally:
-
-```bash
-# Terminal 1: clone and deploy OISY
-git clone https://github.com/dfinity/oisy-wallet
-cd oisy-wallet
-npm ci
-npm run deploy
-dfx start
-
-# Terminal 2: start OISY dev server on port 5174
-npm run dev
-```
-
-Then connect from your dApp:
-
-```typescript
-const wallet = await IcpWallet.connect({
-  url: 'http://localhost:5174/sign',
-  host: 'http://localhost:4943'
-});
-```
-
 ### Mainnet
 
-On mainnet, point to the OISY production signer URL and omit `host` (defaults to `https://icp-api.io`):
+On mainnet, point to the wallet's production signer URL and omit `host` (defaults to `https://icp-api.io`):
 
 ```typescript
 const wallet = await IcpWallet.connect({
-  url: 'https://oisy.com/sign'
+  url: 'https://your-wallet.example.com/sign'
 });
 ```
 
