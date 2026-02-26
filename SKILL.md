@@ -302,7 +302,7 @@ signer.register({
 });
 ```
 
-#### Consent Message: Ok vs Warn
+#### Consent Message: OK vs Warn
 
 - `{ Ok: consentInfo }` — canister implements ICRC-21; message is canister-verified
 - `{ Warn: { consentInfo, canisterId, method, arg } }` — signer generated a fallback (for `icrc1_transfer`, `icrc2_approve`, `icrc2_transfer_from`)
@@ -355,25 +355,86 @@ Permissions stored in `localStorage` as `oisy_signer_{origin}_{owner}` with time
 
 ## Deploy & Test
 
-### Local Development
+### Local Development — Your Own Signer
 
-Start a local IC replica and pass `host` to both sides:
+If you are building both the dApp and the wallet/signer, start a local IC replica and pass `host` to both sides:
 
 ```bash
 dfx start --background
 ```
 
 ```typescript
-// dApp side
+// dApp side — point to your local wallet's /sign route
 const wallet = await IcrcWallet.connect({
-  url: 'http://localhost:5173/sign',
+  url: 'http://localhost:5174/sign',
   host: 'http://localhost:4943'
 });
 
-// Wallet side
+// Wallet/signer side — same replica host
 const signer = Signer.init({
   owner: identity,
   host: 'http://localhost:4943'
+});
+```
+
+### Local Development — Using the Pseudo Wallet Signer
+
+If you are building a dApp (relying party) and need a signer to test against locally, the library provides a pseudo wallet signer in its demo:
+
+```bash
+git clone https://github.com/dfinity/oisy-wallet-signer
+cd oisy-wallet-signer
+npm ci
+
+cd demo
+npm ci
+npm run sync:all
+npm run dev:wallet    # starts the pseudo wallet on port 5174
+```
+
+If your local replica runs on a non-default port, update `LOCAL_REPLICA_HOST` in `demo/.env`.
+
+Then connect from your dApp:
+
+```typescript
+const wallet = await IcpWallet.connect({
+  url: 'http://localhost:5174/sign',
+  host: 'http://localhost:4943' // match your replica port
+});
+```
+
+### Local Development — Testing Against OISY Wallet
+
+To test your dApp against the actual OISY Wallet running locally:
+
+```bash
+# Terminal 1: clone and deploy OISY
+git clone https://github.com/dfinity/oisy-wallet
+cd oisy-wallet
+npm ci
+npm run deploy
+dfx start
+
+# Terminal 2: start OISY dev server on port 5174
+npm run dev
+```
+
+Then connect from your dApp:
+
+```typescript
+const wallet = await IcpWallet.connect({
+  url: 'http://localhost:5174/sign',
+  host: 'http://localhost:4943'
+});
+```
+
+### Mainnet
+
+On mainnet, point to the OISY production signer URL and omit `host` (defaults to `https://icp-api.io`):
+
+```typescript
+const wallet = await IcpWallet.connect({
+  url: 'https://oisy.com/sign'
 });
 ```
 
