@@ -47,8 +47,8 @@ A TypeScript library that enables secure communication between dApps and wallets
 
 ## Prerequisites
 
-- Node.js >= 18
-- npm (or compatible package manager)
+- Node.js >= 24
+- npm >= 11.5.1 (< 12.0.0)
 - `@dfinity/oisy-wallet-signer` installed
 - Peer dependencies installed: `@dfinity/utils`, `@dfinity/zod-schemas`, `@icp-sdk/canisters`, `@icp-sdk/core`, `zod`
 - A non-anonymous identity on the signer side (e.g. `Ed25519KeyIdentity`)
