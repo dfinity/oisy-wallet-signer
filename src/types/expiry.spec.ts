@@ -1,5 +1,4 @@
 import {Expiry} from '@icp-sdk/core/agent';
-
 import {ExpiryObjSchema} from './expiry';
 
 describe('ExpiryObjSchema', () => {
