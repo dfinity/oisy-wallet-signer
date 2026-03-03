@@ -1,5 +1,4 @@
 import {Expiry, JSON_KEY_EXPIRY} from '@icp-sdk/core/agent';
-
 import {bigIntToExpiry} from './expiry.utils';
 
 describe('bigIntToExpiry', () => {

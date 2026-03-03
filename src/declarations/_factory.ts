@@ -1,3 +1,5 @@
+/* eslint-disable import/order */
+
 import {idlFactory as idlFactoryIcrc1} from './icrc/icrc-1.idl';
 import {idlFactory as idlFactoryIcrc2} from './icrc/icrc-2.idl';
 import {idlFactory as idlFactoryIcrc21} from './icrc/icrc-21.idl';
