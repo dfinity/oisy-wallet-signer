@@ -53,7 +53,7 @@
 		"@dfinity/utils": "^4.1.0",
 		"@dfinity/zod-schemas": "^3.0.2",
 		"@icp-sdk/auth": "^5.0.0",
-		"@icp-sdk/canisters": "^3.2.0",
+		"@icp-sdk/canisters": "^3.5.1",
 		"@icp-sdk/core": "^5.0.0",
 		"zod": "^4.3.5"
 	},
