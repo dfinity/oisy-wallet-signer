@@ -32,7 +32,7 @@ describe('icrc-requests', () => {
     };
 
     it('should validate a correct request', () => {
-      expect(() => IcrcRequestAnyPermissionsRequestSchema.parse(validRequest)).not.toThrowError();
+      expect(() => IcrcRequestAnyPermissionsRequestSchema.parse(validRequest)).not.toThrow();
     });
 
     it('should accept request with "random" method names', () => {
@@ -47,9 +47,7 @@ describe('icrc-requests', () => {
         }
       };
 
-      expect(() =>
-        IcrcRequestAnyPermissionsRequestSchema.parse(randomMethodRequest)
-      ).not.toThrowError();
+      expect(() => IcrcRequestAnyPermissionsRequestSchema.parse(randomMethodRequest)).not.toThrow();
     });
 
     it('should throw if request has no method', () => {
@@ -60,7 +58,7 @@ describe('icrc-requests', () => {
         }
       };
 
-      expect(() => IcrcRequestAnyPermissionsRequestSchema.parse(invalidRequest)).toThrowError();
+      expect(() => IcrcRequestAnyPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
 
     it('should throw if request has no scopes', () => {
@@ -70,7 +68,7 @@ describe('icrc-requests', () => {
         params: {}
       };
 
-      expect(() => IcrcRequestAnyPermissionsRequestSchema.parse(invalidRequest)).toThrowError();
+      expect(() => IcrcRequestAnyPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
 
     it('should throw if request has no params', () => {
@@ -79,7 +77,7 @@ describe('icrc-requests', () => {
       // @ts-expect-error: we are testing this on purpose
       const invalidRequest: IcrcRequestAnyPermissionsRequest = rest;
 
-      expect(() => IcrcRequestAnyPermissionsRequestSchema.parse(invalidRequest)).toThrowError();
+      expect(() => IcrcRequestAnyPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
 
     it('should throw if request has invalid method', () => {
@@ -89,7 +87,7 @@ describe('icrc-requests', () => {
         method: 'test'
       };
 
-      expect(() => IcrcRequestAnyPermissionsRequestSchema.parse(invalidRequest)).toThrowError();
+      expect(() => IcrcRequestAnyPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
 
     it('should throw if request has no id', () => {
@@ -97,7 +95,7 @@ describe('icrc-requests', () => {
 
       const invalidRequest: Partial<IcrcRequestAnyPermissionsRequest> = rest;
 
-      expect(() => IcrcRequestAnyPermissionsRequestSchema.parse(invalidRequest)).toThrowError();
+      expect(() => IcrcRequestAnyPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
 
     it('should throw if request has no jsonrpc', () => {
@@ -105,7 +103,7 @@ describe('icrc-requests', () => {
 
       const invalidRequest: Partial<IcrcRequestAnyPermissionsRequest> = rest;
 
-      expect(() => IcrcRequestAnyPermissionsRequestSchema.parse(invalidRequest)).toThrowError();
+      expect(() => IcrcRequestAnyPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
   });
 
@@ -117,7 +115,7 @@ describe('icrc-requests', () => {
     };
 
     it('should validate a correct request', () => {
-      expect(() => IcrcPermissionsRequestSchema.parse(validRequest)).not.toThrowError();
+      expect(() => IcrcPermissionsRequestSchema.parse(validRequest)).not.toThrow();
     });
 
     it('should throw if request has params', () => {
@@ -127,7 +125,7 @@ describe('icrc-requests', () => {
         params: {}
       };
 
-      expect(() => IcrcPermissionsRequestSchema.parse(invalidRequest)).toThrowError();
+      expect(() => IcrcPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
 
     it('should throw if request has invalid method', () => {
@@ -137,7 +135,7 @@ describe('icrc-requests', () => {
         method: 'test'
       };
 
-      expect(() => IcrcPermissionsRequestSchema.parse(invalidRequest)).toThrowError();
+      expect(() => IcrcPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
 
     it('should throw if request has no id', () => {
@@ -145,7 +143,7 @@ describe('icrc-requests', () => {
 
       const invalidRequest: Partial<IcrcPermissionsRequest> = rest;
 
-      expect(() => IcrcPermissionsRequestSchema.parse(invalidRequest)).toThrowError();
+      expect(() => IcrcPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
 
     it('should throw if request has no jsonrpc', () => {
@@ -153,7 +151,7 @@ describe('icrc-requests', () => {
 
       const invalidRequest: Partial<IcrcPermissionsRequest> = rest;
 
-      expect(() => IcrcPermissionsRequestSchema.parse(invalidRequest)).toThrowError();
+      expect(() => IcrcPermissionsRequestSchema.parse(invalidRequest)).toThrow();
     });
   });
 
@@ -170,7 +168,7 @@ describe('icrc-requests', () => {
     };
 
     it('should validate a correct request', () => {
-      expect(() => schema.parse(validRequest)).not.toThrowError();
+      expect(() => schema.parse(validRequest)).not.toThrow();
     });
 
     it('should throw if request has params', () => {
@@ -179,7 +177,7 @@ describe('icrc-requests', () => {
         params: {}
       };
 
-      expect(() => schema.parse(invalidRequest)).toThrowError();
+      expect(() => schema.parse(invalidRequest)).toThrow();
     });
 
     it('should throw if request has invalid method', () => {
@@ -188,7 +186,7 @@ describe('icrc-requests', () => {
         method: 'test'
       };
 
-      expect(() => schema.parse(invalidRequest)).toThrowError();
+      expect(() => schema.parse(invalidRequest)).toThrow();
     });
 
     it('should throw if request has no id', () => {
@@ -196,7 +194,7 @@ describe('icrc-requests', () => {
 
       const invalidRequest = rest;
 
-      expect(() => schema.parse(invalidRequest)).toThrowError();
+      expect(() => schema.parse(invalidRequest)).toThrow();
     });
 
     it('should throw if request has no jsonrpc', () => {
@@ -204,7 +202,7 @@ describe('icrc-requests', () => {
 
       const invalidRequest = rest;
 
-      expect(() => schema.parse(invalidRequest)).toThrowError();
+      expect(() => schema.parse(invalidRequest)).toThrow();
     });
   });
 
@@ -216,7 +214,7 @@ describe('icrc-requests', () => {
     };
 
     it('should validate a correct request', () => {
-      expect(() => IcrcAccountsRequestSchema.parse(validRequest)).not.toThrowError();
+      expect(() => IcrcAccountsRequestSchema.parse(validRequest)).not.toThrow();
     });
 
     it('should throw if request has params', () => {
@@ -226,7 +224,7 @@ describe('icrc-requests', () => {
         params: {}
       };
 
-      expect(() => IcrcAccountsRequestSchema.parse(invalidRequest)).toThrowError();
+      expect(() => IcrcAccountsRequestSchema.parse(invalidRequest)).toThrow();
     });
 
     it('should throw if request has invalid method', () => {
@@ -236,7 +234,7 @@ describe('icrc-requests', () => {
         method: 'test'
       };
 
-      expect(() => IcrcAccountsRequestSchema.parse(invalidRequest)).toThrowError();
+      expect(() => IcrcAccountsRequestSchema.parse(invalidRequest)).toThrow();
     });
 
     it('should throw if request has no id', () => {
@@ -244,7 +242,7 @@ describe('icrc-requests', () => {
 
       const invalidRequest = rest;
 
-      expect(() => IcrcAccountsRequestSchema.parse(invalidRequest)).toThrowError();
+      expect(() => IcrcAccountsRequestSchema.parse(invalidRequest)).toThrow();
     });
 
     it('should throw if request has no jsonrpc', () => {
@@ -252,7 +250,7 @@ describe('icrc-requests', () => {
 
       const invalidRequest = rest;
 
-      expect(() => IcrcAccountsRequestSchema.parse(invalidRequest)).toThrowError();
+      expect(() => IcrcAccountsRequestSchema.parse(invalidRequest)).toThrow();
     });
   });
 
@@ -265,7 +263,7 @@ describe('icrc-requests', () => {
     };
 
     it('should validate a correct request', () => {
-      expect(() => IcrcCallCanisterRequestSchema.parse(validRequest)).not.toThrowError();
+      expect(() => IcrcCallCanisterRequestSchema.parse(validRequest)).not.toThrow();
     });
 
     it('should fail validation when "canisterId" is invalid', () => {
@@ -277,7 +275,7 @@ describe('icrc-requests', () => {
         }
       };
 
-      expect(() => IcrcCallCanisterRequestSchema.parse(invalidRequest)).toThrowError();
+      expect(() => IcrcCallCanisterRequestSchema.parse(invalidRequest)).toThrow();
     });
 
     it('should fail validation when "sender" is invalid', () => {
@@ -289,7 +287,7 @@ describe('icrc-requests', () => {
         }
       };
 
-      expect(() => IcrcCallCanisterRequestSchema.parse(invalidRequest)).toThrowError();
+      expect(() => IcrcCallCanisterRequestSchema.parse(invalidRequest)).toThrow();
     });
 
     it('should fail validation when "method" is an empty string', () => {
@@ -301,7 +299,7 @@ describe('icrc-requests', () => {
         }
       };
 
-      expect(() => IcrcCallCanisterRequestSchema.parse(invalidRequest)).toThrowError();
+      expect(() => IcrcCallCanisterRequestSchema.parse(invalidRequest)).toThrow();
     });
 
     it('should fail validation when "arg" is not a Uint8Array', () => {
@@ -313,7 +311,7 @@ describe('icrc-requests', () => {
         }
       };
 
-      expect(() => IcrcCallCanisterRequestSchema.parse(invalidRequest)).toThrowError();
+      expect(() => IcrcCallCanisterRequestSchema.parse(invalidRequest)).toThrow();
     });
 
     it('should pass validation when "nonce" is a valid Uint8Array of length <= 32', () => {
@@ -325,7 +323,7 @@ describe('icrc-requests', () => {
         }
       };
 
-      expect(() => IcrcCallCanisterRequestSchema.parse(validMemoRequest)).not.toThrowError();
+      expect(() => IcrcCallCanisterRequestSchema.parse(validMemoRequest)).not.toThrow();
     });
 
     it('should pass validation when "nonce" is a valid Uint8Array of length = 32', () => {
@@ -337,7 +335,7 @@ describe('icrc-requests', () => {
         }
       };
 
-      expect(() => IcrcCallCanisterRequestSchema.parse(validMemoRequest)).not.toThrowError();
+      expect(() => IcrcCallCanisterRequestSchema.parse(validMemoRequest)).not.toThrow();
     });
 
     it('should fail validation when "nonce" exceeds 32 bytes', () => {
@@ -349,7 +347,7 @@ describe('icrc-requests', () => {
         }
       };
 
-      expect(() => IcrcCallCanisterRequestSchema.parse(invalidMemoRequest)).toThrowError();
+      expect(() => IcrcCallCanisterRequestSchema.parse(invalidMemoRequest)).toThrow();
     });
 
     it('should fail validation when "params" is missing', () => {
@@ -357,7 +355,7 @@ describe('icrc-requests', () => {
 
       const invalidRequest = rest;
 
-      expect(() => IcrcCallCanisterRequestSchema.parse(invalidRequest)).toThrowError();
+      expect(() => IcrcCallCanisterRequestSchema.parse(invalidRequest)).toThrow();
     });
 
     it('should fail validation when "id" is missing', () => {
@@ -368,7 +366,7 @@ describe('icrc-requests', () => {
         params: validRequest.params
       };
 
-      expect(() => IcrcCallCanisterRequestSchema.parse(invalidRequest)).toThrowError();
+      expect(() => IcrcCallCanisterRequestSchema.parse(invalidRequest)).toThrow();
     });
 
     it('should fail validation when "jsonrpc" is missing', () => {
@@ -379,7 +377,7 @@ describe('icrc-requests', () => {
         params: validRequest.params
       };
 
-      expect(() => IcrcCallCanisterRequestSchema.parse(invalidRequest)).toThrowError();
+      expect(() => IcrcCallCanisterRequestSchema.parse(invalidRequest)).toThrow();
     });
 
     it('should fail validation when "method" is invalid', () => {
@@ -388,15 +386,13 @@ describe('icrc-requests', () => {
         method: 'invalid_method'
       };
 
-      expect(() => IcrcCallCanisterRequestSchema.parse(invalidRequest)).toThrowError();
+      expect(() => IcrcCallCanisterRequestSchema.parse(invalidRequest)).toThrow();
     });
   });
 
   describe('IcrcCallCanisterRequestParamsSchema', () => {
     it('should validate a correct request params', () => {
-      expect(() =>
-        IcrcCallCanisterRequestParamsSchema.parse(mockCallCanisterParams)
-      ).not.toThrowError();
+      expect(() => IcrcCallCanisterRequestParamsSchema.parse(mockCallCanisterParams)).not.toThrow();
     });
 
     it('should fail validation when "canisterId" is invalid', () => {
@@ -405,7 +401,7 @@ describe('icrc-requests', () => {
         canisterId: 'invalid-principal'
       };
 
-      expect(() => IcrcCallCanisterRequestParamsSchema.parse(invalidParams)).toThrowError();
+      expect(() => IcrcCallCanisterRequestParamsSchema.parse(invalidParams)).toThrow();
     });
 
     it('should fail validation when "sender" is invalid', () => {
@@ -414,7 +410,7 @@ describe('icrc-requests', () => {
         sender: 'invalid-principal'
       };
 
-      expect(() => IcrcCallCanisterRequestParamsSchema.parse(invalidParams)).toThrowError();
+      expect(() => IcrcCallCanisterRequestParamsSchema.parse(invalidParams)).toThrow();
     });
 
     it('should fail validation when "method" is an empty string', () => {
@@ -423,7 +419,7 @@ describe('icrc-requests', () => {
         method: ''
       };
 
-      expect(() => IcrcCallCanisterRequestParamsSchema.parse(invalidParams)).toThrowError();
+      expect(() => IcrcCallCanisterRequestParamsSchema.parse(invalidParams)).toThrow();
     });
 
     it('should fail validation when "arg" is not a Uint8Array', () => {
@@ -432,7 +428,7 @@ describe('icrc-requests', () => {
         arg: 'not-a-Uint8Array'
       };
 
-      expect(() => IcrcCallCanisterRequestParamsSchema.parse(invalidParams)).toThrowError();
+      expect(() => IcrcCallCanisterRequestParamsSchema.parse(invalidParams)).toThrow();
     });
 
     it('should pass validation when "nonce" is a valid Uint8Array of length <= 32', () => {
@@ -441,7 +437,7 @@ describe('icrc-requests', () => {
         nonce: uint8ArrayToBase64(new Uint8Array(20))
       };
 
-      expect(() => IcrcCallCanisterRequestParamsSchema.parse(validMemoParams)).not.toThrowError();
+      expect(() => IcrcCallCanisterRequestParamsSchema.parse(validMemoParams)).not.toThrow();
     });
 
     it('should pass validation when "nonce" is a valid Uint8Array of length = 32', () => {
@@ -450,7 +446,7 @@ describe('icrc-requests', () => {
         nonce: uint8ArrayToBase64(new Uint8Array(32))
       };
 
-      expect(() => IcrcCallCanisterRequestParamsSchema.parse(validMemoParams)).not.toThrowError();
+      expect(() => IcrcCallCanisterRequestParamsSchema.parse(validMemoParams)).not.toThrow();
     });
 
     it('should fail validation when "nonce" exceeds 32 bytes', () => {
@@ -459,31 +455,31 @@ describe('icrc-requests', () => {
         nonce: new Uint8Array(33)
       };
 
-      expect(() => IcrcCallCanisterRequestParamsSchema.parse(invalidMemoParams)).toThrowError();
+      expect(() => IcrcCallCanisterRequestParamsSchema.parse(invalidMemoParams)).toThrow();
     });
 
     it('should fail validation when "canisterId" is missing', () => {
       const {canisterId: _, ...rest} = mockCallCanisterParams;
 
-      expect(() => IcrcCallCanisterRequestParamsSchema.parse(rest)).toThrowError();
+      expect(() => IcrcCallCanisterRequestParamsSchema.parse(rest)).toThrow();
     });
 
     it('should fail validation when "sender" is missing', () => {
       const {sender: _, ...rest} = mockCallCanisterParams;
 
-      expect(() => IcrcCallCanisterRequestParamsSchema.parse(rest)).toThrowError();
+      expect(() => IcrcCallCanisterRequestParamsSchema.parse(rest)).toThrow();
     });
 
     it('should fail validation when "method" is missing', () => {
       const {method: _, ...rest} = mockCallCanisterParams;
 
-      expect(() => IcrcCallCanisterRequestParamsSchema.parse(rest)).toThrowError();
+      expect(() => IcrcCallCanisterRequestParamsSchema.parse(rest)).toThrow();
     });
 
     it('should fail validation when "arg" is missing', () => {
       const {arg: _, ...rest} = mockCallCanisterParams;
 
-      expect(() => IcrcCallCanisterRequestParamsSchema.parse(rest)).toThrowError();
+      expect(() => IcrcCallCanisterRequestParamsSchema.parse(rest)).toThrow();
     });
   });
 });

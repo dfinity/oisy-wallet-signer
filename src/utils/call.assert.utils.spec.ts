@@ -14,14 +14,14 @@ describe('call.assert.utils', () => {
       const requestMethod = 'icrc1_transfer';
       const responseMethod = 'icrc1_transfer';
 
-      expect(() => assertCallMethod({requestMethod, responseMethod})).not.toThrowError();
+      expect(() => assertCallMethod({requestMethod, responseMethod})).not.toThrow();
     });
 
     it('should throw an error when methods do not match', () => {
       const requestMethod = 'icrc1_transfer';
       const responseMethod = 'test';
 
-      expect(() => assertCallMethod({requestMethod, responseMethod})).toThrowError(
+      expect(() => assertCallMethod({requestMethod, responseMethod})).toThrow(
         'The response method does not match the request method.'
       );
     });
@@ -37,7 +37,7 @@ describe('call.assert.utils', () => {
           requestArg: requestArgBlob,
           responseArg
         })
-      ).not.toThrowError();
+      ).not.toThrow();
     });
 
     it('should throw an error when arguments do not match', () => {
@@ -49,7 +49,7 @@ describe('call.assert.utils', () => {
           requestArg: requestArgBlob,
           responseArg
         })
-      ).toThrowError('The response does not contain the request arguments.');
+      ).toThrow('The response does not contain the request arguments.');
     });
   });
 
@@ -58,16 +58,14 @@ describe('call.assert.utils', () => {
       const requestCanisterId = Principal.fromText(mockCanisterId);
       const responseCanisterId = Principal.fromText(mockCanisterId);
 
-      expect(() =>
-        assertCallCanisterId({requestCanisterId, responseCanisterId})
-      ).not.toThrowError();
+      expect(() => assertCallCanisterId({requestCanisterId, responseCanisterId})).not.toThrow();
     });
 
     it('should throw an error when methods do not match', () => {
       const requestCanisterId = Principal.fromText(mockCanisterId);
       const responseCanisterId = Principal.fromText(mockPrincipalText);
 
-      expect(() => assertCallCanisterId({requestCanisterId, responseCanisterId})).toThrowError(
+      expect(() => assertCallCanisterId({requestCanisterId, responseCanisterId})).toThrow(
         'The response canister ID does not match the requested canister ID.'
       );
     });
@@ -82,13 +80,13 @@ describe('call.assert.utils', () => {
     it.each(senders)('should not throw an error when sender match', (responseSender) => {
       const requestSender = mockPrincipalText;
 
-      expect(() => assertCallSender({requestSender, responseSender})).not.toThrowError();
+      expect(() => assertCallSender({requestSender, responseSender})).not.toThrow();
     });
 
     it.each(senders)('should throw an error when methods do not match', (responseSender) => {
       const requestSender = mockCanisterId;
 
-      expect(() => assertCallSender({requestSender, responseSender})).toThrowError(
+      expect(() => assertCallSender({requestSender, responseSender})).toThrow(
         'The response sender does not match the request sender.'
       );
     });

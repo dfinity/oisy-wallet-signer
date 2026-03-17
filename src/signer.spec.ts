@@ -300,7 +300,7 @@ describe('Signer', () => {
 
       expect(() => {
         window.dispatchEvent(messageEventDiff);
-      }).not.toThrowError();
+      }).not.toThrow();
     });
   });
 
@@ -2549,7 +2549,7 @@ describe('Signer', () => {
           method: ICRC25_REQUEST_PERMISSIONS,
           prompt: mockPermissionsPrompt
         });
-      }).not.toThrowError();
+      }).not.toThrow();
 
       expect(spy).toHaveBeenCalledWith(mockPermissionsPrompt);
     });
@@ -2564,7 +2564,7 @@ describe('Signer', () => {
           method: ICRC27_ACCOUNTS,
           prompt: mockAccountsPrompt
         });
-      }).not.toThrowError();
+      }).not.toThrow();
 
       expect(spy).toHaveBeenCalledWith(mockAccountsPrompt);
     });
@@ -2579,7 +2579,7 @@ describe('Signer', () => {
           method: ICRC21_CALL_CONSENT_MESSAGE,
           prompt: mockConsentMessagePrompt
         });
-      }).not.toThrowError();
+      }).not.toThrow();
 
       expect(spy).toHaveBeenCalledWith(mockConsentMessagePrompt);
     });
@@ -2594,7 +2594,7 @@ describe('Signer', () => {
           method: ICRC49_CALL_CANISTER,
           prompt: mockCallCanisterPrompt
         });
-      }).not.toThrowError();
+      }).not.toThrow();
 
       expect(spy).toHaveBeenCalledWith(mockCallCanisterPrompt);
     });
@@ -2608,7 +2608,7 @@ describe('Signer', () => {
           method: 'something',
           prompt: mockPrompt
         });
-      }).toThrowError(
+      }).toThrow(
         'The specified method is not supported. Please ensure you are using a supported standard.'
       );
     });

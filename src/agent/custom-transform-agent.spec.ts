@@ -75,7 +75,7 @@ describe('customAddTransform core logic', () => {
 
     await expect(
       transform(mockRequest as unknown as httpAgent.HttpAgentSubmitRequest)
-    ).rejects.toThrowError(
+    ).rejects.toThrow(
       'The request has expired and is no longer valid. Please try again with a new request.'
     );
   });

@@ -85,13 +85,13 @@ describe('SignerPrompts', () => {
         payload.confirm(scopes);
       };
 
-      expect(() => PermissionsPromptSchema.parse(prompt)).not.toThrowError();
+      expect(() => PermissionsPromptSchema.parse(prompt)).not.toThrow();
     });
 
     it('should fail with invalid prompt', () => {
       const invalidPrompt = 123;
 
-      expect(() => PermissionsPromptSchema.parse(invalidPrompt)).toThrowError();
+      expect(() => PermissionsPromptSchema.parse(invalidPrompt)).toThrow();
     });
   });
 
@@ -101,13 +101,13 @@ describe('SignerPrompts', () => {
         payload.approve(mockAccounts);
       };
 
-      expect(() => AccountsPromptSchema.parse(prompt)).not.toThrowError();
+      expect(() => AccountsPromptSchema.parse(prompt)).not.toThrow();
     });
 
     it('should fail with invalid AccountsPrompt', () => {
       const invalidPrompt = 123;
 
-      expect(() => AccountsPromptSchema.parse(invalidPrompt)).toThrowError();
+      expect(() => AccountsPromptSchema.parse(invalidPrompt)).toThrow();
     });
   });
 
@@ -119,7 +119,7 @@ describe('SignerPrompts', () => {
         }
       };
 
-      expect(() => ConsentMessagePromptSchema.parse(prompt)).not.toThrowError();
+      expect(() => ConsentMessagePromptSchema.parse(prompt)).not.toThrow();
     });
 
     it('should validate a ConsentMessagePrompt with status "result"', () => {
@@ -129,7 +129,7 @@ describe('SignerPrompts', () => {
         }
       };
 
-      expect(() => ConsentMessagePromptSchema.parse(prompt)).not.toThrowError();
+      expect(() => ConsentMessagePromptSchema.parse(prompt)).not.toThrow();
     });
 
     it('should validate a ConsentMessagePrompt with status "error"', () => {
@@ -139,7 +139,7 @@ describe('SignerPrompts', () => {
         }
       };
 
-      expect(() => ConsentMessagePromptSchema.parse(prompt)).not.toThrowError();
+      expect(() => ConsentMessagePromptSchema.parse(prompt)).not.toThrow();
     });
   });
 
@@ -151,7 +151,7 @@ describe('SignerPrompts', () => {
         }
       };
 
-      expect(() => CallCanisterPromptSchema.parse(prompt)).not.toThrowError();
+      expect(() => CallCanisterPromptSchema.parse(prompt)).not.toThrow();
     });
 
     it('should validate a CallCanisterPrompt with status "result"', () => {
@@ -161,7 +161,7 @@ describe('SignerPrompts', () => {
         }
       };
 
-      expect(() => CallCanisterPromptSchema.parse(prompt)).not.toThrowError();
+      expect(() => CallCanisterPromptSchema.parse(prompt)).not.toThrow();
     });
 
     it('should validate a CallCanisterPrompt with status "error"', () => {
@@ -171,13 +171,13 @@ describe('SignerPrompts', () => {
         }
       };
 
-      expect(() => CallCanisterPromptSchema.parse(prompt)).not.toThrowError();
+      expect(() => CallCanisterPromptSchema.parse(prompt)).not.toThrow();
     });
 
     it('should fail with an invalid CallCanisterPrompt', () => {
       const invalidPrompt = 123;
 
-      expect(() => CallCanisterPromptSchema.parse(invalidPrompt)).toThrowError();
+      expect(() => CallCanisterPromptSchema.parse(invalidPrompt)).toThrow();
     });
   });
 });
