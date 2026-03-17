@@ -69,7 +69,7 @@ describe('idl.utils', () => {
           recordClass: mockRecordClass,
           bytes: invalidReply
         })
-      ).toThrowError(/Wrong magic number/);
+      ).toThrow(/Wrong magic number/);
     });
 
     it('should throw an error if more than one object is returned', () => {
@@ -85,7 +85,7 @@ describe('idl.utils', () => {
           recordClass: mockRecordClass,
           bytes: mockReply
         })
-      ).toThrowError('More than one object returned. This is unexpected.');
+      ).toThrow('More than one object returned. This is unexpected.');
     });
   });
 });
