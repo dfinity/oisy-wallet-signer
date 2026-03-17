@@ -1435,9 +1435,9 @@ describe('Relying Party', () => {
 
           window.close();
 
-          await expect(
-            relyingParty.testCall({params: mockCallCanisterParams})
-          ).rejects.toThrow('The signer has been closed. Your request cannot be processed.');
+          await expect(relyingParty.testCall({params: mockCallCanisterParams})).rejects.toThrow(
+            'The signer has been closed. Your request cannot be processed.'
+          );
 
           spy.mockReset();
 

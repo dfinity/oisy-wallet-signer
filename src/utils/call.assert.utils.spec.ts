@@ -58,9 +58,7 @@ describe('call.assert.utils', () => {
       const requestCanisterId = Principal.fromText(mockCanisterId);
       const responseCanisterId = Principal.fromText(mockCanisterId);
 
-      expect(() =>
-        assertCallCanisterId({requestCanisterId, responseCanisterId})
-      ).not.toThrow();
+      expect(() => assertCallCanisterId({requestCanisterId, responseCanisterId})).not.toThrow();
     });
 
     it('should throw an error when methods do not match', () => {

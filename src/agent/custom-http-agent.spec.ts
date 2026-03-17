@@ -259,9 +259,7 @@ describe('CustomHttpAgent', () => {
             .spyOn(httpAgent.Certificate, 'create')
             .mockRejectedValue(new Error('Invalid certificate'));
 
-          await expect(agent.request(mockRequestPayload)).rejects.toThrow(
-            'Invalid certificate'
-          );
+          await expect(agent.request(mockRequestPayload)).rejects.toThrow('Invalid certificate');
 
           spy.mockRestore();
         });

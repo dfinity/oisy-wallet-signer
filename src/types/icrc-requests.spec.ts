@@ -47,9 +47,7 @@ describe('icrc-requests', () => {
         }
       };
 
-      expect(() =>
-        IcrcRequestAnyPermissionsRequestSchema.parse(randomMethodRequest)
-      ).not.toThrow();
+      expect(() => IcrcRequestAnyPermissionsRequestSchema.parse(randomMethodRequest)).not.toThrow();
     });
 
     it('should throw if request has no method', () => {
@@ -394,9 +392,7 @@ describe('icrc-requests', () => {
 
   describe('IcrcCallCanisterRequestParamsSchema', () => {
     it('should validate a correct request params', () => {
-      expect(() =>
-        IcrcCallCanisterRequestParamsSchema.parse(mockCallCanisterParams)
-      ).not.toThrow();
+      expect(() => IcrcCallCanisterRequestParamsSchema.parse(mockCallCanisterParams)).not.toThrow();
     });
 
     it('should fail validation when "canisterId" is invalid', () => {
