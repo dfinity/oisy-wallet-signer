@@ -89,7 +89,7 @@
     "npm": ">=11.5.1 <12.0.0"
   },
   "peerDependencies": {
-    "@dfinity/utils": "^4",
+    "@dfinity/utils": "^4.0.3",
     "@dfinity/zod-schemas": "^3",
     "@icp-sdk/canisters": "^3",
     "@icp-sdk/core": "^4",
