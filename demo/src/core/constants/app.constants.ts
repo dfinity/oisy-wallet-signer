@@ -22,7 +22,7 @@ export const WALLET_LEGACY_SIGNER_URL = `https://${LEGACY_SIGNER_FRONTEND_ROOT}`
 const SIGNER_SUBDOMAINS = ['staging', 'beta'];
 
 const standaloneSignerOrigin = ({ root, env }: { root: string; env: string }): string =>
-	`https://${env === 'ic' ? root : `${env}.${root}`}`;
+	`https://${env}.${root}`;
 
 export const SIGNER_TEST_SUBDOMAINS = [
 	...SIGNER_SUBDOMAINS.map((env) => standaloneSignerOrigin({ root: SIGNER_FRONTEND_ROOT, env })),
