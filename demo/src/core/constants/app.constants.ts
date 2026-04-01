@@ -16,13 +16,16 @@ export const WALLET_SIGNER_DEMO_MAINNET_URL = 'https://lr6cl-oyaaa-aaaal-asuga-c
 const SIGNER_FRONTEND_ROOT = 'signer.oisy.com';
 const LEGACY_SIGNER_FRONTEND_ROOT = 'legacy-signer.oisy.com';
 
-export const WALLET_SIGNER_URL = `https://${SIGNER_FRONTEND_ROOT}`;
-export const WALLET_LEGACY_SIGNER_URL = `https://${LEGACY_SIGNER_FRONTEND_ROOT}`;
-
 const SIGNER_SUBDOMAINS = ['staging', 'beta'];
 
 const standaloneSignerOrigin = ({ root, env }: { root: string; env: string }): string =>
-	`https://${env}.${root}`;
+	`https://${env === 'ic' ? root : `${env}.${root}`}`;
+
+export const WALLET_SIGNER_URL = standaloneSignerOrigin({ root: SIGNER_FRONTEND_ROOT, env: 'ic' });
+export const WALLET_LEGACY_SIGNER_URL = standaloneSignerOrigin({
+	root: LEGACY_SIGNER_FRONTEND_ROOT,
+	env: 'ic'
+});
 
 export const WALLET_SIGNER_TEST_SUBDOMAINS = [
 	...SIGNER_SUBDOMAINS.map((env) => standaloneSignerOrigin({ root: SIGNER_FRONTEND_ROOT, env })),
