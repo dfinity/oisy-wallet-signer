@@ -13,6 +13,19 @@ export const WALLET_TEST_SUBDOMAINS = [
 
 export const WALLET_SIGNER_DEMO_MAINNET_URL = 'https://lr6cl-oyaaa-aaaal-asuga-cai.icp0.io/sign';
 
+const SIGNER_FRONTEND_ROOT = 'signer.oisy.com';
+const LEGACY_SIGNER_FRONTEND_ROOT = 'legacy-signer.oisy.com';
+
+const SIGNER_SUBDOMAINS = ['staging', 'beta', 'ic'];
+
+const standaloneSignerOrigin = ({ root, env }: { root: string; env: string }): string =>
+	`https://${env === 'ic' ? root : `${env}.${root}`}`;
+
+export const SIGNER_STANDALONE_FRONTEND_URLS = [
+	...SIGNER_SUBDOMAINS.map((env) => standaloneSignerOrigin({ root: SIGNER_FRONTEND_ROOT, env })),
+	...SIGNER_SUBDOMAINS.map((env) => standaloneSignerOrigin({ root: LEGACY_SIGNER_FRONTEND_ROOT, env }))
+];
+
 export const LOCAL_REPLICA_HOST = import.meta.env.VITE_LOCAL_REPLICA_HOST;
 export const LOCAL_REPLICA_URL = `http://${LOCAL_REPLICA_HOST}`;
 

@@ -4,6 +4,7 @@
 	import InputSelect from '$core/components/InputSelect.svelte';
 	import Value from '$core/components/Value.svelte';
 	import {
+		SIGNER_STANDALONE_FRONTEND_URLS,
 		WALLET_TEST_SUBDOMAINS,
 		PROD,
 		WALLET_DEFAULT_URL,
@@ -30,6 +31,7 @@
 		...(PROD
 			? WALLET_TEST_SUBDOMAINS.map((subdomain) => `https://${subdomain}.oisy.com/sign`)
 			: []),
+		...(PROD ? SIGNER_STANDALONE_FRONTEND_URLS : []),
 		...(PROD ? [WALLET_SIGNER_DEMO_MAINNET_URL] : [])
 	].map<SelectUrl>(mapUrl);
 
