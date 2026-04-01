@@ -24,7 +24,7 @@ const SIGNER_SUBDOMAINS = ['staging', 'beta'];
 const standaloneSignerOrigin = ({ root, env }: { root: string; env: string }): string =>
 	`https://${env}.${root}`;
 
-export const SIGNER_TEST_SUBDOMAINS = [
+export const WALLET_SIGNER_TEST_SUBDOMAINS = [
 	...SIGNER_SUBDOMAINS.map((env) => standaloneSignerOrigin({ root: SIGNER_FRONTEND_ROOT, env })),
 	...SIGNER_SUBDOMAINS.map((env) =>
 		standaloneSignerOrigin({ root: LEGACY_SIGNER_FRONTEND_ROOT, env })
