@@ -16,14 +16,19 @@ export const WALLET_SIGNER_DEMO_MAINNET_URL = 'https://lr6cl-oyaaa-aaaal-asuga-c
 const SIGNER_FRONTEND_ROOT = 'signer.oisy.com';
 const LEGACY_SIGNER_FRONTEND_ROOT = 'legacy-signer.oisy.com';
 
-const SIGNER_SUBDOMAINS = ['staging', 'beta', 'ic'];
+export const WALLET_SIGNER_URL = `https://${SIGNER_FRONTEND_ROOT}`;
+export const WALLET_LEGACY_SIGNER_URL = `https://${LEGACY_SIGNER_FRONTEND_ROOT}`;
+
+const SIGNER_SUBDOMAINS = ['staging', 'beta'];
 
 const standaloneSignerOrigin = ({ root, env }: { root: string; env: string }): string =>
 	`https://${env === 'ic' ? root : `${env}.${root}`}`;
 
-export const SIGNER_STANDALONE_FRONTEND_URLS = [
+export const SIGNER_TEST_SUBDOMAINS = [
 	...SIGNER_SUBDOMAINS.map((env) => standaloneSignerOrigin({ root: SIGNER_FRONTEND_ROOT, env })),
-	...SIGNER_SUBDOMAINS.map((env) => standaloneSignerOrigin({ root: LEGACY_SIGNER_FRONTEND_ROOT, env }))
+	...SIGNER_SUBDOMAINS.map((env) =>
+		standaloneSignerOrigin({ root: LEGACY_SIGNER_FRONTEND_ROOT, env })
+	)
 ];
 
 export const LOCAL_REPLICA_HOST = import.meta.env.VITE_LOCAL_REPLICA_HOST;
