@@ -4,10 +4,13 @@
 	import InputSelect from '$core/components/InputSelect.svelte';
 	import Value from '$core/components/Value.svelte';
 	import {
+		WALLET_SIGNER_TEST_SUBDOMAINS,
 		WALLET_TEST_SUBDOMAINS,
 		PROD,
 		WALLET_DEFAULT_URL,
-		WALLET_SIGNER_DEMO_MAINNET_URL
+		WALLET_SIGNER_DEMO_MAINNET_URL,
+		WALLET_SIGNER_URL,
+		WALLET_LEGACY_SIGNER_URL
 	} from '$core/constants/app.constants';
 	import { walletUrlStore } from '$lib/stores/wallet.store';
 
@@ -27,9 +30,11 @@
 
 	const URLS = [
 		WALLET_DEFAULT_URL,
+		...(PROD ? [WALLET_SIGNER_URL, WALLET_LEGACY_SIGNER_URL] : []),
 		...(PROD
 			? WALLET_TEST_SUBDOMAINS.map((subdomain) => `https://${subdomain}.oisy.com/sign`)
 			: []),
+		...(PROD ? WALLET_SIGNER_TEST_SUBDOMAINS : []),
 		...(PROD ? [WALLET_SIGNER_DEMO_MAINNET_URL] : [])
 	].map<SelectUrl>(mapUrl);
 
