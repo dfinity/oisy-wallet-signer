@@ -73,7 +73,7 @@
   "devDependencies": {
     "@dfinity/eslint-config-oisy-wallet": "^0.3.0",
     "@dfinity/internet-identity-playwright": "^3.0.0",
-    "@icp-sdk/bindgen": "^0.2.1",
+    "@icp-sdk/bindgen": "^0.3.0",
     "@playwright/test": "^1.58.2",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.10.1",
