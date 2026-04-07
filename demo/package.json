@@ -39,7 +39,7 @@
 		"prettier": "^3.8.1",
 		"prettier-plugin-organize-imports": "^4.3.0",
 		"prettier-plugin-svelte": "^3.5.0",
-		"sass": "^1.97.3",
+		"sass": "^1.99.0",
 		"svelte": "^5.53.6",
 		"svelte-check": "^4.4.4",
 		"tailwindcss": "^4.1.18",
