@@ -18,7 +18,7 @@ jobs:
           exit 1
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - name: Prepare Lib
         uses: ./.github/actions/prepare
       - name: Prepare Demo
@@ -34,7 +34,7 @@ jobs:
           cd ..
           npm run e2e:ci:snapshots
       - name: Commit Playwright updated snapshots
-        uses: EndBug/add-and-commit@v9
+        uses: EndBug/add-and-commit@a94899bca583c204427a224a7af87c02f9b325d5 # v9.1.4
         if: ${{ github.ref != 'refs/heads/main' }}
         with:
           add: e2e
