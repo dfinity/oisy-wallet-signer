@@ -132,9 +132,12 @@ describe('call.utils', () => {
 
     describe('With agent root key', () => {
       beforeEach(() => {
-        createSpy = vi.spyOn(agent.HttpAgent, 'create').mockResolvedValue({
-          rootKey: mockLocalIcRootKey
-        } as unknown as agent.HttpAgent);
+        createSpy = vi.spyOn(agent.HttpAgent, 'create').mockResolvedValue(
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- required by tsc since this partial mock does not satisfy the full HttpAgent shape
+          {
+            rootKey: mockLocalIcRootKey
+          } as unknown as agent.HttpAgent
+        );
       });
 
       it('should decode success response', async () => {
@@ -173,9 +176,12 @@ describe('call.utils', () => {
 
     describe('Without agent root key', () => {
       beforeEach(() => {
-        createSpy = vi.spyOn(agent.HttpAgent, 'create').mockResolvedValue({
-          rootKey: null
-        } as unknown as agent.HttpAgent);
+        createSpy = vi.spyOn(agent.HttpAgent, 'create').mockResolvedValue(
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- required by tsc since this partial mock does not satisfy the full HttpAgent shape
+          {
+            rootKey: null
+          } as unknown as agent.HttpAgent
+        );
       });
 
       it('should throw an exception is agent root key is undefined', async () => {
