@@ -114,7 +114,11 @@ describe('Signer', () => {
 
     beforeEach(() => {
       signer = Signer.init(signerOptions);
-      onMessageListenerSpy = vi.spyOn(signer as unknown as {onMessage: () => void}, 'onMessage');
+      onMessageListenerSpy = vi.spyOn(
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- required by tsc to spy on the private `onMessage` method
+        signer as unknown as {onMessage: () => void},
+        'onMessage'
+      );
     });
 
     afterEach(() => {
@@ -132,6 +136,7 @@ describe('Signer', () => {
 
     it('should not process message which are not RpcRequest', () => {
       const spyAssertAndSetOrigin = vi.spyOn(
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- required by tsc to spy on the private `assertNotUndefinedAndSameOrigin` method
         signer as unknown as {
           assertNotUndefinedAndSameOrigin: (params: {
             origin: Origin;
@@ -512,6 +517,7 @@ describe('Signer', () => {
 
         it('should not handle with busy', async () => {
           const handleWithBusySpy = vi.spyOn(
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- required by tsc to spy on the private `handleWithBusy` method
             signer as unknown as {handleWithBusy: () => void},
             'handleWithBusy'
           );
@@ -524,6 +530,7 @@ describe('Signer', () => {
 
         it('should not handle with busy even if the answer to the status message has been notified', async () => {
           const handleWithBusySpy = vi.spyOn(
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- required by tsc to spy on the private `handleWithBusy` method
             signer as unknown as {handleWithBusy: () => void},
             'handleWithBusy'
           );
@@ -1179,7 +1186,11 @@ describe('Signer', () => {
           it('should reset to idle', async () => {
             const {confirm} = await prepareConfirm();
 
-            const spy = vi.spyOn(signer as unknown as {setIdle: () => void}, 'setIdle');
+            const spy = vi.spyOn(
+              // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- required by tsc to spy on the private `setIdle` method
+              signer as unknown as {setIdle: () => void},
+              'setIdle'
+            );
 
             confirm?.([
               {
@@ -1736,7 +1747,11 @@ describe('Signer', () => {
             it('should reset to idle', async () => {
               const {approve} = await prepareApprove();
 
-              const spy = vi.spyOn(signer as unknown as {setIdle: () => void}, 'setIdle');
+              const spy = vi.spyOn(
+                // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- required by tsc to spy on the private `setIdle` method
+                signer as unknown as {setIdle: () => void},
+                'setIdle'
+              );
 
               approve?.(mockAccounts);
 
@@ -2172,7 +2187,11 @@ describe('Signer', () => {
                   let spySetIdle: MockInstance;
 
                   beforeEach(async () => {
-                    spySetIdle = vi.spyOn(signer as unknown as {setIdle: () => void}, 'setIdle');
+                    spySetIdle = vi.spyOn(
+                      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- required by tsc to spy on the private `setIdle` method
+                      signer as unknown as {setIdle: () => void},
+                      'setIdle'
+                    );
 
                     spyCanisterCall = vi
                       .spyOn(SignerApi.prototype, 'call')

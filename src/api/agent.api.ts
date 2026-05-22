@@ -61,7 +61,7 @@ export abstract class AgentApi {
    * @returns {Promise<HttpAgentProvider>} - A promise that resolves to a default agent instance.
    */
   protected async getDefaultAgent(options: SignerOptions): Promise<HttpAgentProvider> {
-    return (await this.getAgent({options, type: 'default'})) as HttpAgentProvider;
+    return await this.getAgent({options, type: 'default'});
   }
 
   /**
