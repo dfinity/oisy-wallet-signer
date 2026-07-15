@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { IcpWallet } from '@dfinity/oisy-wallet-signer/icp-wallet';
+	import type { IcrcAccount } from '@dfinity/oisy-wallet-signer';
 	import { createAgent, isNullish } from '@dfinity/utils';
 	import { IcpLedgerCanister } from '@icp-sdk/canisters/ledger/icp';
 	import { Principal } from '@icp-sdk/core/principal';
@@ -8,10 +8,13 @@
 	import { alertStore } from '$core/stores/alert.store';
 	import { authStore } from '$core/stores/auth.store';
 	import { emit } from '$core/utils/events.utils';
-	import { walletUrlStore } from '$lib/stores/wallet.store';
 	import { getTransferRequest } from '$lib/utils/transfer.utils';
 
-	let wallet = $state<IcpWallet | undefined>(undefined);
+	interface Props {
+		account: IcrcAccount;
+	}
+
+	let { account }: Props = $props();
 
 	const onclick = async () => {
 		try {
@@ -22,26 +25,6 @@
 				});
 				return;
 			}
-
-			wallet = await IcpWallet.connect({
-				url: $walletUrlStore
-			});
-
-			const accounts = await wallet?.accounts();
-
-			const account = accounts?.[0];
-
-			if (isNullish(account)) {
-				await wallet?.disconnect();
-
-				alertStore.set({
-					type: 'error',
-					message: 'The wallet did not provide any account.'
-				});
-				return;
-			}
-
-			await wallet?.disconnect();
 
 			const agent = await createAgent({
 				...(DEV && { host: LOCAL_REPLICA_URL, fetchRootKey: true }),

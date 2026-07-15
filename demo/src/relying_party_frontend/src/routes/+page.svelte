@@ -35,7 +35,7 @@
 		<div class="md:min-h-20">
 			{#if nonNullish(account)}
 				<div in:fade>
-					<SendICP />
+					<SendICP {account} />
 				</div>
 			{/if}
 		</div>
