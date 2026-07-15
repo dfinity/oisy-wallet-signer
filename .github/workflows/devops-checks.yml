@@ -25,6 +25,10 @@ jobs:
         uses: zizmorcore/zizmor-action@6599ee8b7a49aef6a770f63d261d214911a7ce02 # v0.6.0
         with:
           persona: pedantic
+          # Pin the zizmor version so the gate is deterministic: a new release
+          # can add audits that would otherwise fail unrelated PRs. Bump this
+          # deliberately and address any new findings in the same change.
+          version: v1.24.0
           # Fail the job on findings instead of only uploading a SARIF report to
           # the Security tab, so unpinned or otherwise unsafe workflow changes
           # block the pull request.
