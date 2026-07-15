@@ -17,10 +17,6 @@ jobs:
         with:
           persist-credentials: false
 
-      # zizmor statically audits our GitHub Actions workflows and composite
-      # actions. It notably enforces that every third-party action is pinned to
-      # a full commit SHA (unpinned-uses), guarding against supply-chain attacks
-      # via mutable tags. See .github/zizmor.yml for configured exceptions.
       - name: Lint GitHub Actions with zizmor
         run: pipx run zizmor==1.22.0 .github
         env:
