@@ -1,9 +1,0 @@
-rules:
-  artipacked:
-    ignore:
-      # The "Update Snapshots" workflow commits and pushes the regenerated
-      # Playwright snapshots back to the branch via EndBug/add-and-commit,
-      # which needs the checkout credentials to persist. It is a manually
-      # dispatched maintenance workflow that never runs on main, so keeping
-      # the default persist-credentials behaviour here is acceptable.
-      - e2e-snapshots.yml

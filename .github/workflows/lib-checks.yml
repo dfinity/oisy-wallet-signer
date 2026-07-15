@@ -6,8 +6,13 @@ on:
 
 permissions: {}
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   format:
+    name: Format
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -23,6 +28,7 @@ jobs:
         run: npm run format:check
 
   lint:
+    name: Lint
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -38,6 +44,7 @@ jobs:
         run: npm run lint -- --max-warnings 0
 
   build:
+    name: Build
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -53,6 +60,7 @@ jobs:
         run: npm run build
 
   lib-checks-pass:
+    name: lib-checks-pass
     needs: ['build', 'lint', 'format']
     runs-on: ubuntu-latest
     permissions:

@@ -6,8 +6,13 @@ on:
 
 permissions: {}
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   e2e:
+    name: E2E
     runs-on: ubuntu-latest
 
     permissions:
@@ -48,6 +53,7 @@ jobs:
           retention-days: 3
 
   e2e-tests-pass:
+    name: e2e-tests-pass
     needs: ['e2e']
     runs-on: ubuntu-latest
     permissions:

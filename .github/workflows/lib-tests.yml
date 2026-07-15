@@ -6,8 +6,13 @@ on:
 
 permissions: {}
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   tests:
+    name: Tests
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -23,6 +28,7 @@ jobs:
         run: npm run test
 
   lib-tests-pass:
+    name: lib-tests-pass
     needs: ['tests']
     runs-on: ubuntu-latest
     permissions:

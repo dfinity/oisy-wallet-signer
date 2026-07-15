@@ -5,11 +5,16 @@ on:
 
 permissions: {}
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   update_snapshots:
+    name: Update Snapshots
     runs-on: ubuntu-20.04
     permissions:
-      contents: write
+      contents: write # Required to commit and push the regenerated Playwright snapshots back to the branch.
     steps:
       - name: Fail if branch is main
         if: ${{ github.ref == 'refs/heads/main' }}
@@ -19,6 +24,8 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
       - name: Prepare Lib
         uses: ./.github/actions/prepare
       - name: Prepare Demo
@@ -33,6 +40,13 @@ jobs:
           juno emulator start --headless &
           cd ..
           npm run e2e:ci:snapshots
+      # Checkout runs with persist-credentials: false, so re-supply the token to
+      # git (scoped to this local repo) enabling add-and-commit to push.
+      - name: Configure git credentials
+        if: ${{ github.ref != 'refs/heads/main' }}
+        run: git config url."https://github-actions:${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Commit Playwright updated snapshots
         uses: EndBug/add-and-commit@a94899bca583c204427a224a7af87c02f9b325d5 # v9.1.4
         if: ${{ github.ref != 'refs/heads/main' }}
