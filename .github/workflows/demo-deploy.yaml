@@ -34,14 +34,14 @@ jobs:
         working-directory: 'demo'
 
       - name: Deploy Relying Party
-        uses: junobuild/juno-action@3735a47e3c9c24cb89d5a3ca091ed9949ce94fac # v0.6.4
+        uses: junobuild/juno-action@99d76780c60c023b5396298f94a7264e0c7ee2b5 # v0.7.5
         with:
           args: hosting deploy
         env:
           PROJECT_PATH: demo/src/relying_party_frontend
 
       - name: Deploy Signer
-        uses: junobuild/juno-action@3735a47e3c9c24cb89d5a3ca091ed9949ce94fac # v0.6.4
+        uses: junobuild/juno-action@99d76780c60c023b5396298f94a7264e0c7ee2b5 # v0.7.5
         with:
           args: hosting deploy
         env:
