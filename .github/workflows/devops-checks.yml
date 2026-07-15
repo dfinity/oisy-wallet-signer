@@ -1,0 +1,36 @@
+name: Devops Checks
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  lint-github-actions:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      # zizmor statically audits our GitHub Actions workflows and composite
+      # actions. It notably enforces that every third-party action is pinned to
+      # a full commit SHA (unpinned-uses), guarding against supply-chain attacks
+      # via mutable tags. See .github/zizmor.yml for configured exceptions.
+      - name: Lint GitHub Actions with zizmor
+        run: pipx run zizmor==1.22.0 .github
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  devops-checks-pass:
+    needs: ['lint-github-actions']
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Cleared for merging
+        run: echo OK
