@@ -13,8 +13,13 @@ run-name: >-
 
 permissions: {}
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   publish-release:
+    name: Publish Release
     if: github.event_name == 'release'
 
     runs-on: ubuntu-latest
@@ -23,14 +28,16 @@ jobs:
 
     permissions:
       contents: read
-      id-token: write
+      id-token: write # Required for npm provenance, which uses OIDC to sign the published package.
 
     env:
       dist-directory: dist
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Prepare
         uses: ./.github/actions/prepare
@@ -42,6 +49,7 @@ jobs:
         working-directory: ${{env.dist-directory}}
 
   publish-next:
+    name: Publish Next
     if: github.event_name == 'workflow_dispatch'
 
     runs-on: ubuntu-latest
@@ -50,14 +58,16 @@ jobs:
 
     permissions:
       contents: read
-      id-token: write
+      id-token: write # Required for npm provenance, which uses OIDC to sign the published package.
 
     env:
       dist-directory: dist
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Prepare
         uses: ./.github/actions/prepare

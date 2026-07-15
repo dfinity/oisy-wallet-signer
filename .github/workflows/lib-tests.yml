@@ -6,21 +6,29 @@ on:
 
 permissions: {}
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   tests:
+    name: Tests
     runs-on: ubuntu-latest
     permissions:
       contents: read
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
       - name: Prepare
         uses: ./.github/actions/prepare
       - name: Tests
         run: npm run test
 
   lib-tests-pass:
+    name: lib-tests-pass
     needs: ['tests']
     runs-on: ubuntu-latest
     permissions:

@@ -3,10 +3,21 @@
 
 version: 2
 updates:
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: 'build'
+    cooldown:
+      default-days: 30
+
   - package-ecosystem: npm
     directory: '/'
     schedule:
       interval: monthly
+    cooldown:
+      default-days: 30
     allow:
       - dependency-type: development
     ignore:
@@ -21,6 +32,8 @@ updates:
     directory: '/demo'
     schedule:
       interval: monthly
+    cooldown:
+      default-days: 30
     ignore:
       - dependency-name: '@types/*'
       - dependency-name: '@typescript-eslint/*'
