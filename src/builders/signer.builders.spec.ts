@@ -40,6 +40,16 @@ describe('Signer builders', () => {
     icon: 'a-logo'
   };
 
+  // Rendered as markup by a wallet, this text becomes a control that can submit the approval form of the wallet.
+  // It also fits in the 32 bytes every ICRC-1 ledger accepts as a memo.
+  const markupText = '<button style=zoom:99>';
+
+  // The metadata is read from the canister the relying party asks to call, which it can control.
+  const markupToken = {
+    ...token,
+    symbol: markupText
+  };
+
   const expectMessage = ({
     result,
     expectedMessage
@@ -271,7 +281,151 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.t
 0.0010033 TKN
 
 **Memo:**
-PUPT`
+\`PUPT\``
+      });
+    });
+
+    it('should build a consent message with a memo that contains markup', async () => {
+      const memo = asciiStringToByteArray(markupText);
+
+      const arg = encodeIdl({
+        recordClass: Icrc1Idl.TransferArgs,
+        rawArgs: {
+          ...rawArgs,
+          memo: [memo]
+        }
+      });
+
+      const result = await buildContentMessageIcrc1Transfer({
+        arg: uint8ToBuf(base64ToUint8Array(arg)),
+        owner: owner.getPrincipal(),
+        token
+      });
+
+      expectMessage({
+        result,
+        expectedMessage: `# Approve the transfer of funds
+
+**Amount:**
+3,200.00000001 TKN
+
+**From:**
+${encodeIcrcAccount({owner: owner.getPrincipal()})}
+
+**To:**
+${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.to.subaccount)})}
+
+**Fee:**
+0.0010033 TKN
+
+**Memo:**
+\`<button style=zoom:99>\``
+      });
+    });
+
+    it('should build a consent message with a memo that contains markdown', async () => {
+      const memo = asciiStringToByteArray('`# Title [x](https://evil.com)');
+
+      const arg = encodeIdl({
+        recordClass: Icrc1Idl.TransferArgs,
+        rawArgs: {
+          ...rawArgs,
+          memo: [memo]
+        }
+      });
+
+      const result = await buildContentMessageIcrc1Transfer({
+        arg: uint8ToBuf(base64ToUint8Array(arg)),
+        owner: owner.getPrincipal(),
+        token
+      });
+
+      expectMessage({
+        result,
+        expectedMessage: `# Approve the transfer of funds
+
+**Amount:**
+3,200.00000001 TKN
+
+**From:**
+${encodeIcrcAccount({owner: owner.getPrincipal()})}
+
+**To:**
+${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.to.subaccount)})}
+
+**Fee:**
+0.0010033 TKN
+
+**Memo:**
+\`\` \`# Title [x](https://evil.com) \`\``
+      });
+    });
+
+    it('should build a consent message with a memo that impersonates another section', async () => {
+      const memo = asciiStringToByteArray('Thanks\n\n**Fee:**\n0.00000001 TKN');
+
+      const arg = encodeIdl({
+        recordClass: Icrc1Idl.TransferArgs,
+        rawArgs: {
+          ...rawArgs,
+          memo: [memo]
+        }
+      });
+
+      const result = await buildContentMessageIcrc1Transfer({
+        arg: uint8ToBuf(base64ToUint8Array(arg)),
+        owner: owner.getPrincipal(),
+        token
+      });
+
+      expectMessage({
+        result,
+        expectedMessage: `# Approve the transfer of funds
+
+**Amount:**
+3,200.00000001 TKN
+
+**From:**
+${encodeIcrcAccount({owner: owner.getPrincipal()})}
+
+**To:**
+${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.to.subaccount)})}
+
+**Fee:**
+0.0010033 TKN
+
+**Memo:**
+\`Thanks  **Fee:** 0.00000001 TKN\``
+      });
+    });
+
+    it('should build a consent message with a token symbol that contains markup', async () => {
+      const arg = encodeIdl({
+        recordClass: Icrc1Idl.TransferArgs,
+        rawArgs
+      });
+
+      const result = await buildContentMessageIcrc1Transfer({
+        arg: uint8ToBuf(base64ToUint8Array(arg)),
+        owner: owner.getPrincipal(),
+        token: markupToken
+      });
+
+      expectMessage({
+        result,
+        expectedMessage: `# Approve the transfer of funds
+
+**Amount:**
+3,200.00000001 \\<button style\\=zoom:99\\>
+
+**From:**
+${encodeIcrcAccount({owner: owner.getPrincipal()})}
+
+**To:**
+${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.to.subaccount)})}
+
+**Fee:**
+0.0010033 \\<button style\\=zoom:99\\>`
       });
     });
 
@@ -475,7 +629,91 @@ No expiration.
 ${encodeIcrcAccount({owner: owner.getPrincipal()})}
 
 **Memo:**
-PUPT`
+\`PUPT\``
+      });
+    });
+
+    it('should build a consent message with a memo that contains markup', async () => {
+      const memo = asciiStringToByteArray(markupText);
+
+      const arg = encodeIdl({
+        recordClass: Icrc2Idl.ApproveArgs,
+        rawArgs: {
+          ...mockIcrcApproveRawArgs,
+          memo: [memo]
+        }
+      });
+
+      const result = await buildContentMessageIcrc2Approve({
+        arg: uint8ToBuf(base64ToUint8Array(arg)),
+        owner: owner.getPrincipal(),
+        token
+      });
+
+      expectMessage({
+        result,
+        expectedMessage: `# Authorize another address to withdraw from your account
+
+**The following address is allowed to withdraw from your account:**
+${encodeIcrcAccount({owner: mockIcrcApproveRawArgs.spender.owner, subaccount: fromNullable(mockIcrcApproveRawArgs.spender.subaccount)})}
+
+**Your account:**
+${encodeIcrcAccount({owner: owner.getPrincipal()})}
+
+**Requested withdrawal allowance:**
+3,200.00000001 TKN
+
+⚠ The allowance will be set to 3,200.00000001 TKN independently of any previous allowance. Until this transaction has been executed the spender can still exercise the previous allowance (if any) to it's full amount.
+
+**Expiration date:**
+No expiration.
+
+**Approval fee:**
+0.0010033 TKN
+
+**Transaction fees to be paid by:**
+${encodeIcrcAccount({owner: owner.getPrincipal()})}
+
+**Memo:**
+\`<button style=zoom:99>\``
+      });
+    });
+
+    it('should build a consent message with a token symbol that contains markup', async () => {
+      const arg = encodeIdl({
+        recordClass: Icrc2Idl.ApproveArgs,
+        rawArgs: mockIcrcApproveRawArgs
+      });
+
+      const result = await buildContentMessageIcrc2Approve({
+        arg: uint8ToBuf(base64ToUint8Array(arg)),
+        owner: owner.getPrincipal(),
+        token: markupToken
+      });
+
+      expectMessage({
+        result,
+        expectedMessage: `# Authorize another address to withdraw from your account
+
+**The following address is allowed to withdraw from your account:**
+${encodeIcrcAccount({owner: mockIcrcApproveRawArgs.spender.owner, subaccount: fromNullable(mockIcrcApproveRawArgs.spender.subaccount)})}
+
+**Your account:**
+${encodeIcrcAccount({owner: owner.getPrincipal()})}
+
+**Requested withdrawal allowance:**
+3,200.00000001 \\<button style\\=zoom:99\\>
+
+⚠ The allowance will be set to 3,200.00000001 \\<button style\\=zoom:99\\> independently of any previous allowance. Until this transaction has been executed the spender can still exercise the previous allowance (if any) to it's full amount.
+
+**Expiration date:**
+No expiration.
+
+**Approval fee:**
+0.0010033 \\<button style\\=zoom:99\\>
+
+**Transaction fees to be paid by:**
+${encodeIcrcAccount({owner: owner.getPrincipal()})}`
       });
     });
 
@@ -841,7 +1079,81 @@ ${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.to.owner, subaccount: fr
 0.0010044 TKN
 
 **Memo:**
-PUPT`
+\`PUPT\``
+      });
+    });
+
+    it('should build a consent message with a memo that contains markup', async () => {
+      const memo = asciiStringToByteArray(markupText);
+
+      const arg = encodeIdl({
+        recordClass: Icrc2Idl.TransferFromArgs,
+        rawArgs: {
+          ...mockIcrcTransferFromRawArgs,
+          memo: [memo]
+        }
+      });
+
+      const result = await buildContentMessageIcrc2TransferFrom({
+        arg: uint8ToBuf(base64ToUint8Array(arg)),
+        owner: owner.getPrincipal(),
+        token
+      });
+
+      expectMessage({
+        result,
+        expectedMessage: `# Transfer from a withdrawal account
+
+**Withdrawal account:**
+${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.from.owner, subaccount: fromNullable(mockIcrcTransferFromRawArgs.from.subaccount)})}
+
+**Account sending the transfer request:**
+${encodeIcrcAccount({owner: owner.getPrincipal()})}
+
+**Amount to withdraw:**
+3.20678001 TKN
+
+**To:**
+${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.to.owner, subaccount: fromNullable(mockIcrcTransferFromRawArgs.to.subaccount)})}
+
+**Fee paid by withdrawal account:**
+0.0010044 TKN
+
+**Memo:**
+\`<button style=zoom:99>\``
+      });
+    });
+
+    it('should build a consent message with a token symbol that contains markup', async () => {
+      const arg = encodeIdl({
+        recordClass: Icrc2Idl.TransferFromArgs,
+        rawArgs: mockIcrcTransferFromRawArgs
+      });
+
+      const result = await buildContentMessageIcrc2TransferFrom({
+        arg: uint8ToBuf(base64ToUint8Array(arg)),
+        owner: owner.getPrincipal(),
+        token: markupToken
+      });
+
+      expectMessage({
+        result,
+        expectedMessage: `# Transfer from a withdrawal account
+
+**Withdrawal account:**
+${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.from.owner, subaccount: fromNullable(mockIcrcTransferFromRawArgs.from.subaccount)})}
+
+**Account sending the transfer request:**
+${encodeIcrcAccount({owner: owner.getPrincipal()})}
+
+**Amount to withdraw:**
+3.20678001 \\<button style\\=zoom:99\\>
+
+**To:**
+${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.to.owner, subaccount: fromNullable(mockIcrcTransferFromRawArgs.to.subaccount)})}
+
+**Fee paid by withdrawal account:**
+0.0010044 \\<button style\\=zoom:99\\>`
       });
     });
 
