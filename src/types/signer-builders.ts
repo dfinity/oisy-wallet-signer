@@ -21,7 +21,4 @@ export interface SignerBuilderParams {
 export type SignerBuilderFn = (params: SignerBuilderParams) => Promise<SignerBuildersResult>;
 
 export type SignerBuilderMethods =
-  | 'icrc1_transfer'
-  | 'icrc2_approve'
-  | 'icrc2_transfer_from'
-  | string;
+  'icrc1_transfer' | 'icrc2_approve' | 'icrc2_transfer_from' | string;
