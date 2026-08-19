@@ -7,15 +7,22 @@ on:
 
 permissions: {}
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   build:
+    name: Build & Deploy
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write
+      id-token: write # Required for OIDC authentication with Juno when deploying.
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Prepare
         uses: ./.github/actions/prepare
       - name: Prepare Demo
@@ -27,14 +34,14 @@ jobs:
         working-directory: 'demo'
 
       - name: Deploy Relying Party
-        uses: junobuild/juno-action@3735a47e3c9c24cb89d5a3ca091ed9949ce94fac # v0.6.4
+        uses: junobuild/juno-action@99d76780c60c023b5396298f94a7264e0c7ee2b5 # v0.7.5
         with:
           args: hosting deploy
         env:
           PROJECT_PATH: demo/src/relying_party_frontend
 
       - name: Deploy Signer
-        uses: junobuild/juno-action@3735a47e3c9c24cb89d5a3ca091ed9949ce94fac # v0.6.4
+        uses: junobuild/juno-action@99d76780c60c023b5396298f94a7264e0c7ee2b5 # v0.7.5
         with:
           args: hosting deploy
         env:
