@@ -15,7 +15,7 @@ jobs:
     name: Format
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write # Required to commit and push formatting changes back to the pull request branch.
 
     steps:
       - name: Create GitHub App Token
