@@ -205,8 +205,7 @@ export class IcrcWallet extends RelyingParty {
     });
 
     type TransferFromResult =
-      | {Ok: IcrcLedgerDid.BlockIndex}
-      | {Err: IcrcLedgerDid.TransferFromError};
+      {Ok: IcrcLedgerDid.BlockIndex} | {Err: IcrcLedgerDid.TransferFromError};
 
     const response = await decodeResponse<TransferFromResult>({
       params: callParams,
