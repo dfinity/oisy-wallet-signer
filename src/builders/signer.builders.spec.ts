@@ -8,7 +8,7 @@ import {Principal} from '@icp-sdk/core/principal';
 import {MAX_CONSENT_MESSAGE_ARG_SIZE_BYTES} from '../constants/signer.builders.constants';
 import {Icrc1Idl, Icrc2Idl, type Icrc1Did} from '../declarations';
 import {mockCallCanisterParams} from '../mocks/call-canister.mocks';
-import {mockPrincipalText} from '../mocks/icrc-accounts.mocks';
+import {mockPrincipalText, mockSubaccount} from '../mocks/icrc-accounts.mocks';
 import {mockIcrcApproveArg, mockIcrcApproveRawArgs} from '../mocks/icrc-approve.mocks';
 import {mockIcrcLocalCallParams} from '../mocks/icrc-call-utils.mocks';
 import {
@@ -165,7 +165,7 @@ s3oqv-3j7id-xjhbm-3owbe-fvwly-oso6u-vej6n-bexck-koyu2-bxb6y-wae
     });
 
     it('should build a consent message with a from label even if a subaccount is used', async () => {
-      const subaccount = Uint8Array.from([1, 2, 3]);
+      const subaccount = mockSubaccount;
 
       const arg = encodeIdl({
         recordClass: Icrc1Idl.TransferArgs,
@@ -200,7 +200,7 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.t
     });
 
     it('should build a consent message with a to subaccount', async () => {
-      const subaccount = Uint8Array.from([1, 2, 3]);
+      const subaccount = mockSubaccount;
 
       const arg = encodeIdl({
         recordClass: Icrc1Idl.TransferArgs,
@@ -391,7 +391,7 @@ ${encodeIcrcAccount({owner: owner.getPrincipal()})}`
     });
 
     it('should build a consent message with a from subaccount', async () => {
-      const subaccount = Uint8Array.from([1, 2, 3]);
+      const subaccount = mockSubaccount;
 
       const arg = encodeIdl({
         recordClass: Icrc2Idl.ApproveArgs,
@@ -685,7 +685,7 @@ ${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.to.owner, subaccount: fr
     });
 
     it('should build a consent message with a spender subaccount', async () => {
-      const subaccount = Uint8Array.from([1, 2, 3]);
+      const subaccount = mockSubaccount;
 
       const arg = encodeIdl({
         recordClass: Icrc2Idl.TransferFromArgs,
@@ -723,7 +723,7 @@ ${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.to.owner, subaccount: fr
     });
 
     it('should build a consent message with a from subaccount', async () => {
-      const subaccount = Uint8Array.from([1, 2, 3]);
+      const subaccount = mockSubaccount;
 
       const arg = encodeIdl({
         recordClass: Icrc2Idl.TransferFromArgs,
@@ -764,7 +764,7 @@ ${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.to.owner, subaccount: fr
     });
 
     it('should build a consent message with a to subaccount', async () => {
-      const subaccount = Uint8Array.from([1, 2, 3]);
+      const subaccount = mockSubaccount;
 
       const arg = encodeIdl({
         recordClass: Icrc2Idl.TransferFromArgs,
