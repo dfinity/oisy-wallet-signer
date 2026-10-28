@@ -26,7 +26,8 @@ import {
   ArgSizeError,
   buildContentMessageIcrc1Transfer,
   buildContentMessageIcrc2Approve,
-  buildContentMessageIcrc2TransferFrom
+  buildContentMessageIcrc2TransferFrom,
+  SubaccountLengthError
 } from './signer.builders';
 
 describe('Signer builders', () => {
@@ -87,6 +88,19 @@ describe('Signer builders', () => {
       `The argument size is too large. The maximum allowed size is ${MAX_CONSENT_MESSAGE_ARG_SIZE_BYTES} bytes.`
     );
   };
+
+  const expectSubaccountLengthError = (result: SignerBuildersResult) => {
+    expect('Err' in result).toBeTruthy();
+
+    const {Err} = result as SignerBuildersResultError;
+
+    expect(Err).toBeInstanceOf(SubaccountLengthError);
+    expect((Err as SubaccountLengthError).message).toEqual(
+      'A subaccount must be exactly 32 bytes long.'
+    );
+  };
+
+  const subaccountLengths = [0, 31, 33, 36];
 
   describe('icrc1_transfer', () => {
     const rawArgs: Icrc1Did.TransferArgs = {
@@ -320,6 +334,49 @@ ${encodeIcrcAccount({owner: rawArgs.to.owner, subaccount: fromNullable(rawArgs.t
 
 **Fee:**
 0.0001 TKN`
+      });
+    });
+
+    describe.each(subaccountLengths)('With a subaccount of %i bytes', (length) => {
+      const subaccount = new Uint8Array(length).fill(1);
+
+      it('should not build a consent message for the from subaccount', async () => {
+        const arg = encodeIdl({
+          recordClass: Icrc1Idl.TransferArgs,
+          rawArgs: {
+            ...rawArgs,
+            from_subaccount: [subaccount]
+          }
+        });
+
+        const result = await buildContentMessageIcrc1Transfer({
+          arg: uint8ToBuf(base64ToUint8Array(arg)),
+          owner: owner.getPrincipal(),
+          token
+        });
+
+        expectSubaccountLengthError(result);
+      });
+
+      it('should not build a consent message for the to subaccount', async () => {
+        const arg = encodeIdl({
+          recordClass: Icrc1Idl.TransferArgs,
+          rawArgs: {
+            ...rawArgs,
+            to: {
+              ...rawArgs.to,
+              subaccount: [subaccount]
+            }
+          }
+        });
+
+        const result = await buildContentMessageIcrc1Transfer({
+          arg: uint8ToBuf(base64ToUint8Array(arg)),
+          owner: owner.getPrincipal(),
+          token
+        });
+
+        expectSubaccountLengthError(result);
       });
     });
 
@@ -622,6 +679,49 @@ ${encodeIcrcAccount({owner: owner.getPrincipal()})}`
       });
     });
 
+    describe.each(subaccountLengths)('With a subaccount of %i bytes', (length) => {
+      const subaccount = new Uint8Array(length).fill(1);
+
+      it('should not build a consent message for the from subaccount', async () => {
+        const arg = encodeIdl({
+          recordClass: Icrc2Idl.ApproveArgs,
+          rawArgs: {
+            ...mockIcrcApproveRawArgs,
+            from_subaccount: [subaccount]
+          }
+        });
+
+        const result = await buildContentMessageIcrc2Approve({
+          arg: uint8ToBuf(base64ToUint8Array(arg)),
+          owner: owner.getPrincipal(),
+          token
+        });
+
+        expectSubaccountLengthError(result);
+      });
+
+      it('should not build a consent message for the spender subaccount', async () => {
+        const arg = encodeIdl({
+          recordClass: Icrc2Idl.ApproveArgs,
+          rawArgs: {
+            ...mockIcrcApproveRawArgs,
+            spender: {
+              ...mockIcrcApproveRawArgs.spender,
+              subaccount: [subaccount]
+            }
+          }
+        });
+
+        const result = await buildContentMessageIcrc2Approve({
+          arg: uint8ToBuf(base64ToUint8Array(arg)),
+          owner: owner.getPrincipal(),
+          token
+        });
+
+        expectSubaccountLengthError(result);
+      });
+    });
+
     it('should throw error if arg is too long', async () => {
       await assertArgSize(buildContentMessageIcrc2Approve);
     });
@@ -893,6 +993,70 @@ ${encodeIcrcAccount({owner: mockIcrcTransferFromRawArgs.to.owner, subaccount: fr
 
 **Fee paid by withdrawal account:**
 0.0001 TKN`
+      });
+    });
+
+    describe.each(subaccountLengths)('With a subaccount of %i bytes', (length) => {
+      const subaccount = new Uint8Array(length).fill(1);
+
+      it('should not build a consent message for the spender subaccount', async () => {
+        const arg = encodeIdl({
+          recordClass: Icrc2Idl.TransferFromArgs,
+          rawArgs: {
+            ...mockIcrcTransferFromRawArgs,
+            spender_subaccount: [subaccount]
+          }
+        });
+
+        const result = await buildContentMessageIcrc2TransferFrom({
+          arg: uint8ToBuf(base64ToUint8Array(arg)),
+          owner: owner.getPrincipal(),
+          token
+        });
+
+        expectSubaccountLengthError(result);
+      });
+
+      it('should not build a consent message for the from subaccount', async () => {
+        const arg = encodeIdl({
+          recordClass: Icrc2Idl.TransferFromArgs,
+          rawArgs: {
+            ...mockIcrcTransferFromRawArgs,
+            from: {
+              ...mockIcrcTransferFromRawArgs.from,
+              subaccount: [subaccount]
+            }
+          }
+        });
+
+        const result = await buildContentMessageIcrc2TransferFrom({
+          arg: uint8ToBuf(base64ToUint8Array(arg)),
+          owner: owner.getPrincipal(),
+          token
+        });
+
+        expectSubaccountLengthError(result);
+      });
+
+      it('should not build a consent message for the to subaccount', async () => {
+        const arg = encodeIdl({
+          recordClass: Icrc2Idl.TransferFromArgs,
+          rawArgs: {
+            ...mockIcrcTransferFromRawArgs,
+            to: {
+              ...mockIcrcTransferFromRawArgs.to,
+              subaccount: [subaccount]
+            }
+          }
+        });
+
+        const result = await buildContentMessageIcrc2TransferFrom({
+          arg: uint8ToBuf(base64ToUint8Array(arg)),
+          owner: owner.getPrincipal(),
+          token
+        });
+
+        expectSubaccountLengthError(result);
       });
     });
 
