@@ -8,6 +8,9 @@ import type {SignerBuilderFn, SignerBuilderMethods} from '../types/signer-builde
 // @see {@link https://github.com/dfinity/ic/blob/master/packages/icrc-ledger-types/src/icrc21/lib.rs#L20}
 export const MAX_CONSENT_MESSAGE_ARG_SIZE_BYTES = 500;
 
+// @see {@link https://github.com/dfinity/ICRC-1/blob/main/standards/ICRC-1/README.md#account}
+export const ICRC1_SUBACCOUNT_LENGTH_BYTES = 32;
+
 export const SIGNER_BUILDERS: Record<SignerBuilderMethods, SignerBuilderFn> = {
   icrc1_transfer: buildContentMessageIcrc1Transfer,
   icrc2_approve: buildContentMessageIcrc2Approve,
