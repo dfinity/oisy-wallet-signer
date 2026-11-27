@@ -19,7 +19,7 @@ updates:
     cooldown:
       default-days: 30
     allow:
-      - dependency-type: development
+      - dependency-type: all
     ignore:
       - dependency-name: '@types/*'
       - dependency-name: '@typescript-eslint/*'
