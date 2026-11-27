@@ -38,6 +38,7 @@ jobs:
         run: |
           cd demo
           juno emulator start --headless &
+          juno emulator wait --timeout 300000
           cd ..
           npm run e2e:ci:snapshots
       # Checkout runs with persist-credentials: false, so re-supply the token to
