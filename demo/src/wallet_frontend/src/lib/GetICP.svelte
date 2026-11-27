@@ -5,7 +5,7 @@
 	import { emit } from '$core/utils/events.utils';
 
 	const onClick = async () => {
-		// The faucet is a local-only Juno satellite (see demo/docker-compose.yml) used for local
+		// The faucet is a local-only Juno satellite (see demo/juno.config.ts) used for local
 		// development and E2E. Guard the call so it never fires from a production build.
 		if (!PROD) {
 			await fetch(
