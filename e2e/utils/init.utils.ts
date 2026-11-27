@@ -11,7 +11,9 @@ export const initTestSuite = (): (() => PartyPage) => {
 
     const browser = await playwright.chromium.launch();
 
-    const context = await browser.newContext();
+    // Recent Chrome versions block the scripts of the Internet Identity served by the Juno
+    // emulator under that page's own CSP. These tests don't check CSP, so they bypass it.
+    const context = await browser.newContext({bypassCSP: true});
     const page = await context.newPage();
 
     partyPage = new PartyPage({
