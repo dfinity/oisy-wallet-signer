@@ -7,6 +7,7 @@ import {Icrc21Canister} from '../api/icrc21-canister.api';
 import {SignerApi} from '../api/signer.api';
 import {SIGNER_BUILDERS} from '../constants/signer.builders.constants';
 import {SignerErrorCode} from '../constants/signer.constants';
+import {Icrc1Idl} from '../declarations';
 import * as signerSuccessHandlers from '../handlers/signer-success.handlers';
 import * as signerHandlers from '../handlers/signer.handlers';
 import {mockCallCanisterParams} from '../mocks/call-canister.mocks';
@@ -23,6 +24,7 @@ import type {Notify} from '../types/signer-handlers';
 import type {SignerOptions} from '../types/signer-options';
 import type {ConsentMessagePromptPayload} from '../types/signer-prompts';
 import {mapIcrc21ErrorToString} from '../utils/icrc-21.utils';
+import {encodeIdl} from '../utils/idl.utils';
 import {SignerService} from './signer.service';
 
 describe('Signer services', () => {
@@ -580,6 +582,71 @@ describe('Signer services', () => {
             params: {
               ...params,
               method
+            },
+            prompt,
+            options: signerOptions
+          });
+
+          expect(prompt).toHaveBeenCalledWith({
+            origin: testOrigin,
+            status: 'error',
+            details: error
+          });
+        });
+      });
+
+      describe('With a subaccount that is not 32 bytes long', () => {
+        const arg = encodeIdl({
+          recordClass: Icrc1Idl.TransferArgs,
+          rawArgs: {
+            amount: 1_000_000_000_000n,
+            created_at_time: [],
+            fee: [],
+            from_subaccount: [],
+            memo: [],
+            to: {
+              owner: owner.getPrincipal(),
+              subaccount: [new Uint8Array(33).fill(1)]
+            }
+          }
+        });
+
+        it('should return error and not prompt a consent message', async () => {
+          spyIcrc21CanisterConsentMessage.mockRejectedValue(new Error('Test Error'));
+          spySignerApiLedgerMedatada.mockResolvedValue(mockIcrcLedgerMetadata);
+
+          const prompt = vi.fn();
+
+          const result = await signerService.assertAndPromptConsentMessage({
+            notify,
+            params: {
+              ...params,
+              method: 'icrc1_transfer',
+              arg
+            },
+            prompt,
+            options: signerOptions
+          });
+
+          expect(result).toEqual({result: 'error'});
+
+          expect(prompt).not.toHaveBeenCalledWith(expect.objectContaining({status: 'result'}));
+        });
+
+        it('should trigger prompt "error" with the error of the consent message call', async () => {
+          const error = new Error('Test Error');
+
+          spyIcrc21CanisterConsentMessage.mockRejectedValue(error);
+          spySignerApiLedgerMedatada.mockResolvedValue(mockIcrcLedgerMetadata);
+
+          const prompt = vi.fn();
+
+          await signerService.assertAndPromptConsentMessage({
+            notify,
+            params: {
+              ...params,
+              method: 'icrc1_transfer',
+              arg
             },
             prompt,
             options: signerOptions

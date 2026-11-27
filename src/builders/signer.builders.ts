@@ -1,6 +1,9 @@
 import {fromNullable, isNullish, nonNullish} from '@dfinity/utils';
 import {encodeIcrcAccount} from '@icp-sdk/canisters/ledger/icrc';
-import {MAX_CONSENT_MESSAGE_ARG_SIZE_BYTES} from '../constants/signer.builders.constants';
+import {
+  ICRC1_SUBACCOUNT_LENGTH_BYTES,
+  MAX_CONSENT_MESSAGE_ARG_SIZE_BYTES
+} from '../constants/signer.builders.constants';
 import {Icrc1Idl, Icrc2Idl, type Icrc1Did, type Icrc21Did, type Icrc2Did} from '../declarations';
 import type {I18n} from '../types/i18n';
 import type {
@@ -45,6 +48,8 @@ export const buildContentMessageIcrc1Transfer: SignerBuilderFn = async ({
       recordClass: Icrc1Idl.TransferArgs,
       bytes: new Uint8Array(arg)
     });
+
+    assertSubaccountsLength([fromSubaccount, toSubaccount]);
 
     const {
       core: {amount: amountLabel, from, to, fee: feeLabel},
@@ -126,6 +131,8 @@ export const buildContentMessageIcrc2Approve: SignerBuilderFn = async ({
       recordClass: Icrc2Idl.ApproveArgs,
       bytes: new Uint8Array(arg)
     });
+
+    assertSubaccountsLength([spenderSubaccount, fromSubaccount]);
 
     const {
       icrc2_approve: {
@@ -237,6 +244,8 @@ export const buildContentMessageIcrc2TransferFrom: SignerBuilderFn = async ({
       recordClass: Icrc2Idl.TransferFromArgs,
       bytes: new Uint8Array(arg)
     });
+
+    assertSubaccountsLength([fromSubaccount, toSubaccount, spenderSubaccount]);
 
     const {
       core: {to},
@@ -360,6 +369,32 @@ const assertArgSize = ({arg}: Pick<SignerBuilderParams, 'arg'>) => {
   if (arg.byteLength > MAX_CONSENT_MESSAGE_ARG_SIZE_BYTES) {
     throw new ArgSizeError(
       `The argument size is too large. The maximum allowed size is ${MAX_CONSENT_MESSAGE_ARG_SIZE_BYTES} bytes.`
+    );
+  }
+};
+
+export class SubaccountLengthError extends Error {}
+
+/**
+ * Validates that every subaccount provided in the arguments is exactly 32 bytes long.
+ *
+ * ICRC-1 defines a subaccount as a 32-byte array, and the ICRC ledger implementation decodes it as an array of that fixed length. A consent message is therefore only built for arguments whose subaccounts have this length.
+ *
+ * @see {@link https://github.com/dfinity/ICRC-1/blob/main/standards/ICRC-1/README.md#account}
+ *
+ * @param {Array<[] | [Uint8Array]>} subaccounts - The optional subaccounts decoded from the arguments.
+ * @throws {SubaccountLengthError} Throws an error if a provided subaccount is not 32 bytes long.
+ */
+const assertSubaccountsLength = (subaccounts: ([] | [Uint8Array])[]) => {
+  const invalid = subaccounts
+    .map((subaccount) => fromNullable(subaccount))
+    .some(
+      (subaccount) => nonNullish(subaccount) && subaccount.length !== ICRC1_SUBACCOUNT_LENGTH_BYTES
+    );
+
+  if (invalid) {
+    throw new SubaccountLengthError(
+      `A subaccount must be exactly ${ICRC1_SUBACCOUNT_LENGTH_BYTES} bytes long.`
     );
   }
 };
