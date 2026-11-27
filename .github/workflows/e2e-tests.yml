@@ -35,6 +35,7 @@ jobs:
         run: |
           cd demo
           juno emulator start --headless &
+          juno emulator wait --timeout 300000
           cd ..
           npm run e2e:ci
       - name: Upload Playwright report on failure
