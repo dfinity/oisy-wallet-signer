@@ -11,6 +11,7 @@ import type {
 import {decodeMemo} from '../utils/builders.utils';
 import {formatAmount, formatDate} from '../utils/format.utils';
 import {decodeIdl} from '../utils/idl.utils';
+import {escapeMarkdown, inlineCode} from '../utils/markdown.utils';
 
 /**
  * Builds a content message for an ICRC-1 transfer by decoding the arguments for a potential call.
@@ -32,8 +33,11 @@ import {decodeIdl} from '../utils/idl.utils';
 export const buildContentMessageIcrc1Transfer: SignerBuilderFn = async ({
   arg,
   owner,
-  token: {symbol: tokenSymbol, decimals: tokenDecimals, fee: tokenFee}
+  token: {symbol, decimals: tokenDecimals, fee: tokenFee}
 }): Promise<SignerBuildersResult> => {
+  // The metadata is read from the canister the relying party asks to call, therefore it is not trusted either.
+  const tokenSymbol = escapeMarkdown(symbol);
+
   const build = (en: I18n): {message: string[]} => {
     const {
       amount,
@@ -111,8 +115,11 @@ export const buildContentMessageIcrc1Transfer: SignerBuilderFn = async ({
 export const buildContentMessageIcrc2Approve: SignerBuilderFn = async ({
   arg,
   owner,
-  token: {symbol: tokenSymbol, decimals: tokenDecimals, fee: tokenFee}
+  token: {symbol, decimals: tokenDecimals, fee: tokenFee}
 }): Promise<SignerBuildersResult> => {
+  // The metadata is read from the canister the relying party asks to call, therefore it is not trusted either.
+  const tokenSymbol = escapeMarkdown(symbol);
+
   const build = (en: I18n): {message: string[]} => {
     const {
       spender: {owner: spenderOwner, subaccount: spenderSubaccount},
@@ -223,8 +230,11 @@ export const buildContentMessageIcrc2Approve: SignerBuilderFn = async ({
 export const buildContentMessageIcrc2TransferFrom: SignerBuilderFn = async ({
   arg,
   owner,
-  token: {symbol: tokenSymbol, decimals: tokenDecimals, fee: tokenFee}
+  token: {symbol, decimals: tokenDecimals, fee: tokenFee}
 }): Promise<SignerBuildersResult> => {
+  // The metadata is read from the canister the relying party asks to call, therefore it is not trusted either.
+  const tokenSymbol = escapeMarkdown(symbol);
+
   const build = (en: I18n): {message: string[]} => {
     const {
       from: {owner: fromOwner, subaccount: fromSubaccount},
@@ -309,7 +319,9 @@ const buildMemo = ({memo, en}: {memo: [] | [Uint8Array | number[]]; en: I18n}): 
     core: {memo: memoLabel}
   } = en;
 
-  return [`${section(memoLabel)}\n${decodeMemo(nullishMemo)}`];
+  // The memo is a sequence of bytes chosen by the relying party. Rendered as code, it can neither carry Markdown
+  // formatting nor markup into the message the user approves.
+  return [`${section(memoLabel)}\n${inlineCode(decodeMemo(nullishMemo))}`];
 };
 
 const buildContentMessage = async ({
